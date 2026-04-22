@@ -1,0 +1,8 @@
+{
+  "name": "dnevni-nacrt",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "openai": "^5.0.0"
+  }
+}
