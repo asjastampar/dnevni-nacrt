@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dnevni načrt</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--bg:#F8F6F1;--w:#fff;--dk:#1A1A17;--md:#6B6A63;--lt:#B0AFA6;--br:rgba(0,0,0,0.09);--red:#C94B2A;--grn:#2A6147;--r:14px;}
+body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-serif;min-height:100vh;}
+.app{max-width:640px;margin:0 auto;padding:2rem 1.25rem 4rem;}
+.hdate{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--lt);margin-bottom:6px;}
+.htitle{font-family:'Playfair Display',Georgia,serif;font-size:28px;font-weight:500;line-height:1.2;margin-bottom:2rem;}
+.htitle em{font-style:italic;color:var(--red);}
+.sec{margin-bottom:2rem;}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
+.sec-lbl{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--md);}
+.sec-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+/* toggles */
+.tog{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--md);cursor:pointer;user-select:none;}
+.tog-track{position:relative;width:34px;height:19px;background:#D5D3CB;border-radius:10px;transition:background .2s;flex-shrink:0;}
+.tog-track.on{background:var(--red);}
+.tog-track.on-grn{background:var(--grn);}
+.tog-thumb{position:absolute;top:2.5px;left:2.5px;width:14px;height:14px;background:var(--w);border-radius:50%;transition:left .2s;}
+.tog-track.on .tog-thumb,.tog-track.on-grn .tog-thumb{left:17.5px;}
+/* buttons */
+.rbtn{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--md);background:var(--w);border:.5px solid var(--br);border-radius:20px;padding:5px 11px;cursor:pointer;font-family:inherit;transition:all .15s;}
+.rbtn:hover{color:var(--dk);}
+.rbtn:disabled{opacity:.35;pointer-events:none;}
+/* body part selector */
+.bpsel{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.bpb{padding:6px 13px;border:.5px solid var(--br);border-radius:20px;background:var(--w);font-size:13px;color:var(--md);cursor:pointer;font-family:inherit;transition:all .15s;}
+.bpb:hover{color:var(--dk);border-color:rgba(0,0,0,.18);}
+.bpb.ag{background:#EBF4EF;color:var(--grn);border-color:#B8D9C6;font-weight:500;}
+.bpb.ac{background:#EAF0F9;color:#1E4E8C;border-color:#B5CFF0;font-weight:500;}
+.bpb.ar{background:var(--bg);color:var(--md);border-color:rgba(0,0,0,.14);font-weight:500;}
+.bpb.ap{background:#FBE8F5;color:#8B2B6E;border-color:#E4ABCF;font-weight:500;}
+.bpb.acf{background:#FFF3E0;color:#B45309;border-color:#F5C88A;font-weight:500;}
+/* meal card */
+.meal-card{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);margin-bottom:7px;overflow:hidden;transition:opacity .2s;}
+.meal-card.loading{opacity:.4;pointer-events:none;}
+.meal-card.done .mfood{text-decoration:line-through;color:var(--lt);}
+.meal-card.done .mdot{background:#A8CFBA;}
+.meal-top{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;}
+.mdot{width:7px;height:7px;border-radius:50%;background:var(--red);margin-top:7px;flex-shrink:0;transition:background .2s;}
+.mbody{flex:1;min-width:0;}
+.mlbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--lt);margin-bottom:3px;}
+.mfood{font-size:14px;color:var(--dk);line-height:1.5;}
+.mkcal{font-size:12px;color:var(--lt);margin-top:2px;}
+.meal-actions{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.chk{width:22px;height:22px;border-radius:50%;border:.5px solid var(--br);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--lt);transition:all .15s;flex-shrink:0;}
+.chk:hover{border-color:var(--grn);color:var(--grn);}
+.chk.on{background:var(--grn);border-color:var(--grn);color:var(--w);}
+.sbtn{background:none;border:.5px solid var(--br);border-radius:8px;padding:4px 8px;font-size:14px;cursor:pointer;color:var(--lt);line-height:1;font-family:inherit;transition:all .15s;}
+.sbtn:hover{color:var(--md);background:var(--bg);}
+.sbtn:disabled{opacity:.3;pointer-events:none;}
+.ibtn{background:none;border:.5px solid var(--br);border-radius:7px;padding:3px 8px;font-size:11px;cursor:pointer;color:var(--lt);font-family:inherit;transition:all .15s;}
+.ibtn:hover{color:var(--md);background:var(--bg);}
+.ibtn.open{color:var(--grn);border-color:#B8D9C6;background:#EBF4EF;}
+.easy-badge{font-size:11px;color:var(--grn);background:#EBF4EF;padding:2px 6px;border-radius:4px;margin-left:4px;}
+/* ingredients */
+.ing-panel{border-top:.5px solid var(--br);padding:11px 14px 13px;display:none;background:#FDFCF9;}
+.ing-panel.open{display:block;}
+.ing-title{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--lt);margin-bottom:9px;}
+.ing-grid{display:grid;grid-template-columns:1fr auto;row-gap:6px;column-gap:14px;}
+.in{font-size:13px;color:var(--dk);}
+.ia{font-size:13px;color:var(--md);text-align:right;white-space:nowrap;}
+/* exercise card - new expandable structure */
+.ex-wrap{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);margin-bottom:7px;overflow:hidden;transition:opacity .2s;}
+.ex-wrap.loading{opacity:.4;pointer-events:none;}
+.ex-top{display:flex;align-items:center;gap:10px;padding:12px 14px;}
+.ex-top.done .ename{text-decoration:line-through;color:var(--lt);}
+.ex-top.done .edot{background:#A8CFBA;}
+.ex-xbtn{background:none;border:none;cursor:pointer;color:var(--lt);font-size:15px;padding:0 2px;line-height:1;flex-shrink:0;transition:transform .25s,color .15s;}
+.ex-xbtn:hover{color:var(--md);}
+.ex-xbtn.open{transform:rotate(180deg);color:var(--dk);}
+/* exercise detail panel */
+.ex-detail{border-top:.5px solid var(--br);padding:0 14px;max-height:0;overflow:hidden;transition:max-height .35s ease,padding .3s;}
+.ex-detail.open{padding:13px 14px 15px;max-height:700px;}
+.ex-desc{font-size:13px;color:var(--md);line-height:1.7;margin-bottom:9px;}
+.ex-tip{font-size:12px;color:var(--grn);background:#EBF4EF;padding:6px 10px;border-radius:7px;line-height:1.6;margin-bottom:9px;}
+.yt-btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#1E4E8C;background:#EAF0F9;border:.5px solid #B5CFF0;border-radius:7px;padding:4px 10px;cursor:pointer;text-decoration:none;margin-bottom:11px;}
+/* week plan */
+.week-plan{background:var(--bg);border:.5px solid var(--br);border-radius:8px;padding:10px 12px;margin-bottom:11px;}
+.wp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.wp-week{font-size:11px;font-weight:500;color:var(--lt);text-transform:uppercase;letter-spacing:.07em;}
+.wp-target{font-size:14px;color:var(--dk);font-weight:500;}
+.wp-note{font-size:12px;color:var(--md);line-height:1.5;}
+/* log section */
+.log-sec{border-top:.5px solid var(--br);padding-top:11px;}
+.log-title{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--lt);margin-bottom:9px;}
+.log-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.log-lbl{font-size:13px;color:var(--md);white-space:nowrap;}
+.log-inp{border:.5px solid var(--br);border-radius:7px;padding:6px 8px;font-size:14px;font-family:inherit;background:var(--w);color:var(--dk);outline:none;text-align:center;transition:border-color .15s;}
+.log-inp:focus{border-color:rgba(0,0,0,.22);}
+.log-inp.w{width:65px;}
+.log-inp.n{width:46px;}
+.log-save{background:var(--dk);color:var(--w);border:none;border-radius:7px;padding:6px 13px;font-size:13px;cursor:pointer;font-family:inherit;transition:opacity .15s;}
+.log-save:hover{opacity:.8;}
+.log-ok{display:none;font-size:12px;color:var(--grn);background:#EBF4EF;padding:5px 10px;border-radius:7px;}
+.log-ok.show{display:inline-block;}
+/* history */
+.hist-empty{font-size:13px;color:var(--lt);padding:4px 0;}
+.hist-card{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);margin-bottom:8px;overflow:hidden;}
+.hist-head{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none;}
+.hist-head:hover{background:#FDFCF9;}
+.hist-dow{font-size:13px;font-weight:500;color:var(--dk);min-width:90px;}
+.hist-meta{flex:1;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.hist-pill{font-size:12px;color:var(--md);background:var(--bg);padding:2px 8px;border-radius:5px;white-space:nowrap;}
+.hist-pill.green{background:#EBF4EF;color:var(--grn);}
+.hist-pill.red{background:#FDF0EC;color:var(--red);}
+.hist-pill.cf{background:#FFF3E0;color:#B45309;}
+.hist-body{border-top:.5px solid var(--br);padding:12px 14px 14px;display:none;}
+.hist-body.open{display:block;}
+.hist-section-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--lt);margin-bottom:8px;margin-top:12px;}
+.hist-section-lbl:first-child{margin-top:0;}
+.hist-meal-row{display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:.5px solid var(--br);font-size:14px;}
+.hist-meal-row:last-child{border-bottom:none;}
+.hist-meal-name{flex:1;color:var(--dk);}
+.hist-meal-kcal{color:var(--lt);font-size:12px;white-space:nowrap;}
+.hist-ex-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:.5px solid var(--br);font-size:14px;}
+.hist-ex-row:last-child{border-bottom:none;}
+.hist-ex-name{flex:1;color:var(--dk);}
+.hist-ex-log{font-size:12px;color:var(--grn);white-space:nowrap;}
+.hist-ex-log.empty{color:var(--lt);}
+.hist-total{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:.5px solid var(--br);font-size:13px;color:var(--md);}
+.hist-total b{color:var(--dk);font-weight:500;}
+.hist-xbtn{background:none;border:none;cursor:pointer;color:var(--lt);font-size:15px;flex-shrink:0;line-height:1;transition:transform .2s;}
+.hist-xbtn.open{transform:rotate(180deg);}
+.edot{width:7px;height:7px;border-radius:50%;background:var(--grn);flex-shrink:0;transition:background .2s;}
+.ename{flex:1;font-size:14px;color:var(--dk);}
+.epills{display:flex;gap:5px;flex-shrink:0;}
+.ep{background:#EBF4EF;color:var(--grn);font-size:12px;padding:2px 7px;border-radius:5px;white-space:nowrap;}
+.ep.pk{background:#FBE8F5;color:#8B2B6E;}
+/* badge / info */
+.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border-radius:20px;font-size:13px;font-weight:500;margin-bottom:11px;}
+.badge.gym{background:#EBF4EF;color:var(--grn);}
+.badge.cardio{background:#EAF0F9;color:#1E4E8C;}
+.badge.rest{background:var(--bg);color:var(--md);border:.5px solid var(--br);}
+.badge.glute{background:#FBE8F5;color:#8B2B6E;}
+.badge.cf{background:#FFF3E0;color:#B45309;border:.5px solid #F5C88A;}
+.wod-card{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);overflow:hidden;margin-bottom:8px;}
+.wod-head{padding:13px 14px;border-bottom:.5px solid var(--br);display:flex;align-items:center;gap:10px;}
+.wod-type{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:#FFF3E0;color:#B45309;flex-shrink:0;}
+.wod-type.amrap{background:#EBF4EF;color:var(--grn);}
+.wod-type.emom{background:#EAF0F9;color:#1E4E8C;}
+.wod-title{font-size:15px;font-weight:500;color:var(--dk);flex:1;}
+.wod-time{font-size:13px;color:var(--lt);white-space:nowrap;}
+.wod-note{padding:10px 14px 13px;font-size:13px;color:var(--md);line-height:1.6;border-bottom:.5px solid var(--br);}
+.wod-exes{padding:10px 14px 4px;}
+.wod-ex{display:flex;align-items:baseline;gap:8px;padding:6px 0;border-bottom:.5px solid var(--br);}
+.wod-ex:last-child{border-bottom:none;}
+.wod-ex-n{flex:1;font-size:14px;color:var(--dk);}
+.wod-ex-r{font-size:13px;color:var(--md);white-space:nowrap;}
+.wod-ex-info{font-size:11px;color:var(--lt);cursor:pointer;padding:2px 6px;border-radius:5px;border:.5px solid var(--br);}
+.wod-ex-info:hover{color:var(--md);background:var(--bg);}
+.wod-desc-panel{display:none;padding:8px 14px 10px;background:#FDFCF9;border-top:.5px solid var(--br);}
+.wod-desc-panel.open{display:block;}
+.wod-log{padding:10px 14px 13px;border-top:.5px solid var(--br);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.wod-log-lbl{font-size:13px;color:var(--md);}
+.wod-result{border:.5px solid var(--br);border-radius:7px;padding:6px 9px;font-size:14px;font-family:inherit;background:var(--w);color:var(--dk);outline:none;width:120px;}
+.wod-result:focus{border-color:rgba(0,0,0,.2);}
+.info-box{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:15px;font-size:14px;color:var(--md);line-height:1.7;}
+.kcal-bar{background:var(--w);border:.5px solid var(--br);border-radius:10px;padding:9px 13px;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--md);margin-top:6px;}
+.kcal-bar b{color:var(--dk);font-weight:500;}
+.lf-note{display:none;align-items:center;gap:5px;font-size:12px;color:var(--red);background:#FDF0EC;padding:3px 9px;border-radius:5px;margin-bottom:9px;}
+/* weekly tracker */
+.tracker{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:16px;}
+.tracker-head{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--md);margin-bottom:14px;}
+.week-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:14px;}
+.day-cell{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.day-name{font-size:11px;color:var(--lt);}
+.day-ring{position:relative;width:36px;height:36px;}
+.day-ring svg{width:36px;height:36px;}
+.day-today .day-name{color:var(--dk);font-weight:500;}
+.progress-bars{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.pb-item{display:flex;flex-direction:column;gap:4px;}
+.pb-lbl{font-size:12px;color:var(--md);}
+.pb-track{height:5px;background:var(--bg);border-radius:3px;overflow:hidden;}
+.pb-fill{height:5px;border-radius:3px;transition:width .3s;}
+.pb-val{font-size:12px;color:var(--md);text-align:right;}
+/* edit panel */
+.edit-panel{border-top:.5px solid var(--br);padding:10px 14px;display:none;background:#FDFCF9;}
+.edit-panel.open{display:flex;gap:7px;align-items:center;}
+.edit-input{flex:1;border:.5px solid var(--br);border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit;background:var(--w);color:var(--dk);outline:none;}
+.edit-input:focus{border-color:rgba(0,0,0,.2);}
+.edit-input::placeholder{color:var(--lt);}
+.edit-go{background:var(--dk);color:var(--w);border:none;border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:opacity .15s;}
+.edit-go:hover{opacity:.8;}
+.edit-go:disabled{opacity:.4;cursor:default;}
+.ebtn{background:none;border:.5px solid var(--br);border-radius:7px;padding:3px 7px;font-size:13px;cursor:pointer;color:var(--lt);font-family:inherit;transition:all .15s;line-height:1;}
+.ebtn:hover{color:var(--md);background:var(--bg);}
+.ebtn.open{color:var(--red);border-color:#F0B8A8;background:#FDF0EC;}
+/* custom exercise */
+.add-ex-row{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap;}
+.add-ex-row input{border:.5px solid var(--br);border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit;background:var(--w);color:var(--dk);outline:none;}
+.add-ex-row input:focus{border-color:rgba(0,0,0,.2);}
+.add-ex-row input::placeholder{color:var(--lt);}
+.add-ex-name{flex:1;min-width:120px;}
+.add-ex-sm{width:52px;}
+.add-ex-btn{background:var(--grn);color:var(--w);border:none;border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;}
+/* kcal display */
+.kcal-split{display:flex;gap:6px;align-items:center;}
+.kcal-eaten{font-size:18px;font-weight:500;color:var(--dk);}
+.kcal-plan{font-size:12px;color:var(--lt);}
+/* error */
+.err{font-size:13px;color:var(--red);padding:8px 12px;background:#FDF0EC;border-radius:8px;margin:8px 0;display:none;}
+.err.show{display:block;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.spin{display:inline-block;animation:spin .7s linear infinite;}
+@keyframes fi{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:translateY(0);}}
+.fi{animation:fi .3s ease;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hdate" id="ds"></div>
+  <div class="htitle">Tvoj <em>dnevni</em> načrt</div>
+
+  <div class="sec">
+    <div class="sec-head">
+      <span class="sec-lbl">Jedilnik</span>
+      <div class="sec-right">
+        <label class="tog" onclick="toggleEasy()">
+          <div class="tog-track on-grn" id="et"><div class="tog-thumb"></div></div>
+          <span>Enostavno</span>
+        </label>
+        <label class="tog" onclick="toggleLF()">
+          <div class="tog-track" id="lt"><div class="tog-thumb"></div></div>
+          <span>Brez laktoze</span>
+        </label>
+        <button class="rbtn" id="bam" onclick="refreshMeals()">↺ Zamenjaj vse</button>
+      </div>
+    </div>
+    <div class="lf-note" id="lfn">✓ Brez laktoze</div>
+    <div id="mc"></div>
+    <div class="kcal-bar">
+      <span style="font-size:13px;color:var(--md);">Zaužito danes</span>
+      <div class="kcal-split">
+        <span class="kcal-eaten" id="tk-eaten">0</span>
+        <span class="kcal-plan" id="tk-plan">/ — kcal načrtovano</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head">
+      <span class="sec-lbl">Vadba</span>
+      <button class="rbtn" id="baw" onclick="refreshWorkout()">↺ Zamenjaj vaje</button>
+    </div>
+    <div class="bpsel" id="bpsel"></div>
+    <div id="wc"></div>
+    <div class="add-ex-row" id="add-ex-row" style="display:none">
+      <input class="add-ex-name" id="aen" placeholder="Ime vaje (npr. hip thrust)...">
+      <input class="add-ex-sm" id="aes" placeholder="serije" value="3">
+      <input class="add-ex-sm" id="aer" placeholder="ponovitve" value="12">
+      <button class="add-ex-btn" onclick="addCustomEx()">+ Dodaj</button>
+    </div>
+
+  <div class="sec">
+    <div class="sec-lbl" style="margin-bottom:12px;">Tedenski pregled</div>
+    <div class="tracker">
+      <div class="week-row" id="week-row"></div>
+      <div class="progress-bars">
+        <div class="pb-item">
+          <div style="display:flex;justify-content:space-between;"><span class="pb-lbl">Obroki danes</span><span class="pb-val" id="pb-ml">0/5</span></div>
+          <div class="pb-track"><div class="pb-fill" id="pb-mf" style="background:var(--red);width:0%"></div></div>
+        </div>
+        <div class="pb-item">
+          <div style="display:flex;justify-content:space-between;"><span class="pb-lbl">Vadba danes</span><span class="pb-val" id="pb-wl">0/6</span></div>
+          <div class="pb-track"><div class="pb-fill" id="pb-wf" style="background:var(--grn);width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="err" id="eb"></div>
+
+  <div class="sec">
+    <div class="sec-head">
+      <span class="sec-lbl">Zgodovina</span>
+      <span style="font-size:12px;color:var(--lt);">zadnjih 14 dni</span>
+    </div>
+    <div id="hist"><div class="hist-empty">Ni še podatkov za pretekle dneve.</div></div>
+  </div>
+</div>
+
+<script>
+const SLD=['Nedelja','Ponedeljek','Torek','Sreda','Četrtek','Petek','Sobota'];
+const SLM=['januar','februar','marec','april','maj','junij','julij','avgust','september','oktober','november','december'];
+const LBLS=['Zajtrk','Dopoldanski prigrizek','Kosilo','Popoldanski prigrizek','Večerja'];
+const now=new Date(),DOW=now.getDay();
+const TK='dp_v6_'+now.toISOString().split('T')[0];
+const TTRACK='track_'+now.toISOString().split('T')[0];
+document.getElementById('ds').textContent=SLD[DOW]+', '+now.getDate()+'. '+SLM[now.getMonth()]+' '+now.getFullYear();
+
+// ─── MEAL DATA ─────────────────────────────────────────────
+// Normal (klasično) meal data - po dnevih
+const MD={
+ 0:[{l:'Zajtrk',n:{f:'Ovsena kaša z mlekom, jagodami in medom',k:420,i:[{n:'Ovseni kosmiči',a:'70 g'},{n:'Mleko',a:'200 ml'},{n:'Jagode',a:'80 g'},{n:'Med',a:'15 g'},{n:'Chia semena',a:'10 g'}]},lf:{f:'Ajdova kaša z mandljevim mlekom in jagodami',k:380,i:[{n:'Ajdovi kosmiči',a:'70 g'},{n:'Mandljevo mleko',a:'200 ml'},{n:'Jagode',a:'80 g'},{n:'Med',a:'10 g'}]}},
+  {l:'Dopoldanski prigrizek',n:{f:'Grški jogurt z medom in orehi',k:210,i:[{n:'Grški jogurt',a:'150 g'},{n:'Med',a:'15 g'},{n:'Orehi',a:'20 g'}]},lf:{f:'Banana z mandljevim maslom',k:190,i:[{n:'Banana',a:'1 kos'},{n:'Mandljevo maslo',a:'20 g'}]}},
+  {l:'Kosilo',n:{f:'Piščančji rižot s parmezanom in grahom',k:550,i:[{n:'Piščančji file',a:'150 g'},{n:'Arborio riž',a:'80 g'},{n:'Parmezan',a:'30 g'},{n:'Zeleni grah',a:'100 g'},{n:'Maslo',a:'15 g'},{n:'Zelenjavna juha',a:'400 ml'}]},lf:{f:'Piščančji riž z grahom in olivnim oljem',k:500,i:[{n:'Piščančji file',a:'150 g'},{n:'Riž',a:'80 g'},{n:'Zeleni grah',a:'100 g'},{n:'Olivno olje',a:'15 ml'},{n:'Zelenjavna juha',a:'350 ml'}]}},
+  {l:'Popoldanski prigrizek',n:{f:'Skuta z breskvijo in medom',k:160,i:[{n:'Navadna skuta',a:'120 g'},{n:'Breskev',a:'150 g'},{n:'Med',a:'8 g'}]},lf:{f:'Jabolko z mandljevim maslom',k:165,i:[{n:'Jabolko',a:'150 g'},{n:'Mandljevo maslo',a:'18 g'}]}},
+  {l:'Večerja',n:{f:'Pečen losos s kremno omako, brokoli, krompir',k:510,i:[{n:'Losos',a:'200 g'},{n:'Sladka smetana',a:'100 ml'},{n:'Brokoli',a:'150 g'},{n:'Krompir',a:'150 g'},{n:'Maslo',a:'10 g'},{n:'Limonin sok',a:'½ limone'}]},lf:{f:'Pečen losos z olivnim oljem, brokoli, krompir',k:475,i:[{n:'Losos',a:'200 g'},{n:'Olivno olje',a:'15 ml'},{n:'Brokoli',a:'150 g'},{n:'Krompir',a:'200 g'},{n:'Limonin sok',a:'½ limone'}]}}],
+ 1:[{l:'Zajtrk',n:{f:'Palačinke z jagodami in stepeno smetano',k:490,i:[{n:'Pšenična moka',a:'90 g'},{n:'Jajca',a:'2 kos'},{n:'Mleko',a:'150 ml'},{n:'Maslo',a:'12 g'},{n:'Jagode',a:'100 g'},{n:'Stepena smetana',a:'50 ml'}]},lf:{f:'Ajdove palačinke z jagodami in javorjevim sirupom',k:400,i:[{n:'Ajdova moka',a:'80 g'},{n:'Jajca',a:'2 kos'},{n:'Mandljevo mleko',a:'150 ml'},{n:'Kokosovo olje',a:'10 g'},{n:'Jagode',a:'100 g'},{n:'Javorjev sirup',a:'20 ml'}]}},
+  {l:'Dopoldanski prigrizek',n:{f:'Skuta z medom in orehi',k:200,i:[{n:'Navadna skuta',a:'150 g'},{n:'Med',a:'15 g'},{n:'Orehi',a:'20 g'}]},lf:{f:'Banana + pest mandljev',k:180,i:[{n:'Banana',a:'120 g'},{n:'Mandlji',a:'25 g'}]}},
+  {l:'Kosilo',n:{f:'Piščanec s kremno paradižnikovo omako in testenine',k:560,i:[{n:'Piščančji file',a:'160 g'},{n:'Penne',a:'80 g'},{n:'Paradižnikova omaka',a:'150 g'},{n:'Sladka smetana',a:'80 ml'},{n:'Parmezan',a:'20 g'},{n:'Česen',a:'2 stroka'}]},lf:{f:'Piščanec s paradižnikovo omako in riž',k:510,i:[{n:'Piščančji file',a:'160 g'},{n:'Riž',a:'80 g'},{n:'Paradižnikova omaka',a:'150 g'},{n:'Olivno olje',a:'15 ml'},{n:'Česen',a:'2 stroka'}]}},
+  {l:'Popoldanski prigrizek',n:{f:'Sir gouda + rižev keker + paradižnik',k:175,i:[{n:'Sir gouda',a:'30 g'},{n:'Riževi krekerji',a:'20 g'},{n:'Paradižnik',a:'80 g'}]},lf:{f:'Rižev keker s humusom in paprika',k:150,i:[{n:'Riževi krekerji',a:'25 g'},{n:'Hummus',a:'40 g'},{n:'Rdeča paprika',a:'60 g'}]}},
+  {l:'Večerja',n:{f:'Losos z maslovim prelivom, krompir, zelena solata',k:510,i:[{n:'Losos',a:'200 g'},{n:'Maslo',a:'15 g'},{n:'Krompir',a:'200 g'},{n:'Zelena solata',a:'80 g'},{n:'Olivno olje',a:'10 ml'}]},lf:{f:'Pečen losos, krompir in zelena solata',k:480,i:[{n:'Losos',a:'200 g'},{n:'Olivno olje',a:'15 ml'},{n:'Krompir',a:'200 g'},{n:'Zelena solata',a:'80 g'}]}}],
+ 2:[{l:'Zajtrk',n:{f:'Jajci na oko s sirom, toast, paradižnik',k:450,i:[{n:'Jajca',a:'2 kos'},{n:'Maslo',a:'10 g'},{n:'Toast',a:'2 rezini (70 g)'},{n:'Sir gouda',a:'30 g'},{n:'Paradižnik',a:'1 kos'}]},lf:{f:'Jajci + rižev toast + avokado + paradižnik',k:415,i:[{n:'Jajca',a:'2 kos'},{n:'Olivno olje',a:'5 ml'},{n:'Rižev toast',a:'2 rezini'},{n:'Avokado',a:'70 g'},{n:'Paradižnik',a:'1 kos'}]}},
+  {l:'Dopoldanski prigrizek',n:{f:'Jabolko + sir gouda',k:165,i:[{n:'Jabolko',a:'150 g'},{n:'Sir gouda',a:'20 g'}]},lf:{f:'Jabolko + orehi',k:155,i:[{n:'Jabolko',a:'150 g'},{n:'Orehi',a:'20 g'}]}},
+  {l:'Kosilo',n:{f:'Tuna pasta s paradižnikom in parmezanom',k:525,i:[{n:'Špageti',a:'80 g'},{n:'Tuna v olju',a:'120 g'},{n:'Paradižnikova omaka',a:'150 g'},{n:'Parmezan',a:'25 g'},{n:'Olivno olje',a:'10 ml'}]},lf:{f:'Quinoa solata s tunino in olivkami',k:490,i:[{n:'Quinoa',a:'70 g'},{n:'Tuna v olju',a:'120 g'},{n:'Olivke',a:'30 g'},{n:'Paprika',a:'60 g'},{n:'Limonin sok',a:'1 limona'},{n:'Olivno olje',a:'15 ml'}]}},
+  {l:'Popoldanski prigrizek',n:{f:'Grški jogurt z medom',k:175,i:[{n:'Grški jogurt',a:'150 g'},{n:'Med',a:'15 g'}]},lf:{f:'Smoothie: mandljevo mleko + banana + špinača',k:195,i:[{n:'Mandljevo mleko',a:'200 ml'},{n:'Banana',a:'1 kos'},{n:'Špinača',a:'30 g'}]}},
+  {l:'Večerja',n:{f:'Puranji zrezek z maslovim prelivom, ajda, brokoli',k:485,i:[{n:'Puranje prsi',a:'180 g'},{n:'Maslo',a:'12 g'},{n:'Ajda',a:'70 g'},{n:'Brokoli',a:'160 g'},{n:'Česen',a:'2 stroka'}]},lf:{f:'Puranji zrezek, brokolijeva juha in ajda',k:455,i:[{n:'Puranje prsi',a:'180 g'},{n:'Olivno olje',a:'10 ml'},{n:'Ajda',a:'70 g'},{n:'Brokoli',a:'200 g'},{n:'Zelenjavna juha',a:'300 ml'}]}}],
+ 3:[{l:'Zajtrk',n:{f:'Ovseni kosmiči z mlekom, bananami in orehi',k:425,i:[{n:'Ovseni kosmiči',a:'70 g'},{n:'Mleko',a:'200 ml'},{n:'Banana',a:'60 g'},{n:'Med',a:'12 g'},{n:'Orehi',a:'15 g'}]},lf:{f:'Overnight oats z mandljevim mlekom in jagodami',k:365,i:[{n:'Brezgl. ovseni kosmiči',a:'60 g'},{n:'Mandljevo mleko',a:'180 ml'},{n:'Jagode',a:'80 g'},{n:'Med',a:'10 g'},{n:'Lan semena',a:'10 g'}]}},
+  {l:'Dopoldanski prigrizek',n:{f:'Kremni sir na integralnem krekerju',k:185,i:[{n:'Kremni sir',a:'40 g'},{n:'Integralni krekerji',a:'30 g'},{n:'Kumarica',a:'50 g'}]},lf:{f:'Riževi krekerji + oreščki',k:165,i:[{n:'Riževi krekerji',a:'25 g'},{n:'Mešani oreščki',a:'25 g'}]}},
+  {l:'Kosilo',n:{f:'Goveja juha s testeninicami in parmezanom',k:515,i:[{n:'Goveje meso',a:'120 g'},{n:'Korenje',a:'100 g'},{n:'Zelena',a:'60 g'},{n:'Testeninice za juho',a:'50 g'},{n:'Parmezan',a:'20 g'}]},lf:{f:'Goveja zelenjavna juha z rižem in repo',k:505,i:[{n:'Goveje meso',a:'120 g'},{n:'Korenje',a:'100 g'},{n:'Zelena',a:'60 g'},{n:'Riž',a:'60 g'},{n:'Repa',a:'100 g'}]}},
+  {l:'Popoldanski prigrizek',n:{f:'Skuta z breskvijo',k:155,i:[{n:'Navadna skuta',a:'120 g'},{n:'Breskev',a:'150 g'},{n:'Med',a:'5 g'}]},lf:{f:'Sezonsko sadje',k:115,i:[{n:'Sadje po izbiri',a:'200 g'}]}},
+  {l:'Večerja',n:{f:'Tofu stir-fry z riževimi rezanci in zelenjavo',k:465,i:[{n:'Čvrsti tofu',a:'150 g'},{n:'Riževi rezanci',a:'70 g'},{n:'Mešana zelenjava',a:'200 g'},{n:'Sojina omaka',a:'20 ml'},{n:'Sezamovo olje',a:'10 ml'},{n:'Česen',a:'2 stroka'}]},lf:{f:'Tofu stir-fry z riževimi rezanci in zelenjavo',k:465,i:[{n:'Čvrsti tofu',a:'150 g'},{n:'Riževi rezanci',a:'70 g'},{n:'Mešana zelenjava',a:'200 g'},{n:'Sojina omaka',a:'20 ml'},{n:'Sezamovo olje',a:'10 ml'},{n:'Česen',a:'2 stroka'}]}}],
+ 4:[{l:'Zajtrk',n:{f:'Omleta s sirom, špinačo in rdečo papro',k:415,i:[{n:'Jajca',a:'3 kos'},{n:'Maslo',a:'10 g'},{n:'Sir trd',a:'40 g'},{n:'Špinača',a:'50 g'},{n:'Rdeča paprika',a:'60 g'}]},lf:{f:'Omleta s špinačo in papro (brez sira)',k:355,i:[{n:'Jajca',a:'3 kos'},{n:'Olivno olje',a:'8 ml'},{n:'Špinača',a:'60 g'},{n:'Rdeča paprika',a:'60 g'}]}},
+  {l:'Dopoldanski prigrizek',n:{f:'Grški jogurt z medom in orehi',k:215,i:[{n:'Grški jogurt',a:'170 g'},{n:'Med',a:'15 g'},{n:'Orehi',a:'20 g'}]},lf:{f:'Brez-laktozni jogurt z medom in oreščki',k:175,i:[{n:'Brez-lak. jogurt',a:'150 g'},{n:'Med',a:'12 g'},{n:'Oreščki',a:'15 g'}]}},
+  {l:'Kosilo',n:{f:'Piščančja solata z quinoo, parmezanom in kumarami',k:505,i:[{n:'Piščančji file kuhan',a:'150 g'},{n:'Quinoa',a:'60 g'},{n:'Parmezan',a:'25 g'},{n:'Kumare',a:'80 g'},{n:'Zelena solata',a:'60 g'},{n:'Olivno olje',a:'15 ml'}]},lf:{f:'Piščančja solata z quinoo in kumarami',k:475,i:[{n:'Piščančji file kuhan',a:'150 g'},{n:'Quinoa',a:'70 g'},{n:'Kumare',a:'80 g'},{n:'Zelena solata',a:'80 g'},{n:'Olivno olje',a:'15 ml'}]}},
+  {l:'Popoldanski prigrizek',n:{f:'Hruška + sir brie',k:175,i:[{n:'Hruška',a:'150 g'},{n:'Sir brie',a:'30 g'}]},lf:{f:'Hruška + temna čokolada 70%',k:140,i:[{n:'Hruška',a:'150 g'},{n:'Temna čokolada',a:'15 g'}]}},
+  {l:'Večerja',n:{f:'Polenta z gobovo kremno omako in parmezanom',k:475,i:[{n:'Polenta',a:'80 g'},{n:'Maslo',a:'15 g'},{n:'Parmezan',a:'30 g'},{n:'Mešane gobe',a:'200 g'},{n:'Sladka smetana',a:'80 ml'}]},lf:{f:'Polenta z gobovo omako in zelena solata',k:425,i:[{n:'Polenta',a:'80 g'},{n:'Olivno olje',a:'15 ml'},{n:'Mešane gobe',a:'200 g'},{n:'Čebula',a:'50 g'},{n:'Zelenjavna juha',a:'200 ml'}]}}],
+ 5:[{l:'Zajtrk',n:{f:'Palačinke z jagodami in stepeno smetano',k:495,i:[{n:'Pšenična moka',a:'100 g'},{n:'Jajca',a:'2 kos'},{n:'Mleko',a:'150 ml'},{n:'Maslo',a:'15 g'},{n:'Jagode',a:'100 g'},{n:'Stepena smetana',a:'60 ml'}]},lf:{f:'Ajdove palačinke z jagodami in javorjevim sirupom',k:395,i:[{n:'Ajdova moka',a:'80 g'},{n:'Jajca',a:'2 kos'},{n:'Mandljevo mleko',a:'150 ml'},{n:'Kokosovo olje',a:'10 g'},{n:'Jagode',a:'100 g'},{n:'Javorjev sirup',a:'20 ml'}]}},
+  {l:'Dopoldanski prigrizek',n:{f:'Oreščki + sir gouda + pomaranča',k:215,i:[{n:'Mešani oreščki',a:'25 g'},{n:'Sir gouda',a:'30 g'},{n:'Pomaranča',a:'80 g'}]},lf:{f:'Mešani oreščki + pomaranča',k:185,i:[{n:'Mešani oreščki',a:'25 g'},{n:'Pomaranča',a:'150 g'}]}},
+  {l:'Kosilo',n:{f:'Ribja enolončnica s smetano, paradižnikom, krompir',k:535,i:[{n:'Bela riba',a:'200 g'},{n:'Krompir',a:'180 g'},{n:'Paradižnikova omaka',a:'150 g'},{n:'Sladka smetana',a:'80 ml'},{n:'Olivno olje',a:'10 ml'}]},lf:{f:'Ribja enolončnica s krompirjem in zelišči',k:495,i:[{n:'Bela riba',a:'200 g'},{n:'Krompir',a:'200 g'},{n:'Paradižnik svež',a:'200 g'},{n:'Olivno olje',a:'15 ml'},{n:'Peteršilj',a:'10 g'}]}},
+  {l:'Popoldanski prigrizek',n:{f:'Kefir z bananami',k:195,i:[{n:'Kefir',a:'200 ml'},{n:'Banana',a:'60 g'},{n:'Med',a:'8 g'}]},lf:{f:'Zeleni smoothie: špinača, banana, mandljevo mleko',k:175,i:[{n:'Mandljevo mleko',a:'200 ml'},{n:'Banana',a:'120 g'},{n:'Špinača',a:'30 g'}]}},
+  {l:'Večerja',n:{f:'Piščančja stegna z rozmarinom, kremni pire, bučka',k:505,i:[{n:'Piščančja stegna',a:'250 g'},{n:'Krompir',a:'200 g'},{n:'Maslo',a:'20 g'},{n:'Mleko',a:'80 ml'},{n:'Bučka',a:'150 g'}]},lf:{f:'Piščančja stegna z rozmarinom, bučka, riž',k:445,i:[{n:'Piščančja stegna',a:'250 g'},{n:'Riž',a:'70 g'},{n:'Bučka',a:'150 g'},{n:'Olivno olje',a:'15 ml'}]}}],
+ 6:[{l:'Zajtrk',n:{f:'Chia puding z mlekom, mangom in kokosom',k:415,i:[{n:'Chia semena',a:'40 g'},{n:'Mleko',a:'250 ml'},{n:'Mango',a:'100 g'},{n:'Kokosov sladkor',a:'10 g'}]},lf:{f:'Chia puding z mandljevim mlekom in mangom',k:375,i:[{n:'Chia semena',a:'40 g'},{n:'Mandljevo mleko',a:'250 ml'},{n:'Mango',a:'100 g'},{n:'Javorjev sirup',a:'15 ml'}]}},
+  {l:'Dopoldanski prigrizek',n:{f:'Skuta z medom na riževem krekerju',k:175,i:[{n:'Navadna skuta',a:'80 g'},{n:'Med',a:'10 g'},{n:'Rižev keker',a:'20 g'}]},lf:{f:'Kuhano jajce + rižev toast',k:155,i:[{n:'Jajce kuhano',a:'55 g'},{n:'Rižev toast',a:'30 g'}]}},
+  {l:'Kosilo',n:{f:'Piščanec z gorčično kremno omako, riž in zelenjava',k:545,i:[{n:'Piščančji file',a:'160 g'},{n:'Sladka smetana',a:'100 ml'},{n:'Dijon gorčica',a:'15 g'},{n:'Riž',a:'70 g'},{n:'Zelenjava',a:'150 g'}]},lf:{f:'Pečena zelenjava z rižem in piščancem',k:505,i:[{n:'Piščančji file',a:'160 g'},{n:'Riž',a:'70 g'},{n:'Paprika',a:'120 g'},{n:'Bučka',a:'80 g'},{n:'Olivno olje',a:'15 ml'}]}},
+  {l:'Popoldanski prigrizek',n:{f:'Mlečni napitek: mleko + banana + kakav',k:245,i:[{n:'Mleko',a:'250 ml'},{n:'Banana',a:'120 g'},{n:'Kakav v prahu',a:'15 g'},{n:'Med',a:'10 g'}]},lf:{f:'Napitek: mandljevo mleko + banana + kakav',k:195,i:[{n:'Mandljevo mleko',a:'250 ml'},{n:'Banana',a:'120 g'},{n:'Kakav v prahu',a:'15 g'}]}},
+  {l:'Večerja',n:{f:'Lignji na žaru z maslovim prelivom in ajdova solata',k:445,i:[{n:'Lignji',a:'250 g'},{n:'Maslo',a:'15 g'},{n:'Limonin sok',a:'1 limona'},{n:'Ajda kuhana',a:'80 g'},{n:'Paradižnik',a:'100 g'}]},lf:{f:'Lignji na žaru z limonom in ajdova solata',k:425,i:[{n:'Lignji',a:'250 g'},{n:'Olivno olje',a:'15 ml'},{n:'Limonin sok',a:'1 limona'},{n:'Ajda kuhana',a:'80 g'},{n:'Paradižnik',a:'100 g'}]}}]
+};
+
+// ─── EASY MEAL DATA ── z wheyem, konzerve, hitri recepti ───
+const EM={
+ 0:[{l:'Zajtrk',n:{f:'Whey shake: mleko, banana, ovseni kosmiči, kakav',k:430,i:[{n:'Whey protein (čokolada)',a:'30 g'},{n:'Mleko',a:'250 ml'},{n:'Banana',a:'1 kos (120 g)'},{n:'Ovseni kosmiči',a:'30 g'},{n:'Kakav v prahu',a:'8 g'}]},lf:{f:'Whey izolat shake: mandljevo mleko, banana, kakav',k:385,i:[{n:'Whey izolat (brez laktoze)',a:'30 g'},{n:'Mandljevo mleko',a:'250 ml'},{n:'Banana',a:'1 kos (120 g)'},{n:'Kakav v prahu',a:'8 g'}]}},
+  {l:'Dopoldanski prigrizek',n:{f:'Grški jogurt + med + banana',k:205,i:[{n:'Grški jogurt',a:'150 g'},{n:'Med',a:'12 g'},{n:'Banana',a:'½ kos (60 g)'}]},lf:{f:'Brez-lak. jogurt + med + banana',k:185,i:[{n:'Brez-lak. jogurt',a:'150 g'},{n:'Med',a:'12 g'},{n:'Banana',a:'½ kos (60 g)'}]}},
+  {l:'Kosilo',n:{f:'Pečena kura iz pekarne + konzerva belega fižola + paradižnik',k:510,i:[{n:'Pečena kura (prsi/stegno)',a:'200 g'},{n:'Beli fižol (konzerva)',a:'150 g'},{n:'Paradižnik',a:'1 kos'},{n:'Olivno olje',a:'10 ml'},{n:'Sol, poper, česen',a:'po okusu'}]},lf:{f:'Pečena kura iz pekarne + konzerva belega fižola + paradižnik',k:510,i:[{n:'Pečena kura (prsi/stegno)',a:'200 g'},{n:'Beli fižol (konzerva)',a:'150 g'},{n:'Paradižnik',a:'1 kos'},{n:'Olivno olje',a:'10 ml'}]}},
+  {l:'Popoldanski prigrizek',n:{f:'Pest oreščkov + jabolko',k:175,i:[{n:'Mešani oreščki',a:'25 g'},{n:'Jabolko',a:'150 g'}]},lf:{f:'Pest oreščkov + jabolko',k:175,i:[{n:'Mešani oreščki',a:'25 g'},{n:'Jabolko',a:'150 g'}]}},
+  {l:'Večerja',n:{f:'Jajca na oko (3) + rižev toast + avokado + paradižnik',k:445,i:[{n:'Jajca',a:'3 kos'},{n:'Maslo',a:'8 g'},{n:'Rižev toast',a:'2 rezini'},{n:'Avokado',a:'70 g'},{n:'Paradižnik',a:'1 kos'}]},lf:{f:'Jajca na oko (3) + rižev toast + avokado + paradižnik',k:430,i:[{n:'Jajca',a:'3 kos'},{n:'Olivno olje',a:'6 ml'},{n:'Rižev toast',a:'2 rezini'},{n:'Avokado',a:'70 g'},{n:'Paradižnik',a:'1 kos'}]}}],
+ 1:[{l:'Zajtrk',n:{f:'Instant ovsena kaša z mlekom + banana + whey',k:440,i:[{n:'Instant ovseni kosmiči',a:'60 g'},{n:'Mleko',a:'200 ml'},{n:'Banana',a:'½ kos'},{n:'Whey protein (vanilija)',a:'20 g'}]},lf:{f:'Instant ajdova kaša z mandljevim mlekom + whey izolat',k:395,i:[{n:'Instant ajdova kaša',a:'60 g'},{n:'Mandljevo mleko',a:'200 ml'},{n:'Banana',a:'½ kos'},{n:'Whey izolat',a:'20 g'}]}},
+  {l:'Dopoldanski prigrizek',n:{f:'Whey shake z vodo + jabolko',k:195,i:[{n:'Whey protein',a:'30 g'},{n:'Voda',a:'300 ml'},{n:'Jabolko',a:'150 g'}]},lf:{f:'Whey izolat shake z vodo + jabolko',k:195,i:[{n:'Whey izolat',a:'30 g'},{n:'Voda',a:'300 ml'},{n:'Jabolko',a:'150 g'}]}},
+  {l:'Kosilo',n:{f:'Tuna (konzerva) + konzerva koruze + riževi krekerji + olive',k:470,i:[{n:'Tuna v olju (konzerva)',a:'160 g'},{n:'Koruza (konzerva)',a:'80 g'},{n:'Riževi krekerji',a:'30 g'},{n:'Olivke',a:'20 g'},{n:'Limonin sok',a:'½ limone'}]},lf:{f:'Tuna (konzerva) + konzerva koruze + riževi krekerji',k:470,i:[{n:'Tuna v olju (konzerva)',a:'160 g'},{n:'Koruza (konzerva)',a:'80 g'},{n:'Riževi krekerji',a:'30 g'},{n:'Olivke',a:'20 g'}]}},
+  {l:'Popoldanski prigrizek',n:{f:'Skuta + med',k:150,i:[{n:'Navadna skuta',a:'120 g'},{n:'Med',a:'12 g'}]},lf:{f:'Brez-lak. jogurt + med',k:145,i:[{n:'Brez-lak. jogurt',a:'150 g'},{n:'Med',a:'12 g'}]}},
+  {l:'Večerja',n:{f:'Konzerva lososu + kuhan riž + zelena solata',k:480,i:[{n:'Losos (konzerva)',a:'150 g'},{n:'Riž kuhan',a:'130 g'},{n:'Zelena solata',a:'80 g'},{n:'Olivno olje',a:'10 ml'},{n:'Limonin sok',a:'½ limone'}]},lf:{f:'Konzerva lososu + kuhan riž + zelena solata',k:480,i:[{n:'Losos (konzerva)',a:'150 g'},{n:'Riž kuhan',a:'130 g'},{n:'Zelena solata',a:'80 g'},{n:'Olivno olje',a:'10 ml'}]}}],
+ 2:[{l:'Zajtrk',n:{f:'Jajčna omleta (3 jajca) + rižev toast + sir',k:410,i:[{n:'Jajca',a:'3 kos'},{n:'Maslo',a:'8 g'},{n:'Rižev toast',a:'2 rezini'},{n:'Sir gouda',a:'25 g'},{n:'Sol, poper',a:'po okusu'}]},lf:{f:'Jajčna omleta (3 jajca) + rižev toast + avokado',k:395,i:[{n:'Jajca',a:'3 kos'},{n:'Olivno olje',a:'5 ml'},{n:'Rižev toast',a:'2 rezini'},{n:'Avokado',a:'50 g'}]}},
+  {l:'Dopoldanski prigrizek',n:{f:'Jabolko + pest mandljev',k:165,i:[{n:'Jabolko',a:'150 g'},{n:'Mandlji',a:'20 g'}]},lf:{f:'Jabolko + pest mandljev',k:165,i:[{n:'Jabolko',a:'150 g'},{n:'Mandlji',a:'20 g'}]}},
+  {l:'Kosilo',n:{f:'Pečena kura iz pekarne + konzerva čičerike + paradižnik',k:520,i:[{n:'Pečena kura',a:'200 g'},{n:'Čičerika (konzerva)',a:'150 g'},{n:'Paradižnik',a:'1 kos'},{n:'Olivno olje',a:'10 ml'},{n:'Česen v prahu',a:'po okusu'}]},lf:{f:'Pečena kura iz pekarne + konzerva čičerike + paradižnik',k:520,i:[{n:'Pečena kura',a:'200 g'},{n:'Čičerika (konzerva)',a:'150 g'},{n:'Paradižnik',a:'1 kos'},{n:'Olivno olje',a:'10 ml'}]}},
+  {l:'Popoldanski prigrizek',n:{f:'Whey shake z mlekom + banana',k:310,i:[{n:'Whey protein',a:'30 g'},{n:'Mleko',a:'200 ml'},{n:'Banana',a:'1 kos'}]},lf:{f:'Whey izolat shake z mandljevim mlekom + banana',k:280,i:[{n:'Whey izolat',a:'30 g'},{n:'Mandljevo mleko',a:'200 ml'},{n:'Banana',a:'1 kos'}]}},
+  {l:'Večerja',n:{f:'Jajca (2) + konzerva fižola + rižev toast',k:435,i:[{n:'Jajca',a:'2 kos'},{n:'Maslo',a:'8 g'},{n:'Beli fižol (konzerva)',a:'130 g'},{n:'Rižev toast',a:'2 rezini'}]},lf:{f:'Jajca (2) + konzerva fižola + rižev toast',k:420,i:[{n:'Jajca',a:'2 kos'},{n:'Olivno olje',a:'5 ml'},{n:'Beli fižol (konzerva)',a:'130 g'},{n:'Rižev toast',a:'2 rezini'}]}}],
+ 3:[{l:'Zajtrk',n:{f:'Whey proteinski shake: mleko, jagode, ovseni kosmiči',k:420,i:[{n:'Whey protein (jagoda)',a:'30 g'},{n:'Mleko',a:'200 ml'},{n:'Jagode',a:'100 g'},{n:'Ovseni kosmiči',a:'30 g'}]},lf:{f:'Whey izolat shake: mandljevo mleko + jagode',k:355,i:[{n:'Whey izolat',a:'30 g'},{n:'Mandljevo mleko',a:'200 ml'},{n:'Jagode',a:'100 g'}]}},
+  {l:'Dopoldanski prigrizek',n:{f:'Brez-lak. jogurt + banana',k:175,i:[{n:'Brez-lak. jogurt',a:'150 g'},{n:'Banana',a:'½ kos'},{n:'Med',a:'8 g'}]},lf:{f:'Brez-lak. jogurt + banana',k:175,i:[{n:'Brez-lak. jogurt',a:'150 g'},{n:'Banana',a:'½ kos'}]}},
+  {l:'Kosilo',n:{f:'Tuna (konzerva) + kuhan riž + kumare + olivno olje',k:475,i:[{n:'Tuna v olju',a:'160 g'},{n:'Riž kuhan',a:'130 g'},{n:'Kumare',a:'80 g'},{n:'Olivno olje',a:'10 ml'},{n:'Limonin sok',a:'½ limone'}]},lf:{f:'Tuna (konzerva) + kuhan riž + kumare + olivno olje',k:475,i:[{n:'Tuna v olju',a:'160 g'},{n:'Riž kuhan',a:'130 g'},{n:'Kumare',a:'80 g'},{n:'Olivno olje',a:'10 ml'}]}},
+  {l:'Popoldanski prigrizek',n:{f:'Whey shake z vodo + banana',k:210,i:[{n:'Whey protein',a:'30 g'},{n:'Voda',a:'250 ml'},{n:'Banana',a:'1 kos'}]},lf:{f:'Whey izolat shake z vodo + banana',k:210,i:[{n:'Whey izolat',a:'30 g'},{n:'Voda',a:'250 ml'},{n:'Banana',a:'1 kos'}]}},
+  {l:'Večerja',n:{f:'Pečena kura iz pekarne + zelena solata + olivno olje',k:440,i:[{n:'Pečena kura',a:'220 g'},{n:'Zelena solata',a:'100 g'},{n:'Olivno olje',a:'12 ml'},{n:'Limonin sok',a:'½ limone'},{n:'Sol, poper',a:'po okusu'}]},lf:{f:'Pečena kura iz pekarne + zelena solata + olivno olje',k:440,i:[{n:'Pečena kura',a:'220 g'},{n:'Zelena solata',a:'100 g'},{n:'Olivno olje',a:'12 ml'},{n:'Limonin sok',a:'½ limone'}]}}],
+ 4:[{l:'Zajtrk',n:{f:'Instant ovsena kaša z mlekom + borovnice + whey',k:430,i:[{n:'Instant ovseni kosmiči',a:'60 g'},{n:'Mleko',a:'200 ml'},{n:'Borovnice',a:'80 g'},{n:'Whey protein (vanilija)',a:'20 g'}]},lf:{f:'Instant ajdova kaša z mandljevim mlekom + borovnice',k:355,i:[{n:'Instant ajdova kaša',a:'60 g'},{n:'Mandljevo mleko',a:'200 ml'},{n:'Borovnice',a:'80 g'},{n:'Med',a:'8 g'}]}},
+  {l:'Dopoldanski prigrizek',n:{f:'Pest oreščkov + banana',k:185,i:[{n:'Mešani oreščki',a:'25 g'},{n:'Banana',a:'120 g'}]},lf:{f:'Pest oreščkov + banana',k:185,i:[{n:'Mešani oreščki',a:'25 g'},{n:'Banana',a:'120 g'}]}},
+  {l:'Kosilo',n:{f:'Konzerva belega fižola + pečena paprika + rižev kruh',k:455,i:[{n:'Beli fižol (konzerva)',a:'200 g'},{n:'Paprika pečena',a:'1 kos'},{n:'Rižev kruh',a:'2 rezini'},{n:'Olivno olje',a:'10 ml'},{n:'Česen v prahu',a:'po okusu'}]},lf:{f:'Konzerva belega fižola + pečena paprika + rižev kruh',k:455,i:[{n:'Beli fižol (konzerva)',a:'200 g'},{n:'Paprika pečena',a:'1 kos'},{n:'Rižev kruh',a:'2 rezini'},{n:'Olivno olje',a:'10 ml'}]}},
+  {l:'Popoldanski prigrizek',n:{f:'Grški jogurt + med',k:155,i:[{n:'Grški jogurt',a:'150 g'},{n:'Med',a:'12 g'}]},lf:{f:'Brez-lak. jogurt + med',k:145,i:[{n:'Brez-lak. jogurt',a:'150 g'},{n:'Med',a:'12 g'}]}},
+  {l:'Večerja',n:{f:'Jajca (3) na oko + pečen krompir (mikrovalovna) + zelenjava',k:450,i:[{n:'Jajca',a:'3 kos'},{n:'Maslo',a:'8 g'},{n:'Krompir',a:'200 g'},{n:'Zamrznjena zelenjava (mikrovalovna)',a:'150 g'}]},lf:{f:'Jajca (3) na oko + pečen krompir + zamrznjena zelenjava',k:435,i:[{n:'Jajca',a:'3 kos'},{n:'Olivno olje',a:'6 ml'},{n:'Krompir',a:'200 g'},{n:'Zamrznjena zelenjava',a:'150 g'}]}}],
+ 5:[{l:'Zajtrk',n:{f:'Whey shake: mleko + banana + kakav + ovseni kosmiči',k:445,i:[{n:'Whey protein (čokolada)',a:'30 g'},{n:'Mleko',a:'250 ml'},{n:'Banana',a:'1 kos'},{n:'Ovseni kosmiči',a:'30 g'}]},lf:{f:'Whey izolat shake: mandljevo mleko + banana + kakav',k:390,i:[{n:'Whey izolat',a:'30 g'},{n:'Mandljevo mleko',a:'250 ml'},{n:'Banana',a:'1 kos'},{n:'Kakav',a:'10 g'}]}},
+  {l:'Dopoldanski prigrizek',n:{f:'Pest oreščkov + pomaranča',k:185,i:[{n:'Mešani oreščki',a:'25 g'},{n:'Pomaranča',a:'150 g'}]},lf:{f:'Pest oreščkov + pomaranča',k:185,i:[{n:'Mešani oreščki',a:'25 g'},{n:'Pomaranča',a:'150 g'}]}},
+  {l:'Kosilo',n:{f:'Pečena kura iz pekarne + konzerva koruze + rizi-bizi',k:505,i:[{n:'Pečena kura',a:'200 g'},{n:'Koruza (konzerva)',a:'80 g'},{n:'Rizi-bizi (konzerva)',a:'100 g'},{n:'Olivno olje',a:'10 ml'}]},lf:{f:'Pečena kura iz pekarne + konzerva koruze + rizi-bizi',k:505,i:[{n:'Pečena kura',a:'200 g'},{n:'Koruza (konzerva)',a:'80 g'},{n:'Rizi-bizi (konzerva)',a:'100 g'},{n:'Olivno olje',a:'10 ml'}]}},
+  {l:'Popoldanski prigrizek',n:{f:'Whey shake z vodo + jabolko',k:190,i:[{n:'Whey protein',a:'30 g'},{n:'Voda',a:'300 ml'},{n:'Jabolko',a:'150 g'}]},lf:{f:'Whey izolat shake + jabolko',k:190,i:[{n:'Whey izolat',a:'30 g'},{n:'Voda',a:'300 ml'},{n:'Jabolko',a:'150 g'}]}},
+  {l:'Večerja',n:{f:'Tuna (konzerva) + kuhan riž + pečene bučke (mikrovalovna)',k:470,i:[{n:'Tuna v olju',a:'150 g'},{n:'Riž kuhan',a:'130 g'},{n:'Bučka',a:'150 g'},{n:'Olivno olje',a:'10 ml'}]},lf:{f:'Tuna (konzerva) + kuhan riž + pečene bučke',k:470,i:[{n:'Tuna v olju',a:'150 g'},{n:'Riž kuhan',a:'130 g'},{n:'Bučka',a:'150 g'},{n:'Olivno olje',a:'10 ml'}]}}],
+ 6:[{l:'Zajtrk',n:{f:'Jajčna omleta + rižev toast + paradižnik',k:400,i:[{n:'Jajca',a:'3 kos'},{n:'Maslo',a:'8 g'},{n:'Rižev toast',a:'2 rezini'},{n:'Paradižnik',a:'1 kos'}]},lf:{f:'Jajčna omleta + rižev toast + paradižnik',k:385,i:[{n:'Jajca',a:'3 kos'},{n:'Olivno olje',a:'5 ml'},{n:'Rižev toast',a:'2 rezini'},{n:'Paradižnik',a:'1 kos'}]}},
+  {l:'Dopoldanski prigrizek',n:{f:'Sadje + pest oreščkov',k:175,i:[{n:'Sezonsko sadje',a:'150 g'},{n:'Mešani oreščki',a:'20 g'}]},lf:{f:'Sadje + pest oreščkov',k:175,i:[{n:'Sezonsko sadje',a:'150 g'},{n:'Mešani oreščki',a:'20 g'}]}},
+  {l:'Kosilo',n:{f:'Pečena kura iz pekarne + konzerva fižola + zelena solata',k:510,i:[{n:'Pečena kura',a:'200 g'},{n:'Beli fižol (konzerva)',a:'150 g'},{n:'Zelena solata',a:'80 g'},{n:'Olivno olje',a:'10 ml'}]},lf:{f:'Pečena kura iz pekarne + konzerva fižola + zelena solata',k:510,i:[{n:'Pečena kura',a:'200 g'},{n:'Beli fižol (konzerva)',a:'150 g'},{n:'Zelena solata',a:'80 g'},{n:'Olivno olje',a:'10 ml'}]}},
+  {l:'Popoldanski prigrizek',n:{f:'Skuta + med + banana',k:190,i:[{n:'Navadna skuta',a:'100 g'},{n:'Med',a:'10 g'},{n:'Banana',a:'½ kos'}]},lf:{f:'Brez-lak. jogurt + med',k:145,i:[{n:'Brez-lak. jogurt',a:'150 g'},{n:'Med',a:'12 g'}]}},
+  {l:'Večerja',n:{f:'Jajca v mikrovalovki + avokado + riževi krekerji',k:420,i:[{n:'Jajca (pohovana v mikrovalovki)',a:'3 kos'},{n:'Avokado',a:'70 g'},{n:'Riževi krekerji',a:'30 g'},{n:'Sol, poper',a:'po okusu'}]},lf:{f:'Jajca v mikrovalovki + avokado + riževi krekerji',k:420,i:[{n:'Jajca',a:'3 kos'},{n:'Avokado',a:'70 g'},{n:'Riževi krekerji',a:'30 g'}]}}]
+};
+
+// ─── WORKOUT DATA ───────────────────────────────────────────
+const WKT={
+  upper:{title:'Zgornji del telesa',badge:'gym',ex:[{n:'Potisk z ročkami leže',s:'3',r:'12'},{n:'Veslanje z ročko (enoročno)',s:'3',r:'12'},{n:'Vzdolžni potisk nad glavo',s:'3',r:'10'},{n:'Biceps curl z ročkami',s:'3',r:'12'},{n:'Triceps potisk pri kablu',s:'3',r:'12'},{n:'Plank',s:'3',r:'45 sek'}]},
+  lower:{title:'Spodnji del telesa',badge:'gym',ex:[{n:'Počep (goblet ali s palico)',s:'4',r:'12'},{n:'Izpadni koraki z ročkami',s:'3',r:'10/nogo'},{n:'Leg press',s:'3',r:'15'},{n:'Mrtvetek z ročkami (RDL)',s:'3',r:'12'},{n:'Donkey kicks pri kablu',s:'3',r:'15/nogo'},{n:'Dvig na prste — lýtka',s:'3',r:'20'}]},
+  full:{title:'Celo telo',badge:'gym',ex:[{n:'Počep z ročkami',s:'3',r:'12'},{n:'Potisk z ročkami leže',s:'3',r:'10'},{n:'Mrtvetek z ročkami (RDL)',s:'3',r:'10'},{n:'Veslanje v upognjenem položaju',s:'3',r:'12'},{n:'Vzdolžni potisk nad glavo',s:'3',r:'10'},{n:'Plank',s:'3',r:'30 sek'}]},
+  glute:{title:'Glute day',badge:'glute',ex:[{n:'Hip thrust z palico',s:'4',r:'12'},{n:'Donkey kicks pri kablu',s:'3',r:'15/nogo'},{n:'Cable pull-through',s:'3',r:'15'},{n:'Sumo počep z ročko',s:'3',r:'12'},{n:'Frog pumps',s:'3',r:'20'},{n:'Abduktor stroj (odmik nog)',s:'3',r:'20'}]},
+  crossfit:{title:'CrossFit WOD',badge:'cf',wods:[
+    {type:'AMRAP',time:15,name:'Začetniški Cindy',ex:[{n:'Push-up (na kolenih ali polni)',r:'10'},{n:'Air squat',r:'15'},{n:'Sit-up',r:'20'}],note:'Naredi čim več krogov v 15 minutah. Beležiš skupno število krogov.'},
+    {type:'For Time',rounds:null,name:'21-15-9',ex:[{n:'Kettlebell swing (12 kg)',r:'21 / 15 / 9'},{n:'Goblet squat (12 kg)',r:'21 / 15 / 9'}],note:'Naredi 21 ponovitev obeh vaj, nato 15, nato 9. Izmeri čas.'},
+    {type:'EMOM',time:16,name:'EMOM 16',ex:[{n:'Min 1 — Air squat',r:'12'},{n:'Min 2 — Push-up',r:'8'},{n:'Min 3 — Kettlebell swing (12 kg)',r:'10'},{n:'Min 4 — Počitek',r:'—'}],note:'Vsako minuto začneš naslednji blok. Kar ostane od minute je tvoj počitek.'},
+    {type:'For Time',rounds:5,name:'5 krogov',ex:[{n:'Box step-up (z ročkama 4 kg)',r:'10/nogo'},{n:'Push-up',r:'10'},{n:'Sit-up',r:'15'},{n:'Air squat',r:'20'}],note:'5 krogov za čas. Brez odmorov med vajami, kratek odmor med krogi.'},
+    {type:'AMRAP',time:12,name:'KB Chipper',ex:[{n:'Kettlebell swing (12 kg)',r:'12'},{n:'Goblet squat (12 kg)',r:'10'},{n:'Push-up',r:'8'},{n:'Burpee (step-out različica)',r:'5'}],note:'Čim več krogov v 12 minutah. Fokus na tehniki, ne na hitrosti.'},
+    {type:'EMOM',time:20,name:'EMOM 20 Strength',ex:[{n:'Min 1&3 — Goblet squat (14 kg)',r:'8'},{n:'Min 2&4 — Dumbbell push press',r:'10'},{n:'Min 5 — Počitek',r:'—'}],note:'Menjuješ vsakih 5 minut. Odličen trening za moč + vzdržljivost.'},
+    {type:'For Time',rounds:3,name:'3 runde',ex:[{n:'Veslanje (400m ali 2 min)',r:'1×'},{n:'Kettlebell swing (12 kg)',r:'15'},{n:'Air squat',r:'20'},{n:'Push-up',r:'10'}],note:'3 krogi za čas. Veslanje na ergometru ali alternativno: 200m tek.'}
+  ]},
+  cardio:{title:'Kardio',badge:'cardio',ex:null},
+  rest:{title:'Počitek',badge:'rest',ex:null}
+};
+const BP=[{id:'upper',l:'Zgornji del'},{id:'lower',l:'Spodnji del'},{id:'full',l:'Celo telo'},{id:'glute',l:'Glute day'},{id:'crossfit',l:'CrossFit'},{id:'cardio',l:'Kardio'},{id:'rest',l:'Počitek'}];
+const DEF={0:'rest',1:'upper',2:'cardio',3:'upper',4:'rest',5:'lower',6:'cardio'};
+
+// ─── EXERCISE INFO DATABASE ─────────────────────────────────
+const XI={
+  'Potisk z ročkami leže':{desc:'Lezi na ravno klop z ročkami v rokah. Ročki drži na višini prsi, dlani naprej. Počasi spusti do prsi (2 sek), nato potisni navzgor do skoraj iztegnitve.',tip:'Začetniška teža: 4–6 kg/ročka. Hrbet rahlo upognjen, lopatice skupaj, stopala trdno na tleh. Počasi dol, hitreje gor.',kg:5,yt:'dumbbell bench press beginner form'},
+  'Veslanje z ročko (enoročno)':{desc:'Postavi koleno in roko na klop za oporo. Ročko v prosti roki, spusti do iztegnitve roke. Povleci ročko do boka — kot veslaš na čolnu.',tip:'Začetniška teža: 6–8 kg. Komolec gre vzdolž telesa navzgor, ne navzven. Hrbet raven, jedro napeto.',kg:7,yt:'one arm dumbbell row beginner'},
+  'Vzdolžni potisk nad glavo':{desc:'Sedi ali stoji. Ročki drži v višini ramen, dlani naprej. Potisni navzgor do skoraj iztegnitve rok, počasi spusti nazaj na ramena.',tip:'Začetniška teža: 4–6 kg/ročka. Ne zakleni komolcev na vrhu. Jedro napeto, ne upogni v križ.',kg:5,yt:'dumbbell shoulder press beginner form'},
+  'Biceps curl z ročkami':{desc:'Stoji pokonci z ročkami ob telesu, dlani naprej. Upogni komolce in dvigni ročke do ramen. Počasi (3 sek) spusti nazaj v izteg.',tip:'Začetniška teža: 4–6 kg. Komolci ostanejo pri telesu — ne nihaj z rameni ali trupom.',kg:5,yt:'dumbbell bicep curl proper form'},
+  'Triceps potisk pri kablu':{desc:'Stoji pred kabelskim strojem, prime ročko ali vrv z obema rokama. Komolci ob telesu in fiksirani. Iztegni roke navzdol, počasi vrni.',tip:'Začetniška teža: 10–15 kg. Samo podlaket se premika. Komolci so ves čas pri telesu.',kg:12,yt:'cable tricep pushdown form'},
+  'Plank':{desc:'Lezi na trebuh, dvigni se na podlahteh in prstih. Telo ravno kot deska — od glave do pet. Aktivno stisni trebuh in zadnjico.',tip:'Začni s 20–30 sek. Zadnjica ne sme biti previsoka ali pre-nizka. Dihaj normalno.',kg:0,yt:'plank proper form beginners'},
+  'Počep (goblet ali s palico)':{desc:'Stoji z nogami v širini ramen. Drži ročko pri prsih (goblet). Spusti se navzdol kot da sediš na stol — peta ostane na tleh. Vstani z pritisnjenim petami.',tip:'Začetniška teža: 6–8 kg ročka. Kolena sledijo prstom navzven, hrbet raven. Gledaj naprej.',kg:8,yt:'goblet squat beginner tutorial'},
+  'Izpadni koraki z ročkami':{desc:'Stoji pokonci z ročkami ob telesu. Naredi velik korak naprej z eno nogo. Spusti zadnje koleno proti tlom. Vrni se nazaj in zamenjaj nogo.',tip:'Začetniška teža: 4–6 kg/ročka. Sprednje koleno ostane nad gležnjem — ne sega pred prste.',kg:5,yt:'dumbbell lunges beginner form'},
+  'Leg press':{desc:'Sedi v leg press stroj, stopala v širini ramen na ploščo. Počasi upogni kolena do 90°, nato potisni ploščo od sebe nazaj.',tip:'Začetniška teža: 30–40 kg. Ne zakleni kolen na vrhu. Spodnja hrbtna mora ostati pritisnjena na naslonjalo.',kg:35,yt:'leg press machine proper form beginners'},
+  'Mrtvetek z ročkami (RDL)':{desc:'Stoji z ročkami pred stegni. Z ravnim hrbtom nagne naprej — boki gredo nazaj. Ročki gresta vzdolž nog navzdol do sredine golenice, nato iztegni boke nazaj.',tip:'Začetniška teža: 7–10 kg/ročka. Kolena rahlo upognjena, hrbet raven. Čutiš razteg v zadnji stegni.',kg:8,yt:'romanian deadlift dumbbell beginner RDL'},
+  'Donkey kicks pri kablu':{desc:'Pritrdi manšeto na gleženj. Klekni na 4 (roke in kolena). Potisni nogo s pokrčenim kolenom nazaj in navzgor. Počasi spusti.',tip:'Začetniška teža: 5–10 kg na kablu. Hrbet raven, jedro napeto. Na vrhu zadrži sekundo in stisni zadnjico.',kg:7,yt:'cable donkey kicks glutes tutorial'},
+  'Dvig na prste — lýtka':{desc:'Stoji na robu stopnice ali na tleh. Dvigni se visoko na prste, zadrži 1 sekundo na vrhu, nato POČASI (3 sek) spusti navzdol.',tip:'Začni brez teže ali z ročkami. Počasno spuščanje (ekscentrična faza) je ključno za razvoj mišice.',kg:0,yt:'calf raises proper form'},
+  'Hip thrust z palico':{desc:'Opri zgornji del hrbta na klop. Palica (z blazinico) leži na bokih. Dvigni boke navzgor — telo ravna linija od kolen do ramen. Zadrži 1 sek, spusti.',tip:'Začetniška teža: 20 kg (sama olimpijska palica). Brada k prsim, jedro napeto. Na vrhu STISNI zadnjico.',kg:20,yt:'hip thrust barbell beginner guide form'},
+  'Cable pull-through':{desc:'Obrni hrbet h kablu, vrv med nogami. Z ravnim hrbtom nagne naprej — boki gredo nazaj (kot RDL). Iztegni boke naprej in vstani pokonci.',tip:'Začetniška teža: 10–15 kg. Enako gibanje kot RDL — gib je v bokih, ne v hrbtu. Stisni zadnjico na koncu.',kg:12,yt:'cable pull through glutes tutorial form'},
+  'Sumo počep z ročko':{desc:'Noge široko razkoračene, prsti navzven ~45°. Drži eno ročko z obema rokama med nogami. Spusti se navzdol, kolena sledijo prstom navzven.',tip:'Začetniška teža: 10–12 kg ročka. Širok stoj bolj aktivira notranje stegno in zadnjico.',kg:10,yt:'sumo squat dumbbell beginner tutorial'},
+  'Frog pumps':{desc:'Lezi na hrbet, podplati skupaj in kolena navzven (žabji položaj). Dvigni boke navzgor z močjo zadnjice. Zadrži 1 sek, spusti.',tip:'Brez teže za začetek. Odlična aktivacija zadnjice pred težjimi vajami. Stisni čim bolj na vrhu.',kg:0,yt:'frog pumps glutes activation'},
+  'Abduktor stroj (odmik nog)':{desc:'Sedi v stroj, zunanji del kolen ob naslonu. Odpri noge navzven proti uporu stroja, zadrži 1 sek. Počasi (3 sek) vrni skupaj.',tip:'Začetniška teža: 20–30 kg. Sedi pokonci, ne zibaj z trupom. Nadzorovan gib — ne pust da stroj "zateče" nazaj.',kg:25,yt:'hip abductor machine glutes proper form'},
+  'Počep z ročkami':{desc:'Drži ročke ob telesu. Noge v širini ramen, prsti rahlo navzven. Spusti se navzdol — kolena sledijo prstom, hrbet raven, peta na tleh.',tip:'Začetniška teža: 5–7 kg/ročka. Enaki principi kot goblet počep.',kg:6,yt:'dumbbell squat beginner tutorial form'},
+  'Veslanje v upognjenem položaju':{desc:'Nagne naprej ~45° z ravnim hrbtom, ročke pred koleni z dlanmi navzdol. Povleci ročke k pasu — komolci gresta vzdolž telesa navzgor.',tip:'Začetniška teža: 7–9 kg/ročka. Hrbet raven, jedro napeto. Ne zaokroži hrbta.',kg:8,yt:'bent over dumbbell row form beginners'},
+  'Plank z izmenjevanjem rok':{desc:'Začni v visokem planku (iztegnjene roke). Izmenjaje premakni eno roko naprej, vrni, nato drugo. Jedro aktivno ves čas.',tip:'Začni s 20 sek. Boki se ne smejo gugati — stabilnost je cilj.',kg:0,yt:'plank reach tutorial core stability'},
+  'Air squat':{desc:'Stoji z nogami v širini ramen, prsti rahlo navzven. Dvigni roke naprej za ravnotežje. Spusti se navzdol — kolena sledijo prstom, boki gredo pod kolena. Vstani.',tip:'Brez teže. Peta ostane na tleh. Kolena ne smejo "padati" navznoter. Hiter ritem — to je CrossFit osnova.',kg:0,yt:'air squat crossfit technique'},
+  'Push-up (na kolenih ali polni)':{desc:'Dlani nekoliko širše od ramen. Telo ravno. Spusti prsa do tal, komolci grejo diagonalno (ne ravno navzven). Iztegni roke nazaj. Skaliran: kolena na tleh.',tip:'Začni na kolenih dokler ni mogoče narediti 5 čistih polnih push-upov. Jedro napeto ves čas.',kg:0,yt:'push up beginner progression crossfit'},
+  'Kettlebell swing':{desc:'Noge malo širše od ramen. KB med nogami, hrbet raven. Z eksplozivnim gibom bokov (ne rok!) zamahni KB do višine ramen. Spusti nazaj med noge.',tip:'Začetniška teža: 10–12 kg. GIB JE V BOKIH — ne počep, ne dvig z rokami. Stisni zadnjico na vrhu.',kg:12,yt:'kettlebell swing technique beginner'},
+  'Goblet squat (12 kg)':{desc:'Drži kettlebell ali ročko pri prsih. Noge v širini ramen. Spusti se globoko navzdol — komolci naj rahlo potisnejo kolena navzven. Vstani.',tip:'Začetniška teža: 10–12 kg. Bolj vertikalen hrbet kot pri navadnem počepu. Globok počep je cilj.',kg:12,yt:'goblet squat crossfit technique'},
+  'Sit-up':{desc:'Lezi na hrbet, podplati skupaj (butterfly sit-up) ali noge ravne. Z močjo trebuha vzravnaj do sedečega položaja, dotakni se tal pred nogami. Lezi nazaj.',tip:'Brez teže za začetek. Butterfly položaj (podplati skupaj) zmanjša obremenitev na hrbet.',kg:0,yt:'sit up crossfit butterfly'},
+  'Burpee (step-out različica)':{desc:'Stoji, upogni se in postavi dlani na tla. KORAKAJ (ne skači) eno nogo nazaj, potem drugo — si v plank poziciji. Korakaj nazaj naprej. Vstani.',tip:'Skaliran burpee brez skoka. Ko postane lahek, dodaj skok pri vstopu in clap nad glavo.',kg:0,yt:'burpee scaled beginner modification'},
+  'Box step-up (z ročkama 4 kg)':{desc:'Stopi na box ali klop z eno nogo. Potisni s peto stojne noge in dvigni telo navzgor. Postavi drugo nogo zraven. Sestopi enako.',tip:'Začetniška teža: 4–6 kg/ročka. Višina: 40–50 cm. Drži hrbet raven, ne nagibaj naprej.',kg:4,yt:'box step up dumbbell crossfit scaled'},
+  'Dumbbell push press':{desc:'Drži ročke na ramenih. Rahlo upogni kolena (dip), nato eksplozivno iztegni noge in potisni ročke nad glavo hkrati. Spusti nazaj na ramena.',tip:'Začetniška teža: 5–7 kg/ročka. Noge dajo impulz — roke samo dokončajo gib. Bolj eksplozivno kot shoulder press.',kg:6,yt:'dumbbell push press crossfit technique'},
+  'Veslanje':{desc:'Sedi na veslalni ergometer. Noge iztegni, nato potegni veslo k prsim z rokami in upogni kolena hkrati. Vrni v začetek v obratnem vrstnem redu.',tip:'Ritem: 70% noge, 20% trup, 10% roke. Začni počasi in se ustali na ritmičnem veslanju. Monitor kaže tempo/500m.',kg:0,yt:'rowing machine technique beginners'},
+  'Trx veslanje':{desc:'Drži TRX ročici, nagne telo nazaj. Potegni telo navzgor k rokom — komolci gresta ob telesu. Počasi vrni v začetni položaj.',tip:'Bolj pokonci = lažje. Noge skupaj in telo ravno ves čas.',kg:0,yt:'TRX row beginner form'}
+};
+
+// ─── FUZZY EXERCISE INFO LOOKUP ────────────────────────────
+function getExInfo(name){
+  if(!name)return null;
+  if(XI[name])return XI[name];
+  // Strip "Min X — " EMOM prefix
+  const stripped=name.replace(/^Min\s+[\d&]+\s+[—–-]\s+/i,'').trim();
+  if(XI[stripped])return XI[stripped];
+  // Strip weight "(X kg)"
+  const noW=stripped.replace(/\s*\(\d+[.,]?\d*\s*kg\)/gi,'').trim();
+  if(XI[noW])return XI[noW];
+  // Partial match — check if any key is contained in name or vice versa
+  const nl=noW.toLowerCase();
+  for(const key of Object.keys(XI)){
+    const kl=key.toLowerCase();
+    if(nl.includes(kl)||kl.includes(nl))return XI[key];
+  }
+  return null;
+}
+
+// Cache for AI-generated descriptions
+const DESC_CACHE_KEY='exdesc_cache';
+function getDescCache(){try{return JSON.parse(localStorage.getItem(DESC_CACHE_KEY))||{};}catch(e){return{};}}
+function saveDescCache(name,info){const c=getDescCache();c[name]=info;try{localStorage.setItem(DESC_CACHE_KEY,JSON.stringify(c));}catch(e){}}
+
+async function fetchExDesc(name){
+  // Check cache first
+  const cache=getDescCache();
+  if(cache[name])return cache[name];
+  const txt=await api(
+    'Si fitnes trener. Opiši vajo za začetnico v fitnesu. Vrni SAMO veljavni JSON: {"desc":"opis izvedbe v slovenščini (2-3 stavki)","tip":"začetniški nasvet z začetno težo","kg":0,"yt":"youtube search query v angleščini"}',
+    `Opiši vajo: "${name}"`
+  );
+  const info=JSON.parse(txt);
+  saveDescCache(name,info);
+  return info;
+}
+
+// ─── WEEK TRACKING & PROGRESSIVE OVERLOAD ──────────────────
+let fitStart=localStorage.getItem('fit_start');
+if(!fitStart){fitStart=now.toISOString().split('T')[0];localStorage.setItem('fit_start',fitStart);}
+const WEEK_NUM=Math.max(1,Math.floor((now-new Date(fitStart))/(7*24*60*60*1000))+1);
+
+function getWeekPlan(w){
+  if(w<=2)return{s:'2',r:'10',note:'Teden 1–2 — Učenje giba. Lahka teža, fokus na pravilni tehniki.'};
+  if(w<=4)return{s:'2',r:'12',note:'Teden 3–4 — +2 ponovitvi. Teža ostane enaka.'};
+  if(w<=6)return{s:'3',r:'8',note:'Teden 5–6 — +1 serija, zmanjšaj ponovitve. Teža enaka ali +1 kg.'};
+  if(w<=8)return{s:'3',r:'10',note:'Teden 7–8 — +2 ponovitvi. Čutiš napredek!'};
+  if(w<=10)return{s:'3',r:'12',note:'Teden 9–10 — Na koncu tega tedna povečaj težo za 1–2 kg.'};
+  if(w<=12)return{s:'4',r:'8',note:'Teden 11–12 — +1 serija z novo težo. Zmanjšaj ponovitve.'};
+  return{s:'4',r:'10-12',note:'Teden 13+ — Nadaljuj s postopnim povečevanjem teže (+1–2 kg vsaka 2 tedna).'};
+}
+
+// exercise log: store per day, per exercise name
+const ELKEY='exlog_'+now.toISOString().split('T')[0];
+function loadElog(){try{return JSON.parse(localStorage.getItem(ELKEY))||{};}catch(e){return{};}}
+function saveElog(name,data){const l=loadElog();l[name]=data;try{localStorage.setItem(ELKEY,JSON.stringify(l));}catch(e){}}
+
+let exExp={};  // UI state: which exercises are expanded
+
+// ─── STATE ──────────────────────────────────────────────────
+let S={meals:[],exp:[false,false,false,false,false],md:[false,false,false,false,false],exd:[],lf:false,easy:true,wt:DEF[DOW],ex:[]};
+
+function load(){
+  try{const sv=localStorage.getItem(TK);if(sv){S={...S,...JSON.parse(sv)};return;}}catch(e){}
+  initMeals();initWorkout();
+}
+function save(){
+  try{localStorage.setItem(TK,JSON.stringify(S));}catch(e){}
+  saveTrack();
+}
+function saveTrack(){
+  try{localStorage.setItem(TTRACK,JSON.stringify({md:S.md,ed:S.exd,wt:S.wt}));}catch(e){}
+}
+
+function getMealSrc(){return S.easy?(EM[DOW]||EM[1]):(MD[DOW]||MD[1]);}
+function initMeals(){
+  const src=getMealSrc();
+  S.meals=src.map((m,i)=>({label:m.l,...(S.lf?m.lf:m.n)}));
+  S.md=[false,false,false,false,false];
+}
+function initWorkout(){
+  const w=WKT[S.wt];
+  if(S.wt==='crossfit'){S.ex=[];S.exd=[];S.cfWod=null;}
+  else{S.ex=w.ex?w.ex.map(e=>({...e})):[];S.exd=S.ex.map(()=>false);}
+}
+
+// ─── TOGGLES ────────────────────────────────────────────────
+function toggleEasy(){
+  S.easy=!S.easy;
+  document.getElementById('et').className='tog-track'+(S.easy?' on-grn':'');
+  const src=getMealSrc();
+  S.meals=S.meals.map((m,i)=>({label:m.label,...(S.lf?src[i].lf:src[i].n)}));
+  save();renderMeals();
+}
+function toggleLF(){
+  S.lf=!S.lf;
+  document.getElementById('lt').className='tog-track'+(S.lf?' on':'');
+  document.getElementById('lfn').style.display=S.lf?'flex':'none';
+  const src=getMealSrc();
+  S.meals=S.meals.map((m,i)=>({label:m.label,...(S.lf?src[i].lf:src[i].n)}));
+  save();renderMeals();
+}
+
+// ─── BODY PART SELECTOR ─────────────────────────────────────
+function renderBp(){
+  document.getElementById('bpsel').innerHTML=BP.map(b=>{
+    const active=S.wt===b.id;
+    const w=WKT[b.id];
+    let cls='bpb';
+    if(active){if(b.id==='cardio')cls+=' ac';else if(b.id==='rest')cls+=' ar';else if(b.id==='glute')cls+=' ap';else if(b.id==='crossfit')cls+=' acf';else cls+=' ag';}
+    return `<button class="${cls}" onclick="selBp('${b.id}')">${b.l}</button>`;
+  }).join('');
+}
+function selBp(id){S.wt=id;initWorkout();save();renderBp();renderWorkout();renderTracker();}
+
+// ─── RENDER MEALS ───────────────────────────────────────────
+function renderMeals(){
+  document.getElementById('mc').innerHTML=S.meals.map((m,i)=>{
+    const ingH=m.i?m.i.map(x=>`<div class="in">${x.n}</div><div class="ia">${x.a}</div>`).join(''):'';
+    const done=S.md[i];const open=S.exp[i];const editOpen=S.editOpen&&S.editOpen[i];
+    const easyMark=S.easy?`<span class="easy-badge">hitro</span>`:'';
+    const custom=m.custom?`<span style="font-size:11px;color:var(--red);margin-left:4px;">ročni vnos</span>`:'';
+    return `<div class="meal-card fi${done?' done':''}" id="mc${i}">
+      <div class="meal-top">
+        <div class="mdot"></div>
+        <div class="mbody">
+          <div class="mlbl">${m.label}${easyMark}${custom}</div>
+          <div class="mfood">${m.f||m.food}</div>
+          <div class="mkcal" id="mkcal${i}">~${m.k||m.kcal} kcal</div>
+        </div>
+        <div class="meal-actions">
+          <button class="ebtn${editOpen?' open':''}" id="eb${i}" onclick="togEdit(${i})" title="Ročni vnos">✏</button>
+          <button class="ibtn${open?' open':''}" id="ib${i}" onclick="togIng(${i})">${open?'skrij':'sestavine'}</button>
+          <button class="sbtn" onclick="swapMeal(${i})">↺</button>
+          <button class="chk${done?' on':''}" id="chk${i}" onclick="togMeal(${i})" title="Zaužito">${done?'✓':'○'}</button>
+        </div>
+      </div>
+      <div class="edit-panel${editOpen?' open':''}" id="editp${i}">
+        <input class="edit-input" id="ei${i}" placeholder="Vnesi kar si pojedla (npr. 'pizza 2 kosa', '30g whey + mleko')..." onkeydown="if(event.key==='Enter')submitCustom(${i})">
+        <button class="edit-go" id="ego${i}" onclick="submitCustom(${i})">Izračunaj →</button>
+      </div>
+      <div class="ing-panel${open?' open':''}" id="ip${i}">
+        <div class="ing-title">Sestavine</div>
+        <div class="ing-grid">${ingH}</div>
+      </div>
+    </div>`;
+  }).join('');
+  calcKcal();
+}
+
+function calcKcal(){
+  const eaten=S.meals.reduce((s,m,i)=>s+(S.md[i]?(parseInt(m.k||m.kcal)||0):0),0);
+  const planned=S.meals.reduce((s,m)=>s+(parseInt(m.k||m.kcal)||0),0);
+  document.getElementById('tk-eaten').textContent=eaten+' kcal';
+  document.getElementById('tk-plan').textContent='/ '+planned+' kcal načrtovano';
+}
+
+function togMeal(i){
+  S.md[i]=!S.md[i];save();
+  const card=document.getElementById('mc'+i),chk=document.getElementById('chk'+i);
+  if(card)card.classList.toggle('done',S.md[i]);
+  if(chk){chk.classList.toggle('on',S.md[i]);chk.textContent=S.md[i]?'✓':'○';}
+  calcKcal();renderTracker();
+}
+function togEdit(i){
+  if(!S.editOpen)S.editOpen=Array(5).fill(false);
+  S.editOpen[i]=!S.editOpen[i];
+  const panel=document.getElementById('editp'+i),btn=document.getElementById('eb'+i);
+  if(panel)panel.classList.toggle('open',S.editOpen[i]);
+  if(btn)btn.classList.toggle('open',S.editOpen[i]);
+  if(S.editOpen[i])setTimeout(()=>{const inp=document.getElementById('ei'+i);if(inp)inp.focus();},50);
+}
+async function submitCustom(i){
+  const inp=document.getElementById('ei'+i);
+  const go=document.getElementById('ego'+i);
+  const val=(inp&&inp.value)||'';
+  if(!val.trim())return;
+  go.disabled=true;go.textContent='...';
+  try{
+    const txt=await api(
+      'Si prehranjevalni svetovalec. Izračunaj kalorije in sestavine z gramaturami za vneseno hrano. Vrni SAMO veljavni JSON: {"f":"opis hrane v slovenščini","k":450,"i":[{"n":"sestavina","a":"100 g"}]}',
+      `Izračunaj kalorije za: "${val}"`
+    );
+    const p=JSON.parse(txt);
+    S.meals[i]={...S.meals[i],f:p.f,k:parseInt(p.k)||S.meals[i].k,i:p.i||S.meals[i].i,custom:true};
+    if(S.editOpen)S.editOpen[i]=false;
+    save();renderMeals();
+  }catch(e){err('Izračun ni uspel. Poskusi znova.');}
+  if(go){go.disabled=false;go.textContent='Izračunaj →';}
+}
+function togIng(i){
+  S.exp[i]=!S.exp[i];save();
+  const p=document.getElementById('ip'+i),b=document.getElementById('ib'+i);
+  if(p)p.classList.toggle('open',S.exp[i]);
+  if(b){b.classList.toggle('open',S.exp[i]);b.textContent=S.exp[i]?'skrij':'sestavine';}
+}
+
+// ─── RENDER WORKOUT ─────────────────────────────────────────
+function renderWorkout(){
+  const c=document.getElementById('wc'),baw=document.getElementById('baw'),w=WKT[S.wt];
+
+  // ── CrossFit WOD ──
+  if(S.wt==='crossfit'){
+    baw.disabled=false;baw.innerHTML='↺ Nov WOD';document.getElementById('add-ex-row').style.display='none';
+    const wods=w.wods;
+    // Use stored custom WOD if available, else default for today
+    if(!S.cfWod) S.cfWod={...wods[DOW%wods.length]};
+    const wod=S.cfWod;
+    const typeClass=wod.type==='AMRAP'?'amrap':wod.type==='EMOM'?'emom':'';
+    const timeLabel=wod.type==='AMRAP'?`${wod.time} min`:wod.type==='EMOM'?`${wod.time} min`:wod.rounds?`${wod.rounds} krogov`:'';
+    const savedResult=localStorage.getItem('wodlog_'+now.toISOString().split('T')[0])||'';
+    const exRows=wod.ex.map((e,i)=>{
+      const info=getExInfo(e.n)||{};
+      const descHtml=info.desc?`<div class="wod-desc-panel" id="wdp${i}"><div class="ex-desc" style="margin-bottom:6px;">${info.desc}</div><div class="ex-tip">💡 ${info.tip}</div><a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent((info.yt||e.n))}" target="_blank">▶ Video</a></div>`:'';
+      return `<div id="wex${i}">
+        <div class="wod-ex">
+          <div class="wod-ex-n">${e.n}</div>
+          <div class="wod-ex-r">${e.r}</div>
+          ${info.desc?`<button class="wod-ex-info" onclick="togWodDesc(${i})">info</button>`:''}
+          <button class="sbtn" onclick="swapCfEx(${i})" title="Zamenjaj vajo" style="margin-left:4px;">↺</button>
+        </div>
+        ${descHtml}
+      </div>`;
+    }).join('');
+    c.innerHTML=`<div class="badge cf">⚡ CrossFit WOD — Teden ${WEEK_NUM}</div>
+    <div class="wod-card" id="wod-card">
+      <div class="wod-head">
+        <span class="wod-type ${typeClass}">${wod.type}</span>
+        <span class="wod-title">${wod.name}</span>
+        <span class="wod-time">${timeLabel}</span>
+      </div>
+      <div class="wod-note">${wod.note}</div>
+      <div class="wod-exes">${exRows}</div>
+      <div class="wod-log">
+        <span class="wod-log-lbl">${wod.type==='AMRAP'?'Krogi':'Čas'}</span>
+        <input class="wod-result" id="wod-res" placeholder="${wod.type==='AMRAP'?'npr. 8 krogov':'npr. 12:34'}" value="${savedResult}">
+        <button class="log-save" onclick="saveWodResult()">Shrani</button>
+        <span class="log-ok" id="wod-ok"></span>
+      </div>
+    </div>
+    <div style="margin-top:8px;font-size:12px;color:var(--lt);">Klikni ↺ pri posamezni vaji za zamenjavo, ali "Nov WOD" za cel nov trening.</div>`;
+    return;
+  }
+  if(S.wt==='cardio'){baw.disabled=true;c.innerHTML=`<div class="badge cardio">◈ Kardio dan</div><div class="info-box">Danes je kardio dan. Izberi med tekom, kolesom, elipso ali plavanjem.<br><br>Cilj: 45–55 minut pri zmerni intenzivnosti. Ogrevanje 5–10 min + ohlajanje 5 min.</div>`;document.getElementById('add-ex-row').style.display='none';}
+  else if(S.wt==='rest'){baw.disabled=true;c.innerHTML=`<div class="badge rest">○ Počitek</div><div class="info-box">Danes je dan počitka. Telo se regenerira in mišice rastejo.<br><br>Lahka hoja ali raztezanje sta vedno dobrodošla.</div>`;document.getElementById('add-ex-row').style.display='none';}
+  else{
+    baw.disabled=false;document.getElementById('add-ex-row').style.display='flex';
+    const bc=S.wt==='glute'?'glute':'gym';
+    const wp=getWeekPlan(WEEK_NUM);
+    const elog=loadElog();
+    c.innerHTML=`<div class="badge ${bc}">${S.wt==='glute'?'◉':S.wt==='full'?'◈':'◆'} ${w.title} <span style="font-size:11px;opacity:.7;margin-left:4px;">Teden ${WEEK_NUM}</span></div>`+
+      S.ex.map((e,i)=>{
+        const done=S.exd[i];const pk=S.wt==='glute';const open=!!exExp[i];
+        const info=getExInfo(e.n)||{};const logged=elog[e.n]||{};
+        const startKg=info.kg||0;
+        // Week target for this exercise
+        const targetS=wp.s,targetR=wp.r;
+        const ingHtml=info.desc?`
+          <div class="ex-desc">${info.desc}</div>
+          <div class="ex-tip">💡 ${info.tip||''}</div>
+          <a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent((info.yt||e.n)+' tutorial')}" target="_blank">▶ Poglej video navodila</a>
+          <div class="week-plan">
+            <div class="wp-head">
+              <span class="wp-week">Teden ${WEEK_NUM} — cilj danes</span>
+              <span class="wp-target">${targetS} serije × ${targetR} ponovitev${startKg>0?' · '+startKg+' kg start':''}</span>
+            </div>
+            <div class="wp-note">${wp.note}</div>
+          </div>
+          <div class="log-sec">
+            <div class="log-title">Danes sem naredila</div>
+            <div class="log-row">
+              <span class="log-lbl">Teža</span>
+              <input class="log-inp w" id="lkg${i}" type="number" min="0" step="0.5" placeholder="${startKg||'—'}" value="${logged.kg||''}"> <span class="log-lbl">kg</span>
+              <span class="log-lbl" style="margin-left:4px;">Serije</span>
+              <input class="log-inp n" id="ls${i}" type="number" min="0" max="10" placeholder="${targetS}" value="${logged.s||''}">
+              <span class="log-lbl">×</span>
+              <input class="log-inp n" id="lr${i}" type="number" min="0" max="50" placeholder="${targetR.split('-')[0]}" value="${logged.r||''}">
+              <span class="log-lbl">pon.</span>
+              <button class="log-save" onclick="logEx(${i},'${e.n.replace(/'/g,'&#39;')}')">Shrani</button>
+              <span class="log-ok" id="lok${i}">${logged.kg?'✓ shranjeno':''}</span>
+            </div>
+          </div>`:`
+          <div class="no-desc" style="margin-bottom:9px;"></div>
+          <div class="week-plan">
+            <div class="wp-head">
+              <span class="wp-week">Teden ${WEEK_NUM} — cilj danes</span>
+              <span class="wp-target">${targetS} serije × ${targetR} ponovitev</span>
+            </div>
+            <div class="wp-note">${wp.note}</div>
+          </div>
+          <div class="log-sec">
+            <div class="log-title">Danes sem naredila</div>
+            <div class="log-row">
+              <span class="log-lbl">Teža</span>
+              <input class="log-inp w" id="lkg${i}" type="number" min="0" step="0.5" placeholder="kg" value="${logged.kg||''}"> <span class="log-lbl">kg</span>
+              <span class="log-lbl" style="margin-left:4px;">Serije</span>
+              <input class="log-inp n" id="ls${i}" type="number" min="0" max="10" placeholder="${targetS}" value="${logged.s||''}">
+              <span class="log-lbl">×</span>
+              <input class="log-inp n" id="lr${i}" type="number" min="0" max="50" placeholder="${targetR.split('-')[0]}" value="${logged.r||''}">
+              <span class="log-lbl">pon.</span>
+              <button class="log-save" onclick="logEx(${i},'${e.n.replace(/'/g,'&#39;')}')">Shrani</button>
+              <span class="log-ok" id="lok${i}">${logged.kg?'✓ shranjeno':''}</span>
+            </div>
+          </div>`;
+        return `<div class="ex-wrap" id="ew${i}">
+          <div class="ex-top${done?' done':''}" id="et${i}">
+            <div class="edot"></div>
+            <div class="ename">${e.n}${e.custom?` <span style="font-size:11px;color:var(--red);">ročno</span>`:''}${logged.kg?` <span style="font-size:11px;color:var(--grn);">${logged.s||'?'}×${logged.r||'?'} · ${logged.kg}kg</span>`:''}</div>
+            <div class="epills"><span class="ep${pk?' pk':''}">${targetS}×</span><span class="ep${pk?' pk':''}">${targetR}</span></div>
+            <button class="sbtn" onclick="swapEx(${i})">↺</button>
+            <button class="chk${done?' on':''}" id="echk${i}" onclick="togEx(${i})">${done?'✓':'○'}</button>
+            <button class="ex-xbtn${open?' open':''}" id="exb${i}" onclick="togExInfo(${i})" title="Navodila in log">▾</button>
+          </div>
+          <div class="ex-detail${open?' open':''}" id="exd${i}">${ingHtml}</div>
+        </div>`;
+      }).join('');
+  }
+}
+function togWodDesc(i){
+  const p=document.getElementById('wdp'+i);
+  if(!p)return;
+  const isOpen=p.classList.toggle('open');
+  // If opened and empty, fetch AI description
+  if(isOpen&&!p.querySelector('.ex-desc')){
+    const name=S.cfWod?.ex?.[i]?.n||(WKT.crossfit.wods[DOW%WKT.crossfit.wods.length]?.ex?.[i]?.n)||'';
+    if(!name)return;
+    p.innerHTML='<span style="color:var(--lt);font-size:13px;"><span class="spin">↺</span> Generiram opis...</span>';
+    fetchExDesc(name).then(info=>{
+      p.innerHTML=`<div class="ex-desc" style="margin-bottom:6px;">${info.desc}</div><div class="ex-tip">💡 ${info.tip}</div><a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent(info.yt||name)}" target="_blank">▶ Video</a>`;
+    }).catch(()=>{p.innerHTML='<span style="color:var(--lt);font-size:13px;">Opis ni na voljo.</span>';});
+  }
+}
+function saveWodResult(){
+  const val=document.getElementById('wod-res')?.value;
+  if(!val)return;
+  localStorage.setItem('wodlog_'+now.toISOString().split('T')[0],val);
+  const ok=document.getElementById('wod-ok');
+  if(ok){ok.textContent='✓ shranjeno';ok.classList.add('show');setTimeout(()=>ok.classList.remove('show'),2500);}
+}
+function togExInfo(i){
+  exExp[i]=!exExp[i];
+  const det=document.getElementById('exd'+i),btn=document.getElementById('exb'+i);
+  if(det)det.classList.toggle('open',exExp[i]);
+  if(btn)btn.classList.toggle('open',exExp[i]);
+  // If opened and showing "no description", fetch from AI
+  if(exExp[i]&&det&&det.querySelector('.no-desc')){
+    const name=S.ex[i]?.n;
+    if(!name)return;
+    det.querySelector('.no-desc').innerHTML='<span style="color:var(--lt);font-size:13px;"><span class="spin">↺</span> Generiram opis...</span>';
+    fetchExDesc(name).then(info=>{
+      if(!info)return;
+      det.querySelector('.no-desc').outerHTML=`<div class="ex-desc">${info.desc}</div><div class="ex-tip">💡 ${info.tip}</div><a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent(info.yt||name)}" target="_blank">▶ Poglej video navodila</a>`;
+    }).catch(()=>{if(det.querySelector('.no-desc'))det.querySelector('.no-desc').textContent='Opis ni na voljo.';});
+  }
+}
+function logEx(i,name){
+  const kg=document.getElementById('lkg'+i)?.value;
+  const s=document.getElementById('ls'+i)?.value;
+  const r=document.getElementById('lr'+i)?.value;
+  saveElog(name,{kg,s,r});
+  const ok=document.getElementById('lok'+i);
+  if(ok){ok.textContent='✓ shranjeno';ok.classList.add('show');setTimeout(()=>ok.classList.remove('show'),2500);}
+  // update the inline summary in ename without full re-render
+  const et=document.getElementById('et'+i);
+  if(et){const nm=et.querySelector('.ename');if(nm&&kg){const existing=nm.querySelector('span:last-child');const tag=document.createElement('span');tag.style.cssText='font-size:11px;color:var(--grn);';tag.textContent=` ${s||'?'}×${r||'?'} · ${kg}kg`;if(existing&&existing.style.color.includes('rgb(42'))existing.replaceWith(tag);else nm.appendChild(tag);}}
+}
+function togEx(i){
+  S.exd[i]=!S.exd[i];save();
+  const top=document.getElementById('et'+i),chk=document.getElementById('echk'+i);
+  if(top)top.classList.toggle('done',S.exd[i]);
+  if(chk){chk.classList.toggle('on',S.exd[i]);chk.textContent=S.exd[i]?'✓':'○';}
+  renderTracker();
+}
+function addCustomEx(){
+  const n=document.getElementById('aen').value.trim();
+  const s=document.getElementById('aes').value.trim()||'3';
+  const r=document.getElementById('aer').value.trim()||'12';
+  if(!n)return;
+  S.ex.push({n,s,r,custom:true});S.exd.push(false);
+  document.getElementById('aen').value='';
+  save();renderWorkout();
+}
+
+// ─── WEEKLY TRACKER ─────────────────────────────────────────
+const WDAYS=['P','T','S','Č','P','S','N'];
+function getTrackData(d){
+  try{const s=localStorage.getItem('track_'+d);return s?JSON.parse(s):null;}catch(e){return null;}
+}
+function getDayScore(d){
+  if(!d)return null;
+  const md=d.md||[];const ed=d.ed||[];
+  const mTotal=5,mDone=md.filter(Boolean).length;
+  const isRest=d.wt==='rest'||d.wt==='cardio';
+  if(isRest)return mDone/mTotal;
+  const eTotal=ed.length||6,eDone=ed.filter(Boolean).length;
+  return(mDone+eDone)/(mTotal+eTotal);
+}
+function renderTracker(){
+  // Get Mon of current week
+  const monday=new Date(now);
+  monday.setDate(now.getDate()-((now.getDay()+6)%7));
+  const wr=document.getElementById('week-row');
+  wr.innerHTML='';
+  for(let i=0;i<7;i++){
+    const d=new Date(monday);d.setDate(monday.getDate()+i);
+    const isToday=d.toDateString()===now.toDateString();
+    const isFuture=d>now&&!isToday;
+    const key=d.toISOString().split('T')[0];
+    const td=isToday?{md:S.md,ed:S.exd,wt:S.wt}:getTrackData(key);
+    const score=isFuture?null:getDayScore(td);
+    const pct=score===null?0:Math.round(score*100);
+    // SVG ring
+    const r=14,circ=2*Math.PI*r,dash=circ*(pct/100),gap=circ-dash;
+    let ringColor='#E0DED6';
+    if(score!==null&&pct===100)ringColor='#2A6147';
+    else if(score!==null&&pct>0)ringColor='#C94B2A';
+    const cell=document.createElement('div');
+    cell.className='day-cell'+(isToday?' day-today':'');
+    cell.innerHTML=`<div class="day-name">${WDAYS[d.getDay()]}</div>
+      <div class="day-ring">
+        <svg viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="${r}" fill="none" stroke="#E0DED6" stroke-width="3"/>
+          ${pct>0?`<circle cx="18" cy="18" r="${r}" fill="none" stroke="${ringColor}" stroke-width="3" stroke-dasharray="${dash.toFixed(1)} ${gap.toFixed(1)}" stroke-linecap="round" transform="rotate(-90 18 18)"/>`:''}
+          ${isToday?`<circle cx="18" cy="18" r="5" fill="${pct>0?ringColor:'#D5D3CB'}"/>`:''}
+          ${!isToday&&pct===100?`<text x="18" y="22" text-anchor="middle" font-size="10" fill="${ringColor}">✓</text>`:''}
+          ${!isToday&&pct>0&&pct<100?`<text x="18" y="22" text-anchor="middle" font-size="9" fill="${ringColor}">${pct}%</text>`:''}
+        </svg>
+      </div>`;
+    wr.appendChild(cell);
+  }
+  // Progress bars today
+  const mDone=S.md.filter(Boolean).length;
+  const mPct=Math.round(mDone/5*100);
+  document.getElementById('pb-ml').textContent=mDone+'/5';
+  document.getElementById('pb-mf').style.width=mPct+'%';
+  const wt=WKT[S.wt];
+  if(!wt.ex){
+    document.getElementById('pb-wl').textContent=S.wt==='cardio'?'kardio':'počitek';
+    document.getElementById('pb-wf').style.width='0%';
+  }else{
+    const eDone=S.exd.filter(Boolean).length,eTotal=S.exd.length||6;
+    const ePct=Math.round(eDone/eTotal*100);
+    document.getElementById('pb-wl').textContent=eDone+'/'+eTotal;
+    document.getElementById('pb-wf').style.width=ePct+'%';
+  }
+}
+
+// ─── API CALLS ──────────────────────────────────────────────
+async function api(sys,msg){
+  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,system:sys,messages:[{role:'user',content:msg}]})});
+  if(!r.ok)throw new Error('API '+r.status);
+  const d=await r.json();
+  return (d.content?.find(b=>b.type==='text')?.text||'').replace(/```[a-z]*\n?/g,'').replace(/```/g,'').trim();
+}
+async function swapMeal(i){
+  const card=document.getElementById('mc'+i),btn=card.querySelector('.sbtn');
+  btn.disabled=true;btn.innerHTML='<span class="spin">↺</span>';card.classList.add('loading');
+  const ez=S.easy?'Recept mora biti hiter in enostaven (konzerve, jajca, pečena kura, whey shake, mikrovalovna). Ni kompleksnega kuhanja.':'';
+  const lfc=S.lf?'Brez laktoze.':'Z laktozo je ok.';
+  try{
+    const txt=await api(`Si prehranjevalni svetovalec. Zamenjaj obrok. ${ez} ${lfc} Kalorična vrednost ±50 kcal. Vrni SAMO JSON: {"f":"opis v slovenščini","k":380,"i":[{"n":"sestavina","a":"100 g"}]}`,
+      `Zamenjaj ${S.meals[i].label.toLowerCase()}: "${S.meals[i].f||S.meals[i].food}" (~${S.meals[i].k||S.meals[i].kcal} kcal). Drugačna alternativa z gramaturami.`);
+    const p=JSON.parse(txt);
+    S.meals[i]={...S.meals[i],...p};save();renderMeals();
+  }catch(e){err('Zamenjava ni uspela.');card.classList.remove('loading');btn.disabled=false;btn.innerHTML='↺';}
+}
+async function swapEx(i){
+  const card=document.getElementById('ew'+i),btn=card?.querySelector('.sbtn');
+  if(!btn||btn.disabled)return;
+  btn.disabled=true;btn.innerHTML='<span class="spin">↺</span>';card.classList.add('loading');
+  const focus=S.wt==='glute'?'zadnjico (glute focus)':'isto mišično skupino';
+  try{
+    const txt=await api(`Si fitnes trener za telovadnico. Vrni SAMO JSON: {"n":"ime vaje v slovenščini","s":"3","r":"12"}`,
+      `Zamenjaj vajo "${S.ex[i].n}" (${S.ex[i].s}×${S.ex[i].r}) z alternativo za ${focus}.`);
+    const p=JSON.parse(txt);S.ex[i]={n:p.n,s:p.s,r:p.r};save();renderWorkout();
+  }catch(e){err('Zamenjava ni uspela.');card.classList.remove('loading');btn.disabled=false;btn.innerHTML='↺';}
+}
+async function refreshMeals(){
+  const btn=document.getElementById('bam');btn.disabled=true;btn.innerHTML='<span class="spin">↺</span> Generiram...';
+  const ez=S.easy?'Hiter in enostaven jedilnik (konzerve, jajca, whey shake, pečena kura iz pekarne, mikrovalovna). Brez kompleksnega kuhanja.':'';
+  const lfc=S.lf?'Brez laktoze.':'Z laktozo je ok.';
+  try{
+    const txt=await api(`Si prehranjevalni svetovalec. ${ez} ${lfc} Sestavi dnevni jedilnik ~1600 kcal za žensko ki hoče shujšati. SAMO JSON array 5 elementov: [{"f":"...","k":380,"i":[{"n":"...","a":"100 g"}]},...] — zajtrk, dopold. prig., kosilo, popold. prig., večerja.`,
+      'Svež raznovrsten jedilnik za danes z natančnimi gramaturami.');
+    const p=JSON.parse(txt);
+    if(Array.isArray(p)&&p.length===5){S.meals=LBLS.map((l,i)=>({label:l,...p[i]}));S.md=[false,false,false,false,false];save();renderMeals();}
+  }catch(e){err('Generiranje ni uspelo.');}
+  btn.disabled=false;btn.innerHTML='↺ Zamenjaj vse';
+}
+async function swapCfEx(i){
+  const row=document.getElementById('wex'+i);
+  const btn=row?.querySelector('.sbtn');
+  if(!btn||btn.disabled)return;
+  btn.disabled=true;btn.innerHTML='<span class="spin">↺</span>';
+  const cur=S.cfWod.ex[i];
+  try{
+    const txt=await api(
+      'Si CrossFit trener. Zamenjaj eno vajo v WODu z alternativo primerno za začetnico v fitnesu. Vrni SAMO veljavni JSON: {"n":"ime vaje v slovenščini","r":"10"}',
+      `Zamenjaj CrossFit vajo "${cur.n}" (${cur.r}) z drugačno alternativo za isto območje ali podobno intenzivnost.`
+    );
+    const p=JSON.parse(txt);
+    S.cfWod.ex[i]={n:p.n,r:p.r};
+    save();renderWorkout();
+  }catch(e){err('Zamenjava ni uspela.');btn.disabled=false;btn.innerHTML='↺';}
+}
+async function refreshWorkout(){
+  const btn=document.getElementById('baw');if(!btn||btn.disabled)return;
+  btn.disabled=true;btn.innerHTML='<span class="spin">↺</span> Generiram...';
+
+  if(S.wt==='crossfit'){
+    const types=['AMRAP','For Time','EMOM'];
+    const t=types[Math.floor(Math.random()*types.length)];
+    try{
+      const txt=await api(
+        'Si CrossFit trener. Sestavi WOD za začetnico v fitnesu — skalirane vaje, dostopna oprema (kettlebell, ročke, veslanje, lastna teža). Vrni SAMO veljavni JSON: {"type":"AMRAP","time":15,"name":"Ime WODa","ex":[{"n":"ime vaje","r":"10"},{"n":"ime vaje","r":"15"}],"note":"kratko navodilo"}',
+        `Sestavi nov ${t} CrossFit WOD za danes. Vaje v slovenščini, skalirane za začetnico.`
+      );
+      const p=JSON.parse(txt);
+      S.cfWod={...p};save();renderWorkout();
+    }catch(e){err('Generiranje ni uspelo.');}
+    btn.disabled=false;btn.innerHTML='↺ Nov WOD';
+    return;
+  }
+
+  const w=WKT[S.wt];
+  const focus=S.wt==='glute'?'zadnjico (hip thrust, donkey kicks, cable pull-through, sumo počep, glute bridge)':w.title.toLowerCase();
+  try{
+    const txt=await api('Si fitnes trener za telovadnico. SAMO JSON array 6 vaj: [{"n":"ime v slovenščini","s":"3","r":"12"},...]',
+      `Svež trening za ${focus}. Drugačen od navadnega.`);
+    const p=JSON.parse(txt);if(Array.isArray(p)){S.ex=p.slice(0,6);S.exd=S.ex.map(()=>false);save();renderWorkout();}
+  }catch(e){err('Generiranje ni uspelo.');}
+  btn.disabled=false;btn.innerHTML='↺ Zamenjaj vaje';
+}
+
+function err(msg){const b=document.getElementById('eb');b.textContent=msg;b.classList.add('show');setTimeout(()=>b.classList.remove('show'),5000);}
+
+// ─── HISTORY ────────────────────────────────────────────────
+const WKT_LABELS={upper:'Zgornji del',lower:'Spodnji del',full:'Celo telo',glute:'Glute day',crossfit:'CrossFit',cardio:'Kardio',rest:'Počitek'};
+const HIST_OPEN={};
+
+function togHist(key){
+  HIST_OPEN[key]=!HIST_OPEN[key];
+  const body=document.getElementById('hb_'+key);
+  const btn=document.getElementById('hx_'+key);
+  if(body)body.classList.toggle('open',HIST_OPEN[key]);
+  if(btn)btn.classList.toggle('open',HIST_OPEN[key]);
+}
+
+function renderHistory(){
+  const container=document.getElementById('hist');
+  const days=[];
+  for(let i=1;i<=14;i++){
+    const d=new Date(now);d.setDate(now.getDate()-i);
+    const key=d.toISOString().split('T')[0];
+    let track=null,plan=null,exlog={},wodRes='';
+    try{const s=localStorage.getItem('track_'+key);if(s)track=JSON.parse(s);}catch(e){}
+    if(!track)continue;
+    try{const s=localStorage.getItem('dp_v6_'+key);if(s)plan=JSON.parse(s);}catch(e){}
+    try{const s=localStorage.getItem('exlog_'+key);if(s)exlog=JSON.parse(s);}catch(e){}
+    try{wodRes=localStorage.getItem('wodlog_'+key)||'';}catch(e){}
+    days.push({d,key,track,plan,exlog,wodRes});
+  }
+  if(!days.length){container.innerHTML='<div class="hist-empty">Ni še podatkov za pretekle dneve. Začni obkljukovati obroke in vaje!</div>';return;}
+
+  container.innerHTML=days.map(({d,key,track,plan,exlog,wodRes})=>{
+    const md=track.md||[];const ed=track.ed||[];const wt=track.wt||'rest';
+    const mealsDone=md.filter(Boolean).length;
+    const exDone=ed.filter(Boolean).length;
+    const exTotal=ed.length||0;
+
+    // Meals eaten
+    const eatenMeals=plan?plan.meals.filter((_,i)=>md[i]).map(m=>({food:m.f||m.food||'',kcal:parseInt(m.k||m.kcal)||0})):[];
+    const totalKcal=eatenMeals.reduce((s,m)=>s+m.kcal,0);
+
+    // Exercises done
+    const doneEx=plan?plan.ex.filter((_,i)=>ed[i]).map(e=>({n:e.n,log:exlog[e.n]||null})):[];
+
+    // Pills
+    const wtLabel=WKT_LABELS[wt]||wt;
+    const wtPill=wt==='rest'?'':wt==='cardio'?`<span class="hist-pill">Kardio</span>`:wt==='crossfit'?`<span class="hist-pill cf">CrossFit${wodRes?' · '+wodRes:''}</span>`:`<span class="hist-pill${doneEx.length>0?' green':''}">${wtLabel}${exTotal>0?' '+exDone+'/'+exTotal:''}</span>`;
+    const kcalPill=totalKcal>0?`<span class="hist-pill">${totalKcal} kcal</span>`:'';
+    const mealPill=`<span class="hist-pill${mealsDone===5?' green':mealsDone>0?'':' red'}">${mealsDone}/5 obrokov</span>`;
+
+    const dayName=SLD[d.getDay()];
+    const dateStr=d.getDate()+'. '+SLM[d.getMonth()];
+
+    // Meals HTML
+    const mealsHtml=eatenMeals.length?eatenMeals.map(m=>`<div class="hist-meal-row"><div class="hist-meal-name">${m.food}</div><div class="hist-meal-kcal">~${m.kcal} kcal</div></div>`).join(''):'<div style="font-size:13px;color:var(--lt);">Ni zabeleženih obrokov ta dan.</div>';
+
+    // Workout HTML
+    let workoutHtml='';
+    if(wt==='rest'){workoutHtml='<div style="font-size:13px;color:var(--lt);">Dan počitka.</div>';}
+    else if(wt==='cardio'){workoutHtml='<div style="font-size:13px;color:var(--md);">Kardio trening.</div>';}
+    else if(wt==='crossfit'){workoutHtml=`<div style="font-size:13px;color:var(--md);">CrossFit WOD${wodRes?' — Rezultat: <b>'+wodRes+'</b>':''}.</div>`;}
+    else if(doneEx.length){
+      workoutHtml=doneEx.map(e=>{
+        const l=e.log;const logStr=l&&l.kg?`${l.s||'?'}×${l.r||'?'} · ${l.kg} kg`:'';
+        return `<div class="hist-ex-row"><div class="hist-ex-name">${e.n}</div><div class="hist-ex-log${logStr?'':' empty'}">${logStr||'opravljeno'}</div></div>`;
+      }).join('');
+    } else {workoutHtml='<div style="font-size:13px;color:var(--lt);">Vadba ni bila zabeležena.</div>';}
+
+    const totalLine=totalKcal>0||doneEx.length?`<div class="hist-total"><span>${mealsDone}/5 obrokov · ${exDone>0?exDone+'/'+exTotal+' vaj':'brez vadbe'}</span><b>${totalKcal>0?totalKcal+' kcal':''}</b></div>`:'';
+
+    return `<div class="hist-card">
+      <div class="hist-head" onclick="togHist('${key}')">
+        <div class="hist-dow">${dayName}, ${dateStr}</div>
+        <div class="hist-meta">${mealPill}${kcalPill}${wtPill}</div>
+        <button class="hist-xbtn" id="hx_${key}">▾</button>
+      </div>
+      <div class="hist-body" id="hb_${key}">
+        <div class="hist-section-lbl">Zaužiti obroki</div>
+        ${mealsHtml}
+        <div class="hist-section-lbl">Vadba — ${wtLabel}</div>
+        ${workoutHtml}
+        ${totalLine}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── INIT ───────────────────────────────────────────────────
+load();
+if(S.lf){document.getElementById('lt').classList.add('on');document.getElementById('lfn').style.display='flex';}
+if(S.easy)document.getElementById('et').classList.add('on-grn');
+renderBp();renderMeals();renderWorkout();renderTracker();renderHistory();
+</script>
+</body>
+</html>
