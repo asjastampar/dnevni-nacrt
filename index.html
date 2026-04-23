@@ -204,6 +204,58 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .kcal-split{display:flex;gap:6px;align-items:center;}
 .kcal-eaten{font-size:18px;font-weight:500;color:var(--dk);}
 .kcal-plan{font-size:12px;color:var(--lt);}
+/* ── AUTH MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(26,26,23,.55);z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay.hide{display:none;}
+.modal{background:var(--w);border-radius:18px;padding:2rem 1.75rem 1.75rem;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.18);}
+.modal-logo{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:500;margin-bottom:4px;}
+.modal-logo em{font-style:italic;color:var(--red);}
+.modal-sub{font-size:13px;color:var(--lt);margin-bottom:1.5rem;}
+.modal-tabs{display:flex;gap:0;margin-bottom:1.25rem;border:.5px solid var(--br);border-radius:9px;overflow:hidden;}
+.modal-tab{flex:1;padding:8px;font-size:13px;background:none;border:none;cursor:pointer;font-family:inherit;color:var(--md);transition:all .15s;}
+.modal-tab.active{background:var(--dk);color:var(--w);font-weight:500;}
+.modal-field{margin-bottom:12px;}
+.modal-field label{font-size:12px;color:var(--md);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;}
+.modal-field input{width:100%;border:.5px solid var(--br);border-radius:9px;padding:10px 12px;font-size:15px;font-family:inherit;background:var(--bg);color:var(--dk);outline:none;transition:border-color .15s;}
+.modal-field input:focus{border-color:rgba(0,0,0,.25);}
+.modal-btn{width:100%;background:var(--dk);color:var(--w);border:none;border-radius:9px;padding:12px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;margin-top:4px;transition:opacity .15s;}
+.modal-btn:hover{opacity:.85;}
+.modal-btn:disabled{opacity:.4;cursor:default;}
+.modal-err{font-size:13px;color:var(--red);background:#FDF0EC;padding:8px 12px;border-radius:7px;margin-top:10px;display:none;}
+.modal-err.show{display:block;}
+/* ── USER HEADER ── */
+.user-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:var(--dk);color:var(--w);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;flex-shrink:0;}
+.user-name{font-size:13px;color:var(--md);margin-left:8px;flex:1;}
+.user-sync{font-size:11px;color:var(--lt);margin-left:4px;}
+.logout-btn{font-size:12px;color:var(--lt);background:none;border:.5px solid var(--br);border-radius:7px;padding:4px 9px;cursor:pointer;font-family:inherit;transition:all .15s;}
+.logout-btn:hover{color:var(--red);border-color:rgba(201,75,42,.3);}
+.steps-card{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:13px 15px;display:flex;align-items:center;gap:12px;}
+.steps-icon{font-size:20px;flex-shrink:0;line-height:1;}
+.steps-body{flex:1;min-width:0;}
+.steps-top{display:flex;align-items:baseline;gap:6px;margin-bottom:6px;}
+.steps-val{font-size:22px;font-weight:500;color:var(--dk);line-height:1;}
+.steps-lbl{font-size:12px;color:var(--lt);}
+.steps-inp{border:.5px solid var(--br);border-radius:7px;padding:4px 7px;font-size:15px;font-family:inherit;font-weight:500;background:var(--bg);color:var(--dk);outline:none;width:90px;text-align:center;display:none;}
+.steps-inp.show{display:inline-block;}
+.steps-inp:focus{border-color:rgba(0,0,0,.2);}
+.steps-prog{height:5px;background:var(--bg);border-radius:3px;overflow:hidden;margin-bottom:4px;}
+.steps-fill{height:5px;border-radius:3px;background:#1E4E8C;transition:width .4s ease;}
+.steps-fill.done{background:var(--grn);}
+.steps-sub{display:flex;justify-content:space-between;font-size:11px;color:var(--lt);}
+.steps-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.steps-ebtn{background:none;border:.5px solid var(--br);border-radius:7px;padding:4px 8px;font-size:12px;cursor:pointer;color:var(--lt);font-family:inherit;transition:all .15s;}
+.steps-ebtn:hover{color:var(--md);background:var(--bg);}
+/* kcal net */
+.kcal-net-bar{background:var(--w);border:.5px solid var(--br);border-radius:10px;padding:9px 13px;margin-top:6px;display:none;}
+.kcal-net-bar.show{display:block;}
+.kcal-net-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--md);}
+.kcal-net-row+.kcal-net-row{margin-top:5px;padding-top:5px;border-top:.5px solid var(--br);}
+.kcal-net-val{font-weight:500;}
+.kcal-net-val.pos{color:var(--dk);}
+.kcal-net-val.neg{color:var(--grn);}
+.kcal-net-val.net-ok{color:var(--grn);}
+.kcal-net-val.net-warn{color:var(--red);}
 /* error */
 .err{font-size:13px;color:var(--red);padding:8px 12px;background:#FDF0EC;border-radius:8px;margin:8px 0;display:none;}
 .err.show{display:block;}
@@ -214,7 +266,38 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 </style>
 </head>
 <body>
-<div class="app">
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="auth-overlay">
+  <div class="modal">
+    <div class="modal-logo">Tvoj <em>načrt</em></div>
+    <div class="modal-sub">Prijavi se ali ustvari profil</div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tab-login" onclick="switchTab('login')">Prijava</button>
+      <button class="modal-tab" id="tab-register" onclick="switchTab('register')">Registracija</button>
+    </div>
+    <div class="modal-field">
+      <label>Ime</label>
+      <input type="text" id="auth-name" placeholder="npr. Maja" maxlength="30" autocomplete="username">
+    </div>
+    <div class="modal-field">
+      <label>PIN (4–8 znakov)</label>
+      <input type="password" id="auth-pin" placeholder="••••" maxlength="8" inputmode="numeric" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter')submitAuth()">
+    </div>
+    <button class="modal-btn" id="auth-btn" onclick="submitAuth()">Prijava →</button>
+    <div class="modal-err" id="auth-err"></div>
+  </div>
+</div>
+
+<div class="app" id="main-app" style="display:none">
+  <div class="user-bar">
+    <div style="display:flex;align-items:center;">
+      <div class="user-avatar" id="u-avatar">?</div>
+      <span class="user-name" id="u-name">—</span>
+      <span class="user-sync" id="u-sync"></span>
+    </div>
+    <button class="logout-btn" onclick="logout()">Odjava</button>
+  </div>
   <div class="hdate" id="ds"></div>
   <div class="htitle">Tvoj <em>dnevni</em> načrt</div>
 
@@ -240,6 +323,40 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
       <div class="kcal-split">
         <span class="kcal-eaten" id="tk-eaten">0</span>
         <span class="kcal-plan" id="tk-plan">/ — kcal načrtovano</span>
+      </div>
+    </div>
+    <div class="kcal-net-bar" id="kcal-net-bar">
+      <div class="kcal-net-row">
+        <span>🔥 Porabljeno (vadba)</span>
+        <span class="kcal-net-val neg" id="tk-burn">−0 kcal</span>
+      </div>
+      <div class="kcal-net-row">
+        <span>Neto danes</span>
+        <span class="kcal-net-val" id="tk-net">—</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-lbl" style="margin-bottom:10px;">Dnevni koraki</div>
+    <div class="steps-card">
+      <div class="steps-icon">🚶‍♀️</div>
+      <div class="steps-body">
+        <div class="steps-top">
+          <span class="steps-val" id="st-val">0</span>
+          <input class="steps-inp" id="st-inp" type="number" min="0" max="100000" step="500"
+            onblur="saveSteps()" onkeydown="if(event.key==='Enter')saveSteps()">
+          <span class="steps-lbl">/ <span id="st-goal" onclick="changeStepsGoal()" style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px;" title="Klikni za spremembo cilja">10.000</span> korakov</span>
+        </div>
+        <div class="steps-prog"><div class="steps-fill" id="st-fill" style="width:0%"></div></div>
+        <div class="steps-sub">
+          <span id="st-pct">0%</span>
+          <span id="st-kcal" style="color:var(--grn);display:none">🔥 — kcal</span>
+        </div>
+      </div>
+      <div class="steps-actions">
+        <button class="steps-ebtn" id="st-ebtn" onclick="togStepsEdit()" title="Uredi korake">✏ vnesi</button>
+        <button class="chk" id="st-chk" onclick="togStepsDone()" title="Cilj dosežen">○</button>
       </div>
     </div>
   </div>
@@ -389,7 +506,15 @@ const WKT={
     {type:'EMOM',time:20,name:'EMOM 20 Strength',ex:[{n:'Min 1&3 — Goblet squat (14 kg)',r:'8'},{n:'Min 2&4 — Dumbbell push press',r:'10'},{n:'Min 5 — Počitek',r:'—'}],note:'Menjuješ vsakih 5 minut. Odličen trening za moč + vzdržljivost.'},
     {type:'For Time',rounds:3,name:'3 runde',ex:[{n:'Veslanje (400m ali 2 min)',r:'1×'},{n:'Kettlebell swing (12 kg)',r:'15'},{n:'Air squat',r:'20'},{n:'Push-up',r:'10'}],note:'3 krogi za čas. Veslanje na ergometru ali alternativno: 200m tek.'}
   ]},
-  cardio:{title:'Kardio',badge:'cardio',ex:null},
+  cardio:{title:'Kardio',badge:'cardio',ex:[
+    {n:'Tek (zunaj ali tekalna steza)',s:'1',r:'30 min',kcal:210},
+    {n:'Kolesarjenje (zunaj ali sobno kolo)',s:'1',r:'45 min',kcal:270},
+    {n:'Elipsa',s:'1',r:'40 min',kcal:240},
+    {n:'Veslalni ergometer',s:'1',r:'20 min',kcal:180},
+    {n:'Plavanje',s:'1',r:'30 min',kcal:220},
+    {n:'Hoja (hiter tempo, zunaj)',s:'1',r:'45 min',kcal:160},
+    {n:'Pohod na Pohorje 🏔',s:'1',r:'vzpenjača → Bellevue (1h 15min)',kcal:420}
+  ]},
   rest:{title:'Počitek',badge:'rest',ex:null}
 };
 const BP=[{id:'upper',l:'Zgornji del'},{id:'lower',l:'Spodnji del'},{id:'full',l:'Celo telo'},{id:'glute',l:'Glute day'},{id:'crossfit',l:'CrossFit'},{id:'cardio',l:'Kardio'},{id:'rest',l:'Počitek'}];
@@ -426,7 +551,14 @@ const XI={
   'Box step-up (z ročkama 4 kg)':{desc:'Stopi na box ali klop z eno nogo. Potisni s peto stojne noge in dvigni telo navzgor. Postavi drugo nogo zraven. Sestopi enako.',tip:'Začetniška teža: 4–6 kg/ročka. Višina: 40–50 cm. Drži hrbet raven, ne nagibaj naprej.',kg:4,yt:'box step up dumbbell crossfit scaled'},
   'Dumbbell push press':{desc:'Drži ročke na ramenih. Rahlo upogni kolena (dip), nato eksplozivno iztegni noge in potisni ročke nad glavo hkrati. Spusti nazaj na ramena.',tip:'Začetniška teža: 5–7 kg/ročka. Noge dajo impulz — roke samo dokončajo gib. Bolj eksplozivno kot shoulder press.',kg:6,yt:'dumbbell push press crossfit technique'},
   'Veslanje':{desc:'Sedi na veslalni ergometer. Noge iztegni, nato potegni veslo k prsim z rokami in upogni kolena hkrati. Vrni v začetek v obratnem vrstnem redu.',tip:'Ritem: 70% noge, 20% trup, 10% roke. Začni počasi in se ustali na ritmičnem veslanju. Monitor kaže tempo/500m.',kg:0,yt:'rowing machine technique beginners'},
-  'Trx veslanje':{desc:'Drži TRX ročici, nagne telo nazaj. Potegni telo navzgor k rokom — komolci gresta ob telesu. Počasi vrni v začetni položaj.',tip:'Bolj pokonci = lažje. Noge skupaj in telo ravno ves čas.',kg:0,yt:'TRX row beginner form'}
+  'Trx veslanje':{desc:'Drži TRX ročici, nagne telo nazaj. Potegni telo navzgor k rokam — komolci gresta ob telesu. Počasi vrni v začetni položaj.',tip:'Bolj pokonci = lažje. Noge skupaj in telo ravno ves čas.',kg:0,yt:'TRX row beginner form'},
+  'Tek (zunaj ali tekalna steza)':{desc:'Teci v tempu pri katerem še lahko govoriš v kratkih stavkih (zmerna intenzivnost). Ogrevanje 5 min hoje, ohlajanje 5 min hoje.',tip:'Za začetnico: izmenjuj 2 min tek + 1 min hoja. Postopno povečuj čas teka. Dobri čevlji so ključni.',kg:0,yt:'running technique beginners form'},
+  'Kolesarjenje (zunaj ali sobno kolo)':{desc:'Na sobnem kolesu nastavi upor tako, da je pedajanje zahtevno a vzdržljivo. Na cesti izberi teren brez prevelikih vzponov za začetek.',tip:'Sedlo nastavi na višino kolka. Kolena se ne smejo povsem iztegniti pri pedaliranju. Začni s 20–30 min.',kg:0,yt:'cycling beginner tips technique'},
+  'Elipsa':{desc:'Stopi na elipso, drži ročke in enakomerno pedaliraj naprej. Hkrati potiskaj in vleci ročke z rokami za aktivacijo zgornjega dela.',tip:'Odlično za kolena — brez udarca ob podlago. Nastavi upor postopno. Drži hrbet raven, ne visi na ročkah.',kg:0,yt:'elliptical machine beginner tips'},
+  'Veslalni ergometer':{desc:'Sedi na ergometer. Začni z nogami, dodaj trup, dokončaj z rokami (10-20-70 razmerje). Vrni v obratnem vrstnem redu.',tip:'Začni pri tempu /500m +2 min nad udobnim. Osredotoči se na tehniko, ne na hitrost. 20 min je dober začetni cilj.',kg:0,yt:'rowing machine technique beginners'},
+  'Plavanje':{desc:'Izberi stil v katerem se počutiš varno (kravl ali hrbtno). Plavi v enakomernemu tempu, dihaj ritmično.',tip:'Začni s 4×25m z odmorom. Postopno povečuj do 4×50m brez odmora. Fokus na tehniki dihanja.',kg:0,yt:'freestyle swimming beginner technique'},
+  'Hoja (hiter tempo, zunaj)':{desc:'Hodi v tempu pri katerem je dihanje oteženo a še vedno možen pogovor. Roke aktivno zamahuj, hrbtenica ravna.',tip:'Podcenjena vadba! 8000–10000 korakov na dan z nahrbtničkom ali v hrib znatno poveča kalorično porabo.',kg:0,yt:'power walking technique tips'},
+  'Pohod na Pohorje 🏔':{desc:'Vzpon z vzpenjače (Mariborska vzpenjača) do koče Bellevue — 1 ura 15 minut normalne hoje po gozdni poti. Pot je dobro označena, primerna za vse ravni. Sestop po isti ali alternativni poti.',tip:'Oprema: udobni čevlji (ni nujno pohodniški), voda 0.5–1L. Odlično za aktiven dan na svežem zraku. Skupaj vzpon + sestop ~2.5 ure in ~400–500 kcal.',kg:0,yt:'Pohorje vzpenjača Maribor pohod'}
 };
 
 // ─── FUZZY EXERCISE INFO LOOKUP ────────────────────────────
@@ -483,24 +615,181 @@ function getWeekPlan(w){
 
 // exercise log: store per day, per exercise name
 const ELKEY='exlog_'+now.toISOString().split('T')[0];
-function loadElog(){try{return JSON.parse(localStorage.getItem(ELKEY))||{};}catch(e){return{};}}
-function saveElog(name,data){const l=loadElog();l[name]=data;try{localStorage.setItem(ELKEY,JSON.stringify(l));}catch(e){}}
+function loadElog(){try{return JSON.parse(localStorage.getItem(lsKey(ELKEY)))||{};}catch(e){return{};}}
+function saveElog(name,data){const l=loadElog();l[name]=data;try{localStorage.setItem(lsKey(ELKEY),JSON.stringify(l));}catch(e){}}
 
 let exExp={};  // UI state: which exercises are expanded
 
 // ─── STATE ──────────────────────────────────────────────────
 let S={meals:[],exp:[false,false,false,false,false],md:[false,false,false,false,false],exd:[],lf:false,easy:true,wt:DEF[DOW],ex:[]};
 
+// ─── AUTH ────────────────────────────────────────────────────
+let AUTH = null; // {username, pin, displayName}
+
+function getAuth(){
+  try{ return JSON.parse(localStorage.getItem('fit_auth'))||null; }catch(e){return null;}
+}
+function setAuth(a){
+  AUTH=a;
+  try{ localStorage.setItem('fit_auth', JSON.stringify(a)); }catch(e){}
+}
+function logout(){
+  localStorage.removeItem('fit_auth');
+  AUTH=null;
+  document.getElementById('main-app').style.display='none';
+  document.getElementById('auth-overlay').classList.remove('hide');
+  document.getElementById('auth-name').value='';
+  document.getElementById('auth-pin').value='';
+}
+
+function switchTab(tab){
+  const isLogin=tab==='login';
+  document.getElementById('tab-login').classList.toggle('active',isLogin);
+  document.getElementById('tab-register').classList.toggle('active',!isLogin);
+  document.getElementById('auth-btn').textContent=isLogin?'Prijava →':'Ustvari profil →';
+  document.getElementById('auth-err').classList.remove('show');
+  switchTab._mode=tab;
+}
+switchTab._mode='login';
+
+async function submitAuth(){
+  const name=document.getElementById('auth-name').value.trim();
+  const pin=document.getElementById('auth-pin').value.trim();
+  const btn=document.getElementById('auth-btn');
+  const errEl=document.getElementById('auth-err');
+  errEl.classList.remove('show');
+  if(!name||!pin){errEl.textContent='Vnesi ime in PIN.';errEl.classList.add('show');return;}
+  btn.disabled=true;btn.textContent='...';
+  try{
+    const r=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:switchTab._mode||'login',username:name,pin})});
+    const d=await r.json();
+    if(!r.ok){errEl.textContent=d.error||'Napaka';errEl.classList.add('show');btn.disabled=false;btn.textContent=switchTab._mode==='login'?'Prijava →':'Ustvari profil →';return;}
+    setAuth({username:d.username,pin,displayName:d.displayName});
+    await initApp();
+  }catch(e){errEl.textContent='Napaka pri povezavi.';errEl.classList.add('show');btn.disabled=false;btn.textContent='Poskusi znova';}
+}
+
+// ─── CLOUD STORAGE ───────────────────────────────────────────
+function lsKey(k){ return AUTH?`${AUTH.username}__${k}`:k; }
+
 function load(){
-  try{const sv=localStorage.getItem(TK);if(sv){S={...S,...JSON.parse(sv)};return;}}catch(e){}
-  initMeals();initWorkout();
+  try{const sv=localStorage.getItem(lsKey(TK));if(sv){S={...S,...JSON.parse(sv)};}}catch(e){}
 }
 function save(){
-  try{localStorage.setItem(TK,JSON.stringify(S));}catch(e){}
+  try{localStorage.setItem(lsKey(TK),JSON.stringify(S));}catch(e){}
   saveTrack();
+  // Async cloud sync — fire and forget
+  cloudSave();
 }
 function saveTrack(){
-  try{localStorage.setItem(TTRACK,JSON.stringify({md:S.md,ed:S.exd,wt:S.wt}));}catch(e){}
+  try{localStorage.setItem(lsKey(TTRACK),JSON.stringify({md:S.md,ed:S.exd,wt:S.wt}));}catch(e){}
+}
+
+let _syncTimer=null;
+function cloudSave(){
+  // Debounce — sync 2s after last change
+  clearTimeout(_syncTimer);
+  _syncTimer=setTimeout(async()=>{
+    if(!AUTH)return;
+    const today=now.toISOString().split('T')[0];
+    const payload={
+      main:S,
+      track:{md:S.md,ed:S.exd,wt:S.wt},
+      elog:loadElog(),
+      wod:localStorage.getItem(lsKey('wodlog_'+today))||'',
+      steps:ST
+    };
+    try{
+      await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'save',username:AUTH.username,pin:AUTH.pin,date:today,payload})});
+      setSyncStatus('✓ sinhronizirano');
+    }catch(e){setSyncStatus('⚠ offline');}
+  },2000);
+}
+
+async function cloudLoad(date){
+  if(!AUTH)return null;
+  try{
+    const r=await fetch(`/api/data?action=load&username=${AUTH.username}&pin=${AUTH.pin}&date=${date}`);
+    const d=await r.json();
+    return d.ok?d.data:null;
+  }catch(e){return null;}
+}
+
+async function cloudHistory(){
+  if(!AUTH)return null;
+  try{
+    const r=await fetch(`/api/data?action=history&username=${AUTH.username}&pin=${AUTH.pin}`);
+    const d=await r.json();
+    return d.ok?d.history:null;
+  }catch(e){return null;}
+}
+
+function setSyncStatus(msg){
+  const el=document.getElementById('u-sync');
+  if(el){el.textContent=msg;setTimeout(()=>{if(el.textContent===msg)el.textContent='';},4000);}
+}
+
+// ─── APP INIT ────────────────────────────────────────────────
+async function initApp(){
+  // Show app, hide modal
+  document.getElementById('auth-overlay').classList.add('hide');
+  document.getElementById('main-app').style.display='block';
+
+  // Update user bar
+  const av=document.getElementById('u-avatar');
+  const nm=document.getElementById('u-name');
+  if(av)av.textContent=(AUTH.displayName||AUTH.username).charAt(0).toUpperCase();
+  if(nm)nm.textContent=AUTH.displayName||AUTH.username;
+
+  // Try load from cloud first, fall back to localStorage
+  setSyncStatus('↺ nalagam...');
+  const today=now.toISOString().split('T')[0];
+  const cloudData=await cloudLoad(today);
+  if(cloudData){
+    if(cloudData.main)S={...S,...cloudData.main};
+    if(cloudData.steps)ST={...ST,...cloudData.steps};
+    if(cloudData.elog)try{localStorage.setItem(lsKey(ELKEY),JSON.stringify(cloudData.elog));}catch(e){}
+    if(cloudData.wod)try{localStorage.setItem(lsKey('wodlog_'+today),cloudData.wod);}catch(e){}
+    setSyncStatus('✓ naloženo');
+  } else {
+    load(); // fall back to localStorage
+    loadSteps();
+    setSyncStatus('');
+  }
+
+  // Date display
+  document.getElementById('ds').textContent=SLD[DOW]+', '+now.getDate()+'. '+SLM[now.getMonth()]+' '+now.getFullYear();
+
+  if(S.lf){document.getElementById('lt').classList.add('on');document.getElementById('lfn').style.display='flex';}
+  if(S.easy)document.getElementById('et').classList.add('on-grn');
+
+  renderBp();renderMeals();renderWorkout();renderTracker();renderSteps();
+
+  // Load history from cloud async
+  cloudHistory().then(hist=>{
+    if(hist){
+      // Store in localStorage for renderHistory
+      Object.entries(hist).forEach(([date,data])=>{
+        if(data.main)try{localStorage.setItem(lsKey('dp_v6_'+date),JSON.stringify(data.main));}catch(e){}
+        if(data.track)try{localStorage.setItem(lsKey('track_'+date),JSON.stringify(data.track));}catch(e){}
+        if(data.elog)try{localStorage.setItem(lsKey('exlog_'+date),JSON.stringify(data.elog));}catch(e){}
+        if(data.wod)try{localStorage.setItem(lsKey('wodlog_'+date),data.wod);}catch(e){}
+      });
+    }
+    renderHistory();
+  });
+}
+
+// ─── START ───────────────────────────────────────────────────
+AUTH=getAuth();
+if(AUTH){
+  initApp();
+} else {
+  document.getElementById('auth-overlay').classList.remove('hide');
+  document.getElementById('main-app').style.display='none';
+  switchTab('login');
 }
 
 function getMealSrc(){return S.easy?(EM[DOW]||EM[1]):(MD[DOW]||MD[1]);}
@@ -579,11 +868,153 @@ function renderMeals(){
   calcKcal();
 }
 
+// ─── CALORIE BURN PER EXERCISE ─────────────────────────────
+// Ocena kcal/serijo za posamezno vajo (povprečje za 65kg žensko)
+const BURN={
+  'Potisk z ročkami leže':18,'Veslanje z ročko (enoročno)':16,'Vzdolžni potisk nad glavo':15,
+  'Biceps curl z ročkami':12,'Triceps potisk pri kablu':12,'Plank':8,
+  'Počep (goblet ali s palico)':25,'Izpadni koraki z ročkami':22,'Leg press':20,
+  'Mrtvetek z ročkami (RDL)':24,'Donkey kicks pri kablu':12,'Dvig na prste — lýtka':8,
+  'Hip thrust z palico':20,'Cable pull-through':16,'Sumo počep z ročko':22,
+  'Frog pumps':8,'Abduktor stroj (odmik nog)':10,
+  'Počep z ročkami':24,'Veslanje v upognjenem položaju':18,'Plank z izmenjevanjem rok':9,
+  'Air squat':14,'Push-up (na kolenih ali polni)':12,'Kettlebell swing':20,
+  'Goblet squat (12 kg)':22,'Sit-up':10,'Burpee (step-out različica)':28,
+  'Box step-up (z ročkama 4 kg)':18,'Dumbbell push press':17,'Veslanje':35,
+  // Cardio: per minute approximation stored separately
+};
+const BURN_DEFAULT=14; // kcal/serijo za neznane vaje
+const CARDIO_BURN_PER_MIN=7; // kcal/min zmerne intenzivnosti
+
+const STEPS_KEY='steps_'+now.toISOString().split('T')[0];
+let ST={goal:10000,done:false,val:0};
+function loadSteps(){try{const s=localStorage.getItem(lsKey(STEPS_KEY));if(s)ST=JSON.parse(s);}catch(e){}}
+function saveStepsState(){try{localStorage.setItem(lsKey(STEPS_KEY),JSON.stringify(ST));}catch(e){}}
+
+function stepsKcal(steps){
+  // ~0.04 kcal/korak za 65kg žensko
+  return Math.round(steps*0.04);
+}
+
+function renderSteps(){
+  const pct=Math.min(100,Math.round((ST.val/ST.goal)*100));
+  const isDone=ST.done||ST.val>=ST.goal;
+  const kcal=stepsKcal(ST.val);
+
+  document.getElementById('st-val').textContent=ST.val.toLocaleString('sl-SI');
+  document.getElementById('st-goal').textContent=ST.goal.toLocaleString('sl-SI');
+  document.getElementById('st-pct').textContent=pct+'%';
+  const fill=document.getElementById('st-fill');
+  fill.style.width=pct+'%';
+  fill.className='steps-fill'+(isDone?' done':'');
+  const kcalEl=document.getElementById('st-kcal');
+  if(ST.val>0){kcalEl.style.display='inline';kcalEl.textContent='🔥 −'+kcal+' kcal';}
+  else{kcalEl.style.display='none';}
+  const chk=document.getElementById('st-chk');
+  if(chk){chk.classList.toggle('on',isDone);chk.textContent=isDone?'✓':'○';}
+}
+
+function togStepsEdit(){
+  const inp=document.getElementById('st-inp');
+  const btn=document.getElementById('st-ebtn');
+  const isEditing=inp.classList.toggle('show');
+  const valEl=document.getElementById('st-val');
+  if(isEditing){
+    // Show input prefilled with current val, hide display
+    inp.value=ST.val||'';
+    valEl.style.display='none';
+    btn.textContent='✓ shrani';
+    setTimeout(()=>inp.focus(),50);
+  } else {
+    valEl.style.display='';
+    btn.textContent='✏ vnesi';
+    saveSteps();
+  }
+}
+
+function saveSteps(){
+  const inp=document.getElementById('st-inp');
+  const v=parseInt(inp.value)||0;
+  ST.val=Math.max(0,Math.min(100000,v));
+  if(ST.val>=ST.goal)ST.done=true;
+  saveStepsState();
+  // Hide input, show value
+  inp.classList.remove('show');
+  document.getElementById('st-val').style.display='';
+  document.getElementById('st-ebtn').textContent='✏ vnesi';
+  renderSteps();
+  calcKcal();
+}
+
+function togStepsDone(){
+  // Toggle: if not done, mark as done at goal; if done, reset
+  if(ST.done||ST.val>=ST.goal){
+    ST.done=false;
+    if(ST.val>=ST.goal)ST.val=0;
+  } else {
+    ST.done=true;
+    if(ST.val===0)ST.val=ST.goal;
+  }
+  saveStepsState();renderSteps();calcKcal();
+}
+
+// Allow changing goal via long-press / right-click on goal text
+function changeStepsGoal(){
+  const newGoal=prompt('Cilj korakov:',ST.goal);
+  if(newGoal&&parseInt(newGoal)>0){ST.goal=parseInt(newGoal);saveStepsState();renderSteps();calcKcal();}
+}
+
+loadSteps();
+
+function calcExBurn(){
+  if(S.wt==='cardio'){
+    return S.ex.reduce((sum,ex,i)=>{
+      if(!S.exd[i])return sum;
+      return sum+(ex.kcal||CARDIO_BURN_PER_MIN*parseInt(ex.r)||150);
+    },0);
+  }
+  if(S.wt==='crossfit'){
+    const wod=S.cfWod||(WKT.crossfit?.wods?.[DOW%7]);
+    if(!wod||!S.exd.length)return 0;
+    const done=S.exd.filter(Boolean).length;
+    const total=wod.ex?.length||1;
+    const timeMin=(wod.time||15);
+    return Math.round((done/total)*timeMin*9); // ~9 kcal/min CrossFit
+  }
+  // Strength training: sum by exercise
+  return S.ex.reduce((sum,ex,i)=>{
+    if(!S.exd[i])return sum;
+    const logged=loadElog()[ex.n]||{};
+    const sets=parseInt(logged.s)||parseInt(ex.s)||3;
+    const kcalPerSet=BURN[ex.n]||BURN_DEFAULT;
+    return sum+sets*kcalPerSet;
+  },0);
+}
+
 function calcKcal(){
   const eaten=S.meals.reduce((s,m,i)=>s+(S.md[i]?(parseInt(m.k||m.kcal)||0):0),0);
   const planned=S.meals.reduce((s,m)=>s+(parseInt(m.k||m.kcal)||0),0);
+  const exBurned=calcExBurn();
+  const stepsBurned=stepsKcal(ST.val);
+  const burned=exBurned+stepsBurned;
+  const net=eaten-burned;
+
   document.getElementById('tk-eaten').textContent=eaten+' kcal';
   document.getElementById('tk-plan').textContent='/ '+planned+' kcal načrtovano';
+
+  const netBar=document.getElementById('kcal-net-bar');
+  if(burned>0){
+    netBar.classList.add('show');
+    const parts=[];
+    if(exBurned>0)parts.push('vadba −'+exBurned);
+    if(stepsBurned>0)parts.push('koraki −'+stepsBurned);
+    document.getElementById('tk-burn').textContent='−'+burned+' kcal  ('+parts.join(', ')+')';
+    const netEl=document.getElementById('tk-net');
+    netEl.textContent=net+' kcal';
+    netEl.className='kcal-net-val '+(net<planned?'net-ok':'net-warn');
+  } else {
+    netBar.classList.remove('show');
+  }
 }
 
 function togMeal(i){
@@ -639,7 +1070,7 @@ function renderWorkout(){
     const wod=S.cfWod;
     const typeClass=wod.type==='AMRAP'?'amrap':wod.type==='EMOM'?'emom':'';
     const timeLabel=wod.type==='AMRAP'?`${wod.time} min`:wod.type==='EMOM'?`${wod.time} min`:wod.rounds?`${wod.rounds} krogov`:'';
-    const savedResult=localStorage.getItem('wodlog_'+now.toISOString().split('T')[0])||'';
+    const savedResult=localStorage.getItem(lsKey('wodlog_'+now.toISOString().split('T')[0]))||'';
     const exRows=wod.ex.map((e,i)=>{
       const info=getExInfo(e.n)||{};
       const descHtml=info.desc?`<div class="wod-desc-panel" id="wdp${i}"><div class="ex-desc" style="margin-bottom:6px;">${info.desc}</div><div class="ex-tip">💡 ${info.tip}</div><a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent((info.yt||e.n))}" target="_blank">▶ Video</a></div>`:'';
@@ -672,7 +1103,35 @@ function renderWorkout(){
     <div style="margin-top:8px;font-size:12px;color:var(--lt);">Klikni ↺ pri posamezni vaji za zamenjavo, ali "Nov WOD" za cel nov trening.</div>`;
     return;
   }
-  if(S.wt==='cardio'){baw.disabled=true;c.innerHTML=`<div class="badge cardio">◈ Kardio dan</div><div class="info-box">Danes je kardio dan. Izberi med tekom, kolesom, elipso ali plavanjem.<br><br>Cilj: 45–55 minut pri zmerni intenzivnosti. Ogrevanje 5–10 min + ohlajanje 5 min.</div>`;document.getElementById('add-ex-row').style.display='none';}
+  if(S.wt==='cardio'){
+    baw.disabled=false;document.getElementById('add-ex-row').style.display='none';
+    const wp=getWeekPlan(WEEK_NUM);
+    c.innerHTML=`<div class="badge cardio">◈ Kardio dan</div>
+      <div style="font-size:12px;color:var(--lt);margin-bottom:10px;">Izberi kaj boš naredila danes in odkljukaj ob koncu.</div>`+
+      S.ex.map((e,i)=>{
+        const done=S.exd[i];const open=!!exExp[i];
+        const info=getExInfo(e.n)||{};
+        const kcalEst=e.kcal||CARDIO_BURN_PER_MIN*parseInt(e.r)||150;
+        const descHtml=info.desc?`
+          <div class="ex-desc">${info.desc}</div>
+          <div class="ex-tip">💡 ${info.tip}</div>
+          <a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent((info.yt||e.n))}" target="_blank">▶ Video navodila</a>
+          <div style="font-size:12px;color:var(--grn);background:#EBF4EF;padding:5px 10px;border-radius:7px;margin-top:4px;">🔥 Ocena: ~${kcalEst} kcal</div>
+        `:`<div class="no-desc"></div>`;
+        return `<div class="ex-wrap" id="ew${i}">
+          <div class="ex-top${done?' done':''}" id="et${i}">
+            <div class="edot" style="background:#1E4E8C"></div>
+            <div class="ename">${e.n}</div>
+            <div class="epills"><span class="ep" style="background:#EAF0F9;color:#1E4E8C;">${e.r}</span></div>
+            <button class="sbtn" onclick="swapEx(${i})">↺</button>
+            <button class="chk${done?' on':''}" id="echk${i}" onclick="togEx(${i})">${done?'✓':'○'}</button>
+            <button class="ex-xbtn${open?' open':''}" id="exb${i}" onclick="togExInfo(${i})">▾</button>
+          </div>
+          <div class="ex-detail${open?' open':''}" id="exd${i}">${descHtml}</div>
+        </div>`;
+      }).join('');
+    return;
+  }
   else if(S.wt==='rest'){baw.disabled=true;c.innerHTML=`<div class="badge rest">○ Počitek</div><div class="info-box">Danes je dan počitka. Telo se regenerira in mišice rastejo.<br><br>Lahka hoja ali raztezanje sta vedno dobrodošla.</div>`;document.getElementById('add-ex-row').style.display='none';}
   else{
     baw.disabled=false;document.getElementById('add-ex-row').style.display='flex';
@@ -764,7 +1223,7 @@ function togWodDesc(i){
 function saveWodResult(){
   const val=document.getElementById('wod-res')?.value;
   if(!val)return;
-  localStorage.setItem('wodlog_'+now.toISOString().split('T')[0],val);
+  localStorage.setItem(lsKey('wodlog_'+now.toISOString().split('T')[0]),val);
   const ok=document.getElementById('wod-ok');
   if(ok){ok.textContent='✓ shranjeno';ok.classList.add('show');setTimeout(()=>ok.classList.remove('show'),2500);}
 }
@@ -789,6 +1248,7 @@ function logEx(i,name){
   const s=document.getElementById('ls'+i)?.value;
   const r=document.getElementById('lr'+i)?.value;
   saveElog(name,{kg,s,r});
+  calcKcal();
   const ok=document.getElementById('lok'+i);
   if(ok){ok.textContent='✓ shranjeno';ok.classList.add('show');setTimeout(()=>ok.classList.remove('show'),2500);}
   // update the inline summary in ename without full re-render
@@ -800,7 +1260,7 @@ function togEx(i){
   const top=document.getElementById('et'+i),chk=document.getElementById('echk'+i);
   if(top)top.classList.toggle('done',S.exd[i]);
   if(chk){chk.classList.toggle('on',S.exd[i]);chk.textContent=S.exd[i]?'✓':'○';}
-  renderTracker();
+  calcKcal();renderTracker();
 }
 function addCustomEx(){
   const n=document.getElementById('aen').value.trim();
@@ -815,13 +1275,13 @@ function addCustomEx(){
 // ─── WEEKLY TRACKER ─────────────────────────────────────────
 const WDAYS=['P','T','S','Č','P','S','N'];
 function getTrackData(d){
-  try{const s=localStorage.getItem('track_'+d);return s?JSON.parse(s):null;}catch(e){return null;}
+  try{const s=localStorage.getItem(lsKey('track_'+d));return s?JSON.parse(s):null;}catch(e){return null;}
 }
 function getDayScore(d){
   if(!d)return null;
   const md=d.md||[];const ed=d.ed||[];
   const mTotal=5,mDone=md.filter(Boolean).length;
-  const isRest=d.wt==='rest'||d.wt==='cardio';
+  const isRest=d.wt==='rest';
   if(isRest)return mDone/mTotal;
   const eTotal=ed.length||6,eDone=ed.filter(Boolean).length;
   return(mDone+eDone)/(mTotal+eTotal);
@@ -899,6 +1359,14 @@ async function swapEx(i){
   const card=document.getElementById('ew'+i),btn=card?.querySelector('.sbtn');
   if(!btn||btn.disabled)return;
   btn.disabled=true;btn.innerHTML='<span class="spin">↺</span>';card.classList.add('loading');
+  if(S.wt==='cardio'){
+    try{
+      const txt=await api('Si fitnes trener. Predlagaj alternativno kardio aktivnost. Vrni SAMO JSON: {"n":"ime aktivnosti v slovenščini","s":"1","r":"30 min","kcal":200}',
+        `Zamenjaj kardio aktivnost "${S.ex[i].n}" z drugačno alternativo.`);
+      const p=JSON.parse(txt);S.ex[i]={...S.ex[i],...p};save();renderWorkout();
+    }catch(e){err('Zamenjava ni uspela.');card.classList.remove('loading');btn.disabled=false;btn.innerHTML='↺';}
+    return;
+  }
   const focus=S.wt==='glute'?'zadnjico (glute focus)':'isto mišično skupino';
   try{
     const txt=await api(`Si fitnes trener za telovadnico. Vrni SAMO JSON: {"n":"ime vaje v slovenščini","s":"3","r":"12"}`,
@@ -947,6 +1415,19 @@ async function refreshWorkout(){
   const btn=document.getElementById('baw');if(!btn||btn.disabled)return;
   btn.disabled=true;btn.innerHTML='<span class="spin">↺</span> Generiram...';
 
+  if(S.wt==='cardio'){
+    try{
+      const txt=await api(
+        'Si fitnes trener. Predlagaj 7 različnih kardio aktivnosti. Vrni SAMO JSON array: [{"n":"ime aktivnosti v slovenščini","s":"1","r":"30 min","kcal":200},...]',
+        'Sestavi raznovrsten seznam kardio aktivnosti — tek, kolo, plavanje, hoja, planinarjenje, elipsa itd. Vključi pohod na Pohorje z oceno kcal ~800.'
+      );
+      const p=JSON.parse(txt);
+      if(Array.isArray(p)){S.ex=p.slice(0,7);S.exd=S.ex.map(()=>false);save();renderWorkout();}
+    }catch(e){err('Generiranje ni uspelo.');}
+    btn.disabled=false;btn.innerHTML='↺ Zamenjaj vaje';
+    return;
+  }
+
   if(S.wt==='crossfit'){
     const types=['AMRAP','For Time','EMOM'];
     const t=types[Math.floor(Math.random()*types.length)];
@@ -993,11 +1474,11 @@ function renderHistory(){
     const d=new Date(now);d.setDate(now.getDate()-i);
     const key=d.toISOString().split('T')[0];
     let track=null,plan=null,exlog={},wodRes='';
-    try{const s=localStorage.getItem('track_'+key);if(s)track=JSON.parse(s);}catch(e){}
+    try{const s=localStorage.getItem(lsKey('track_'+key));if(s)track=JSON.parse(s);}catch(e){}
     if(!track)continue;
-    try{const s=localStorage.getItem('dp_v6_'+key);if(s)plan=JSON.parse(s);}catch(e){}
-    try{const s=localStorage.getItem('exlog_'+key);if(s)exlog=JSON.parse(s);}catch(e){}
-    try{wodRes=localStorage.getItem('wodlog_'+key)||'';}catch(e){}
+    try{const s=localStorage.getItem(lsKey('dp_v6_'+key));if(s)plan=JSON.parse(s);}catch(e){}
+    try{const s=localStorage.getItem(lsKey('exlog_'+key));if(s)exlog=JSON.parse(s);}catch(e){}
+    try{wodRes=localStorage.getItem(lsKey('wodlog_'+key))||'';}catch(e){}
     days.push({d,key,track,plan,exlog,wodRes});
   }
   if(!days.length){container.innerHTML='<div class="hist-empty">Ni še podatkov za pretekle dneve. Začni obkljukovati obroke in vaje!</div>';return;}
@@ -1058,11 +1539,8 @@ function renderHistory(){
   }).join('');
 }
 
-// ─── INIT ───────────────────────────────────────────────────
-load();
-if(S.lf){document.getElementById('lt').classList.add('on');document.getElementById('lfn').style.display='flex';}
-if(S.easy)document.getElementById('et').classList.add('on-grn');
-renderBp();renderMeals();renderWorkout();renderTracker();renderHistory();
+// ─── INIT called from initApp() above ────────────────────────
 </script>
 </body>
 </html>
+
