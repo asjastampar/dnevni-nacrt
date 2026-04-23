@@ -911,10 +911,19 @@ async function refreshMeals(){
   const ez=S.easy?'Hiter in enostaven jedilnik (konzerve, jajca, whey shake, pečena kura iz pekarne, mikrovalovna). Brez kompleksnega kuhanja.':'';
   const lfc=S.lf?'Brez laktoze.':'Z laktozo je ok.';
   try{
-    const txt=await api(`Si prehranjevalni svetovalec. ${ez} ${lfc} Sestavi dnevni jedilnik ~1600 kcal za žensko ki hoče shujšati. SAMO JSON array 5 elementov: [{"f":"...","k":380,"i":[{"n":"...","a":"100 g"}]},...] — zajtrk, dopold. prig., kosilo, popold. prig., večerja.`,
+    const txt=await api(`Si prehranjevalni svetovalec. ${ez} ${lfc} Sestavi dnevni jedilnik ~1600 kcal za žensko ki hoče shujšati. Vrni SAMO veljavni JSON array s 5 elementi. Vsak element mora imeti: "f" = konkretno ime jedi v slovenščini, ne generično "zajtrk", "kosilo", "večerja", "prigrizek"; "k" = kalorije; "i" = seznam sestavin z gramaturami. Format: [{"f":"Skyr z ovsenimi kosmiči, borovnicami in mandlji","k":360,"i":[{"n":"Skyr navadni","a":"170 g"}]}]. Ne uporabljaj generičnih imen obrokov kot naslov jedi.`,
       'Svež raznovrsten jedilnik za danes z natančnimi gramaturami.');
     const p=JSON.parse(txt);
-    if(Array.isArray(p)&&p.length===5){S.meals=LBLS.map((l,i)=>({label:l,...p[i]}));S.md=[false,false,false,false,false];save();renderMeals();}
+    const genericTitles=['zajtrk','dopoldanski prigrizek','dopold. prig.','kosilo','popoldanski prigrizek','popold. prig.','večerja'];
+    const cleaned=Array.isArray(p)?p.map((m,i)=>{
+      const title=(m.f||'').trim().toLowerCase();
+      if(genericTitles.includes(title)){
+        const ing=(m.i||[]).map(x=>x.n).filter(Boolean).join(', ');
+        return {...m,f:ing?ing:LBLS[i]};
+      }
+      return m;
+    }):p;
+    if(Array.isArray(cleaned)&&cleaned.length===5){S.meals=LBLS.map((l,i)=>({label:l,...cleaned[i]}));S.md=[false,false,false,false,false];save();renderMeals();}
   }catch(e){err('Generiranje ni uspelo.');}
   btn.disabled=false;btn.innerHTML='↺ Zamenjaj vse';
 }
