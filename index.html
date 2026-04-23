@@ -257,6 +257,12 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .kcal-net-val.net-ok{color:var(--grn);}
 .kcal-net-val.net-warn{color:var(--red);}
 /* add extra meal */
+.pin-btn{background:none;border:.5px solid var(--br);border-radius:7px;padding:3px 7px;font-size:12px;cursor:pointer;color:var(--lt);font-family:inherit;transition:all .15s;line-height:1.4;}
+.pin-btn:hover{color:#B45309;background:#FFF3E0;border-color:#F5C88A;}
+.pin-btn.pinned{color:#B45309;background:#FFF3E0;border-color:#F5C88A;}
+.del-btn{background:none;border:.5px solid var(--br);border-radius:7px;padding:3px 7px;font-size:13px;cursor:pointer;color:var(--lt);font-family:inherit;transition:all .15s;line-height:1.4;}
+.del-btn:hover{color:var(--red);background:#FDF0EC;border-color:rgba(201,75,42,.3);}
+.pinned-badge{font-size:11px;color:#B45309;background:#FFF3E0;padding:2px 6px;border-radius:4px;margin-left:4px;}
 .add-meal-row{display:flex;gap:7px;margin-top:8px;}
 .add-meal-inp{flex:1;border:.5px solid var(--br);border-radius:8px;padding:8px 11px;font-size:14px;font-family:inherit;background:var(--w);color:var(--dk);outline:none;}
 .add-meal-inp:focus{border-color:rgba(0,0,0,.2);}
@@ -840,10 +846,19 @@ if(AUTH){
   switchTab('login');
 }
 
+const PINNED_KEY='pinned_meals';
+function getPinned(){try{return JSON.parse(localStorage.getItem(lsKey(PINNED_KEY)))||{};}catch(e){return{};}}
+function savePinned(p){try{localStorage.setItem(lsKey(PINNED_KEY),JSON.stringify(p));}catch(e){}}
+
 function getMealSrc(){return S.easy?(EM[DOW]||EM[1]):(MD[DOW]||MD[1]);}
 function initMeals(){
   const src=getMealSrc();
-  S.meals=src.map((m,i)=>({label:m.l,...(S.lf?m.lf:m.n)}));
+  const pinned=getPinned();
+  S.meals=src.map((m,i)=>{
+    // If this slot has a pinned meal, use it
+    if(pinned[i])return {label:m.l,...pinned[i],pinned:true};
+    return {label:m.l,...(S.lf?m.lf:m.n)};
+  });
   S.md=[false,false,false,false,false];
 }
 function initWorkout(){
@@ -883,28 +898,33 @@ function selBp(id){S.wt=id;initWorkout();save();renderBp();renderWorkout();rende
 
 // ─── RENDER MEALS ───────────────────────────────────────────
 function renderMeals(){
+  const pinned=getPinned();
   document.getElementById('mc').innerHTML=S.meals.map((m,i)=>{
     const ingH=m.i?m.i.map(x=>`<div class="in">${x.n}</div><div class="ia">${x.a}</div>`).join(''):'';
     const done=S.md[i];const open=S.exp[i];const editOpen=S.editOpen&&S.editOpen[i];
-    const easyMark=S.easy?`<span class="easy-badge">hitro</span>`:'';
+    const easyMark=S.easy&&!m.pinned?`<span class="easy-badge">hitro</span>`:'';
     const custom=m.custom?`<span style="font-size:11px;color:var(--red);margin-left:4px;">ročni vnos</span>`:'';
+    const isPinned=!!m.pinned||!!pinned[i];
+    const pinnedBadge=isPinned?`<span class="pinned-badge">📌 privzeto</span>`:'';
     return `<div class="meal-card fi${done?' done':''}" id="mc${i}">
       <div class="meal-top">
         <div class="mdot"></div>
         <div class="mbody">
-          <div class="mlbl">${m.label}${easyMark}${custom}</div>
-          <div class="mfood">${m.f||m.food}</div>
+          <div class="mlbl">${m.label}${easyMark}${custom}${pinnedBadge}</div>
+          <div class="mfood" id="mfood${i}">${m.f||m.food}</div>
           <div class="mkcal" id="mkcal${i}">~${m.k||m.kcal} kcal</div>
         </div>
         <div class="meal-actions">
-          <button class="ebtn${editOpen?' open':''}" id="eb${i}" onclick="togEdit(${i})" title="Ročni vnos">✏</button>
+          <button class="pin-btn${isPinned?' pinned':''}" onclick="togPin(${i})" title="${isPinned?'Odstrani privzeto':'Nastavi kot privzeto vsak dan'}">📌</button>
+          <button class="del-btn" onclick="deleteMeal(${i})" title="Izbriši obrok">✕</button>
+          <button class="ebtn${editOpen?' open':''}" id="eb${i}" onclick="togEdit(${i})" title="Uredi vsebino">✏</button>
           <button class="ibtn${open?' open':''}" id="ib${i}" onclick="togIng(${i})">${open?'skrij':'sestavine'}</button>
           <button class="sbtn" onclick="swapMeal(${i})">↺</button>
           <button class="chk${done?' on':''}" id="chk${i}" onclick="togMeal(${i})" title="Zaužito">${done?'✓':'○'}</button>
         </div>
       </div>
       <div class="edit-panel${editOpen?' open':''}" id="editp${i}">
-        <input class="edit-input" id="ei${i}" placeholder="Vnesi kar si pojedla (npr. 'pizza 2 kosa', '30g whey + mleko')..." onkeydown="if(event.key==='Enter')submitCustom(${i})">
+        <input class="edit-input" id="ei${i}" placeholder="Zamenjaj z... (npr. 'skyr z borovnicami', '30g whey + mleko')..." onkeydown="if(event.key==='Enter')submitCustom(${i})">
         <button class="edit-go" id="ego${i}" onclick="submitCustom(${i})">Izračunaj →</button>
       </div>
       <div class="ing-panel${open?' open':''}" id="ip${i}">
@@ -1095,6 +1115,9 @@ async function submitCustom(i){
     );
     const p=JSON.parse(txt);
     S.meals[i]={...S.meals[i],f:p.f,k:parseInt(p.k)||S.meals[i].k,i:p.i||S.meals[i].i,custom:true};
+    // If meal was pinned, update the pin too
+    const pinned=getPinned();
+    if(pinned[i]){pinned[i]={f:p.f,k:parseInt(p.k)||0,i:p.i||[]};savePinned(pinned);}
     if(S.editOpen)S.editOpen[i]=false;
     save();renderMeals();
   }catch(e){err('Izračun ni uspel. Poskusi znova.');}
@@ -1105,6 +1128,28 @@ function togIng(i){
   const p=document.getElementById('ip'+i),b=document.getElementById('ib'+i);
   if(p)p.classList.toggle('open',S.exp[i]);
   if(b){b.classList.toggle('open',S.exp[i]);b.textContent=S.exp[i]?'skrij':'sestavine';}
+}
+function togPin(i){
+  const pinned=getPinned();
+  const m=S.meals[i];
+  if(pinned[i]){
+    delete pinned[i];
+    S.meals[i]={...S.meals[i],pinned:false};
+  }else{
+    // Save current meal (food + kcal + ingredients) as pinned for this slot
+    pinned[i]={f:m.f||m.food,k:m.k||m.kcal,i:m.i||[]};
+    S.meals[i]={...S.meals[i],pinned:true};
+  }
+  savePinned(pinned);save();renderMeals();
+}
+function deleteMeal(i){
+  // Replace with empty placeholder
+  S.meals[i]={...S.meals[i],f:'(obrok izbrisan)',k:0,i:[],custom:false,pinned:false};
+  S.md[i]=false;
+  // Also unpin if pinned
+  const pinned=getPinned();
+  if(pinned[i]){delete pinned[i];savePinned(pinned);}
+  save();renderMeals();
 }
 
 // ─── RENDER WORKOUT ─────────────────────────────────────────
