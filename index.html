@@ -878,10 +878,10 @@ function renderTracker(){
 
 // ─── API CALLS ──────────────────────────────────────────────
 async function api(sys,msg){
-  const r=await fetch('/api/meal-swap',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mealLabel:'obrok',currentMeal:msg,lactoseFree:S.lf,easyMode:S.easy})});
+  const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:sys,message:msg})});
   if(!r.ok) throw new Error('API '+r.status);
   const d=await r.json();
-  return JSON.stringify({f:d.food,k:d.kcal,i:(d.ingredients||[]).map(x=>({n:x.name,a:x.amount}))});
+  return (d.text||'').trim();
 }
 async function swapMeal(i){
   const card=document.getElementById('mc'+i),btn=card.querySelector('.sbtn');
