@@ -1277,10 +1277,11 @@ function togPin(i){
   savePinned(pinned);save();renderMeals();
 }
 function deleteMeal(i){
-  // Replace with empty placeholder
-  S.meals[i]={...S.meals[i],f:'(obrok izbrisan)',k:0,i:[],custom:false,pinned:false};
-  S.md[i]=false;
-  // Also unpin if pinned
+  S.meals.splice(i,1);
+  S.md.splice(i,1);
+  if(S.exp)S.exp.splice(i,1);
+  if(S.editOpen)S.editOpen.splice(i,1);
+  // Unpin if pinned
   const pinned=getPinned();
   if(pinned[i]){delete pinned[i];savePinned(pinned);}
   save();renderMeals();
@@ -2082,4 +2083,3 @@ function renderHistory(){
 </script>
 </body>
 </html>
-
