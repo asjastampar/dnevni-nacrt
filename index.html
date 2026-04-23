@@ -256,6 +256,33 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .kcal-net-val.neg{color:var(--grn);}
 .kcal-net-val.net-ok{color:var(--grn);}
 .kcal-net-val.net-warn{color:var(--red);}
+/* add extra meal */
+.add-meal-row{display:flex;gap:7px;margin-top:8px;}
+.add-meal-inp{flex:1;border:.5px solid var(--br);border-radius:8px;padding:8px 11px;font-size:14px;font-family:inherit;background:var(--w);color:var(--dk);outline:none;}
+.add-meal-inp:focus{border-color:rgba(0,0,0,.2);}
+.add-meal-inp::placeholder{color:var(--lt);}
+.add-meal-btn{background:var(--dk);color:var(--w);border:none;border-radius:8px;padding:8px 13px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:opacity .15s;}
+.add-meal-btn:hover{opacity:.8;}
+.add-meal-btn:disabled{opacity:.4;pointer-events:none;}
+/* personalize panel */
+.pers-btn{display:flex;align-items:center;gap:5px;font-size:12px;color:#8B2B6E;background:#FBE8F5;border:.5px solid #E4ABCF;border-radius:20px;padding:5px 11px;cursor:pointer;font-family:inherit;transition:all .15s;}
+.pers-btn:hover{background:#f5d5ed;}
+.pers-btn:disabled{opacity:.4;pointer-events:none;}
+.pers-panel{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:14px;margin-bottom:8px;display:none;}
+.pers-panel.show{display:block;}
+.pers-title{font-size:11px;font-weight:500;color:var(--md);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;}
+.pers-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
+.pers-tab{padding:5px 12px;border:.5px solid var(--br);border-radius:20px;font-size:13px;color:var(--md);background:none;cursor:pointer;font-family:inherit;transition:all .15s;}
+.pers-tab.active{background:var(--dk);color:var(--w);border-color:var(--dk);}
+.pers-suggestions{display:flex;flex-direction:column;gap:7px;}
+.pers-item{background:var(--bg);border-radius:9px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;border:.5px solid transparent;transition:all .15s;}
+.pers-item:hover{background:#EDECEA;border-color:var(--br);}
+.pers-item-body{flex:1;min-width:0;}
+.pers-item-name{font-size:14px;color:var(--dk);margin-bottom:2px;}
+.pers-item-meta{font-size:12px;color:var(--lt);}
+.pers-item-tag{font-size:11px;padding:2px 7px;border-radius:5px;white-space:nowrap;flex-shrink:0;}
+.pers-item-tag.fav{background:#EBF4EF;color:var(--grn);}
+.pers-item-tag.new{background:#FBE8F5;color:#8B2B6E;}
 /* error */
 .err{font-size:13px;color:var(--red);padding:8px 12px;background:#FDF0EC;border-radius:8px;margin:8px 0;display:none;}
 .err.show{display:block;}
@@ -314,10 +341,28 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
           <span>Brez laktoze</span>
         </label>
         <button class="rbtn" id="bam" onclick="refreshMeals()">↺ Zamenjaj vse</button>
+        <button class="pers-btn" id="pers-btn" onclick="togPers()">✦ Personaliziraj</button>
       </div>
     </div>
     <div class="lf-note" id="lfn">✓ Brez laktoze</div>
+    <!-- Personalize panel -->
+    <div class="pers-panel" id="pers-panel">
+      <div class="pers-title">Predlogi za tebe</div>
+      <div class="pers-tabs">
+        <button class="pers-tab active" id="ptab-fav" onclick="showPersTab('fav')">⭐ Tvoje jedi</button>
+        <button class="pers-tab" id="ptab-new" onclick="showPersTab('new')">✦ Novo za tebe</button>
+      </div>
+      <div class="pers-suggestions" id="pers-suggestions">
+        <div style="font-size:13px;color:var(--lt);padding:8px 0;">Generiram predloge...</div>
+      </div>
+    </div>
     <div id="mc"></div>
+    <!-- Add extra meal -->
+    <div class="add-meal-row">
+      <input class="add-meal-inp" id="extra-inp" placeholder="Dodaj obrok... (npr. sladoled, kava z mlekom, banana)" onkeydown="if(event.key==='Enter')addExtraMeal()">
+      <button class="add-meal-btn" id="extra-btn" onclick="addExtraMeal()">+ Dodaj</button>
+    </div>
+    <div id="extra-meals"></div>
     <div class="kcal-bar">
       <span style="font-size:13px;color:var(--md);">Zaužito danes</span>
       <div class="kcal-split">
@@ -621,7 +666,7 @@ function saveElog(name,data){const l=loadElog();l[name]=data;try{localStorage.se
 let exExp={};  // UI state: which exercises are expanded
 
 // ─── STATE ──────────────────────────────────────────────────
-let S={meals:[],exp:[false,false,false,false,false],md:[false,false,false,false,false],exd:[],lf:false,easy:true,wt:DEF[DOW],ex:[]};
+let S={meals:[],exp:[false,false,false,false,false],md:[false,false,false,false,false],exd:[],lf:false,easy:true,wt:DEF[DOW],ex:[],extras:[]};
 
 // ─── AUTH ────────────────────────────────────────────────────
 let AUTH = null; // {username, pin, displayName}
@@ -768,7 +813,7 @@ async function initApp(){
   if(S.lf){document.getElementById('lt').classList.add('on');document.getElementById('lfn').style.display='flex';}
   if(S.easy)document.getElementById('et').classList.add('on-grn');
 
-  renderBp();renderMeals();renderWorkout();renderTracker();renderSteps();
+  renderBp();renderMeals();renderWorkout();renderTracker();renderSteps();renderExtras();
 
   // Load history from cloud async
   cloudHistory().then(hist=>{
@@ -996,13 +1041,15 @@ function calcExBurn(){
 
 function calcKcal(){
   const eaten=S.meals.reduce((s,m,i)=>s+(S.md[i]?(parseInt(m.k||m.kcal)||0):0),0);
+  const extraEaten=(S.extras||[]).reduce((s,e)=>s+(e.done?(parseInt(e.k)||0):0),0);
   const planned=S.meals.reduce((s,m)=>s+(parseInt(m.k||m.kcal)||0),0);
   const exBurned=calcExBurn();
   const stepsBurned=stepsKcal(ST.val);
   const burned=exBurned+stepsBurned;
-  const net=eaten-burned;
+  const totalEaten=eaten+extraEaten;
+  const net=totalEaten-burned;
 
-  document.getElementById('tk-eaten').textContent=eaten+' kcal';
+  document.getElementById('tk-eaten').textContent=totalEaten+' kcal';
   document.getElementById('tk-plan').textContent='/ '+planned+' kcal načrtovano';
 
   const netBar=document.getElementById('kcal-net-bar');
@@ -1458,7 +1505,149 @@ async function refreshWorkout(){
 
 function err(msg){const b=document.getElementById('eb');b.textContent=msg;b.classList.add('show');setTimeout(()=>b.classList.remove('show'),5000);}
 
-// ─── HISTORY ────────────────────────────────────────────────
+// ─── EXTRA MEALS ─────────────────────────────────────────────
+function renderExtras(){
+  const c=document.getElementById('extra-meals');
+  if(!c)return;
+  if(!S.extras||!S.extras.length){c.innerHTML='';return;}
+  c.innerHTML=S.extras.map((e,i)=>`
+    <div class="meal-card fi${e.done?' done':''}" style="margin-top:0;margin-bottom:7px;" id="xmc${i}">
+      <div class="meal-top">
+        <div class="mdot" style="background:#8B2B6E"></div>
+        <div class="mbody">
+          <div class="mlbl" style="color:#8B2B6E;">Dodano</div>
+          <div class="mfood">${e.f}</div>
+          <div class="mkcal">~${e.k} kcal</div>
+        </div>
+        <div class="meal-actions">
+          <button class="sbtn" onclick="removeExtra(${i})" title="Odstrani" style="font-size:12px;">✕</button>
+          <button class="chk${e.done?' on':''}" id="xchk${i}" onclick="togExtra(${i})">${e.done?'✓':'○'}</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function togExtra(i){
+  S.extras[i].done=!S.extras[i].done;
+  save();renderExtras();calcKcal();
+}
+function removeExtra(i){
+  S.extras.splice(i,1);save();renderExtras();calcKcal();
+}
+async function addExtraMeal(){
+  const inp=document.getElementById('extra-inp');
+  const btn=document.getElementById('extra-btn');
+  const val=(inp&&inp.value.trim())||'';
+  if(!val)return;
+  btn.disabled=true;btn.textContent='...';
+  try{
+    const txt=await api(
+      'Si prehranjevalni svetovalec. Izračunaj kalorije za vneseno hrano. Vrni SAMO JSON: {"f":"natančen opis v slovenščini","k":250,"i":[{"n":"sestavina","a":"100 g"}]}',
+      `Izračunaj kalorije za: "${val}"`
+    );
+    const p=JSON.parse(txt);
+    if(!S.extras)S.extras=[];
+    S.extras.push({f:p.f,k:parseInt(p.k)||0,i:p.i||[],done:false});
+    inp.value='';
+    save();renderExtras();calcKcal();
+  }catch(e){err('Izračun ni uspel.');}
+  btn.disabled=false;btn.textContent='+ Dodaj';
+}
+
+// ─── PERSONALIZATION ─────────────────────────────────────────
+let persMode='fav';
+let persLoaded=false;
+
+function getHistoryFoods(){
+  // Collect all foods eaten in last 14 days from localStorage
+  const foods=[];
+  for(let i=1;i<=14;i++){
+    const d=new Date(now);d.setDate(now.getDate()-i);
+    const key=d.toISOString().split('T')[0];
+    try{
+      const s=localStorage.getItem(lsKey('dp_v6_'+key));
+      if(!s)continue;
+      const plan=JSON.parse(s);
+      const track=JSON.parse(localStorage.getItem(lsKey('track_'+key))||'{}');
+      const md=track.md||[];
+      (plan.meals||[]).forEach((m,mi)=>{
+        if(md[mi]&&(m.f||m.food))foods.push({f:m.f||m.food,k:m.k||m.kcal||0,date:key});
+      });
+      (plan.extras||[]).forEach(e=>{
+        if(e.done&&e.f)foods.push({f:e.f,k:e.k||0,date:key,extra:true});
+      });
+    }catch(e){}
+  }
+  return foods;
+}
+
+function showPersTab(tab){
+  persMode=tab;
+  document.getElementById('ptab-fav').classList.toggle('active',tab==='fav');
+  document.getElementById('ptab-new').classList.toggle('active',tab==='new');
+  loadPers(true);
+}
+
+async function togPers(){
+  const panel=document.getElementById('pers-panel');
+  const btn=document.getElementById('pers-btn');
+  const isOpen=panel.classList.toggle('show');
+  btn.textContent=isOpen?'✦ Zapri':'✦ Personaliziraj';
+  if(isOpen&&!persLoaded)await loadPers(false);
+}
+
+async function loadPers(force){
+  if(!force&&persLoaded)return;
+  const c=document.getElementById('pers-suggestions');
+  c.innerHTML='<div style="font-size:13px;color:var(--lt);padding:4px 0;"><span class="spin">↺</span> Generiram predloge...</div>';
+
+  const foods=getHistoryFoods();
+  const ez=S.easy?'Enostavni recepti (konzerve, whey, jajca, pečena kura).':'';
+  const lfc=S.lf?'Brez laktoze.':'Z laktozo je ok.';
+
+  let prompt='';
+  if(persMode==='fav'){
+    if(foods.length){
+      const foodList=foods.slice(-20).map(f=>f.f).join(', ');
+      prompt=`Na podlagi teh jedi ki jih je oseba jedla: ${foodList} — predlagaj 5 podobnih ali enakoh jedi ki bi ji bile všeč. ${ez} ${lfc}`;
+    }else{
+      prompt=`Predlagaj 5 zdravih jedi za žensko ki hoče shujšati. ${ez} ${lfc}`;
+    }
+  }else{
+    const eaten=foods.map(f=>f.f).join(', ');
+    prompt=`Predlagaj 5 novih, zanimivih jedi ki jih ta oseba še ni jedla${eaten?` (jedla je: ${eaten.slice(0,200)})`:''} in bi jih bilo vredno poskusiti. ${ez} ${lfc} Naj bodo raznolike in okusne.`;
+  }
+
+  try{
+    const txt=await api(
+      `Si prehranjevalni svetovalec. Vrni SAMO JSON array s 5 predlogi: [{"f":"ime jedi v slovenščini","k":350,"why":"zakaj je dobra (1 stavek)","tag":"${persMode==='fav'?'priljubljena':'novo'}"}]`,
+      prompt
+    );
+    const items=JSON.parse(txt);
+    persLoaded=true;
+    c.innerHTML=items.map((it,i)=>`
+      <div class="pers-item" onclick="applyPers(${i})" id="pi${i}" data-f="${(it.f||'').replace(/"/g,'&quot;')}" data-k="${it.k||300}" data-why="${(it.why||'').replace(/"/g,'&quot;')}">
+        <div class="pers-item-body">
+          <div class="pers-item-name">${it.f}</div>
+          <div class="pers-item-meta">~${it.k} kcal · ${it.why}</div>
+        </div>
+        <span class="pers-item-tag ${it.tag==='novo'?'new':'fav'}">${it.tag==='novo'?'novo ✦':'tvoje ⭐'}</span>
+      </div>`).join('');
+  }catch(e){c.innerHTML='<div style="font-size:13px;color:var(--lt);">Napaka pri generiranju. Poskusi znova.</div>';persLoaded=false;}
+}
+
+async function applyPers(i){
+  const el=document.getElementById('pi'+i);
+  if(!el)return;
+  const f=el.dataset.f;const k=parseInt(el.dataset.k)||300;
+  // Add as extra meal
+  if(!S.extras)S.extras=[];
+  S.extras.push({f,k,i:[],done:false});
+  save();renderExtras();calcKcal();
+  // Visual feedback
+  el.style.background='#EBF4EF';el.style.borderColor='#B8D9C6';
+  el.querySelector('.pers-item-tag').textContent='✓ dodano';
+  setTimeout(()=>{el.style.background='';el.style.borderColor='';},2000);
+}
 const WKT_LABELS={upper:'Zgornji del',lower:'Spodnji del',full:'Celo telo',glute:'Glute day',crossfit:'CrossFit',cardio:'Kardio',rest:'Počitek'};
 const HIST_OPEN={};
 
