@@ -754,7 +754,10 @@ async function initApp(){
     if(cloudData.wod)try{localStorage.setItem(lsKey('wodlog_'+today),cloudData.wod);}catch(e){}
     setSyncStatus('✓ naloženo');
   } else {
-    load(); // fall back to localStorage
+    load();
+    // If still no meals (first time), initialize defaults
+    if(!S.meals||!S.meals.length){initMeals();}
+    if(!S.ex||(!S.ex.length&&S.wt!=='crossfit'&&S.wt!=='cardio')){initWorkout();}
     loadSteps();
     setSyncStatus('');
   }
@@ -1543,4 +1546,3 @@ function renderHistory(){
 </script>
 </body>
 </html>
-
