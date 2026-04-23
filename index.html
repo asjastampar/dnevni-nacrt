@@ -274,7 +274,26 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .pers-btn{display:flex;align-items:center;gap:5px;font-size:12px;color:#8B2B6E;background:#FBE8F5;border:.5px solid #E4ABCF;border-radius:20px;padding:5px 11px;cursor:pointer;font-family:inherit;transition:all .15s;}
 .pers-btn:hover{background:#f5d5ed;}
 .pers-btn:disabled{opacity:.4;pointer-events:none;}
-/* goals modal options */
+/* calorie budget block */
+.kcal-budget{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:14px 16px;margin-top:8px;}
+.kb-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0;font-size:14px;}
+.kb-row.kb-eaten{border-top:.5px solid var(--br);margin-top:4px;padding-top:8px;}
+.kb-lbl{color:var(--md);}
+.kb-lbl-b{color:var(--dk);font-weight:500;}
+.kb-val{font-weight:500;color:var(--dk);}
+.kb-val.neg{color:var(--red);}
+.kb-val.pos{color:var(--grn);}
+.kb-divider{height:.5px;background:var(--br);margin:8px 0;}
+.kb-remaining{padding-top:0;}
+.kb-remaining-val{font-size:20px;font-weight:500;}
+.kb-remaining-val.ok{color:var(--grn);}
+.kb-remaining-val.over{color:var(--red);}
+.kb-note{font-size:12px;color:var(--lt);margin-top:4px;line-height:1.5;}
+/* progress ring in budget */
+.kb-ring-wrap{display:flex;align-items:center;gap:10px;margin-top:10px;}
+.kb-ring-bar{flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden;}
+.kb-ring-fill{height:6px;border-radius:3px;transition:width .4s ease;}
+.kb-ring-pct{font-size:12px;color:var(--md);white-space:nowrap;}
 .goal-opt{flex:1;min-width:0;padding:7px 5px;border:.5px solid var(--br);border-radius:8px;background:none;font-size:12px;color:var(--md);cursor:pointer;font-family:inherit;transition:all .15s;text-align:center;white-space:nowrap;}
 .goal-opt:hover{border-color:rgba(0,0,0,.2);color:var(--dk);}
 .goal-opt.active{background:var(--dk);color:var(--w);border-color:var(--dk);}
@@ -439,24 +458,27 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
       <div class="macro-sep"></div>
       <div class="macro-item"><div class="macro-val" id="mk-f">—</div><div class="macro-lbl">maščobe</div><div class="macro-goal" id="mg-f"></div></div>
     </div>
-    <div class="kcal-bar">
-      <span style="font-size:13px;color:var(--md);">Zaužito danes</span>
-      <div class="kcal-split">
-        <span class="kcal-eaten" id="tk-eaten">0</span>
-        <span class="kcal-plan" id="tk-plan">/ — kcal načrtovano</span>
+    <!-- Calorie budget -->
+    <div class="kcal-budget" id="kcal-budget">
+      <div class="kb-row">
+        <span class="kb-lbl">Cilj dneva</span>
+        <span class="kb-val" id="kb-goal">— kcal</span>
       </div>
+      <div class="kb-row kb-eaten">
+        <span class="kb-lbl">Zaužito</span>
+        <span class="kb-val neg" id="kb-eaten">0 kcal</span>
+      </div>
+      <div class="kb-row" id="kb-burn-row" style="display:none">
+        <span class="kb-lbl">🔥 Vadba & koraki</span>
+        <span class="kb-val pos" id="kb-burn">+0 kcal</span>
+      </div>
+      <div class="kb-divider"></div>
+      <div class="kb-row kb-remaining">
+        <span class="kb-lbl-b">Ostalo danes</span>
+        <span class="kb-remaining-val" id="kb-remaining">—</span>
+      </div>
+      <div class="kb-note" id="kb-note"></div>
     </div>
-    <div class="kcal-net-bar" id="kcal-net-bar">
-      <div class="kcal-net-row">
-        <span>🔥 Porabljeno (vadba)</span>
-        <span class="kcal-net-val neg" id="tk-burn">−0 kcal</span>
-      </div>
-      <div class="kcal-net-row">
-        <span>Neto danes</span>
-        <span class="kcal-net-val" id="tk-net">—</span>
-      </div>
-    </div>
-  </div>
 
   <div class="sec">
     <div class="sec-lbl" style="margin-bottom:10px;">Dnevni koraki</div>
@@ -1138,30 +1160,64 @@ function calcKcal(){
   loadGoals();
   const eaten=S.meals.reduce((s,m,i)=>s+(S.md[i]?(parseInt(m.k||m.kcal)||0):0),0);
   const extraEaten=(S.extras||[]).reduce((s,e)=>s+(e.done?(parseInt(e.k)||0):0),0);
-  const goalKcal=calcGoalKcal();
-  const planned=goalKcal||S.meals.reduce((s,m)=>s+(parseInt(m.k||m.kcal)||0),0);
+  const totalEaten=eaten+extraEaten;
   const exBurned=calcExBurn();
   const stepsBurned=stepsKcal(ST.val);
-  const burned=exBurned+stepsBurned;
-  const totalEaten=eaten+extraEaten;
-  const net=totalEaten-burned;
+  const totalBurned=exBurned+stepsBurned;
+  const goalKcal=calcGoalKcal();
 
-  document.getElementById('tk-eaten').textContent=totalEaten+' kcal';
-  document.getElementById('tk-plan').textContent='/ '+planned+' kcal '+(goalKcal?'cilj':'načrtovano');
+  // MFP model: Remaining = Goal + Exercise - Eaten
+  // Exercise adds to budget (zaslužene kalorije)
+  const remaining=goalKcal?goalKcal+totalBurned-totalEaten:null;
 
-  const netBar=document.getElementById('kcal-net-bar');
-  if(burned>0){
-    netBar.classList.add('show');
-    const parts=[];
-    if(exBurned>0)parts.push('vadba −'+exBurned);
-    if(stepsBurned>0)parts.push('koraki −'+stepsBurned);
-    document.getElementById('tk-burn').textContent='−'+burned+' kcal  ('+parts.join(', ')+')';
-    const netEl=document.getElementById('tk-net');
-    netEl.textContent=net+' kcal';
-    netEl.className='kcal-net-val '+(net<planned?'net-ok':'net-warn');
-  } else {
-    netBar.classList.remove('show');
+  // Update new budget display
+  const budgetEl=document.getElementById('kcal-budget');
+  if(budgetEl){
+    document.getElementById('kb-goal').textContent=goalKcal?(goalKcal+' kcal'):'Nastavi profil →';
+    document.getElementById('kb-eaten').textContent='−'+totalEaten+' kcal';
+    const burnRow=document.getElementById('kb-burn-row');
+    if(totalBurned>0){
+      burnRow.style.display='flex';
+      const parts=[];
+      if(exBurned>0)parts.push('vadba');
+      if(stepsBurned>0)parts.push('koraki');
+      document.getElementById('kb-burn').textContent='+'+totalBurned+' kcal';
+      burnRow.querySelector('.kb-lbl').textContent='🔥 '+parts.join(' & ');
+    }else{burnRow.style.display='none';}
+
+    const remEl=document.getElementById('kb-remaining');
+    const noteEl=document.getElementById('kb-note');
+    if(remaining!==null){
+      remEl.textContent=(remaining>=0?'+':'')+remaining+' kcal';
+      remEl.className='kb-remaining-val '+(remaining>=0?'ok':'over');
+      if(remaining>=0){
+        noteEl.textContent=`V okvirju cilja. Še ${remaining} kcal do dnevne meje.`;
+      }else{
+        noteEl.textContent=`${Math.abs(remaining)} kcal nad ciljem danes.`;
+      }
+    }else{
+      remEl.textContent='—';remEl.className='kb-remaining-val';
+      noteEl.innerHTML='<a href="#" onclick="openGoals();return false;" style="color:var(--red);">⚙ Nastavi profil za sledenje</a>';
+    }
+
+    // Progress bar
+    if(goalKcal&&totalEaten>0){
+      const pct=Math.min(130,Math.round(totalEaten/(goalKcal)*100));
+      const color=pct>100?'var(--red)':pct>85?'#B45309':'var(--grn)';
+      const existing=budgetEl.querySelector('.kb-ring-wrap');
+      if(existing)existing.remove();
+      const wrap=document.createElement('div');wrap.className='kb-ring-wrap';
+      wrap.innerHTML=`<div class="kb-ring-bar"><div class="kb-ring-fill" style="width:${Math.min(100,pct)}%;background:${color}"></div></div><span class="kb-ring-pct">${pct}%</span>`;
+      budgetEl.appendChild(wrap);
+    }
   }
+
+  // Also keep legacy elements updated (for tracker etc.)
+  const tkEaten=document.getElementById('tk-eaten');
+  const tkPlan=document.getElementById('tk-plan');
+  if(tkEaten)tkEaten.textContent=totalEaten+' kcal';
+  if(tkPlan)tkPlan.textContent=goalKcal?'/ '+goalKcal+' kcal cilj':'';
+
   renderMacros();
 }
 
@@ -1682,23 +1738,44 @@ function updateGoalsCalc(){
   const height=parseInt(document.getElementById('g-height')?.value)||null;
   const weight=parseFloat(document.getElementById('g-weight')?.value)||null;
   const target=parseFloat(document.getElementById('g-target')?.value)||null;
-  if(!age||!height||!weight)return;
-  const bmr=10*weight+6.25*height-5*age-161;
+  const box=document.getElementById('goals-calc');
+  if(!age||!height||!weight){box.classList.remove('show');return;}
+
+  const bmr=Math.round(10*weight+6.25*height-5*age-161);
   const tdee=Math.round(bmr*ACT_MULT[_selAct]);
   let goalKcal=tdee;
-  if(_selGoal==='lose')goalKcal=tdee-500;
-  if(_selGoal==='gain')goalKcal=tdee+300;
+  const adj={lose:-500,maintain:0,gain:300};
+  goalKcal=tdee+(adj[_selGoal]||0);
   const p=Math.round(goalKcal*0.30/4);
   const c=Math.round(goalKcal*0.40/4);
   const f=Math.round(goalKcal*0.30/9);
   const diff=target&&weight?Math.abs(weight-target):null;
   const weeks=diff?Math.round(diff/0.5):null;
-  const box=document.getElementById('goals-calc');
+  const goalLabel={lose:'hujšanje (−500 kcal/dan)',maintain:'vzdrževanje',gain:'pridobivanje (+300 kcal/dan)'};
+
   box.classList.add('show');
-  box.innerHTML=`<b>Tvoj izračun:</b><br>
-    TDEE: ~${tdee} kcal/dan &nbsp;·&nbsp; Cilj: <b>${goalKcal} kcal/dan</b><br>
-    Beljakovine: ${p}g &nbsp;·&nbsp; OH: ${c}g &nbsp;·&nbsp; Maščobe: ${f}g
-    ${weeks?`<br>Do cilja (~${weeks} tednov pri 0.5 kg/teden)`:''}`;
+  box.innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
+      <div style="background:var(--w);border-radius:8px;padding:8px 10px;text-align:center;">
+        <div style="font-size:18px;font-weight:500;color:var(--dk);">${bmr}</div>
+        <div style="font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.05em;">BMR (samo življenje)</div>
+      </div>
+      <div style="background:var(--w);border-radius:8px;padding:8px 10px;text-align:center;">
+        <div style="font-size:18px;font-weight:500;color:var(--dk);">${tdee}</div>
+        <div style="font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.05em;">TDEE (skupaj z aktivnostjo)</div>
+      </div>
+    </div>
+    <div style="background:var(--w);border-radius:8px;padding:10px 12px;margin-bottom:8px;">
+      <div style="font-size:13px;color:var(--md);margin-bottom:4px;">Cilj: <b style="color:var(--dk);">${goalLabel[_selGoal]}</b></div>
+      <div style="font-size:22px;font-weight:500;color:var(--dk);">${goalKcal} kcal/dan</div>
+      <div style="font-size:12px;color:var(--lt);margin-top:4px;">B: ${p}g &nbsp;·&nbsp; OH: ${c}g &nbsp;·&nbsp; M: ${f}g</div>
+    </div>
+    ${weeks?`<div style="font-size:12px;color:var(--grn);padding:4px 0;">📅 Do cilja ~${weeks} tednov pri 0.5 kg/teden</div>`:''}
+    <div style="font-size:12px;color:var(--lt);margin-top:4px;line-height:1.6;">
+      BMR = kalorije ki jih telo porabi za dihanje, srce, možgane.<br>
+      TDEE = BMR × faktor aktivnosti = kar telo res porabi vsak dan.<br>
+      Vadba v appu se doda k cilju ("zaslužene" kalorije).
+    </div>`;
 }
 function openGoals(){
   loadGoals();
