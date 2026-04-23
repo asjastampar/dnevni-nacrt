@@ -274,6 +274,19 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .pers-btn{display:flex;align-items:center;gap:5px;font-size:12px;color:#8B2B6E;background:#FBE8F5;border:.5px solid #E4ABCF;border-radius:20px;padding:5px 11px;cursor:pointer;font-family:inherit;transition:all .15s;}
 .pers-btn:hover{background:#f5d5ed;}
 .pers-btn:disabled{opacity:.4;pointer-events:none;}
+/* goals modal options */
+.goal-opt{flex:1;min-width:0;padding:7px 5px;border:.5px solid var(--br);border-radius:8px;background:none;font-size:12px;color:var(--md);cursor:pointer;font-family:inherit;transition:all .15s;text-align:center;white-space:nowrap;}
+.goal-opt:hover{border-color:rgba(0,0,0,.2);color:var(--dk);}
+.goal-opt.active{background:var(--dk);color:var(--w);border-color:var(--dk);}
+.goals-calc{background:var(--bg);border-radius:9px;padding:10px 12px;margin-bottom:14px;font-size:13px;color:var(--md);line-height:1.7;display:none;}
+.goals-calc.show{display:block;}
+/* macro bar */
+.macro-bar{background:var(--w);border:.5px solid var(--br);border-radius:10px;padding:10px 14px;margin-top:6px;display:flex;align-items:center;justify-content:space-around;}
+.macro-item{text-align:center;flex:1;}
+.macro-val{font-size:16px;font-weight:500;color:var(--dk);}
+.macro-lbl{font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.05em;margin-top:1px;}
+.macro-goal{font-size:11px;color:var(--lt);margin-top:2px;}
+.macro-sep{width:.5px;background:var(--br);height:32px;flex-shrink:0;}
 .pers-panel{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:14px;margin-bottom:8px;display:none;}
 .pers-panel.show{display:block;}
 .pers-title{font-size:11px;font-weight:500;color:var(--md);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;}
@@ -322,6 +335,52 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
   </div>
 </div>
 
+<!-- GOALS MODAL -->
+<div class="modal-overlay hide" id="goals-overlay">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-logo">Moj <em>profil</em></div>
+    <div class="modal-sub">Nastavi svoje podatke za natančen izračun</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+      <div class="modal-field" style="margin-bottom:0;">
+        <label>Starost</label>
+        <input type="number" id="g-age" placeholder="npr. 30" min="15" max="80" style="text-align:center;">
+      </div>
+      <div class="modal-field" style="margin-bottom:0;">
+        <label>Višina (cm)</label>
+        <input type="number" id="g-height" placeholder="npr. 168" min="140" max="220" style="text-align:center;">
+      </div>
+      <div class="modal-field" style="margin-bottom:0;">
+        <label>Teža (kg)</label>
+        <input type="number" id="g-weight" placeholder="npr. 68" min="40" max="200" step="0.1" style="text-align:center;">
+      </div>
+      <div class="modal-field" style="margin-bottom:0;">
+        <label>Ciljna teža (kg)</label>
+        <input type="number" id="g-target" placeholder="npr. 63" min="40" max="200" step="0.1" style="text-align:center;">
+      </div>
+    </div>
+    <div class="modal-field">
+      <label>Cilj</label>
+      <div style="display:flex;gap:6px;">
+        <button class="goal-opt" id="go-lose" onclick="selGoal('lose')">📉 Hujšanje</button>
+        <button class="goal-opt" id="go-maintain" onclick="selGoal('maintain')">⚖️ Vzdrževanje</button>
+        <button class="goal-opt" id="go-gain" onclick="selGoal('gain')">📈 Pridobivanje</button>
+      </div>
+    </div>
+    <div class="modal-field">
+      <label>Aktivnost</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="goal-opt" id="ga-sed" onclick="selAct('sed')">🪑 Pretežno sedem</button>
+        <button class="goal-opt" id="ga-light" onclick="selAct('light')">🚶 Malo gibanja</button>
+        <button class="goal-opt" id="ga-mod" onclick="selAct('mod')">🏃 Zmerno aktiven</button>
+        <button class="goal-opt" id="ga-high" onclick="selAct('high')">💪 Zelo aktiven</button>
+      </div>
+    </div>
+    <div class="goals-calc" id="goals-calc"></div>
+    <button class="modal-btn" onclick="saveGoals()">Shrani profil →</button>
+    <button onclick="closeGoals()" style="width:100%;background:none;border:none;color:var(--lt);font-size:13px;cursor:pointer;margin-top:10px;font-family:inherit;">Zapri</button>
+  </div>
+</div>
+
 <div class="app" id="main-app" style="display:none">
   <div class="user-bar">
     <div style="display:flex;align-items:center;">
@@ -329,7 +388,10 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
       <span class="user-name" id="u-name">—</span>
       <span class="user-sync" id="u-sync"></span>
     </div>
-    <button class="logout-btn" onclick="logout()">Odjava</button>
+    <div style="display:flex;gap:7px;align-items:center;">
+      <button class="logout-btn" onclick="openGoals()" style="color:var(--md);">⚙ Profil</button>
+      <button class="logout-btn" onclick="logout()">Odjava</button>
+    </div>
   </div>
   <div class="hdate" id="ds"></div>
   <div class="htitle">Tvoj <em>dnevni</em> načrt</div>
@@ -347,11 +409,11 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
           <span>Brez laktoze</span>
         </label>
         <button class="rbtn" id="bam" onclick="refreshMeals()">↺ Zamenjaj vse</button>
-        <button class="pers-btn" id="pers-btn" onclick="togPers()">✦ Personaliziraj</button>
+        <button class="pers-btn" id="pers-btn" onclick="togPers()">✦ Ideje</button>
       </div>
     </div>
     <div class="lf-note" id="lfn">✓ Brez laktoze</div>
-    <!-- Personalize panel -->
+    <!-- Ideas panel -->
     <div class="pers-panel" id="pers-panel">
       <div class="pers-title">Predlogi za tebe</div>
       <div class="pers-tabs">
@@ -363,12 +425,20 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
       </div>
     </div>
     <div id="mc"></div>
-    <!-- Add extra meal -->
-    <div class="add-meal-row">
-      <input class="add-meal-inp" id="extra-inp" placeholder="Dodaj obrok... (npr. sladoled, kava z mlekom, banana)" onkeydown="if(event.key==='Enter')addExtraMeal()">
-      <button class="add-meal-btn" id="extra-btn" onclick="addExtraMeal()">+ Dodaj</button>
-    </div>
     <div id="extra-meals"></div>
+    <!-- Add extra meal - always at bottom -->
+    <div class="add-meal-row" style="margin-top:10px;">
+      <input class="add-meal-inp" id="extra-inp" placeholder="+ Dodaj obrok (sladoled, kava, banana...)" onkeydown="if(event.key==='Enter')addExtraMeal()">
+      <button class="add-meal-btn" id="extra-btn" onclick="addExtraMeal()">Dodaj</button>
+    </div>
+    <!-- Macro summary -->
+    <div class="macro-bar" id="macro-bar" style="display:none">
+      <div class="macro-item"><div class="macro-val" id="mk-p">—</div><div class="macro-lbl">beljakovine</div><div class="macro-goal" id="mg-p"></div></div>
+      <div class="macro-sep"></div>
+      <div class="macro-item"><div class="macro-val" id="mk-c">—</div><div class="macro-lbl">ogljikovi hidrati</div><div class="macro-goal" id="mg-c"></div></div>
+      <div class="macro-sep"></div>
+      <div class="macro-item"><div class="macro-val" id="mk-f">—</div><div class="macro-lbl">maščobe</div><div class="macro-goal" id="mg-f"></div></div>
+    </div>
     <div class="kcal-bar">
       <span style="font-size:13px;color:var(--md);">Zaužito danes</span>
       <div class="kcal-split">
@@ -820,6 +890,11 @@ async function initApp(){
   if(S.easy)document.getElementById('et').classList.add('on-grn');
 
   renderBp();renderMeals();renderWorkout();renderTracker();renderSteps();renderExtras();
+  loadGoals();bindGoalsInputs();
+  // Show goals setup prompt if no profile yet
+  if(!G.age||!G.weight)setTimeout(()=>{
+    if(!G.age||!G.weight)openGoals();
+  },1500);
 
   // Load history from cloud async
   cloudHistory().then(hist=>{
@@ -1060,9 +1135,11 @@ function calcExBurn(){
 }
 
 function calcKcal(){
+  loadGoals();
   const eaten=S.meals.reduce((s,m,i)=>s+(S.md[i]?(parseInt(m.k||m.kcal)||0):0),0);
   const extraEaten=(S.extras||[]).reduce((s,e)=>s+(e.done?(parseInt(e.k)||0):0),0);
-  const planned=S.meals.reduce((s,m)=>s+(parseInt(m.k||m.kcal)||0),0);
+  const goalKcal=calcGoalKcal();
+  const planned=goalKcal||S.meals.reduce((s,m)=>s+(parseInt(m.k||m.kcal)||0),0);
   const exBurned=calcExBurn();
   const stepsBurned=stepsKcal(ST.val);
   const burned=exBurned+stepsBurned;
@@ -1070,7 +1147,7 @@ function calcKcal(){
   const net=totalEaten-burned;
 
   document.getElementById('tk-eaten').textContent=totalEaten+' kcal';
-  document.getElementById('tk-plan').textContent='/ '+planned+' kcal načrtovano';
+  document.getElementById('tk-plan').textContent='/ '+planned+' kcal '+(goalKcal?'cilj':'načrtovano');
 
   const netBar=document.getElementById('kcal-net-bar');
   if(burned>0){
@@ -1085,6 +1162,7 @@ function calcKcal(){
   } else {
     netBar.classList.remove('show');
   }
+  renderMacros();
 }
 
 function togMeal(i){
@@ -1473,8 +1551,9 @@ async function refreshMeals(){
   const btn=document.getElementById('bam');btn.disabled=true;btn.innerHTML='<span class="spin">↺</span> Generiram...';
   const ez=S.easy?'Hiter in enostaven jedilnik (konzerve, jajca, whey shake, pečena kura iz pekarne, mikrovalovna). Brez kompleksnega kuhanja.':'';
   const lfc=S.lf?'Brez laktoze.':'Z laktozo je ok.';
+  const goalKcalTarget=calcGoalKcal()||1600;
   try{
-    const txt=await api(`Si prehranjevalni svetovalec. ${ez} ${lfc} Sestavi dnevni jedilnik ~1600 kcal za žensko ki hoče shujšati. Vrni SAMO veljavni JSON array s 5 elementi. Vsak element mora imeti: "f" = konkretno ime jedi v slovenščini, ne generično "zajtrk", "kosilo", "večerja", "prigrizek"; "k" = kalorije; "i" = seznam sestavin z gramaturami. Format: [{"f":"Skyr z ovsenimi kosmiči, borovnicami in mandlji","k":360,"i":[{"n":"Skyr navadni","a":"170 g"}]}]. Ne uporabljaj generičnih imen obrokov kot naslov jedi.`,
+    const txt=await api(`Si prehranjevalni svetovalec. ${ez} ${lfc} Sestavi dnevni jedilnik ~${goalKcalTarget} kcal za žensko ki želi ${G.goal==='lose'?'shujšati':G.goal==='gain'?'pridobiti mišice':'vzdrževati težo'}. Vrni SAMO veljavni JSON array s 5 elementi. Vsak element mora imeti: "f" = konkretno ime jedi v slovenščini, ne generično "zajtrk", "kosilo", "večerja", "prigrizek"; "k" = kalorije; "i" = seznam sestavin z gramaturami. Format: [{"f":"Skyr z ovsenimi kosmiči, borovnicami in mandlji","k":360,"i":[{"n":"Skyr navadni","a":"170 g"}]}]. Ne uporabljaj generičnih imen obrokov kot naslov jedi.`,
       'Svež raznovrsten jedilnik za danes z natančnimi gramaturami.');
     const p=JSON.parse(txt);
     const genericTitles=['zajtrk','dopoldanski prigrizek','dopold. prig.','kosilo','popoldanski prigrizek','popold. prig.','večerja'];
@@ -1550,7 +1629,153 @@ async function refreshWorkout(){
 
 function err(msg){const b=document.getElementById('eb');b.textContent=msg;b.classList.add('show');setTimeout(()=>b.classList.remove('show'),5000);}
 
-// ─── EXTRA MEALS ─────────────────────────────────────────────
+// ─── GOALS & PROFILE ─────────────────────────────────────────
+const GOALS_KEY='user_goals';
+let G={age:null,height:null,weight:null,target:null,goal:'lose',act:'light'};
+
+function loadGoals(){
+  try{const s=localStorage.getItem(lsKey(GOALS_KEY));if(s)G={...G,...JSON.parse(s)};}catch(e){}
+}
+function saveGoalsState(){
+  try{localStorage.setItem(lsKey(GOALS_KEY),JSON.stringify(G));}catch(e){}
+}
+
+// Mifflin-St Jeor for female + activity multiplier
+const ACT_MULT={sed:1.2,light:1.375,mod:1.55,high:1.725};
+function calcTDEE(){
+  if(!G.age||!G.height||!G.weight)return null;
+  const bmr=10*G.weight+6.25*G.height-5*G.age-161;
+  const tdee=Math.round(bmr*ACT_MULT[G.act||'light']);
+  return tdee;
+}
+function calcGoalKcal(){
+  const tdee=calcTDEE();
+  if(!tdee)return null;
+  if(G.goal==='lose')return tdee-500;
+  if(G.goal==='gain')return tdee+300;
+  return tdee;
+}
+// Macro targets based on goal kcal (protein 30%, carbs 40%, fat 30%)
+function calcMacroTargets(){
+  const kcal=calcGoalKcal();
+  if(!kcal)return null;
+  return {
+    p:Math.round(kcal*0.30/4),  // protein: 4 kcal/g
+    c:Math.round(kcal*0.40/4),  // carbs: 4 kcal/g
+    f:Math.round(kcal*0.30/9)   // fat: 9 kcal/g
+  };
+}
+
+let _selGoal='lose',_selAct='light';
+function selGoal(g){
+  _selGoal=g;
+  ['lose','maintain','gain'].forEach(x=>document.getElementById('go-'+x)?.classList.toggle('active',x===g));
+  updateGoalsCalc();
+}
+function selAct(a){
+  _selAct=a;
+  ['sed','light','mod','high'].forEach(x=>document.getElementById('ga-'+x)?.classList.toggle('active',x===a));
+  updateGoalsCalc();
+}
+function updateGoalsCalc(){
+  const age=parseInt(document.getElementById('g-age')?.value)||null;
+  const height=parseInt(document.getElementById('g-height')?.value)||null;
+  const weight=parseFloat(document.getElementById('g-weight')?.value)||null;
+  const target=parseFloat(document.getElementById('g-target')?.value)||null;
+  if(!age||!height||!weight)return;
+  const bmr=10*weight+6.25*height-5*age-161;
+  const tdee=Math.round(bmr*ACT_MULT[_selAct]);
+  let goalKcal=tdee;
+  if(_selGoal==='lose')goalKcal=tdee-500;
+  if(_selGoal==='gain')goalKcal=tdee+300;
+  const p=Math.round(goalKcal*0.30/4);
+  const c=Math.round(goalKcal*0.40/4);
+  const f=Math.round(goalKcal*0.30/9);
+  const diff=target&&weight?Math.abs(weight-target):null;
+  const weeks=diff?Math.round(diff/0.5):null;
+  const box=document.getElementById('goals-calc');
+  box.classList.add('show');
+  box.innerHTML=`<b>Tvoj izračun:</b><br>
+    TDEE: ~${tdee} kcal/dan &nbsp;·&nbsp; Cilj: <b>${goalKcal} kcal/dan</b><br>
+    Beljakovine: ${p}g &nbsp;·&nbsp; OH: ${c}g &nbsp;·&nbsp; Maščobe: ${f}g
+    ${weeks?`<br>Do cilja (~${weeks} tednov pri 0.5 kg/teden)`:''}`;
+}
+function openGoals(){
+  loadGoals();
+  document.getElementById('g-age').value=G.age||'';
+  document.getElementById('g-height').value=G.height||'';
+  document.getElementById('g-weight').value=G.weight||'';
+  document.getElementById('g-target').value=G.target||'';
+  _selGoal=G.goal||'lose';_selAct=G.act||'light';
+  selGoal(_selGoal);selAct(_selAct);
+  document.getElementById('goals-overlay').classList.remove('hide');
+}
+function closeGoals(){document.getElementById('goals-overlay').classList.add('hide');}
+function saveGoals(){
+  G.age=parseInt(document.getElementById('g-age')?.value)||null;
+  G.height=parseInt(document.getElementById('g-height')?.value)||null;
+  G.weight=parseFloat(document.getElementById('g-weight')?.value)||null;
+  G.target=parseFloat(document.getElementById('g-target')?.value)||null;
+  G.goal=_selGoal;G.act=_selAct;
+  saveGoalsState();closeGoals();
+  calcKcal(); // refresh with new targets
+}
+
+// Add event listeners to recalculate on input change
+function bindGoalsInputs(){
+  ['g-age','g-height','g-weight','g-target'].forEach(id=>{
+    document.getElementById(id)?.addEventListener('input',updateGoalsCalc);
+  });
+}
+
+// ─── MACRO ESTIMATION ────────────────────────────────────────
+// Rough macro estimates per kcal for common foods
+// Used when detailed ingredient data not available
+function estimateMacros(mealName, kcal){
+  const n=(mealName||'').toLowerCase();
+  // Protein-heavy
+  if(/whey|skuta|jogurt|piščan|tuna|losos|jajc|tofu|sir|skyr|riba|meso/.test(n))
+    return {p:Math.round(kcal*0.35/4),c:Math.round(kcal*0.30/4),f:Math.round(kcal*0.35/9)};
+  // Carb-heavy
+  if(/riž|krompir|testenin|kruh|ovseni|kaša|ajda|quinoa|palačink|krekerj/.test(n))
+    return {p:Math.round(kcal*0.12/4),c:Math.round(kcal*0.65/4),f:Math.round(kcal*0.23/9)};
+  // Fat-heavy
+  if(/avokado|oreščk|mandlj|olivn|smetana|maslo/.test(n))
+    return {p:Math.round(kcal*0.10/4),c:Math.round(kcal*0.15/4),f:Math.round(kcal*0.75/9)};
+  // Default balanced
+  return {p:Math.round(kcal*0.22/4),c:Math.round(kcal*0.45/4),f:Math.round(kcal*0.33/9)};
+}
+
+function renderMacros(){
+  loadGoals();
+  const targets=calcMacroTargets();
+  // Sum macros from eaten meals only
+  let totP=0,totC=0,totF=0;
+  S.meals.forEach((m,i)=>{
+    if(!S.md[i])return;
+    const kcal=parseInt(m.k||m.kcal)||0;
+    const est=estimateMacros(m.f||m.food||'',kcal);
+    totP+=est.p;totC+=est.c;totF+=est.f;
+  });
+  (S.extras||[]).forEach(e=>{
+    if(!e.done)return;
+    const kcal=parseInt(e.k)||0;
+    const est=estimateMacros(e.f||'',kcal);
+    totP+=est.p;totC+=est.c;totF+=est.f;
+  });
+  const bar=document.getElementById('macro-bar');
+  if(!bar)return;
+  if(totP+totC+totF===0){bar.style.display='none';return;}
+  bar.style.display='flex';
+  document.getElementById('mk-p').textContent=totP+'g';
+  document.getElementById('mk-c').textContent=totC+'g';
+  document.getElementById('mk-f').textContent=totF+'g';
+  if(targets){
+    document.getElementById('mg-p').textContent='cilj: '+targets.p+'g';
+    document.getElementById('mg-c').textContent='cilj: '+targets.c+'g';
+    document.getElementById('mg-f').textContent='cilj: '+targets.f+'g';
+  }
+}
 function renderExtras(){
   const c=document.getElementById('extra-meals');
   if(!c)return;
