@@ -37,7 +37,7 @@ async function verifyUser(username, pin) {
   } catch { return false; }
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -52,7 +52,6 @@ module.exports = async function handler(req, res) {
   const valid = await verifyUser(uname, pin);
   if (!valid) return res.status(401).json({ error: 'Napačni podatki' });
 
-  // ── SAVE daily bundle ──
   if (action === 'save' && req.method === 'POST') {
     const { date, payload } = req.body;
     if (!date || !payload) return res.status(400).json({ error: 'Manjkajoči date ali payload' });
@@ -65,7 +64,6 @@ module.exports = async function handler(req, res) {
     return res.json({ ok: true });
   }
 
-  // ── LOAD single day ──
   if (action === 'load' && req.method === 'GET') {
     const { date } = req.query;
     if (!date) return res.status(400).json({ error: 'Manjkajoči date' });
@@ -73,7 +71,6 @@ module.exports = async function handler(req, res) {
     return res.json({ ok: true, data: d.result ? JSON.parse(d.result) : null });
   }
 
-  // ── HISTORY ──
   if (action === 'history' && req.method === 'GET') {
     const today = new Date();
     const dates = [];
@@ -92,4 +89,4 @@ module.exports = async function handler(req, res) {
   }
 
   res.status(400).json({ error: 'Neznana akcija' });
-};
+}
