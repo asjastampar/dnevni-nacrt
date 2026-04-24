@@ -1053,6 +1053,20 @@ const DIET_OPTS=[
 ];
 const DIET_LABELS=Object.fromEntries(DIET_OPTS.map(o=>[o.id,o.l]));
 const DIET_PRESETS={
+  stableEnergy:[
+    {f:'Jajčna omleta s puranjimi prsmi, špinačo in avokadom',k:430,i:[{n:'Jajca',a:'2 kos'},{n:'Puranje prsi',a:'80 g'},{n:'Špinača',a:'70 g'},{n:'Avokado',a:'60 g'},{n:'Olivno olje',a:'5 ml'}]},
+    {f:'Skyr z borovnicami in chia semeni',k:230,i:[{n:'Skyr',a:'180 g'},{n:'Borovnice',a:'70 g'},{n:'Chia semena',a:'12 g'}]},
+    {f:'Piščančja bowl skleda z rižem, zelenjavo in olivnim oljem',k:540,i:[{n:'Piščančji file',a:'180 g'},{n:'Riž',a:'70 g'},{n:'Mešana zelenjava',a:'220 g'},{n:'Olivno olje',a:'10 ml'}]},
+    {f:'Tuna z riževimi krekerji in kumaro',k:210,i:[{n:'Tuna v lastnem soku',a:'120 g'},{n:'Riževi krekerji',a:'25 g'},{n:'Kumara',a:'120 g'}]},
+    {f:'Losos s krompirjem, brokolijem in zeleno solato',k:505,i:[{n:'Losos',a:'180 g'},{n:'Krompir',a:'180 g'},{n:'Brokoli',a:'180 g'},{n:'Zelena solata',a:'80 g'},{n:'Olivno olje',a:'8 ml'}]}
+  ],
+  lactoseFreeStable:[
+    {f:'Jajčna omleta s puranjimi prsmi, špinačo in avokadom',k:430,i:[{n:'Jajca',a:'2 kos'},{n:'Puranje prsi',a:'80 g'},{n:'Špinača',a:'70 g'},{n:'Avokado',a:'60 g'},{n:'Olivno olje',a:'5 ml'}]},
+    {f:'Tuna z riževimi krekerji in kumaro',k:210,i:[{n:'Tuna v lastnem soku',a:'120 g'},{n:'Riževi krekerji',a:'25 g'},{n:'Kumara',a:'120 g'}]},
+    {f:'Piščančja bowl skleda z rižem, zelenjavo in olivnim oljem',k:540,i:[{n:'Piščančji file',a:'180 g'},{n:'Riž',a:'70 g'},{n:'Mešana zelenjava',a:'220 g'},{n:'Olivno olje',a:'10 ml'}]},
+    {f:'Brezlaktozni proteinski jogurt z borovnicami',k:210,i:[{n:'Brezlaktozni proteinski jogurt',a:'180 g'},{n:'Borovnice',a:'70 g'},{n:'Chia semena',a:'10 g'}]},
+    {f:'Puranji zrezek z ajdo in brokolijem',k:495,i:[{n:'Puranje prsi',a:'190 g'},{n:'Ajda',a:'70 g'},{n:'Brokoli',a:'200 g'},{n:'Olivno olje',a:'10 ml'}]}
+  ],
   vegan:[
     {f:'Tofu scramble s špinačo, paradižnikom in riževim toastom',k:390,i:[{n:'Čvrsti tofu',a:'180 g'},{n:'Špinača',a:'60 g'},{n:'Paradižnik',a:'120 g'},{n:'Rižev toast',a:'2 rezini'},{n:'Olivno olje',a:'8 ml'}]},
     {f:'Sojin jogurt z borovnicami in chia semeni',k:210,i:[{n:'Sojin jogurt',a:'180 g'},{n:'Borovnice',a:'80 g'},{n:'Chia semena',a:'12 g'}]},
@@ -1106,8 +1120,7 @@ function hasDiet(id){return getDiet().includes(id);}
 function dietSummary(){const d=getDiet();return d.length?d.map(x=>DIET_LABELS[x]||x).join(', '):'Prehrana';}
 function dietPrompt(){
   const d=getDiet();
-  if(!d.length)return 'Brez posebnih prehranskih omejitev.';
-  const rules=[];
+  const rules=['Privzeto naj bo jedilnik visoko beljakovinski in za stabilno energijo: zajtrk naj ima vsaj 25 g beljakovin, brez sladkih palačink, medu, sirupov, sladke smetane, sadnih smoothijev in obrokov, ki so pretežno sladkor/škrob. Kombiniraj beljakovine + vlaknine + zdrave maščobe.'];
   if(hasDiet('vegan'))rules.push('Vegansko: brez mesa, rib, jajc, mleka, sira, jogurta, skute, medu in vseh živalskih izdelkov.');
   else if(hasDiet('vegetarian'))rules.push('Vegetarijansko: brez mesa, rib in morskih sadežev.');
   if(hasDiet('lactoseFree'))rules.push('Brez laktoze: ne uporabljaj navadnega mleka, smetane, skute, sira ali jogurta; uporabi rastlinske ali brezlaktozne alternative.');
@@ -1121,15 +1134,30 @@ function dietPrompt(){
   if(hasDiet('lowCarb'))rules.push('Low carb: zmanjšaj kruh, riž, testenine, sladkor in večje porcije škroba.');
   return rules.join(' ');
 }
+function avoidMealList(){try{return JSON.parse(localStorage.getItem(lsKey('avoided_meals_v1')))||[];}catch(e){return[];}}
+function rememberAvoidedMeal(name){
+  if(!name)return;
+  const clean=String(name).trim();
+  if(!clean)return;
+  const list=avoidMealList().filter(x=>x.toLowerCase()!==clean.toLowerCase());
+  list.unshift(clean);
+  try{localStorage.setItem(lsKey('avoided_meals_v1'),JSON.stringify(list.slice(0,30)));}catch(e){}
+}
+function avoidPrompt(){
+  const list=avoidMealList().slice(0,14);
+  const sugar='Ne predlagaj sladkih zajtrkov ali hitrih sladkornih obrokov: palačinke, med, sirup, sladka smetana, sladki kosmiči, sadni smoothie, sladkani jogurt, pecivo, marmelada.';
+  return list.length? sugar+' Izogni se tudi nedavno zavrnjenim jedem: '+list.join('; ')+'.':sugar;
+}
 function pickDietPreset(){
   if(hasDiet('vegan'))return DIET_PRESETS.vegan;
   if(hasDiet('vegetarian')&&(hasDiet('lactoseFree')||hasDiet('eggFree')))return DIET_PRESETS.vegan;
   if(hasDiet('vegetarian'))return DIET_PRESETS.vegetarian;
   if(hasDiet('glutenFree'))return DIET_PRESETS.glutenFree;
   if(hasDiet('lowCarb'))return DIET_PRESETS.lowCarb;
-  if(hasDiet('highProtein'))return DIET_PRESETS.highProtein;
+  if(hasDiet('highProtein'))return DIET_PRESETS.stableEnergy;
+  if(hasDiet('lactoseFree'))return DIET_PRESETS.lactoseFreeStable;
   if(['nutFree','eggFree','fishFree','noPork','noRedMeat'].some(hasDiet))return DIET_PRESETS.safe;
-  return null;
+  return DIET_PRESETS.stableEnergy;
 }
 function mealVariant(m,i){
   const preset=pickDietPreset();
@@ -1808,8 +1836,9 @@ async function api(sys,msg){
 async function swapMeal(i){
   const card=document.getElementById('mc'+i),btn=card.querySelector('.sbtn');
   btn.disabled=true;btn.innerHTML='<span class="spin">↺</span>';card.classList.add('loading');
+  rememberAvoidedMeal(S.meals[i].f||S.meals[i].food);
   const ez=S.easy?'Recept mora biti hiter in enostaven (konzerve, jajca, pečena kura, whey shake, mikrovalovna). Ni kompleksnega kuhanja.':'';
-  const lfc=dietPrompt();
+  const lfc=dietPrompt()+' '+avoidPrompt();
   try{
     const txt=await api(`Si prehranjevalni svetovalec. Zamenjaj obrok. ${ez} ${lfc} Kalorična vrednost ±50 kcal. Vrni SAMO JSON: {"f":"opis v slovenščini","k":380,"i":[{"n":"sestavina","a":"100 g"}]}`,
       `Zamenjaj ${S.meals[i].label.toLowerCase()}: "${S.meals[i].f||S.meals[i].food}" (~${S.meals[i].k||S.meals[i].kcal} kcal). Upoštevaj prehranske posebnosti: ${dietPrompt()} Drugačna alternativa z gramaturami.`);
@@ -1839,7 +1868,7 @@ async function swapEx(i){
 async function refreshMeals(){
   const btn=document.getElementById('bam');btn.disabled=true;btn.innerHTML='<span class="spin">↺</span> Generiram...';
   const ez=S.easy?'Hiter in enostaven jedilnik (konzerve, jajca, whey shake, pečena kura iz pekarne, mikrovalovna). Brez kompleksnega kuhanja.':'';
-  const lfc=dietPrompt();
+  const lfc=dietPrompt()+' '+avoidPrompt();
   const goalKcalTarget=calcGoalKcal()||1600;
   try{
     const txt=await api(`Si prehranjevalni svetovalec. ${ez} ${lfc} Sestavi dnevni jedilnik ~${goalKcalTarget} kcal za žensko ki želi ${G.goal==='lose'?'shujšati':G.goal==='gain'?'pridobiti mišice':'vzdrževati težo'}. Vrni SAMO veljavni JSON array s 5 elementi. Vsak element mora imeti: "f" = konkretno ime jedi v slovenščini, ne generično "zajtrk", "kosilo", "večerja", "prigrizek"; "k" = kalorije; "i" = seznam sestavin z gramaturami. Format: [{"f":"Skyr z ovsenimi kosmiči, borovnicami in mandlji","k":360,"i":[{"n":"Skyr navadni","a":"170 g"}]}]. Ne uporabljaj generičnih imen obrokov kot naslov jedi.`,
