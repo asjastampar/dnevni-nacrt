@@ -303,6 +303,27 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .pers-btn{display:flex;align-items:center;gap:5px;font-size:12px;color:#8B2B6E;background:#FBE8F5;border:.5px solid #E4ABCF;border-radius:20px;padding:5px 11px;cursor:pointer;font-family:inherit;transition:all .15s;}
 .pers-btn:hover{background:#f5d5ed;}
 .pers-btn:disabled{opacity:.4;pointer-events:none;}
+/* dietary dropdown */
+.diet-wrap{position:relative;display:inline-flex;}
+.diet-btn{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--md);background:var(--w);border:.5px solid var(--br);border-radius:20px;padding:5px 11px;cursor:pointer;font-family:inherit;transition:all .15s;}
+.diet-btn:hover{color:var(--dk);border-color:rgba(0,0,0,.18);}
+.diet-btn.active{color:var(--red);background:#FDF0EC;border-color:#F0B8A8;}
+.diet-panel{position:absolute;right:0;top:34px;z-index:30;width:250px;background:var(--w);border:.5px solid var(--br);border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.12);padding:10px;display:none;}
+.diet-panel.open{display:block;}
+.diet-panel-title{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--lt);padding:2px 3px 8px;}
+.diet-opt{display:flex;align-items:center;gap:8px;width:100%;border:none;background:none;padding:8px 7px;border-radius:9px;font-family:inherit;cursor:pointer;text-align:left;color:var(--md);font-size:13px;}
+.diet-opt:hover{background:var(--bg);color:var(--dk);}
+.diet-check{width:18px;height:18px;border:.5px solid var(--br);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;color:transparent;flex-shrink:0;}
+.diet-opt.on .diet-check{background:var(--grn);border-color:var(--grn);color:var(--w);}
+.diet-opt.on{color:var(--dk);font-weight:500;}
+.diet-actions{display:flex;gap:6px;margin-top:8px;padding-top:8px;border-top:.5px solid var(--br);}
+.diet-mini{flex:1;border:.5px solid var(--br);border-radius:8px;background:var(--bg);color:var(--md);padding:6px 8px;font-size:12px;font-family:inherit;cursor:pointer;}
+.diet-mini.primary{background:var(--dk);color:var(--w);border-color:var(--dk);}
+.diet-note{display:none;align-items:center;gap:5px;font-size:12px;color:var(--red);background:#FDF0EC;padding:3px 9px;border-radius:5px;margin-bottom:9px;flex-wrap:wrap;}
+.diet-note.show{display:flex;}
+.diet-chip{display:inline-flex;align-items:center;background:rgba(255,255,255,.55);border-radius:5px;padding:1px 5px;}
+@media(max-width:500px){.diet-panel{position:fixed;left:.85rem;right:.85rem;top:auto;bottom:1rem;width:auto;}.diet-wrap{position:static;}}
+
 /* calorie budget block */
 /* arc summary */
 .kcal-summary{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:20px 16px 16px;margin-top:8px;}
@@ -461,15 +482,22 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
           <div class="tog-track on-grn" id="et"><div class="tog-thumb"></div></div>
           <span>Enostavno</span>
         </label>
-        <label class="tog" onclick="toggleLF()">
-          <div class="tog-track" id="lt"><div class="tog-thumb"></div></div>
-          <span>Brez laktoze</span>
-        </label>
+        <div class="diet-wrap">
+          <button class="diet-btn" id="diet-btn" onclick="toggleDietPanel(event)">Prehrana ▾</button>
+          <div class="diet-panel" id="diet-panel">
+            <div class="diet-panel-title">Prehranske posebnosti</div>
+            <div id="diet-options"></div>
+            <div class="diet-actions">
+              <button class="diet-mini" onclick="clearDiet(event)">Počisti</button>
+              <button class="diet-mini primary" onclick="closeDietPanel(event)">Shrani</button>
+            </div>
+          </div>
+        </div>
         <button class="rbtn" id="bam" onclick="refreshMeals()">↺ Zamenjaj vse</button>
         <button class="pers-btn" id="pers-btn" onclick="togPers()">✦ Ideje</button>
       </div>
     </div>
-    <div class="lf-note" id="lfn">✓ Brez laktoze</div>
+    <div class="diet-note" id="diet-note"></div>
     <!-- Ideas panel -->
     <div class="pers-panel" id="pers-panel">
       <div class="pers-title">Predlogi za tebe</div>
@@ -821,7 +849,7 @@ function saveElog(name,data){const l=loadElog();l[name]=data;try{localStorage.se
 let exExp={};  // UI state: which exercises are expanded
 
 // ─── STATE ──────────────────────────────────────────────────
-let S={meals:[],exp:[false,false,false,false,false],md:[false,false,false,false,false],exd:[],lf:false,easy:true,wt:DEF[DOW],ex:[],extras:[]};
+let S={meals:[],exp:[false,false,false,false,false],md:[false,false,false,false,false],exd:[],lf:false,diet:[],easy:true,wt:DEF[DOW],ex:[],extras:[]};
 
 // ─── AUTH ────────────────────────────────────────────────────
 let AUTH = null; // {username, pin, displayName}
@@ -874,7 +902,7 @@ async function submitAuth(){
 function lsKey(k){ return AUTH?`${AUTH.username}__${k}`:k; }
 
 function load(){
-  try{const sv=localStorage.getItem(lsKey(TK));if(sv){S={...S,...JSON.parse(sv)};}}catch(e){}
+  try{const sv=localStorage.getItem(lsKey(TK));if(sv){S={...S,...JSON.parse(sv)};getDiet();}}catch(e){}
 }
 function save(){
   try{localStorage.setItem(lsKey(TK),JSON.stringify(S));}catch(e){}
@@ -948,7 +976,7 @@ async function initApp(){
   const today=now.toISOString().split('T')[0];
   const cloudData=await cloudLoad(today);
   if(cloudData){
-    if(cloudData.main)S={...S,...cloudData.main};
+    if(cloudData.main){S={...S,...cloudData.main};getDiet();}
     if(cloudData.steps)ST={...ST,...cloudData.steps};
     if(cloudData.elog)try{localStorage.setItem(lsKey(ELKEY),JSON.stringify(cloudData.elog));}catch(e){}
     if(cloudData.wod)try{localStorage.setItem(lsKey('wodlog_'+today),cloudData.wod);}catch(e){}
@@ -965,7 +993,8 @@ async function initApp(){
   // Date display
   document.getElementById('ds').textContent=SLD[DOW]+', '+now.getDate()+'. '+SLM[now.getMonth()]+' '+now.getFullYear();
 
-  if(S.lf){document.getElementById('lt').classList.add('on');document.getElementById('lfn').style.display='flex';}
+  getDiet();
+  renderDietUI();
   if(S.easy)document.getElementById('et').classList.add('on-grn');
 
   renderBp();renderMeals();renderWorkout();renderTracker();renderSteps();renderExtras();
@@ -1001,20 +1030,149 @@ if(AUTH){
   switchTab('login');
 }
 
+
+// ─── DIETARY PREFERENCES ────────────────────────────────────
+const DIET_OPTS=[
+  {id:'lactoseFree',l:'Brez laktoze',hint:'brez mleka, smetane, navadne skute'},
+  {id:'vegetarian',l:'Vegetarijansko',hint:'brez mesa in rib'},
+  {id:'vegan',l:'Vegansko',hint:'brez vseh živalskih izdelkov'},
+  {id:'glutenFree',l:'Brez glutena',hint:'brez pšenice, testenin, navadnega kruha'},
+  {id:'nutFree',l:'Brez oreščkov',hint:'brez mandljev, orehov, arašidov'},
+  {id:'eggFree',l:'Brez jajc',hint:'brez jajc in omlet'},
+  {id:'fishFree',l:'Brez rib/morskih sadežev',hint:'brez tune, lososa, lignjev'},
+  {id:'noPork',l:'Brez svinjine',hint:'brez svinjskega mesa'},
+  {id:'noRedMeat',l:'Brez rdečega mesa',hint:'brez govedine'},
+  {id:'highProtein',l:'Visoko beljakovinsko',hint:'več beljakovin'},
+  {id:'lowCarb',l:'Low carb',hint:'manj kruha, riža, testenin'}
+];
+const DIET_LABELS=Object.fromEntries(DIET_OPTS.map(o=>[o.id,o.l]));
+const DIET_PRESETS={
+  vegan:[
+    {f:'Tofu scramble s špinačo, paradižnikom in riževim toastom',k:390,i:[{n:'Čvrsti tofu',a:'180 g'},{n:'Špinača',a:'60 g'},{n:'Paradižnik',a:'120 g'},{n:'Rižev toast',a:'2 rezini'},{n:'Olivno olje',a:'8 ml'}]},
+    {f:'Sojin jogurt z borovnicami in chia semeni',k:210,i:[{n:'Sojin jogurt',a:'180 g'},{n:'Borovnice',a:'80 g'},{n:'Chia semena',a:'12 g'}]},
+    {f:'Buddha bowl s čičeriko, quinoo in tahini prelivom',k:540,i:[{n:'Čičerika',a:'150 g'},{n:'Quinoa',a:'70 g'},{n:'Mešana zelenjava',a:'200 g'},{n:'Tahini',a:'18 g'},{n:'Limonin sok',a:'1/2 limone'}]},
+    {f:'Riževi krekerji s humusom in kumaro',k:180,i:[{n:'Riževi krekerji',a:'30 g'},{n:'Humus',a:'55 g'},{n:'Kumara',a:'100 g'}]},
+    {f:'Lečina enolončnica s krompirjem in korenjem',k:465,i:[{n:'Leča',a:'90 g suha'},{n:'Krompir',a:'180 g'},{n:'Korenje',a:'120 g'},{n:'Paradižnikova omaka',a:'120 g'},{n:'Olivno olje',a:'10 ml'}]}
+  ],
+  vegetarian:[
+    {f:'Skyr bowl z jagodami in ovsenimi kosmiči',k:380,i:[{n:'Skyr',a:'180 g'},{n:'Ovseni kosmiči',a:'50 g'},{n:'Jagode',a:'100 g'},{n:'Med',a:'10 g'}]},
+    {f:'Kuhano jajce, riževi krekerji in paradižnik',k:190,i:[{n:'Jajce',a:'1 kos'},{n:'Riževi krekerji',a:'25 g'},{n:'Paradižnik',a:'120 g'}]},
+    {f:'Quinoa solata s feto, čičeriko in kumaro',k:515,i:[{n:'Quinoa',a:'70 g'},{n:'Čičerika',a:'120 g'},{n:'Feta',a:'45 g'},{n:'Kumara',a:'100 g'},{n:'Olivno olje',a:'12 ml'}]},
+    {f:'Grški jogurt z medom in sadjem',k:180,i:[{n:'Grški jogurt',a:'150 g'},{n:'Med',a:'10 g'},{n:'Sadje',a:'100 g'}]},
+    {f:'Tofu stir-fry z rižem in zelenjavo',k:465,i:[{n:'Tofu',a:'170 g'},{n:'Riž',a:'70 g'},{n:'Mešana zelenjava',a:'220 g'},{n:'Sojina omaka',a:'15 ml'},{n:'Sezamovo olje',a:'8 ml'}]}
+  ],
+  glutenFree:[
+    {f:'Omleta s špinačo, avokadom in paradižnikom',k:405,i:[{n:'Jajca',a:'3 kos'},{n:'Špinača',a:'60 g'},{n:'Avokado',a:'60 g'},{n:'Paradižnik',a:'120 g'}]},
+    {f:'Brezlaktozni jogurt z banano in chia semeni',k:190,i:[{n:'Brezlaktozni jogurt',a:'160 g'},{n:'Banana',a:'80 g'},{n:'Chia semena',a:'10 g'}]},
+    {f:'Piščančja riževa skleda z zelenjavo',k:525,i:[{n:'Piščančji file',a:'160 g'},{n:'Riž',a:'80 g'},{n:'Zelenjava',a:'200 g'},{n:'Olivno olje',a:'12 ml'}]},
+    {f:'Jabolko in temna čokolada',k:155,i:[{n:'Jabolko',a:'150 g'},{n:'Temna čokolada 70%',a:'15 g'}]},
+    {f:'Losos s krompirjem in brokolijem',k:500,i:[{n:'Losos',a:'180 g'},{n:'Krompir',a:'220 g'},{n:'Brokoli',a:'180 g'},{n:'Olivno olje',a:'10 ml'}]}
+  ],
+  highProtein:[
+    {f:'Proteinski shake z whey izolatom, banano in ovsenimi kosmiči',k:420,i:[{n:'Whey izolat',a:'30 g'},{n:'Banana',a:'120 g'},{n:'Ovseni kosmiči',a:'45 g'},{n:'Voda ali mandljevo mleko',a:'250 ml'}]},
+    {f:'Skyr z borovnicami',k:180,i:[{n:'Skyr',a:'180 g'},{n:'Borovnice',a:'80 g'}]},
+    {f:'Piščančja bowl skleda z rižem in zelenjavo',k:540,i:[{n:'Piščančji file',a:'190 g'},{n:'Riž',a:'75 g'},{n:'Zelenjava',a:'220 g'},{n:'Olivno olje',a:'10 ml'}]},
+    {f:'Tuna z riževimi krekerji in kumaro',k:210,i:[{n:'Tuna v lastnem soku',a:'120 g'},{n:'Riževi krekerji',a:'25 g'},{n:'Kumara',a:'100 g'}]},
+    {f:'Puranji zrezek z ajdo in brokolijem',k:495,i:[{n:'Puranje prsi',a:'190 g'},{n:'Ajda',a:'70 g'},{n:'Brokoli',a:'200 g'},{n:'Olivno olje',a:'10 ml'}]}
+  ],
+  lowCarb:[
+    {f:'Jajčna omleta z avokadom in špinačo',k:410,i:[{n:'Jajca',a:'3 kos'},{n:'Avokado',a:'80 g'},{n:'Špinača',a:'70 g'},{n:'Olivno olje',a:'6 ml'}]},
+    {f:'Grški jogurt z borovnicami',k:170,i:[{n:'Grški jogurt',a:'170 g'},{n:'Borovnice',a:'70 g'}]},
+    {f:'Piščančja solata z bučnimi semeni',k:480,i:[{n:'Piščančji file',a:'180 g'},{n:'Zelena solata',a:'120 g'},{n:'Kumara',a:'100 g'},{n:'Bučna semena',a:'18 g'},{n:'Olivno olje',a:'15 ml'}]},
+    {f:'Sirni krožnik z zelenjavo',k:190,i:[{n:'Sir',a:'45 g'},{n:'Paprika',a:'100 g'},{n:'Kumara',a:'100 g'}]},
+    {f:'Losos z bučkinimi rezanci',k:470,i:[{n:'Losos',a:'190 g'},{n:'Bučke',a:'250 g'},{n:'Olivno olje',a:'12 ml'},{n:'Limonin sok',a:'1/2 limone'}]}
+  ],
+  safe:[
+    {f:'Chia puding s sojinim jogurtom in jagodami',k:330,i:[{n:'Sojin jogurt',a:'180 g'},{n:'Chia semena',a:'25 g'},{n:'Jagode',a:'100 g'},{n:'Javorjev sirup',a:'10 ml'}]},
+    {f:'Banana in riževi krekerji',k:180,i:[{n:'Banana',a:'120 g'},{n:'Riževi krekerji',a:'25 g'}]},
+    {f:'Riževa skleda s tofujem in zelenjavo',k:510,i:[{n:'Tofu',a:'180 g'},{n:'Riž',a:'80 g'},{n:'Zelenjava',a:'220 g'},{n:'Olivno olje',a:'10 ml'}]},
+    {f:'Humus s korenjem in kumaro',k:175,i:[{n:'Humus',a:'60 g'},{n:'Korenje',a:'120 g'},{n:'Kumara',a:'100 g'}]},
+    {f:'Krompirjeva ponev s fižolom in zelenjavo',k:455,i:[{n:'Krompir',a:'240 g'},{n:'Beli fižol',a:'130 g'},{n:'Paprika',a:'120 g'},{n:'Olivno olje',a:'12 ml'}]}
+  ]
+};
+function getDiet(){
+  if(!Array.isArray(S.diet))S.diet=[];
+  if(S.lf&&!S.diet.includes('lactoseFree'))S.diet.push('lactoseFree');
+  S.lf=S.diet.includes('lactoseFree');
+  return S.diet;
+}
+function hasDiet(id){return getDiet().includes(id);}
+function dietSummary(){const d=getDiet();return d.length?d.map(x=>DIET_LABELS[x]||x).join(', '):'Prehrana';}
+function dietPrompt(){
+  const d=getDiet();
+  if(!d.length)return 'Brez posebnih prehranskih omejitev.';
+  const rules=[];
+  if(hasDiet('vegan'))rules.push('Vegansko: brez mesa, rib, jajc, mleka, sira, jogurta, skute, medu in vseh živalskih izdelkov.');
+  else if(hasDiet('vegetarian'))rules.push('Vegetarijansko: brez mesa, rib in morskih sadežev.');
+  if(hasDiet('lactoseFree'))rules.push('Brez laktoze: ne uporabljaj navadnega mleka, smetane, skute, sira ali jogurta; uporabi rastlinske ali brezlaktozne alternative.');
+  if(hasDiet('glutenFree'))rules.push('Brez glutena: brez pšenice, navadnih testenin, kruha, kuskusa, ječmena; uporabi riž, krompir, ajdo, quinoo, riževe krekerje.');
+  if(hasDiet('nutFree'))rules.push('Brez oreščkov: brez mandljev, orehov, arašidov, lešnikov in oreščkovih masel.');
+  if(hasDiet('eggFree'))rules.push('Brez jajc.');
+  if(hasDiet('fishFree'))rules.push('Brez rib in morskih sadežev.');
+  if(hasDiet('noPork'))rules.push('Brez svinjine.');
+  if(hasDiet('noRedMeat'))rules.push('Brez rdečega mesa, posebej govedine.');
+  if(hasDiet('highProtein'))rules.push('Visoko beljakovinsko: vsak glavni obrok naj ima jasen vir beljakovin.');
+  if(hasDiet('lowCarb'))rules.push('Low carb: zmanjšaj kruh, riž, testenine, sladkor in večje porcije škroba.');
+  return rules.join(' ');
+}
+function pickDietPreset(){
+  if(hasDiet('vegan'))return DIET_PRESETS.vegan;
+  if(hasDiet('vegetarian')&&(hasDiet('lactoseFree')||hasDiet('eggFree')))return DIET_PRESETS.vegan;
+  if(hasDiet('vegetarian'))return DIET_PRESETS.vegetarian;
+  if(hasDiet('glutenFree'))return DIET_PRESETS.glutenFree;
+  if(hasDiet('lowCarb'))return DIET_PRESETS.lowCarb;
+  if(hasDiet('highProtein'))return DIET_PRESETS.highProtein;
+  if(['nutFree','eggFree','fishFree','noPork','noRedMeat'].some(hasDiet))return DIET_PRESETS.safe;
+  return null;
+}
+function mealVariant(m,i){
+  const preset=pickDietPreset();
+  if(preset)return {label:m.l,...preset[i%preset.length]};
+  return {label:m.l,...(hasDiet('lactoseFree')?m.lf:m.n)};
+}
+function renderDietUI(){
+  getDiet();
+  const holder=document.getElementById('diet-options');
+  if(holder)holder.innerHTML=DIET_OPTS.map(o=>`<button class="diet-opt ${hasDiet(o.id)?'on':''}" onclick="toggleDiet('${o.id}',event)"><span class="diet-check">✓</span><span><span>${o.l}</span><br><small style="color:var(--lt);font-weight:400;">${o.hint}</small></span></button>`).join('');
+  const btn=document.getElementById('diet-btn');
+  if(btn){const count=getDiet().length;btn.textContent=count?`Prehrana (${count}) ▾`:'Prehrana ▾';btn.classList.toggle('active',count>0);}
+  const note=document.getElementById('diet-note');
+  if(note){const d=getDiet();note.classList.toggle('show',d.length>0);note.innerHTML=d.length?'✓ '+d.map(x=>`<span class="diet-chip">${DIET_LABELS[x]||x}</span>`).join(' '):'';}
+}
+function applyDietToCurrentMeals(){
+  const src=getMealSrc();
+  const pinned=getPinned();
+  S.meals=src.map((m,i)=>{
+    if(pinned[i])return {label:m.l,...pinned[i],pinned:true};
+    return mealVariant(m,i);
+  });
+  S.md=[false,false,false,false,false];
+}
+function toggleDietPanel(e){if(e)e.stopPropagation();renderDietUI();document.getElementById('diet-panel')?.classList.toggle('open');}
+function closeDietPanel(e){if(e)e.stopPropagation();document.getElementById('diet-panel')?.classList.remove('open');renderDietUI();}
+function clearDiet(e){if(e)e.stopPropagation();S.diet=[];S.lf=false;applyDietToCurrentMeals();save();renderDietUI();renderMeals();}
+function toggleDiet(id,e){
+  if(e)e.stopPropagation();
+  const d=getDiet();
+  const exists=d.includes(id);
+  S.diet=exists?d.filter(x=>x!==id):[...d,id];
+  if(id==='vegan'&&!exists)S.diet=S.diet.filter(x=>x!=='vegetarian').concat('vegetarian');
+  if(id==='vegetarian'&&!exists&&hasDiet('vegan'))S.diet=S.diet.filter(x=>x!=='vegetarian').concat('vegetarian');
+  S.diet=[...new Set(S.diet)];
+  S.lf=S.diet.includes('lactoseFree');
+  applyDietToCurrentMeals();
+  save();renderDietUI();renderMeals();
+}
+document.addEventListener('click',e=>{const p=document.getElementById('diet-panel');if(p&&!e.target.closest('.diet-wrap'))p.classList.remove('open');});
+
 const PINNED_KEY='pinned_meals';
 function getPinned(){try{return JSON.parse(localStorage.getItem(lsKey(PINNED_KEY)))||{};}catch(e){return{};}}
 function savePinned(p){try{localStorage.setItem(lsKey(PINNED_KEY),JSON.stringify(p));}catch(e){}}
 
 function getMealSrc(){return S.easy?(EM[DOW]||EM[1]):(MD[DOW]||MD[1]);}
 function initMeals(){
-  const src=getMealSrc();
-  const pinned=getPinned();
-  S.meals=src.map((m,i)=>{
-    // If this slot has a pinned meal, use it
-    if(pinned[i])return {label:m.l,...pinned[i],pinned:true};
-    return {label:m.l,...(S.lf?m.lf:m.n)};
-  });
-  S.md=[false,false,false,false,false];
+  getDiet();
+  applyDietToCurrentMeals();
 }
 function initWorkout(){
   const w=WKT[S.wt];
@@ -1026,17 +1184,11 @@ function initWorkout(){
 function toggleEasy(){
   S.easy=!S.easy;
   document.getElementById('et').className='tog-track'+(S.easy?' on-grn':'');
-  const src=getMealSrc();
-  S.meals=S.meals.map((m,i)=>({label:m.label,...(S.lf?src[i].lf:src[i].n)}));
+  applyDietToCurrentMeals();
   save();renderMeals();
 }
 function toggleLF(){
-  S.lf=!S.lf;
-  document.getElementById('lt').className='tog-track'+(S.lf?' on':'');
-  document.getElementById('lfn').style.display=S.lf?'flex':'none';
-  const src=getMealSrc();
-  S.meals=S.meals.map((m,i)=>({label:m.label,...(S.lf?src[i].lf:src[i].n)}));
-  save();renderMeals();
+  toggleDiet('lactoseFree');
 }
 
 // ─── BODY PART SELECTOR ─────────────────────────────────────
@@ -1651,10 +1803,10 @@ async function swapMeal(i){
   const card=document.getElementById('mc'+i),btn=card.querySelector('.sbtn');
   btn.disabled=true;btn.innerHTML='<span class="spin">↺</span>';card.classList.add('loading');
   const ez=S.easy?'Recept mora biti hiter in enostaven (konzerve, jajca, pečena kura, whey shake, mikrovalovna). Ni kompleksnega kuhanja.':'';
-  const lfc=S.lf?'Brez laktoze.':'Z laktozo je ok.';
+  const lfc=dietPrompt();
   try{
     const txt=await api(`Si prehranjevalni svetovalec. Zamenjaj obrok. ${ez} ${lfc} Kalorična vrednost ±50 kcal. Vrni SAMO JSON: {"f":"opis v slovenščini","k":380,"i":[{"n":"sestavina","a":"100 g"}]}`,
-      `Zamenjaj ${S.meals[i].label.toLowerCase()}: "${S.meals[i].f||S.meals[i].food}" (~${S.meals[i].k||S.meals[i].kcal} kcal). Drugačna alternativa z gramaturami.`);
+      `Zamenjaj ${S.meals[i].label.toLowerCase()}: "${S.meals[i].f||S.meals[i].food}" (~${S.meals[i].k||S.meals[i].kcal} kcal). Upoštevaj prehranske posebnosti: ${dietPrompt()} Drugačna alternativa z gramaturami.`);
     const p=JSON.parse(txt);
     S.meals[i]={...S.meals[i],...p};save();renderMeals();
   }catch(e){err('Zamenjava ni uspela.');card.classList.remove('loading');btn.disabled=false;btn.innerHTML='↺';}
@@ -1681,7 +1833,7 @@ async function swapEx(i){
 async function refreshMeals(){
   const btn=document.getElementById('bam');btn.disabled=true;btn.innerHTML='<span class="spin">↺</span> Generiram...';
   const ez=S.easy?'Hiter in enostaven jedilnik (konzerve, jajca, whey shake, pečena kura iz pekarne, mikrovalovna). Brez kompleksnega kuhanja.':'';
-  const lfc=S.lf?'Brez laktoze.':'Z laktozo je ok.';
+  const lfc=dietPrompt();
   const goalKcalTarget=calcGoalKcal()||1600;
   try{
     const txt=await api(`Si prehranjevalni svetovalec. ${ez} ${lfc} Sestavi dnevni jedilnik ~${goalKcalTarget} kcal za žensko ki želi ${G.goal==='lose'?'shujšati':G.goal==='gain'?'pridobiti mišice':'vzdrževati težo'}. Vrni SAMO veljavni JSON array s 5 elementi. Vsak element mora imeti: "f" = konkretno ime jedi v slovenščini, ne generično "zajtrk", "kosilo", "večerja", "prigrizek"; "k" = kalorije; "i" = seznam sestavin z gramaturami. Format: [{"f":"Skyr z ovsenimi kosmiči, borovnicami in mandlji","k":360,"i":[{"n":"Skyr navadni","a":"170 g"}]}]. Ne uporabljaj generičnih imen obrokov kot naslov jedi.`,
@@ -2030,7 +2182,7 @@ async function loadPers(force){
 
   const foods=getHistoryFoods();
   const ez=S.easy?'Enostavni recepti (konzerve, whey, jajca, pečena kura).':'';
-  const lfc=S.lf?'Brez laktoze.':'Z laktozo je ok.';
+  const lfc=dietPrompt();
 
   let prompt='';
   if(persMode==='fav'){
@@ -2163,5 +2315,3 @@ function renderHistory(){
 </script>
 </body>
 </html>
-
-    
