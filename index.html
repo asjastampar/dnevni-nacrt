@@ -48,13 +48,35 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .mlbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--lt);margin-bottom:3px;}
 .mfood{font-size:14px;color:var(--dk);line-height:1.5;}
 .mkcal{font-size:12px;color:var(--lt);margin-top:2px;}
-.meal-actions{display:flex;align-items:center;gap:5px;flex-shrink:0;}
-.chk{width:22px;height:22px;border-radius:50%;border:.5px solid var(--br);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--lt);transition:all .15s;flex-shrink:0;}
+.meal-actions{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.chk{width:24px;height:24px;border-radius:50%;border:.5px solid var(--br);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--lt);transition:all .15s;flex-shrink:0;}
 .chk:hover{border-color:var(--grn);color:var(--grn);}
 .chk.on{background:var(--grn);border-color:var(--grn);color:var(--w);}
-.sbtn{background:none;border:.5px solid var(--br);border-radius:8px;padding:4px 8px;font-size:14px;cursor:pointer;color:var(--lt);line-height:1;font-family:inherit;transition:all .15s;}
+.sbtn{background:none;border:.5px solid var(--br);border-radius:8px;padding:4px 7px;font-size:14px;cursor:pointer;color:var(--lt);line-height:1;font-family:inherit;transition:all .15s;}
 .sbtn:hover{color:var(--md);background:var(--bg);}
 .sbtn:disabled{opacity:.3;pointer-events:none;}
+/* ── RESPONSIVE ── */
+@media(max-width:500px){
+  .app{padding:1.1rem .85rem 3rem;}
+  .htitle{font-size:22px;margin-bottom:1.4rem;}
+  .sec-right{gap:5px;}
+  .rbtn,.pers-btn{padding:4px 9px;font-size:11px;}
+  .bp-btn{padding:5px 9px;font-size:12px;}
+  .bpsel{gap:5px;}
+  /* Hide pin and sestavine on mobile — accessible via edit instead */
+  .meal-actions .pin-btn{display:none;}
+  .meal-actions .ibtn{display:none;}
+  .meal-actions{gap:5px;}
+  .modal{padding:1.4rem 1.1rem;}
+  .goal-opt{font-size:12px;padding:8px 3px;}
+  .user-bar{flex-wrap:wrap;gap:6px;}
+  .user-bar>div:first-child{flex:1;}
+  .macro-val{font-size:14px;}
+  .kcal-budget{padding:12px;}
+  .kb-remaining-val{font-size:18px;}
+  .steps-val{font-size:18px;}
+  .week-row{gap:4px;}
+}
 .ibtn{background:none;border:.5px solid var(--br);border-radius:7px;padding:3px 8px;font-size:11px;cursor:pointer;color:var(--lt);font-family:inherit;transition:all .15s;}
 .ibtn:hover{color:var(--md);background:var(--bg);}
 .ibtn.open{color:var(--grn);border-color:#B8D9C6;background:#EBF4EF;}
@@ -294,7 +316,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .kb-ring-bar{flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden;}
 .kb-ring-fill{height:6px;border-radius:3px;transition:width .4s ease;}
 .kb-ring-pct{font-size:12px;color:var(--md);white-space:nowrap;}
-.goal-opt{flex:1;min-width:0;padding:7px 5px;border:.5px solid var(--br);border-radius:8px;background:none;font-size:12px;color:var(--md);cursor:pointer;font-family:inherit;transition:all .15s;text-align:center;white-space:nowrap;}
+.goal-opt{padding:9px 5px;border:.5px solid var(--br);border-radius:9px;background:none;font-size:13px;color:var(--md);cursor:pointer;font-family:inherit;transition:all .15s;text-align:center;line-height:1.4;}
 .goal-opt:hover{border-color:rgba(0,0,0,.2);color:var(--dk);}
 .goal-opt.active{background:var(--dk);color:var(--w);border-color:var(--dk);}
 .goals-calc{background:var(--bg);border-radius:9px;padding:10px 12px;margin-bottom:14px;font-size:13px;color:var(--md);line-height:1.7;display:none;}
@@ -379,15 +401,15 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
     </div>
     <div class="modal-field">
       <label>Cilj</label>
-      <div style="display:flex;gap:6px;">
-        <button class="goal-opt" id="go-lose" onclick="selGoal('lose')">📉 Hujšanje</button>
-        <button class="goal-opt" id="go-maintain" onclick="selGoal('maintain')">⚖️ Vzdrževanje</button>
-        <button class="goal-opt" id="go-gain" onclick="selGoal('gain')">📈 Pridobivanje</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;">
+        <button class="goal-opt" id="go-lose" onclick="selGoal('lose')">📉<br>Hujšanje</button>
+        <button class="goal-opt" id="go-maintain" onclick="selGoal('maintain')">⚖️<br>Vzdrževanje</button>
+        <button class="goal-opt" id="go-gain" onclick="selGoal('gain')">📈<br>Pridobivanje</button>
       </div>
     </div>
     <div class="modal-field">
       <label>Aktivnost</label>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
         <button class="goal-opt" id="ga-sed" onclick="selAct('sed')">🪑 Pretežno sedem</button>
         <button class="goal-opt" id="ga-light" onclick="selAct('light')">🚶 Malo gibanja</button>
         <button class="goal-opt" id="ga-mod" onclick="selAct('mod')">🏃 Zmerno aktiven</button>
