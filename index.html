@@ -72,8 +72,10 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
   .user-bar{flex-wrap:wrap;gap:6px;}
   .user-bar>div:first-child{flex:1;}
   .macro-val{font-size:13px;}
-  .kcal-arc-remaining{font-size:22px;}
-  .kcal-arc-wrap{width:160px;}
+  .kcal-arc-remaining{font-size:26px;}
+  .kcal-arc-wrap{width:220px;}
+  .modal{max-height:92vh;overflow-y:auto;padding:1.4rem 1.1rem 1.2rem;}
+  .modal-close-x{display:flex;}
   .steps-val{font-size:18px;}
   .week-row{gap:4px;}
 }
@@ -229,7 +231,12 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 /* ── AUTH MODAL ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(26,26,23,.55);z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem;}
 .modal-overlay.hide{display:none;}
-.modal{background:var(--w);border-radius:18px;padding:2rem 1.75rem 1.75rem;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.18);}
+.modal{background:var(--w);border-radius:18px;padding:2rem 1.75rem 1.75rem;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.18);position:relative;max-height:90vh;overflow-y:auto;}
+.modal-close-x{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;background:var(--bg);border:none;cursor:pointer;font-size:18px;color:var(--md);display:none;align-items:center;justify-content:center;font-family:inherit;z-index:10;}
+.modal-close-x:hover{background:#EDECEA;color:var(--dk);}
+@media(max-width:500px){
+  .modal-close-x{display:flex;}
+}
 .modal-logo{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:500;margin-bottom:4px;}
 .modal-logo em{font-style:italic;color:var(--red);}
 .modal-sub{font-size:13px;color:var(--lt);margin-bottom:1.5rem;}
@@ -238,7 +245,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .modal-tab.active{background:var(--dk);color:var(--w);font-weight:500;}
 .modal-field{margin-bottom:12px;}
 .modal-field label{font-size:12px;color:var(--md);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;}
-.modal-field input{width:100%;border:.5px solid var(--br);border-radius:9px;padding:10px 12px;font-size:15px;font-family:inherit;background:var(--bg);color:var(--dk);outline:none;transition:border-color .15s;}
+.modal-field input{width:100%;border:.5px solid var(--br);border-radius:9px;padding:10px 12px;font-size:16px;font-family:inherit;background:var(--bg);color:var(--dk);outline:none;transition:border-color .15s;scroll-margin-top:60px;scroll-margin-bottom:120px;}
 .modal-field input:focus{border-color:rgba(0,0,0,.25);}
 .modal-btn{width:100%;background:var(--dk);color:var(--w);border:none;border-radius:9px;padding:12px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;margin-top:4px;transition:opacity .15s;}
 .modal-btn:hover{opacity:.85;}
@@ -298,20 +305,20 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .pers-btn:disabled{opacity:.4;pointer-events:none;}
 /* calorie budget block */
 /* arc summary */
-.kcal-summary{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:18px 16px 14px;margin-top:8px;}
-.kcal-arc-wrap{position:relative;width:180px;margin:0 auto 4px;}
+.kcal-summary{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:20px 16px 16px;margin-top:8px;}
+.kcal-arc-wrap{position:relative;width:220px;margin:0 auto 4px;}
 .kcal-arc-svg{width:100%;display:block;}
 .arc-bg{stroke:#EDECEA;}
 .arc-fill{stroke:var(--grn);transition:stroke-dasharray .5s ease;}
 .arc-fill.over{stroke:var(--red);}
-.kcal-arc-center{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);text-align:center;width:120px;}
-.kcal-arc-remaining{font-size:28px;font-weight:500;color:var(--dk);line-height:1.1;}
+.kcal-arc-center{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);text-align:center;width:140px;}
+.kcal-arc-remaining{font-size:32px;font-weight:500;color:var(--dk);line-height:1.1;}
 .kcal-arc-remaining.over{color:var(--red);}
 .kcal-arc-lbl{font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.07em;}
 .kcal-arc-goal{font-size:11px;color:var(--lt);margin-top:2px;}
-.kcal-arc-cols{display:flex;justify-content:center;gap:36px;margin-top:8px;}
+.kcal-arc-cols{display:flex;justify-content:center;gap:40px;margin-top:10px;}
 .kcal-arc-col{text-align:center;}
-.kcal-arc-num{font-size:17px;font-weight:500;color:var(--dk);}
+.kcal-arc-num{font-size:18px;font-weight:500;color:var(--dk);}
 .kcal-arc-num.green{color:var(--grn);}
 .kcal-arc-sub{font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.06em;margin-top:1px;}
 /* macro bar */
@@ -331,6 +338,9 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .goal-opt.active{background:var(--dk);color:var(--w);border-color:var(--dk);}
 .goals-calc{background:var(--bg);border-radius:9px;padding:10px 12px;margin-bottom:14px;font-size:13px;color:var(--md);line-height:1.7;display:none;}
 .goals-calc.show{display:block;}
+/* Prevent layout shift when inputs open the calc box */
+.goals-calc-wrap{min-height:0;transition:min-height .2s ease;}
+.goals-calc-wrap.has-data{min-height:200px;}
 .pers-panel{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:14px;margin-bottom:8px;display:none;}
 .pers-panel.show{display:block;}
 .pers-title{font-size:11px;font-weight:500;color:var(--md);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;}
@@ -382,6 +392,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 <!-- GOALS MODAL -->
 <div class="modal-overlay hide" id="goals-overlay">
   <div class="modal" style="max-width:420px;">
+    <button class="modal-close-x" onclick="closeGoals()" aria-label="Zapri">✕</button>
     <div class="modal-logo">Moj <em>profil</em></div>
     <div class="modal-sub">Nastavi svoje podatke za natančen izračun</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
@@ -420,8 +431,10 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
       </div>
     </div>
     <div class="goals-calc" id="goals-calc"></div>
-    <button class="modal-btn" onclick="saveGoals()">Shrani profil →</button>
-    <button onclick="closeGoals()" style="width:100%;background:none;border:none;color:var(--lt);font-size:13px;cursor:pointer;margin-top:10px;font-family:inherit;">Zapri</button>
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      <button onclick="closeGoals()" style="flex:0 0 auto;background:var(--bg);color:var(--md);border:.5px solid var(--br);border-radius:9px;padding:12px 18px;font-size:14px;cursor:pointer;font-family:inherit;">Zapri</button>
+      <button class="modal-btn" style="flex:1;margin-top:0;" onclick="saveGoals()">Shrani profil →</button>
+    </div>
   </div>
 </div>
 
@@ -1180,7 +1193,7 @@ function calcExBurn(){
   if(S.wt==='cardio'){
     return S.ex.reduce((sum,ex,i)=>{
       if(!S.exd[i])return sum;
-      return sum+(ex.kcal||CARDIO_BURN_PER_MIN*parseInt(ex.r)||150);
+      return sum+(ex.customKcal||ex.kcal||CARDIO_BURN_PER_MIN*parseInt(ex.r)||150);
     },0);
   }
   if(S.wt==='crossfit'){
@@ -1369,29 +1382,41 @@ function renderWorkout(){
   }
   if(S.wt==='cardio'){
     baw.disabled=false;document.getElementById('add-ex-row').style.display='none';
-    const wp=getWeekPlan(WEEK_NUM);
     c.innerHTML=`<div class="badge cardio">◈ Kardio dan</div>
-      <div style="font-size:12px;color:var(--lt);margin-bottom:10px;">Izberi kaj boš naredila danes in odkljukaj ob koncu.</div>`+
+      <div style="font-size:12px;color:var(--lt);margin-bottom:10px;">Izberi kaj boš naredila, nastavi čas in odkljukaj ob koncu.</div>`+
       S.ex.map((e,i)=>{
         const done=S.exd[i];const open=!!exExp[i];
         const info=getExInfo(e.n)||{};
-        const kcalEst=e.kcal||CARDIO_BURN_PER_MIN*parseInt(e.r)||150;
+        // Parse duration in minutes from e.r (supports "30 min", "45 min", etc.)
+        const parsedMin=parseInt(e.r)||30;
+        const kcalEst=e.customKcal||Math.round((e.kcal||0)*(parsedMin/(parseInt(e.origR||e.r)||30)))||CARDIO_BURN_PER_MIN*parsedMin||150;
         const descHtml=info.desc?`
           <div class="ex-desc">${info.desc}</div>
           <div class="ex-tip">💡 ${info.tip}</div>
           <a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent((info.yt||e.n))}" target="_blank">▶ Video navodila</a>
-          <div style="font-size:12px;color:var(--grn);background:#EBF4EF;padding:5px 10px;border-radius:7px;margin-top:4px;">🔥 Ocena: ~${kcalEst} kcal</div>
         `:`<div class="no-desc"></div>`;
         return `<div class="ex-wrap" id="ew${i}">
           <div class="ex-top${done?' done':''}" id="et${i}">
             <div class="edot" style="background:#1E4E8C"></div>
             <div class="ename">${e.n}</div>
-            <div class="epills"><span class="ep" style="background:#EAF0F9;color:#1E4E8C;">${e.r}</span></div>
+            <button class="ep cardio-time" onclick="togCardioTime(${i})" style="background:#EAF0F9;color:#1E4E8C;border:none;cursor:pointer;padding:3px 8px;border-radius:5px;font-size:12px;font-family:inherit;">${parsedMin} min</button>
             <button class="sbtn" onclick="swapEx(${i})">↺</button>
             <button class="chk${done?' on':''}" id="echk${i}" onclick="togEx(${i})">${done?'✓':'○'}</button>
             <button class="ex-xbtn${open?' open':''}" id="exb${i}" onclick="togExInfo(${i})">▾</button>
           </div>
-          <div class="ex-detail${open?' open':''}" id="exd${i}">${descHtml}</div>
+          <div class="cardio-time-edit" id="cte${i}" style="display:none;padding:10px 14px;background:#FDFCF9;border-top:.5px solid var(--br);">
+            <div style="font-size:12px;color:var(--md);margin-bottom:6px;">Koliko minut si (boš) naredila?</div>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <input type="number" id="cti${i}" value="${parsedMin}" min="5" max="300" step="5" style="border:.5px solid var(--br);border-radius:8px;padding:7px 10px;font-size:14px;font-family:inherit;background:var(--w);width:80px;text-align:center;outline:none;">
+              <span style="font-size:13px;color:var(--md);">min</span>
+              <button class="add-meal-btn" style="padding:7px 12px;font-size:13px;" onclick="saveCardioTime(${i})">Shrani</button>
+              <span style="font-size:12px;color:var(--grn);margin-left:auto;">🔥 ~<span id="cte-kcal${i}">${kcalEst}</span> kcal</span>
+            </div>
+          </div>
+          <div class="ex-detail${open?' open':''}" id="exd${i}">
+            ${descHtml}
+            <div style="font-size:12px;color:var(--grn);background:#EBF4EF;padding:5px 10px;border-radius:7px;margin-top:4px;">🔥 Pri ${parsedMin} min: ~${kcalEst} kcal</div>
+          </div>
         </div>`;
       }).join('');
     return;
@@ -1490,6 +1515,21 @@ function saveWodResult(){
   localStorage.setItem(lsKey('wodlog_'+now.toISOString().split('T')[0]),val);
   const ok=document.getElementById('wod-ok');
   if(ok){ok.textContent='✓ shranjeno';ok.classList.add('show');setTimeout(()=>ok.classList.remove('show'),2500);}
+}
+function togCardioTime(i){
+  const el=document.getElementById('cte'+i);
+  if(!el)return;
+  el.style.display=el.style.display==='none'?'block':'none';
+}
+function saveCardioTime(i){
+  const inp=document.getElementById('cti'+i);
+  const newMin=parseInt(inp?.value)||30;
+  if(!S.ex[i])return;
+  if(!S.ex[i].origR)S.ex[i].origR=S.ex[i].r;
+  if(!S.ex[i].origKcal)S.ex[i].origKcal=S.ex[i].kcal||CARDIO_BURN_PER_MIN*parseInt(S.ex[i].origR||30);
+  S.ex[i].r=newMin+' min';
+  S.ex[i].customKcal=Math.round(S.ex[i].origKcal*(newMin/(parseInt(S.ex[i].origR)||30)));
+  save();renderWorkout();calcKcal();
 }
 function togExInfo(i){
   exExp[i]=!exExp[i];
