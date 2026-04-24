@@ -71,9 +71,9 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
   .goal-opt{font-size:12px;padding:8px 3px;}
   .user-bar{flex-wrap:wrap;gap:6px;}
   .user-bar>div:first-child{flex:1;}
-  .macro-val{font-size:14px;}
-  .kcal-budget{padding:12px;}
-  .kb-remaining-val{font-size:18px;}
+  .macro-val{font-size:13px;}
+  .kcal-arc-remaining{font-size:22px;}
+  .kcal-arc-wrap{width:160px;}
   .steps-val{font-size:18px;}
   .week-row{gap:4px;}
 }
@@ -297,37 +297,40 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .pers-btn:hover{background:#f5d5ed;}
 .pers-btn:disabled{opacity:.4;pointer-events:none;}
 /* calorie budget block */
-.kcal-budget{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:14px 16px;margin-top:8px;}
-.kb-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0;font-size:14px;}
-.kb-row.kb-eaten{border-top:.5px solid var(--br);margin-top:4px;padding-top:8px;}
-.kb-lbl{color:var(--md);}
-.kb-lbl-b{color:var(--dk);font-weight:500;}
-.kb-val{font-weight:500;color:var(--dk);}
-.kb-val.neg{color:var(--red);}
-.kb-val.pos{color:var(--grn);}
-.kb-divider{height:.5px;background:var(--br);margin:8px 0;}
-.kb-remaining{padding-top:0;}
-.kb-remaining-val{font-size:20px;font-weight:500;}
-.kb-remaining-val.ok{color:var(--grn);}
-.kb-remaining-val.over{color:var(--red);}
-.kb-note{font-size:12px;color:var(--lt);margin-top:4px;line-height:1.5;}
-/* progress ring in budget */
-.kb-ring-wrap{display:flex;align-items:center;gap:10px;margin-top:10px;}
-.kb-ring-bar{flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden;}
-.kb-ring-fill{height:6px;border-radius:3px;transition:width .4s ease;}
-.kb-ring-pct{font-size:12px;color:var(--md);white-space:nowrap;}
+/* arc summary */
+.kcal-summary{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:18px 16px 14px;margin-top:8px;}
+.kcal-arc-wrap{position:relative;width:180px;margin:0 auto 4px;}
+.kcal-arc-svg{width:100%;display:block;}
+.arc-bg{stroke:#EDECEA;}
+.arc-fill{stroke:var(--grn);transition:stroke-dasharray .5s ease;}
+.arc-fill.over{stroke:var(--red);}
+.kcal-arc-center{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);text-align:center;width:120px;}
+.kcal-arc-remaining{font-size:28px;font-weight:500;color:var(--dk);line-height:1.1;}
+.kcal-arc-remaining.over{color:var(--red);}
+.kcal-arc-lbl{font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.07em;}
+.kcal-arc-goal{font-size:11px;color:var(--lt);margin-top:2px;}
+.kcal-arc-cols{display:flex;justify-content:center;gap:36px;margin-top:8px;}
+.kcal-arc-col{text-align:center;}
+.kcal-arc-num{font-size:17px;font-weight:500;color:var(--dk);}
+.kcal-arc-num.green{color:var(--grn);}
+.kcal-arc-sub{font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.06em;margin-top:1px;}
+/* macro bar */
+.macro-bar{background:var(--w);border:.5px solid var(--br);border-radius:10px;padding:12px 14px;margin-top:8px;display:flex;align-items:flex-start;justify-content:space-around;}
+.macro-item{text-align:center;flex:1;}
+.macro-val{font-size:15px;font-weight:500;color:var(--dk);}
+.macro-lbl{font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.05em;margin-top:1px;}
+.macro-goal{font-size:11px;color:var(--lt);margin-top:1px;}
+.macro-sep{width:.5px;background:var(--br);align-self:stretch;flex-shrink:0;}
+.macro-prog{height:3px;background:var(--bg);border-radius:2px;overflow:hidden;margin:5px auto 4px;width:80%;}
+.macro-prog-fill{height:3px;border-radius:2px;width:0%;transition:width .4s ease;}
+.p-fill{background:#4A90D9;}
+.c-fill{background:#F5A623;}
+.f-fill{background:#7ED321;}
 .goal-opt{padding:9px 5px;border:.5px solid var(--br);border-radius:9px;background:none;font-size:13px;color:var(--md);cursor:pointer;font-family:inherit;transition:all .15s;text-align:center;line-height:1.4;}
 .goal-opt:hover{border-color:rgba(0,0,0,.2);color:var(--dk);}
 .goal-opt.active{background:var(--dk);color:var(--w);border-color:var(--dk);}
 .goals-calc{background:var(--bg);border-radius:9px;padding:10px 12px;margin-bottom:14px;font-size:13px;color:var(--md);line-height:1.7;display:none;}
 .goals-calc.show{display:block;}
-/* macro bar */
-.macro-bar{background:var(--w);border:.5px solid var(--br);border-radius:10px;padding:10px 14px;margin-top:6px;display:flex;align-items:center;justify-content:space-around;}
-.macro-item{text-align:center;flex:1;}
-.macro-val{font-size:16px;font-weight:500;color:var(--dk);}
-.macro-lbl{font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.05em;margin-top:1px;}
-.macro-goal{font-size:11px;color:var(--lt);margin-top:2px;}
-.macro-sep{width:.5px;background:var(--br);height:32px;flex-shrink:0;}
 .pers-panel{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:14px;margin-bottom:8px;display:none;}
 .pers-panel.show{display:block;}
 .pers-title{font-size:11px;font-weight:500;color:var(--md);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;}
@@ -472,35 +475,54 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
       <input class="add-meal-inp" id="extra-inp" placeholder="+ Dodaj obrok (sladoled, kava, banana...)" onkeydown="if(event.key==='Enter')addExtraMeal()">
       <button class="add-meal-btn" id="extra-btn" onclick="addExtraMeal()">Dodaj</button>
     </div>
-    <!-- Macro summary -->
+    <!-- Lifesum-style calorie summary -->
+    <div class="kcal-summary" id="kcal-summary">
+      <div class="kcal-arc-wrap">
+        <svg class="kcal-arc-svg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+          <path class="arc-bg" d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke-width="14" stroke-linecap="round"/>
+          <path class="arc-fill" id="arc-fill" d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke-width="14" stroke-linecap="round" stroke-dasharray="0 251"/>
+        </svg>
+        <div class="kcal-arc-center">
+          <div class="kcal-arc-remaining" id="arc-remaining">—</div>
+          <div class="kcal-arc-lbl">ostalo</div>
+          <div class="kcal-arc-goal" id="arc-goal"></div>
+        </div>
+      </div>
+      <div class="kcal-arc-cols">
+        <div class="kcal-arc-col">
+          <div class="kcal-arc-num" id="arc-eaten">0</div>
+          <div class="kcal-arc-sub">zaužito</div>
+        </div>
+        <div class="kcal-arc-col" id="arc-burn-col" style="display:none">
+          <div class="kcal-arc-num green" id="arc-burn">+0</div>
+          <div class="kcal-arc-sub">porabljeno</div>
+        </div>
+      </div>
+    </div>
+    <!-- Macro cards -->
     <div class="macro-bar" id="macro-bar" style="display:none">
-      <div class="macro-item"><div class="macro-val" id="mk-p">—</div><div class="macro-lbl">beljakovine</div><div class="macro-goal" id="mg-p"></div></div>
+      <div class="macro-item">
+        <div class="macro-prog"><div class="macro-prog-fill p-fill" id="mpf-p"></div></div>
+        <div class="macro-val" id="mk-p">0g</div>
+        <div class="macro-lbl">beljakovine</div>
+        <div class="macro-goal" id="mg-p"></div>
+      </div>
       <div class="macro-sep"></div>
-      <div class="macro-item"><div class="macro-val" id="mk-c">—</div><div class="macro-lbl">ogljikovi hidrati</div><div class="macro-goal" id="mg-c"></div></div>
+      <div class="macro-item">
+        <div class="macro-prog"><div class="macro-prog-fill c-fill" id="mpf-c"></div></div>
+        <div class="macro-val" id="mk-c">0g</div>
+        <div class="macro-lbl">ogljikovi hidrati</div>
+        <div class="macro-goal" id="mg-c"></div>
+      </div>
       <div class="macro-sep"></div>
-      <div class="macro-item"><div class="macro-val" id="mk-f">—</div><div class="macro-lbl">maščobe</div><div class="macro-goal" id="mg-f"></div></div>
+      <div class="macro-item">
+        <div class="macro-prog"><div class="macro-prog-fill f-fill" id="mpf-f"></div></div>
+        <div class="macro-val" id="mk-f">0g</div>
+        <div class="macro-lbl">maščobe</div>
+        <div class="macro-goal" id="mg-f"></div>
+      </div>
     </div>
-    <!-- Calorie budget -->
-    <div class="kcal-budget" id="kcal-budget">
-      <div class="kb-row">
-        <span class="kb-lbl">Cilj dneva</span>
-        <span class="kb-val" id="kb-goal">— kcal</span>
-      </div>
-      <div class="kb-row kb-eaten">
-        <span class="kb-lbl">Zaužito</span>
-        <span class="kb-val neg" id="kb-eaten">0 kcal</span>
-      </div>
-      <div class="kb-row" id="kb-burn-row" style="display:none">
-        <span class="kb-lbl">🔥 Vadba & koraki</span>
-        <span class="kb-val pos" id="kb-burn">+0 kcal</span>
-      </div>
-      <div class="kb-divider"></div>
-      <div class="kb-row kb-remaining">
-        <span class="kb-lbl-b">Ostalo danes</span>
-        <span class="kb-remaining-val" id="kb-remaining">—</span>
-      </div>
-      <div class="kb-note" id="kb-note"></div>
-    </div>
+
 
   <div class="sec">
     <div class="sec-lbl" style="margin-bottom:10px;">Dnevni koraki</div>
@@ -935,10 +957,11 @@ async function initApp(){
 
   renderBp();renderMeals();renderWorkout();renderTracker();renderSteps();renderExtras();
   loadGoals();bindGoalsInputs();
-  // Show goals setup prompt if no profile yet
-  if(!G.age||!G.weight)setTimeout(()=>{
-    if(!G.age||!G.weight)openGoals();
-  },1500);
+  // Show goals setup only if never set before
+  if(!G.age||!G.weight){
+    const seen=localStorage.getItem(lsKey('goals_seen'));
+    if(!seen)setTimeout(()=>openGoals(),1500);
+  }
 
   // Load history from cloud async
   cloudHistory().then(hist=>{
@@ -1192,49 +1215,38 @@ function calcKcal(){
   // Exercise adds to budget (zaslužene kalorije)
   const remaining=goalKcal?goalKcal+totalBurned-totalEaten:null;
 
-  // Update new budget display
-  const budgetEl=document.getElementById('kcal-budget');
-  if(budgetEl){
-    document.getElementById('kb-goal').textContent=goalKcal?(goalKcal+' kcal'):'Nastavi profil →';
-    document.getElementById('kb-eaten').textContent='−'+totalEaten+' kcal';
-    const burnRow=document.getElementById('kb-burn-row');
-    if(totalBurned>0){
-      burnRow.style.display='flex';
-      const parts=[];
-      if(exBurned>0)parts.push('vadba');
-      if(stepsBurned>0)parts.push('koraki');
-      document.getElementById('kb-burn').textContent='+'+totalBurned+' kcal';
-      burnRow.querySelector('.kb-lbl').textContent='🔥 '+parts.join(' & ');
-    }else{burnRow.style.display='none';}
+  // Arc SVG display
+  const ARC_LEN=251; // approximate half-circle arc length for viewBox 200x120 r=80
+  const arcFill=document.getElementById('arc-fill');
+  const arcRemEl=document.getElementById('arc-remaining');
+  const arcGoalEl=document.getElementById('arc-goal');
+  const arcEatenEl=document.getElementById('arc-eaten');
+  const arcBurnCol=document.getElementById('arc-burn-col');
+  const arcBurnEl=document.getElementById('arc-burn');
 
-    const remEl=document.getElementById('kb-remaining');
-    const noteEl=document.getElementById('kb-note');
-    if(remaining!==null){
-      remEl.textContent=(remaining>=0?'+':'')+remaining+' kcal';
-      remEl.className='kb-remaining-val '+(remaining>=0?'ok':'over');
-      if(remaining>=0){
-        noteEl.textContent=`V okvirju cilja. Še ${remaining} kcal do dnevne meje.`;
-      }else{
-        noteEl.textContent=`${Math.abs(remaining)} kcal nad ciljem danes.`;
-      }
-    }else{
-      remEl.textContent='—';remEl.className='kb-remaining-val';
-      noteEl.innerHTML='<a href="#" onclick="openGoals();return false;" style="color:var(--red);">⚙ Nastavi profil za sledenje</a>';
-    }
+  if(arcEatenEl)arcEatenEl.textContent=totalEaten;
+  if(goalKcal&&arcGoalEl)arcGoalEl.textContent='cilj: '+goalKcal+' kcal';
 
-    // Progress bar
-    if(goalKcal&&totalEaten>0){
-      const pct=Math.min(130,Math.round(totalEaten/(goalKcal)*100));
-      const color=pct>100?'var(--red)':pct>85?'#B45309':'var(--grn)';
-      const existing=budgetEl.querySelector('.kb-ring-wrap');
-      if(existing)existing.remove();
-      const wrap=document.createElement('div');wrap.className='kb-ring-wrap';
-      wrap.innerHTML=`<div class="kb-ring-bar"><div class="kb-ring-fill" style="width:${Math.min(100,pct)}%;background:${color}"></div></div><span class="kb-ring-pct">${pct}%</span>`;
-      budgetEl.appendChild(wrap);
+  if(remaining!==null&&arcRemEl){
+    arcRemEl.textContent=(remaining>=0?remaining:remaining)+' kcal';
+    arcRemEl.className='kcal-arc-remaining'+(remaining<0?' over':'');
+    const pct=Math.min(1,totalEaten/goalKcal);
+    const dashLen=Math.round(pct*ARC_LEN);
+    if(arcFill){
+      arcFill.setAttribute('stroke-dasharray',dashLen+' '+(ARC_LEN-dashLen));
+      arcFill.className='arc-fill'+(remaining<0?' over':'');
     }
+  }else if(arcRemEl){
+    arcRemEl.textContent='—';
+    if(arcFill)arcFill.setAttribute('stroke-dasharray','0 '+ARC_LEN);
   }
 
-  // Also keep legacy elements updated (for tracker etc.)
+  if(totalBurned>0&&arcBurnCol&&arcBurnEl){
+    arcBurnCol.style.display='block';
+    arcBurnEl.textContent='+'+totalBurned;
+  }else if(arcBurnCol){arcBurnCol.style.display='none';}
+
+  // Also keep legacy elements if still present
   const tkEaten=document.getElementById('tk-eaten');
   const tkPlan=document.getElementById('tk-plan');
   if(tkEaten)tkEaten.textContent=totalEaten+' kcal';
@@ -1817,7 +1829,9 @@ function saveGoals(){
   G.weight=parseFloat(document.getElementById('g-weight')?.value)||null;
   G.target=parseFloat(document.getElementById('g-target')?.value)||null;
   G.goal=_selGoal;G.act=_selAct;
-  saveGoalsState();closeGoals();
+  saveGoalsState();
+  try{localStorage.setItem(lsKey('goals_seen'),'1');}catch(e){}
+  closeGoals();
   calcKcal(); // refresh with new targets
 }
 
@@ -1849,7 +1863,6 @@ function estimateMacros(mealName, kcal){
 function renderMacros(){
   loadGoals();
   const targets=calcMacroTargets();
-  // Sum macros from eaten meals only
   let totP=0,totC=0,totF=0;
   S.meals.forEach((m,i)=>{
     if(!S.md[i])return;
@@ -1865,15 +1878,20 @@ function renderMacros(){
   });
   const bar=document.getElementById('macro-bar');
   if(!bar)return;
-  if(totP+totC+totF===0){bar.style.display='none';return;}
-  bar.style.display='flex';
+  // Always show macro bar if goals set
+  bar.style.display=(targets||totP>0)?'flex':'none';
   document.getElementById('mk-p').textContent=totP+'g';
   document.getElementById('mk-c').textContent=totC+'g';
   document.getElementById('mk-f').textContent=totF+'g';
   if(targets){
-    document.getElementById('mg-p').textContent='cilj: '+targets.p+'g';
-    document.getElementById('mg-c').textContent='cilj: '+targets.c+'g';
-    document.getElementById('mg-f').textContent='cilj: '+targets.f+'g';
+    document.getElementById('mg-p').textContent='/ '+targets.p+'g';
+    document.getElementById('mg-c').textContent='/ '+targets.c+'g';
+    document.getElementById('mg-f').textContent='/ '+targets.f+'g';
+    // Progress bars
+    const pP=document.getElementById('mpf-p');const pC=document.getElementById('mpf-c');const pF=document.getElementById('mpf-f');
+    if(pP)pP.style.width=Math.min(100,Math.round(totP/targets.p*100))+'%';
+    if(pC)pC.style.width=Math.min(100,Math.round(totC/targets.c*100))+'%';
+    if(pF)pF.style.width=Math.min(100,Math.round(totF/targets.f*100))+'%';
   }
 }
 function renderExtras(){
