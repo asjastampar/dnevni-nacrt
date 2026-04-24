@@ -63,9 +63,16 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
   .rbtn,.pers-btn{padding:4px 9px;font-size:11px;}
   .bp-btn{padding:5px 9px;font-size:12px;}
   .bpsel{gap:5px;}
-  /* Hide only pin on mobile */
+  /* Mobile meal layout: actions in first row, meal text below full width */
+  .meal-top{display:grid;grid-template-columns:12px 1fr;grid-template-areas:"actions actions" "dot body";gap:9px 10px;align-items:start;padding:12px 14px;}
+  .meal-actions{grid-area:actions;width:100%;justify-content:flex-end;gap:6px;flex-wrap:nowrap;}
   .meal-actions .pin-btn{display:none;}
-  .meal-actions{gap:5px;}
+  .mdot{grid-area:dot;margin-top:8px;}
+  .mbody{grid-area:body;width:100%;min-width:0;}
+  .mfood{font-size:15px;line-height:1.45;}
+  .ibtn{padding:5px 10px;font-size:12px;}
+  .sbtn,.ebtn,.del-btn{min-width:34px;min-height:34px;padding:6px 8px;}
+  .chk{width:34px;height:34px;font-size:14px;}
   .modal{padding:1.4rem 1.1rem;}
   .goal-opt{font-size:12px;padding:8px 3px;}
   .user-bar{flex-wrap:wrap;gap:6px;}
