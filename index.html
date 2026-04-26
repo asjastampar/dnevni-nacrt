@@ -439,7 +439,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .macro-item:nth-child(3){background:#FFF9ED;}
 .macro-item:nth-child(5){background:#FFF6F1;}
 .macro-head{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
-.macro-ico{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;background:#FDE0DD;color:#D93030;flex-shrink:0;}
+.macro-ico{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;background:#FDE0DD;color:#D93030;flex-shrink:0;}
 .macro-item:nth-child(3) .macro-ico{background:#FFEBC2;color:#F5A623;}
 .macro-item:nth-child(5) .macro-ico{background:#FFE1D4;color:#E95420;}
 .macro-lbl{font-size:15px;color:#D93030;text-transform:none;letter-spacing:0;margin-top:0;font-weight:600;line-height:1.15;}
@@ -586,7 +586,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
   .macro-ico{
     width:24px !important;
     height:24px !important;
-    font-size:12px !important;
+    font-size:13px !important;
   }
   .macro-lbl{
     font-size:13px !important;
@@ -824,7 +824,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 	<!-- Macro cards -->
 	<div class="macro-bar" id="macro-bar" style="display:none">
 	  <div class="macro-item">
-		<div class="macro-head"><div class="macro-ico">▮</div><div class="macro-lbl">Beljakovine</div></div>
+		<div class="macro-head"><div class="macro-ico">🥚</div><div class="macro-lbl">Protein</div></div>
 		<div class="macro-val-row"><div class="macro-val" id="mk-p">0g</div><div class="macro-goal" id="mg-p"></div></div>
 		<div class="macro-prog"><div class="macro-prog-fill p-fill" id="mpf-p"></div></div>
 		<div class="macro-status" id="ms-p">—</div>
@@ -832,7 +832,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 	  </div>
 	  <div class="macro-sep"></div>
 	  <div class="macro-item">
-		<div class="macro-head"><div class="macro-ico">💧</div><div class="macro-lbl">Ogljikovi hidrati</div></div>
+		<div class="macro-head"><div class="macro-ico">🍞</div><div class="macro-lbl">OH</div></div>
 		<div class="macro-val-row"><div class="macro-val" id="mk-c">0g</div><div class="macro-goal" id="mg-c"></div></div>
 		<div class="macro-prog"><div class="macro-prog-fill c-fill" id="mpf-c"></div></div>
 		<div class="macro-status" id="ms-c">—</div>
@@ -840,7 +840,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 	  </div>
 	  <div class="macro-sep"></div>
 	  <div class="macro-item">
-		<div class="macro-head"><div class="macro-ico">💧</div><div class="macro-lbl">Maščobe</div></div>
+		<div class="macro-head"><div class="macro-ico">🥑</div><div class="macro-lbl">Maščobe</div></div>
 		<div class="macro-val-row"><div class="macro-val" id="mk-f">0g</div><div class="macro-goal" id="mg-f"></div></div>
 		<div class="macro-prog"><div class="macro-prog-fill f-fill" id="mpf-f"></div></div>
 		<div class="macro-status" id="ms-f">—</div>
@@ -1685,8 +1685,8 @@ function initWorkout(){
 function toggleEasy(){
   S.easy=!S.easy;
   document.getElementById('et').className='tog-track'+(S.easy?' on-grn':'');
-  applyDietToCurrentMeals();
-  save();renderMeals();
+  save();
+  renderMeals();
 }
 function toggleLF(){
   toggleDiet('lactoseFree');
@@ -2807,7 +2807,14 @@ async function refreshMeals(){
 	  }
 	  return m;
 	}):p;
-	if(Array.isArray(cleaned)&&cleaned.length===5){S.meals=LBLS.map((l,i)=>({label:l,...cleaned[i]}));S.md=[false,false,false,false,false];save();renderMeals();}
+	if(Array.isArray(cleaned)&&cleaned.length===5){
+  S.meals = S.meals.map((oldMeal,i)=>{
+    if(S.md[i]) return oldMeal; // obkljukane obroke pusti pri miru
+    return {label:LBLS[i], ...cleaned[i]};
+  });
+  save();
+  renderMeals();
+}
   }catch(e){err('Generiranje ni uspelo.');}
   btn.disabled=false;btn.innerHTML='↺ Zamenjaj vse';
 }
