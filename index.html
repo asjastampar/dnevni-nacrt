@@ -1046,9 +1046,6 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 
 
   <div class="sec">
-	<!-- ─── DANAŠNJI OBROKI overview module ─── -->
-	<div class="meals-overview" id="meals-overview"></div>
-
 	<div class="sec-head">
 	  <span class="sec-lbl">Jedilnik</span>
 	  <div class="sec-right">
@@ -2204,63 +2201,6 @@ function renderBp(){
 function selBp(id){S.wt=id;initWorkout();save();renderBp();renderWorkout();renderNextUp();renderTracker();}
 
 // ─── RENDER MEALS ───────────────────────────────────────────
-// ─── DANAŠNJI OBROKI — overview module ─────────────────
-function renderMealsOverview(){
-  const el=document.getElementById('meals-overview');
-  if(!el)return;
-  const meals=S.meals||[];
-  const md=S.md||[];
-  const totalMeals=meals.length;
-  const eatenMeals=md.filter(Boolean).length;
-  const totalKcal=meals.reduce((s,m)=>s+(parseInt(m.k||m.kcal)||0),0);
-  const eatenKcal=meals.reduce((s,m,i)=>s+(md[i]?(parseInt(m.k||m.kcal)||0):0),0);
-
-  // Find next unfinished meal
-  const nextIdx=meals.findIndex((_,i)=>!md[i]);
-  const nextMeal=nextIdx>=0?meals[nextIdx]:null;
-  const nextKcal=nextMeal?(parseInt(nextMeal.k||nextMeal.kcal)||0):0;
-  const nextLabel=nextMeal?(nextMeal.label||'Naslednji obrok'):'';
-
-  // Focus banner content
-  let fb;
-  if(totalMeals===0){
-	fb={cls:'fb-go',icon:'🍽',title:'Še ni obrokov',sub:'Dodaj obrok ali počakaj na predloge.'};
-  }else if(eatenMeals===0){
-	fb={cls:'fb-go',icon:'🍽',title:'Začni z zajtrkom',sub:'Označi obroke ko jih poješ — sledil bo dnevni cilj.'};
-  }else if(eatenMeals<totalMeals&&nextMeal){
-	fb={cls:'fb-go',icon:'➜',title:`Naslednji: ${nextLabel.toLowerCase()}`,sub:`~${nextKcal} kcal · ${nextMeal.f||nextMeal.food||''}`};
-  }else{
-	fb={cls:'fb-good',icon:'✓',title:'Vsi obroki opravljeni',sub:'Bravo — jutri spet!'};
-  }
-
-  el.innerHTML=`
-	<div class="wo-overview">
-	  <div class="wo-section-head">DANAŠNJI OBROKI</div>
-	  <div class="wo-overview-top">
-		<div class="wo-icon-wrap"><div class="wo-icon" style="background:#FDECE6;">🍽</div></div>
-		<div class="wo-overview-body">
-		  <div class="wo-overview-lbl">Plan za danes${eatenMeals>0?' · '+eatenMeals+'/'+totalMeals+' opravljenih':''}</div>
-		  <div class="wo-overview-name">${totalMeals} obrokov</div>
-		  <div class="wo-pills">
-			<span class="wo-pill"><span class="wo-pill-icon">🔥</span> ~${totalKcal} kcal načrtovano</span>
-			${eatenKcal>0?`<span class="wo-pill"><span class="wo-pill-icon">✓</span> ${eatenKcal} kcal zaužito</span>`:''}
-		  </div>
-		</div>
-		<div class="wo-overview-actions">
-		  <button class="next-up-btn" onclick="document.getElementById('extra-inp')?.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>document.getElementById('extra-inp')?.focus(),300);" title="Dodaj nov obrok">+ Dodaj</button>
-		</div>
-	  </div>
-	  <div class="wo-focus-banner ${fb.cls}">
-		<div class="wo-fb-icon">${fb.icon}</div>
-		<div class="wo-fb-text">
-		  <div class="wo-fb-title">${fb.title}</div>
-		  <div class="wo-fb-sub">${fb.sub}</div>
-		</div>
-	  </div>
-	</div>
-  `;
-}
-
 function renderMeals(){
   const pinned=getPinned();
   document.getElementById('mc').innerHTML=S.meals.map((m,i)=>{
@@ -2489,7 +2429,6 @@ function calcKcal(){
   if(tkPlan)tkPlan.textContent=goalKcal?'/ '+goalKcal+' kcal cilj':'';
 
   renderMacros();
-  renderMealsOverview();
 }
 
 function togMeal(i){
