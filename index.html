@@ -814,12 +814,12 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 
 /* Compact user dropdown menu */
 .user-bar{position:relative;z-index:40;}
-.user-menu-wrap{position:relative;display:inline-flex;align-items:center;}
+.user-menu-wrap{position:relative;display:inline-flex;align-items:center;margin-left:auto;}
 .user-menu-trigger{display:flex;align-items:center;gap:9px;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;color:var(--md);}
 .user-menu-trigger:hover .user-name{color:var(--dk);}
 .user-menu-chevron{font-size:15px;color:var(--lt);transition:transform .18s ease;}
 .user-menu-wrap.open .user-menu-chevron{transform:rotate(180deg);}
-.user-menu{position:absolute;top:44px;left:0;width:260px;background:var(--w);border:1px solid var(--br);border-radius:22px;padding:12px;box-shadow:0 24px 70px rgba(20,18,13,.14);display:none;z-index:80;}
+.user-menu{position:absolute;top:44px;right:0;left:auto;width:260px;background:var(--w);border:1px solid var(--br);border-radius:22px;padding:12px;box-shadow:0 24px 70px rgba(20,18,13,.14);display:none;z-index:80;}
 .user-menu-wrap.open .user-menu{display:block;}
 .user-menu-top{display:flex;align-items:center;gap:11px;padding:8px 8px 12px;margin-bottom:6px;border-bottom:1px solid var(--br);}
 .user-menu-avatar{width:34px;height:34px;border-radius:50%;background:var(--grn);color:var(--w);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;letter-spacing:.02em;flex-shrink:0;}
@@ -831,8 +831,8 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 .umi-ico{width:22px;text-align:center;color:var(--md);font-size:17px;line-height:1;}
 .user-menu-item.danger .umi-ico{color:var(--red);}
 .user-menu-sep{height:1px;background:var(--br);margin:7px 4px;}
-.user-sync{margin-left:10px;}
-@media(max-width:500px){.user-menu{width:245px;top:43px;border-radius:20px;}.user-menu-item{font-size:14px;padding:10px 8px;}}
+.user-sync{display:none !important;}
+@media(max-width:500px){.user-menu{width:245px;top:43px;right:0;left:auto;border-radius:20px;}.user-menu-item{font-size:14px;padding:10px 8px;}}
 
 </style>
 </head>
@@ -1652,8 +1652,7 @@ async function cloudHistory(){
 }
 
 function setSyncStatus(msg){
-  const el=document.getElementById('u-sync');
-  if(el){el.textContent=msg;setTimeout(()=>{if(el.textContent===msg)el.textContent='';},4000);}
+  // Sync status is intentionally hidden in the compact header.
 }
 
 // ─── APP INIT ────────────────────────────────────────────────
