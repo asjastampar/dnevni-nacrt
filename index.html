@@ -784,6 +784,26 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
   .macro-item{min-width:108px !important;flex-basis:108px !important;}
 }
 
+
+/* 2026 color refresh — warmer, less dull, emoji icons restored */
+:root{--grn:#2C7554;--grn-soft:#EEF8F2;--grn-ink:#1F5E43;--orn:#D88A16;--orn-soft:#FFF5E3;--red:#D94A42;--red-soft:#FFF0EF;--peach-soft:#FFF6F0;}
+.kcal-summary{background:linear-gradient(180deg,#FFFFFF 0%,#FFFEFB 100%) !important;box-shadow:0 18px 50px rgba(42,97,71,.08) !important;}
+.kcal-hero-icon{background:linear-gradient(135deg,#EEF8F2,#E6F3EC) !important;color:var(--grn) !important;}
+.arc-bg{stroke:#E8E5DE !important;}.arc-fill{stroke:var(--grn) !important;filter:drop-shadow(0 3px 7px rgba(44,117,84,.16)) !important;}
+.kcal-arc-svg circle{stroke-width:8.5 !important;}.kcal-arc-sub{font-size:12px !important;color:#8A877F !important;line-height:1.1 !important;}
+.kcal-focus{background:linear-gradient(90deg,#EEF8F2 0%,#FBFCFA 100%) !important;}.kcal-focus-icon{background:var(--grn) !important;}.kcal-focus-title{color:var(--grn-ink) !important;}
+.macro-bar{background:#fff !important;box-shadow:0 16px 46px rgba(0,0,0,.045) !important;}
+.macro-item{background:#fff !important;border:1px solid rgba(0,0,0,.055) !important;box-shadow:0 8px 20px rgba(0,0,0,.035) !important;}
+.macro-item:nth-child(1){background:linear-gradient(180deg,#fff 0%,#FFFAFA 100%) !important;}.macro-item:nth-child(3){background:linear-gradient(180deg,#fff 0%,#FFFCF5 100%) !important;}.macro-item:nth-child(5){background:linear-gradient(180deg,#fff 0%,#FAFFFC 100%) !important;}
+.macro-ico{width:30px !important;height:30px !important;font-size:17px !important;background:var(--red-soft) !important;color:inherit !important;}
+.macro-item:nth-child(3) .macro-ico{background:var(--orn-soft) !important;}.macro-item:nth-child(5) .macro-ico{background:var(--grn-soft) !important;}.macro-ico::before{content:none !important;}
+.macro-lbl{font-weight:700 !important;}.macro-item:nth-child(1) .macro-lbl{color:var(--red) !important;}.macro-item:nth-child(3) .macro-lbl{color:var(--orn) !important;}.macro-item:nth-child(5) .macro-lbl{color:var(--grn) !important;}
+.p-fill{background:var(--red) !important;}.c-fill{background:var(--orn) !important;}.f-fill{background:#65B94D !important;}
+.macro-status{background:var(--red-soft) !important;color:#A53630 !important;border:1px solid rgba(217,74,66,.16) !important;box-shadow:none !important;}
+.macro-item:nth-child(3) .macro-status{background:var(--orn-soft) !important;color:#9A620E !important;border-color:rgba(216,138,22,.18) !important;}
+.macro-item:nth-child(5) .macro-status{background:var(--grn-soft) !important;color:var(--grn-ink) !important;border-color:rgba(44,117,84,.16) !important;}
+@media(max-width:700px){.kcal-arc-sub{font-size:11px !important;max-width:64px !important;}.kcal-arc-num{font-size:21px !important;}.macro-ico{width:25px !important;height:25px !important;font-size:15px !important;}.macro-lbl{font-size:14px !important;}}
+
 </style>
 </head>
 <body>
@@ -900,7 +920,7 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 		  </svg>
 		  <div class="kcal-arc-center">
 			<div class="kcal-arc-num" id="arc-eaten">0</div>
-			<div class="kcal-arc-sub">kcal zaužito</div>
+			<div class="kcal-arc-sub">zaužito</div>
 		  </div>
 		</div>
 	  </div>
