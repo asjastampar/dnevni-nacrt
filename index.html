@@ -144,8 +144,8 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
   .chk{width:34px;height:34px;font-size:14px;}
   .modal{padding:1.4rem 1.1rem;}
   .goal-opt{font-size:12px;padding:8px 3px;}
-  .user-bar{flex-wrap:wrap;gap:6px;}
-  .user-bar>div:first-child{flex:1;}
+  .user-bar{flex-wrap:nowrap;gap:6px;justify-content:flex-end;}
+  .user-bar>.user-menu-wrap{margin-left:auto;}
   .macro-val{font-size:13px;}
   .kcal-arc-remaining{font-size:26px;}
   .kcal-arc-wrap{width:220px;}
@@ -520,157 +520,157 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 /* Mobile dashboard fix — nutrition hero + macro cards */
 @media (max-width: 700px){
   .kcal-summary{
-    padding:16px 16px 18px !important;
-    border-radius:18px;
-    margin-top:12px;
+	padding:16px 16px 18px !important;
+	border-radius:18px;
+	margin-top:12px;
   }
   .kcal-hero{
-    display:grid !important;
-    grid-template-columns:44px 1fr 88px !important;
-    gap:12px !important;
-    align-items:center !important;
+	display:grid !important;
+	grid-template-columns:44px 1fr 88px !important;
+	gap:12px !important;
+	align-items:center !important;
   }
   .kcal-hero-icon{
-    width:44px !important;
-    height:44px !important;
-    font-size:21px !important;
+	width:44px !important;
+	height:44px !important;
+	font-size:21px !important;
   }
   .kcal-hero-title{
-    font-size:16px !important;
-    margin-bottom:4px !important;
+	font-size:16px !important;
+	margin-bottom:4px !important;
   }
   .kcal-arc-remaining{
-    font-size:36px !important;
-    line-height:.95 !important;
+	font-size:36px !important;
+	line-height:.95 !important;
   }
   .kcal-hero-unit{
-    font-size:20px !important;
+	font-size:20px !important;
   }
   .kcal-arc-goal{
-    font-size:12px !important;
-    line-height:1.35 !important;
-    margin-top:8px !important;
+	font-size:12px !important;
+	line-height:1.35 !important;
+	margin-top:8px !important;
   }
   .kcal-arc-wrap,
   .kcal-arc-svg{
-    width:88px !important;
-    height:88px !important;
+	width:88px !important;
+	height:88px !important;
   }
   .kcal-arc-svg circle{
-    stroke-width:8 !important;
+	stroke-width:8 !important;
   }
   .kcal-arc-num{
-    font-size:20px !important;
+	font-size:20px !important;
   }
   .kcal-arc-sub{
-    font-size:11px !important;
-    margin-top:4px !important;
-    max-width:70px;
+	font-size:11px !important;
+	margin-top:4px !important;
+	max-width:70px;
   }
   .kcal-focus{
-    margin-top:14px !important;
-    padding:11px 12px !important;
-    gap:10px !important;
+	margin-top:14px !important;
+	padding:11px 12px !important;
+	gap:10px !important;
   }
   .kcal-focus-icon{
-    width:36px !important;
-    height:36px !important;
-    font-size:15px !important;
+	width:36px !important;
+	height:36px !important;
+	font-size:15px !important;
   }
   .kcal-focus-title{
-    font-size:14px !important;
+	font-size:14px !important;
   }
   .kcal-focus-text{
-    font-size:13px !important;
+	font-size:13px !important;
   }
 
   .macro-bar{
-    display:flex !important;
-    flex-direction:row !important;
-    gap:10px !important;
-    padding:12px !important;
-    border-radius:18px !important;
-    overflow-x:auto !important;
-    overflow-y:hidden !important;
-    -webkit-overflow-scrolling:touch;
-    scroll-snap-type:x proximity;
+	display:flex !important;
+	flex-direction:row !important;
+	gap:10px !important;
+	padding:12px !important;
+	border-radius:18px !important;
+	overflow-x:auto !important;
+	overflow-y:hidden !important;
+	-webkit-overflow-scrolling:touch;
+	scroll-snap-type:x proximity;
   }
   .macro-bar::-webkit-scrollbar{display:none;}
   .macro-item{
-    flex:0 0 calc((100% - 20px)/3) !important;
-    min-width:105px !important;
-    min-height:112px !important;
-    padding:12px 10px !important;
-    display:flex !important;
-    flex-direction:column !important;
-    overflow:hidden !important;
-    scroll-snap-align:start;
+	flex:0 0 calc((100% - 20px)/3) !important;
+	min-width:105px !important;
+	min-height:112px !important;
+	padding:12px 10px !important;
+	display:flex !important;
+	flex-direction:column !important;
+	overflow:hidden !important;
+	scroll-snap-align:start;
   }
   .macro-head{
-    margin:0 0 8px !important;
-    min-width:0 !important;
-    gap:6px !important;
+	margin:0 0 8px !important;
+	min-width:0 !important;
+	gap:6px !important;
   }
   .macro-ico{
-    width:24px !important;
-    height:24px !important;
-    font-size:13px !important;
+	width:24px !important;
+	height:24px !important;
+	font-size:13px !important;
   }
   .macro-lbl{
-    font-size:13px !important;
-    white-space:nowrap !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
-    line-height:1.1 !important;
+	font-size:13px !important;
+	white-space:nowrap !important;
+	overflow:hidden !important;
+	text-overflow:ellipsis !important;
+	line-height:1.1 !important;
   }
   .macro-val-row{
-    margin:0 0 7px !important;
-    align-items:baseline !important;
-    gap:3px !important;
+	margin:0 0 7px !important;
+	align-items:baseline !important;
+	gap:3px !important;
   }
   .macro-val{
-    font-size:23px !important;
-    white-space:nowrap !important;
+	font-size:23px !important;
+	white-space:nowrap !important;
   }
   .macro-goal{
-    font-size:13px !important;
-    white-space:nowrap !important;
+	font-size:13px !important;
+	white-space:nowrap !important;
   }
   .macro-prog{
-    margin:0 0 8px !important;
-    height:4px !important;
+	margin:0 0 8px !important;
+	height:4px !important;
   }
   .macro-status{
-    margin:0 !important;
-    font-size:11px !important;
-    padding:3px 7px !important;
-    white-space:nowrap !important;
-    max-width:100%;
-    overflow:hidden;
-    text-overflow:ellipsis;
+	margin:0 !important;
+	font-size:11px !important;
+	padding:3px 7px !important;
+	white-space:nowrap !important;
+	max-width:100%;
+	overflow:hidden;
+	text-overflow:ellipsis;
   }
   .macro-tip{
-    display:none !important;
+	display:none !important;
   }
 }
 @media (max-width: 380px){
   .kcal-hero{
-    grid-template-columns:40px 1fr !important;
+	grid-template-columns:40px 1fr !important;
   }
   .kcal-arc-wrap{
-    display:none !important;
+	display:none !important;
   }
   .kcal-hero-icon{
-    width:40px !important;
-    height:40px !important;
+	width:40px !important;
+	height:40px !important;
   }
   .macro-item{
-    flex-basis:112px !important;
-    min-width:112px !important;
+	flex-basis:112px !important;
+	min-width:112px !important;
   }
   .macro-status{
-    font-size:10px !important;
-    padding:3px 6px !important;
+	font-size:10px !important;
+	padding:3px 6px !important;
   }
 }
 
@@ -891,6 +891,176 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 .meal-actions .chk {
   width: 38px;
   height: 38px;
+}
+
+/* ─────────────────────────────────────────────────────
+   MODERN POLISH LAYER
+   Tightens the visual language without touching logic.
+   - Calmer surface tones, no double borders
+   - Softer shadows, larger consistent radii
+   - Less uppercase, less letter-spacing screaming
+   - Cleaner button hierarchy
+   ───────────────────────────────────────────────────── */
+:root{
+  --bg:#F7F4ED;          /* page warmth, slightly cooler than before */
+  --w:#FFFFFF;
+  --dk:#1A1A1A;
+  --md:#5C5A55;
+  --lt:#8E8B83;
+  --br:rgba(20,18,12,.075);
+  --grn:#2E6D4C;
+  --grn-soft:#E9F1EC;
+  --red:#C24B2A;
+  --red-soft:#FBEDE7;
+}
+body{background:var(--bg)!important;color:var(--dk);font-feature-settings:"ss01","cv11";letter-spacing:-.005em;}
+.app{background:transparent!important;}
+
+/* Card unification — single soft style for ALL primary cards */
+.kcal-summary,
+.steps-card,
+.tracker,
+.hist-card,
+.meal-card,
+.ex-wrap,
+.next-up,
+.info-box,
+.wod-card,
+.pers-panel,
+.user-menu{
+  background:var(--w)!important;
+  border:1px solid var(--br)!important;
+  border-radius:22px!important;
+  box-shadow:0 1px 2px rgba(20,18,12,.025), 0 8px 24px rgba(20,18,12,.04)!important;
+}
+.next-up{background:linear-gradient(180deg,#FFFFFF 0%,#FAF6EC 100%)!important;}
+
+/* Section spacing & headers */
+.sec{margin-bottom:1.4rem;}
+.sec-lbl{font-size:13px!important;font-weight:600!important;color:var(--md)!important;text-transform:none!important;letter-spacing:0!important;}
+.sec-head{margin-bottom:.85rem;}
+.htitle{font-size:1.6rem;font-weight:600;letter-spacing:-.02em;color:var(--dk);margin:.3rem 0 1.1rem;line-height:1.15;}
+.htitle em{font-style:italic;font-weight:600;color:var(--red);}
+.hdate{font-size:13px;color:var(--lt);text-transform:none;letter-spacing:0;font-weight:500;}
+
+/* Flatten dashed/dotted borders that read as 2006 */
+.diet-note,.kcal-arc-goal,.steps-prog,.pb-track,.diet-panel,
+.add-meal-row,.add-ex-row,.cardio-time-edit{border-style:solid!important;}
+hr,.user-menu-sep,.ex-actions{border-top-style:solid!important;}
+.ex-actions{border-top:1px solid var(--br)!important;}
+
+/* Buttons — calmer, more iOS-feeling */
+.rbtn,.diet-btn,.pers-btn,.logout-btn,.ghost-btn,
+.next-up-btn,.add-meal-btn,.steps-ebtn,.bp-toggle-btn,
+.ws-overview-btn,.workout-expand-btn,.diet-mini,.pin-btn,
+.del-btn,.modal-btn,.goal-opt,.bpb,.ex-action-btn,
+.split-opt,.cdr-x,.user-menu-item,.modal-close-x{
+  font-feature-settings:"ss01";
+}
+.rbtn,.ghost-btn,.next-up-btn,.steps-ebtn,.bp-toggle-btn,
+.ws-overview-btn,.workout-expand-btn,.diet-btn,.pers-btn,.logout-btn{
+  background:var(--w);
+  border:1px solid var(--br)!important;
+  color:var(--md);
+  border-radius:11px!important;
+  padding:8px 14px;
+  font-size:13px;
+  font-weight:500;
+  transition:all .18s ease;
+  box-shadow:0 1px 2px rgba(20,18,12,.03);
+}
+.rbtn:hover,.ghost-btn:hover,.next-up-btn:hover{background:var(--bg);color:var(--dk);transform:translateY(-1px);box-shadow:0 2px 6px rgba(20,18,12,.05);}
+.next-up-btn.primary{background:var(--dk)!important;color:var(--w)!important;border-color:var(--dk)!important;font-weight:600;}
+.next-up-btn.primary:hover{background:#000!important;color:var(--w)!important;}
+
+/* Meal cards — more breathing room */
+.meal-card{padding:18px 18px 14px!important;}
+.meal-card+.meal-card{margin-top:10px;}
+.meal-name{font-size:15px;font-weight:600;color:var(--dk);letter-spacing:-.01em;}
+.meal-kcal{color:var(--md);font-weight:500;}
+.meal-card.done{opacity:.55;}
+.meal-card.done .meal-name{text-decoration:line-through;}
+
+/* Exercise cards same treatment */
+.ex-wrap{padding:0!important;overflow:hidden;}
+.ex-top{padding:14px 16px!important;}
+.ename{font-size:15px;font-weight:600;color:var(--dk);letter-spacing:-.01em;}
+.epills .ep{font-size:11px;font-weight:500;border-radius:8px;padding:3px 8px;background:var(--grn-soft)!important;color:var(--grn)!important;}
+.epills .ep.pk{background:#FBE8F0!important;color:#9B2D5C!important;}
+.ex-detail.open{padding:0 16px 16px!important;}
+
+/* Checkboxes — circular, refined */
+.chk{
+  width:30px;height:30px;border-radius:50%;
+  border:1.5px solid var(--br);background:transparent;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--lt);font-size:13px;cursor:pointer;
+  transition:all .15s ease;flex-shrink:0;
+}
+.chk.on{background:var(--grn);border-color:var(--grn);color:var(--w);}
+.chk:hover:not(.on){border-color:var(--md);color:var(--md);}
+
+/* Steps card refinement */
+.steps-card{padding:18px!important;display:flex;align-items:center;gap:14px;}
+.steps-icon{font-size:24px;background:var(--grn-soft);width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.steps-val{font-size:24px;font-weight:600;color:var(--dk);letter-spacing:-.01em;}
+.steps-prog{height:6px;border-radius:3px;background:rgba(20,18,12,.06);overflow:hidden;border:none!important;}
+.steps-fill{background:var(--grn);height:100%;border-radius:3px;}
+
+/* Modal polish */
+.modal{border-radius:24px!important;box-shadow:0 32px 90px rgba(20,18,12,.25)!important;border:1px solid var(--br)!important;}
+.modal-logo{font-size:1.75rem;font-weight:600;letter-spacing:-.02em;}
+.modal-sub{font-size:14px;color:var(--md);}
+.modal-btn{background:var(--dk);color:var(--w);border:none;border-radius:13px;padding:14px;font-size:15px;font-weight:600;letter-spacing:-.005em;transition:all .15s;}
+.modal-btn:hover{background:#000;transform:translateY(-1px);}
+
+/* User menu pill trigger */
+.user-menu-trigger{
+  background:var(--w)!important;
+  border:1px solid var(--br);
+  border-radius:999px;
+  padding:5px 12px 5px 5px;
+  box-shadow:0 1px 2px rgba(20,18,12,.04);
+  transition:all .15s;
+}
+.user-menu-trigger:hover{box-shadow:0 2px 8px rgba(20,18,12,.08);}
+.user-avatar{width:30px;height:30px;font-size:13px;font-weight:600;}
+.user-name{font-size:13px;font-weight:500;color:var(--dk);}
+.user-menu-chevron{font-size:13px;}
+.user-menu{border-radius:18px!important;padding:8px!important;box-shadow:0 16px 48px rgba(20,18,12,.16)!important;}
+.user-menu-item{border-radius:11px!important;font-size:14px;padding:10px 12px;font-weight:500;}
+.user-menu-name{font-size:14px;letter-spacing:-.005em;}
+.user-menu-top{padding:10px 12px 12px!important;}
+
+/* Workout overview module */
+.wo-section-head{font-size:11.5px!important;font-weight:600!important;color:var(--lt)!important;letter-spacing:.04em!important;}
+.wo-overview-name{font-size:22px;font-weight:600;letter-spacing:-.02em;color:var(--dk);}
+.wo-overview-lbl{font-size:13px;color:var(--md);}
+.wo-pill{background:rgba(20,18,12,.04)!important;border:none!important;color:var(--md);font-weight:500;font-size:11.5px;}
+.wo-icon{background:var(--grn-soft)!important;border:none;}
+.wo-focus-banner{border-radius:14px!important;}
+.wo-focus-banner.fb-go{background:var(--grn-soft)!important;border:none!important;}
+.wo-focus-banner.fb-good{background:var(--grn-soft)!important;border:none!important;}
+.wo-focus-banner.fb-rest{background:#F4EFE3!important;border:none!important;}
+.wo-fb-title{font-size:14px;font-weight:600;letter-spacing:-.005em;color:var(--grn);}
+.wo-focus-banner.fb-rest .wo-fb-title{color:#7A6A50;}
+.wo-fb-sub{font-size:13px;color:var(--md);}
+
+/* Tracker week dots */
+.week-row{display:flex;gap:5px;justify-content:space-between;margin-bottom:14px;}
+.week-cell{flex:1;text-align:center;}
+.day-letter{font-size:11px;color:var(--lt);font-weight:500;margin-bottom:5px;}
+
+/* Subtle animations */
+*,*::before,*::after{transition-timing-function:cubic-bezier(.32,.72,.0,1);}
+
+/* Mobile tightening */
+@media(max-width:500px){
+  .htitle{font-size:1.4rem;}
+  .meal-card{padding:15px 14px!important;}
+  .ex-top{padding:12px 14px!important;}
+  .steps-card{padding:14px!important;}
+  .wo-overview-name{font-size:19px;}
 }
 </style>
 </head>
@@ -1160,25 +1330,25 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 <!-- SPLIT PICKER MODAL -->
 <div class="modal-overlay hide" id="split-overlay">
   <div class="modal" style="max-width:440px;">
-    <button class="modal-close-x" onclick="closeSplitPicker()" aria-label="Zapri">✕</button>
-    <div class="modal-logo">Tvoj <em>plan</em> vadb</div>
-    <div class="modal-sub">Izberi razdelitev — naslednji trening se bo prikazal samodejno</div>
-    <div id="split-options" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
-    <div id="custom-split-edit" style="display:none;background:var(--bg);border-radius:9px;padding:12px;margin-bottom:12px;">
-      <div style="font-size:12px;color:var(--md);margin-bottom:8px;">Vrstni red treningov (rotacija):</div>
-      <div id="custom-days-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px;"></div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button class="bpb" onclick="addCustomDay('upper')">+ Zgornji</button>
-        <button class="bpb" onclick="addCustomDay('lower')">+ Spodnji</button>
-        <button class="bpb" onclick="addCustomDay('full')">+ Celo telo</button>
-        <button class="bpb" onclick="addCustomDay('glute')">+ Glute</button>
-        <button class="bpb" onclick="addCustomDay('cardio')">+ Kardio</button>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;">
-      <button onclick="closeSplitPicker()" style="flex:0 0 auto;background:var(--bg);color:var(--md);border:.5px solid var(--br);border-radius:9px;padding:12px 18px;font-size:14px;cursor:pointer;font-family:inherit;">Zapri</button>
-      <button class="modal-btn" style="flex:1;margin-top:0;" onclick="saveSplitChoice()">Shrani plan →</button>
-    </div>
+	<button class="modal-close-x" onclick="closeSplitPicker()" aria-label="Zapri">✕</button>
+	<div class="modal-logo">Tvoj <em>plan</em> vadb</div>
+	<div class="modal-sub">Izberi razdelitev — naslednji trening se bo prikazal samodejno</div>
+	<div id="split-options" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
+	<div id="custom-split-edit" style="display:none;background:var(--bg);border-radius:9px;padding:12px;margin-bottom:12px;">
+	  <div style="font-size:12px;color:var(--md);margin-bottom:8px;">Vrstni red treningov (rotacija):</div>
+	  <div id="custom-days-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px;"></div>
+	  <div style="display:flex;gap:6px;flex-wrap:wrap;">
+		<button class="bpb" onclick="addCustomDay('upper')">+ Zgornji</button>
+		<button class="bpb" onclick="addCustomDay('lower')">+ Spodnji</button>
+		<button class="bpb" onclick="addCustomDay('full')">+ Celo telo</button>
+		<button class="bpb" onclick="addCustomDay('glute')">+ Glute</button>
+		<button class="bpb" onclick="addCustomDay('cardio')">+ Kardio</button>
+	  </div>
+	</div>
+	<div style="display:flex;gap:8px;">
+	  <button onclick="closeSplitPicker()" style="flex:0 0 auto;background:var(--bg);color:var(--md);border:.5px solid var(--br);border-radius:9px;padding:12px 18px;font-size:14px;cursor:pointer;font-family:inherit;">Zapri</button>
+	  <button class="modal-btn" style="flex:1;margin-top:0;" onclick="saveSplitChoice()">Shrani plan →</button>
+	</div>
   </div>
 </div>
 
@@ -1328,42 +1498,42 @@ const WKT={
 // Predefined splits — each cycles through workouts in order
 const SPLITS={
   'glute_focus':{
-    name:'Glute Focus',
-    desc:'2× spodnji del + 1× zgornji. Za izklesano zadnjico.',
-    days:['lower','upper','glute']
+	name:'Glute Focus',
+	desc:'2× spodnji del + 1× zgornji. Za izklesano zadnjico.',
+	days:['lower','upper','glute']
   },
   'upper_lower':{
-    name:'Upper/Lower 3x',
-    desc:'Klasičen split — zgornji, spodnji, celo telo.',
-    days:['upper','lower','full']
+	name:'Upper/Lower 3x',
+	desc:'Klasičen split — zgornji, spodnji, celo telo.',
+	days:['upper','lower','full']
   },
   'full_body':{
-    name:'Full Body 3x',
-    desc:'Celotno telo vsako sejo. Idealno za začetnice.',
-    days:['full','full','full']
+	name:'Full Body 3x',
+	desc:'Celotno telo vsako sejo. Idealno za začetnice.',
+	days:['full','full','full']
   },
   'ppl':{
-    name:'Push / Pull / Legs',
-    desc:'Klasičen bodybuilding split (push=zgornji potisk, pull=zgornji vlek).',
-    days:['upper','upper','lower']
+	name:'Push / Pull / Legs',
+	desc:'Klasičen bodybuilding split (push=zgornji potisk, pull=zgornji vlek).',
+	days:['upper','upper','lower']
   },
   'mix':{
-    name:'Mešano (4x)',
-    desc:'4× tedensko — zgornji, glute, celo, spodnji.',
-    days:['upper','glute','full','lower']
+	name:'Mešano (4x)',
+	desc:'4× tedensko — zgornji, glute, celo, spodnji.',
+	days:['upper','glute','full','lower']
   },
   'custom':{
-    name:'Po meri',
-    desc:'Določi sama svoj zaporedje vadb.',
-    days:['lower','upper','glute']
+	name:'Po meri',
+	desc:'Določi sama svoj zaporedje vadb.',
+	days:['lower','upper','glute']
   }
 };
 
 const SPLIT_KEY='workout_split';
 function getSplit(){
   try{
-    const s=localStorage.getItem(lsKey(SPLIT_KEY));
-    if(s)return JSON.parse(s);
+	const s=localStorage.getItem(lsKey(SPLIT_KEY));
+	if(s)return JSON.parse(s);
   }catch(e){}
   return {id:'glute_focus',days:SPLITS.glute_focus.days,position:0};
 }
@@ -1482,16 +1652,16 @@ function getWeekPlan(w){
 function getExerciseHistory(name){
   const history=[];
   for(let i=0;i<=30;i++){
-    const d=new Date(now);d.setDate(now.getDate()-i);
-    const key=d.toISOString().split('T')[0];
-    try{
-      const s=localStorage.getItem(lsKey('exlog_'+key));
-      if(!s)continue;
-      const log=JSON.parse(s);
-      if(log[name]){
-        history.push({date:key,daysAgo:i,...log[name]});
-      }
-    }catch(e){}
+	const d=new Date(now);d.setDate(now.getDate()-i);
+	const key=d.toISOString().split('T')[0];
+	try{
+	  const s=localStorage.getItem(lsKey('exlog_'+key));
+	  if(!s)continue;
+	  const log=JSON.parse(s);
+	  if(log[name]){
+		history.push({date:key,daysAgo:i,...log[name]});
+	  }
+	}catch(e){}
   }
   return history; // newest first
 }
@@ -1503,11 +1673,11 @@ function suggestProgression(name,targetRepLow,targetRepHigh,startKg){
   // Filter to valid logs only — must have reps and either kg>0 or be bodyweight context
   const allHist=getExerciseHistory(name);
   const hist=allHist.filter(h=>{
-    const r=parseInt(h.r)||0;
-    return r>0; // must have logged at least 1 rep
+	const r=parseInt(h.r)||0;
+	return r>0; // must have logged at least 1 rep
   });
   if(hist.length===0){
-    return {kg:startKg,reps:targetRepLow,sets:3,note:'Začni rahlo — fokus na tehniko',type:'first'};
+	return {kg:startKg,reps:targetRepLow,sets:3,note:'Začni rahlo — fokus na tehniko',type:'first'};
   }
   const last=hist[0];
   const lastReps=parseInt(last.r)||0;
@@ -1519,49 +1689,49 @@ function suggestProgression(name,targetRepLow,targetRepHigh,startKg){
 
   // Deload if more than 10 days
   if(daysSince>=10){
-    return {
-      kg:Math.max(startKg,Math.round(lastKg*0.9*2)/2),
-      reps:targetRepLow,
-      sets:lastSets,
-      note:`Deload — ${daysSince} dni pavze, gremo z lažjo težo`,
-      type:'deload'
-    };
+	return {
+	  kg:Math.max(startKg,Math.round(lastKg*0.9*2)/2),
+	  reps:targetRepLow,
+	  sets:lastSets,
+	  note:`Deload — ${daysSince} dni pavze, gremo z lažjo težo`,
+	  type:'deload'
+	};
   }
 
   // Hit top of range with all sets — check 2 sessions at SAME weight
   const hitTop=lastReps>=targetRepHigh&&lastSets>=3;
   const prevHitTop=hist.length>1&&
-    parseInt(hist[1].r)>=targetRepHigh&&
-    Math.abs(parseFloat(hist[1].kg||0)-lastKg)<0.01;
+	parseInt(hist[1].r)>=targetRepHigh&&
+	Math.abs(parseFloat(hist[1].kg||0)-lastKg)<0.01;
 
   if(hitTop&&prevHitTop){
-    return {
-      kg:lastKg+2.5,
-      reps:targetRepLow,
-      sets:lastSets,
-      note:`✨ +2.5 kg — 2× zaporedoma si naredila ${targetRepHigh}+ ponovitev`,
-      type:'increase'
-    };
+	return {
+	  kg:lastKg+2.5,
+	  reps:targetRepLow,
+	  sets:lastSets,
+	  note:`✨ +2.5 kg — 2× zaporedoma si naredila ${targetRepHigh}+ ponovitev`,
+	  type:'increase'
+	};
   }
 
   if(hitTop){
-    return {
-      kg:lastKg,
-      reps:targetRepHigh,
-      sets:lastSets,
-      note:`Še 1× ponovi ${targetRepHigh} pon. → naslednjič +2.5 kg`,
-      type:'consolidate'
-    };
+	return {
+	  kg:lastKg,
+	  reps:targetRepHigh,
+	  sets:lastSets,
+	  note:`Še 1× ponovi ${targetRepHigh} pon. → naslednjič +2.5 kg`,
+	  type:'consolidate'
+	};
   }
 
   // Otherwise — same weight, +1 rep (but never below low end)
   const nextReps=Math.max(targetRepLow,Math.min(targetRepHigh,lastReps+1));
   return {
-    kg:lastKg,
-    reps:nextReps,
-    sets:lastSets,
-    note:`Cilj: še ${nextReps} pon. (zadnjič ${lastReps})`,
-    type:'rep_push'
+	kg:lastKg,
+	reps:nextReps,
+	sets:lastSets,
+	note:`Cilj: še ${nextReps} pon. (zadnjič ${lastReps})`,
+	type:'rep_push'
   };
 }
 
@@ -1728,8 +1898,8 @@ async function initApp(){
   const umAv=document.getElementById('um-avatar');
   const umNm=document.getElementById('um-name');
   if(umAv){
-    const parts=displayName.trim().split(/\s+/);
-    umAv.textContent=(parts[0]?.charAt(0)||'?').toUpperCase()+(parts[1]?.charAt(0)||'').toUpperCase();
+	const parts=displayName.trim().split(/\s+/);
+	umAv.textContent=(parts[0]?.charAt(0)||'?').toUpperCase()+(parts[1]?.charAt(0)||'').toUpperCase();
   }
   if(umNm)umNm.textContent=displayName;
 
@@ -1964,10 +2134,10 @@ function toggleDiet(id,e){
   // Vegetarijansko naj vključuje tudi veganske predloge.
   // Vegansko pa je strogo vegansko, zato odstrani vegetarijansko.
   if(id==='vegetarian'&&!exists){
-    S.diet=S.diet.filter(x=>x!=='vegan').concat('vegan');
+	S.diet=S.diet.filter(x=>x!=='vegan').concat('vegan');
   }
   if(id==='vegan'&&!exists){
-    S.diet=S.diet.filter(x=>x!=='vegetarian');
+	S.diet=S.diet.filter(x=>x!=='vegetarian');
   }
 
   S.diet=[...new Set(S.diet)];
@@ -2110,10 +2280,10 @@ function markWorkoutDone(){
   // Brief visual confirmation
   const el=document.getElementById('next-up');
   if(el){
-    el.style.transition='background 0.4s';
-    const orig=el.style.background;
-    el.style.background='#EBF4EF';
-    setTimeout(()=>{el.style.background=orig;},900);
+	el.style.transition='background 0.4s';
+	const orig=el.style.background;
+	el.style.background='#EBF4EF';
+	setTimeout(()=>{el.style.background=orig;},900);
   }
 }
 
@@ -2128,11 +2298,11 @@ function togBpManual(){
   const tog=document.querySelector('.bp-toggle-btn'); // legacy, may not exist
   const isHidden=sel.style.display==='none'||sel.style.display==='';
   if(isHidden){
-    sel.style.display='flex';
-    if(tog)tog.textContent='Skrij ▴';
+	sel.style.display='flex';
+	if(tog)tog.textContent='Skrij ▴';
   }else{
-    sel.style.display='none';
-    if(tog)tog.textContent='Druga vadba ▾';
+	sel.style.display='none';
+	if(tog)tog.textContent='Druga vadba ▾';
   }
 }
 
@@ -2151,13 +2321,13 @@ function renderSplitOptions(){
   const sp=getSplit();
   const c=document.getElementById('split-options');
   c.innerHTML=Object.entries(SPLITS).map(([id,split])=>{
-    const isActive=sp.id===id;
-    const days=(id==='custom'&&_customDays?_customDays:split.days).map(d=>WT_LBL[d]||d);
-    return `<button class="split-opt${isActive?' active':''}" onclick="pickSplit('${id}')">
-      <div class="split-opt-name">${split.name}</div>
-      <div class="split-opt-desc">${split.desc}</div>
-      <div class="split-opt-days">${days.map(d=>`<span>${d}</span>`).join('')}</div>
-    </button>`;
+	const isActive=sp.id===id;
+	const days=(id==='custom'&&_customDays?_customDays:split.days).map(d=>WT_LBL[d]||d);
+	return `<button class="split-opt${isActive?' active':''}" onclick="pickSplit('${id}')">
+	  <div class="split-opt-name">${split.name}</div>
+	  <div class="split-opt-desc">${split.desc}</div>
+	  <div class="split-opt-days">${days.map(d=>`<span>${d}</span>`).join('')}</div>
+	</button>`;
   }).join('');
   // Show custom editor if custom selected
   document.getElementById('custom-split-edit').style.display=sp.id==='custom'||_customDays?'block':'none';
@@ -2169,14 +2339,14 @@ function pickSplit(id){
   const wasActive=sp.id===id;
   sp.id=id;
   if(id==='custom'){
-    if(!_customDays)_customDays=sp.days&&sp.id==='custom'?[...sp.days]:[...SPLITS.custom.days];
-    document.getElementById('custom-split-edit').style.display='block';
-    renderCustomDays();
+	if(!_customDays)_customDays=sp.days&&sp.id==='custom'?[...sp.days]:[...SPLITS.custom.days];
+	document.getElementById('custom-split-edit').style.display='block';
+	renderCustomDays();
   }else{
-    _customDays=null;
-    sp.days=[...SPLITS[id].days];
-    sp.position=0;
-    document.getElementById('custom-split-edit').style.display='none';
+	_customDays=null;
+	sp.days=[...SPLITS[id].days];
+	sp.position=0;
+	document.getElementById('custom-split-edit').style.display='none';
   }
   saveSplit(sp);
   renderSplitOptions();
@@ -2186,11 +2356,11 @@ function renderCustomDays(){
   const c=document.getElementById('custom-days-list');
   if(!c||!_customDays)return;
   c.innerHTML=_customDays.map((d,i)=>`
-    <div class="custom-day-row">
-      <span class="cdr-num">${i+1}.</span>
-      <span class="cdr-name">${WT_EMOJI[d]||''} ${WT_LBL[d]||d}</span>
-      <button class="cdr-x" onclick="removeCustomDay(${i})">✕</button>
-    </div>`).join('');
+	<div class="custom-day-row">
+	  <span class="cdr-num">${i+1}.</span>
+	  <span class="cdr-name">${WT_EMOJI[d]||''} ${WT_LBL[d]||d}</span>
+	  <button class="cdr-x" onclick="removeCustomDay(${i})">✕</button>
+	</div>`).join('');
 }
 
 function addCustomDay(type){
@@ -2207,9 +2377,9 @@ function removeCustomDay(i){
 function saveSplitChoice(){
   const sp=getSplit();
   if(sp.id==='custom'&&_customDays&&_customDays.length>0){
-    sp.days=[..._customDays];
-    sp.position=0;
-    saveSplit(sp);
+	sp.days=[..._customDays];
+	sp.position=0;
+	saveSplit(sp);
   }
   // Switch to first workout in new plan
   S.wt=nextWorkoutInSplit();
@@ -3000,64 +3170,64 @@ async function swapMeal(i){
 // alternatives from the same pattern.
 const MOVEMENT_PATTERNS = {
   squat: {
-    label: 'počep',
-    alternatives: ['Goblet počep','Počep s palico','Bolgarski split squat','Smith squat','Leg press','Hack squat','Sumo počep z ročko']
+	label: 'počep',
+	alternatives: ['Goblet počep','Počep s palico','Bolgarski split squat','Smith squat','Leg press','Hack squat','Sumo počep z ročko']
   },
   hip_hinge: {
-    label: 'hip hinge / mrtvetek',
-    alternatives: ['Mrtvetek z ročkami (RDL)','Mrtvetek s palico','Cable pull-through','Single-leg RDL','Good morning','Sumo mrtvetek']
+	label: 'hip hinge / mrtvetek',
+	alternatives: ['Mrtvetek z ročkami (RDL)','Mrtvetek s palico','Cable pull-through','Single-leg RDL','Good morning','Sumo mrtvetek']
   },
   hip_thrust: {
-    label: 'hip thrust / glute bridge',
-    alternatives: ['Hip thrust z palico','Hip thrust na stroju','Glute bridge','Single-leg hip thrust','Frog pumps','Banded hip thrust']
+	label: 'hip thrust / glute bridge',
+	alternatives: ['Hip thrust z palico','Hip thrust na stroju','Glute bridge','Single-leg hip thrust','Frog pumps','Banded hip thrust']
   },
   lunge: {
-    label: 'izpadni korak',
-    alternatives: ['Izpadni koraki z ročkami','Reverse lunge','Walking lunges','Bolgarski split squat','Step-up','Curtsy lunge']
+	label: 'izpadni korak',
+	alternatives: ['Izpadni koraki z ročkami','Reverse lunge','Walking lunges','Bolgarski split squat','Step-up','Curtsy lunge']
   },
   glute_isolation: {
-    label: 'glute izolacija',
-    alternatives: ['Donkey kicks pri kablu','Cable kickback','Abduktor stroj','Banded clamshell','Side-lying leg raise','Fire hydrant','Frog pumps']
+	label: 'glute izolacija',
+	alternatives: ['Donkey kicks pri kablu','Cable kickback','Abduktor stroj','Banded clamshell','Side-lying leg raise','Fire hydrant','Frog pumps']
   },
   calf: {
-    label: 'lytka',
-    alternatives: ['Dvig na prste — lýtka','Seated calf raise','Standing calf raise','Single-leg calf raise']
+	label: 'lytka',
+	alternatives: ['Dvig na prste — lýtka','Seated calf raise','Standing calf raise','Single-leg calf raise']
   },
   horizontal_push: {
-    label: 'horizontalni potisk',
-    alternatives: ['Potisk z ročkami leže','Bench press','Push-up (na kolenih ali polni)','Incline dumbbell press','Cable chest fly','Machine chest press']
+	label: 'horizontalni potisk',
+	alternatives: ['Potisk z ročkami leže','Bench press','Push-up (na kolenih ali polni)','Incline dumbbell press','Cable chest fly','Machine chest press']
   },
   vertical_push: {
-    label: 'vertikalni potisk',
-    alternatives: ['Vzdolžni potisk nad glavo','Dumbbell shoulder press','Arnold press','Seated machine press','Push press','Pike push-up']
+	label: 'vertikalni potisk',
+	alternatives: ['Vzdolžni potisk nad glavo','Dumbbell shoulder press','Arnold press','Seated machine press','Push press','Pike push-up']
   },
   horizontal_pull: {
-    label: 'horizontalni vlek',
-    alternatives: ['Veslanje z ročko (enoročno)','Veslanje v upognjenem položaju','Cable row','Seated machine row','TRX veslanje','Inverted row']
+	label: 'horizontalni vlek',
+	alternatives: ['Veslanje z ročko (enoročno)','Veslanje v upognjenem položaju','Cable row','Seated machine row','TRX veslanje','Inverted row']
   },
   vertical_pull: {
-    label: 'vertikalni vlek',
-    alternatives: ['Lat pulldown','Assisted pull-up','Pull-up','Cable pulldown','Straight-arm pulldown']
+	label: 'vertikalni vlek',
+	alternatives: ['Lat pulldown','Assisted pull-up','Pull-up','Cable pulldown','Straight-arm pulldown']
   },
   biceps: {
-    label: 'biceps',
-    alternatives: ['Biceps curl z ročkami','Hammer curl','Cable curl','Preacher curl','Concentration curl','Incline dumbbell curl']
+	label: 'biceps',
+	alternatives: ['Biceps curl z ročkami','Hammer curl','Cable curl','Preacher curl','Concentration curl','Incline dumbbell curl']
   },
   triceps: {
-    label: 'triceps',
-    alternatives: ['Triceps potisk pri kablu','Triceps dip','Overhead triceps extension','Skull crusher','Diamond push-up','Cable rope pushdown']
+	label: 'triceps',
+	alternatives: ['Triceps potisk pri kablu','Triceps dip','Overhead triceps extension','Skull crusher','Diamond push-up','Cable rope pushdown']
   },
   core: {
-    label: 'jedro / trebuh',
-    alternatives: ['Plank','Sit-up','Crunch','Hanging leg raise','Russian twist','Dead bug','Bird dog','Plank z izmenjevanjem rok']
+	label: 'jedro / trebuh',
+	alternatives: ['Plank','Sit-up','Crunch','Hanging leg raise','Russian twist','Dead bug','Bird dog','Plank z izmenjevanjem rok']
   },
   cardio: {
-    label: 'kardio',
-    alternatives: ['Tek (zunaj ali tekalna steza)','Kolesarjenje (zunaj ali sobno kolo)','Elipsa','Veslalni ergometer','Plavanje','Hoja (hiter tempo, zunaj)','Pohod na Pohorje 🏔']
+	label: 'kardio',
+	alternatives: ['Tek (zunaj ali tekalna steza)','Kolesarjenje (zunaj ali sobno kolo)','Elipsa','Veslalni ergometer','Plavanje','Hoja (hiter tempo, zunaj)','Pohod na Pohorje 🏔']
   },
   general: {
-    label: 'splošna',
-    alternatives: []
+	label: 'splošna',
+	alternatives: []
   }
 };
 
@@ -3180,8 +3350,8 @@ async function refreshMeals(){
 	}):p;
 	if(Array.isArray(cleaned)&&cleaned.length===5){
   S.meals = S.meals.map((oldMeal,i)=>{
-    if(S.md[i]) return oldMeal; // obkljukane obroke pusti pri miru
-    return {label:LBLS[i], ...cleaned[i]};
+	if(S.md[i]) return oldMeal; // obkljukane obroke pusti pri miru
+	return {label:LBLS[i], ...cleaned[i]};
   });
   save();
   renderMeals();
