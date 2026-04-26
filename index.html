@@ -32,6 +32,34 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .bpsel{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
 /* Next workout header */
 .next-up{background:linear-gradient(135deg,#FDFCF9 0%,#F5F1E8 100%);border:.5px solid var(--br);border-radius:var(--r);padding:16px 18px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+/* ─── DANAŠNJA VADBA — overview module ─────────────── */
+.wo-overview{padding:0;width:100%;}
+.wo-section-head{font-size:12px;font-weight:600;color:var(--lt);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;}
+.wo-overview-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;}
+.wo-icon-wrap{flex-shrink:0;}
+.wo-icon{width:54px;height:54px;background:#EBF4EF;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.wo-overview-body{flex:1;min-width:0;}
+.wo-overview-lbl{font-size:13px;color:var(--md);margin-bottom:3px;}
+.wo-overview-name{font-size:22px;font-weight:600;color:var(--dk);line-height:1.15;margin-bottom:9px;}
+.wo-pills{display:flex;flex-wrap:wrap;gap:6px;}
+.wo-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.7);border:.5px solid var(--br);border-radius:999px;padding:4px 10px;font-size:11.5px;color:var(--md);font-weight:500;}
+.wo-pill-icon{opacity:.7;}
+.wo-overview-actions{display:flex;flex-direction:column;gap:5px;flex-shrink:0;}
+/* Focus banner inside the overview */
+.wo-focus-banner{background:#EBF4EF;border-radius:13px;padding:11px 13px;display:flex;align-items:center;gap:11px;border:.5px solid rgba(46,109,76,.15);}
+.wo-focus-banner.fb-rest{background:#F5F0E8;border-color:rgba(160,140,110,.18);}
+.wo-focus-banner.fb-good{background:#EBF4EF;border-color:rgba(46,109,76,.18);}
+.wo-focus-banner.fb-go{background:#EBF4EF;border-color:rgba(46,109,76,.15);}
+.wo-fb-icon{width:36px;height:36px;background:var(--grn);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px;flex-shrink:0;font-weight:600;}
+.wo-focus-banner.fb-rest .wo-fb-icon{background:#A0907A;font-size:18px;}
+.wo-fb-title{font-weight:600;color:var(--grn);font-size:14px;line-height:1.3;}
+.wo-focus-banner.fb-rest .wo-fb-title{color:#6B5E48;}
+.wo-fb-sub{font-size:13px;color:var(--md);line-height:1.4;margin-top:2px;}
+@media(max-width:500px){
+  .wo-icon{width:46px;height:46px;font-size:21px;}
+  .wo-overview-name{font-size:19px;}
+  .wo-overview-actions .next-up-btn{font-size:11px;padding:6px 9px;}
+}
 /* Subtle action row below next-up */
 .workout-actions-row{display:flex;gap:6px;justify-content:flex-end;margin-bottom:12px;}
 .ghost-btn{background:none;border:.5px solid var(--br);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;color:var(--lt);font-family:inherit;transition:all .15s;}
@@ -833,37 +861,7 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 .user-menu-sep{height:1px;background:var(--br);margin:7px 4px;}
 .user-sync{display:none !important;}
 @media(max-width:500px){.user-menu{width:245px;top:43px;right:0;left:auto;border-radius:20px;}.user-menu-item{font-size:14px;padding:10px 8px;}}
-/* Unified meal action buttons */
-.meal-actions .sbtn,
-.meal-actions .ibtn,
-.meal-actions .pin-btn,
-.meal-actions .del-btn {
-  height: 36px;
-  min-width: 36px;
-  padding: 0 12px;
-  border-radius: 999px !important;
-  border: 1px solid rgba(0,0,0,0.08);
-  background: #fff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-size: 14px;
-  color: #6B6A63;
-}
 
-.meal-actions .sbtn:hover,
-.meal-actions .ibtn:hover,
-.meal-actions .pin-btn:hover,
-.meal-actions .del-btn:hover {
-  background: #F7F4EF;
-  color: #1A1A17;
-}
-
-.meal-actions .chk {
-  width: 38px;
-  height: 38px;
-}
 </style>
 </head>
 <body>
@@ -1048,6 +1046,9 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 
 
   <div class="sec">
+	<!-- ─── DANAŠNJI OBROKI overview module ─── -->
+	<div class="meals-overview" id="meals-overview"></div>
+
 	<div class="sec-head">
 	  <span class="sec-lbl">Jedilnik</span>
 	  <div class="sec-right">
@@ -1997,36 +1998,77 @@ function renderNextUp(){
   const isOnPlan=showing===next;
   const w=WKT[showing];
   const exCount=w?.ex?.length||0;
+  const isDone=!!S.workoutDone;
 
-  // REST DAY — special layout, mark-done still advances split
-  if(showing==='rest'){
-    el.innerHTML=`
-      <div class="next-up-body">
-        <div class="next-up-lbl">Danes je na planu</div>
-        <div class="next-up-name">😌 Počitek</div>
-        <div class="next-up-meta">${isOnPlan?'Nato: '+(WT_LBL[nextNext]||nextNext):''}</div>
-      </div>
-      <div class="next-up-actions">
-        <button class="next-up-btn" onclick="togBpManual()" title="Izberi drugo vadbo">Spremeni</button>
-        ${isOnPlan?`<button class="next-up-btn primary" onclick="markWorkoutDone()" title="Potrdi počitek in pojdi na naslednjo">✓ Potrdi</button>`:''}
-      </div>
-    `;
-    return;
+  // Split position: e.g. "Trening 1/3" → user sees where she is in the rotation
+  const splitLen=sp.days.length;
+  const splitPos=(sp.position%splitLen)+1; // 1-based
+
+  // Done count for active sessions
+  const exDone=Array.isArray(S.exd)?S.exd.filter(Boolean).length:0;
+
+  // ── Focus banner content depends on context ──
+  function getFocusBanner(){
+	if(isDone){
+	  return {cls:'fb-good',icon:'✓',title:'Trening opravljen',sub:'Odlično! Telo se zdaj regenerira.'};
+	}
+	if(showing==='rest'){
+	  return {cls:'fb-rest',icon:'😌',title:'Danes je počitek',sub:'Posveti čas regeneraciji. Lahka hoja ali raztezanje sta vedno dobrodošla.'};
+	}
+	// Active strength/cardio/crossfit
+	if(exDone===0){
+	  return {cls:'fb-go',icon:'📊',title:'Fokus danes:',sub:'Samo pojdi v gym!'};
+	}
+	if(exDone<exCount){
+	  return {cls:'fb-go',icon:'💪',title:`${exDone} / ${exCount} vaj opravljeno`,sub:'Še zmoreš — drži tempo!'};
+	}
+	return {cls:'fb-good',icon:'✓',title:'Vse vaje opravljene',sub:'Označi kot opravljeno za napredek v planu.'};
+  }
+  const fb=getFocusBanner();
+
+  // Estimated time + kcal (rough heuristic — doesn't change anything in DB)
+  let estMin=null, estKcal=null;
+  if(showing==='cardio'){
+	const t=parseInt(w?.ex?.[0]?.r)||30;estMin=t;estKcal=Math.round(t*7);
+  }else if(showing!=='rest'&&exCount){
+	estMin=Math.max(20,exCount*9);            // ~9 min per exercise incl. rest
+	estKcal=Math.round(estMin*4.5);            // ~270 kcal/hour moderate strength
   }
 
-  // ACTIVE WORKOUT — standard layout
+  // Pillsi (under name)
+  const pills=[];
+  if(splitLen>1&&showing!=='rest')pills.push(`<span class="wo-pill">Trening ${splitPos}/${splitLen}</span>`);
+  if(estMin)pills.push(`<span class="wo-pill"><span class="wo-pill-icon">⏱</span> ~${estMin} min</span>`);
+  if(estKcal)pills.push(`<span class="wo-pill"><span class="wo-pill-icon">🔥</span> ~${estKcal} kcal</span>`);
+
+  // Layout
   const planLabel=isOnPlan?'Danes je na planu':'Trening (ročno izbran)';
-  const isDone=!!S.workoutDone;
+  const restMode=showing==='rest';
+  const showOpravljeno=isOnPlan&&!isDone;
+
   el.innerHTML=`
-    <div class="next-up-body">
-      <div class="next-up-lbl">${planLabel}${isDone?' · ✓ opravljeno':''}</div>
-      <div class="next-up-name">${WT_EMOJI[showing]||'◆'} ${WT_LBL[showing]||showing}</div>
-      <div class="next-up-meta">${exCount?exCount+' vaj':''}${isOnPlan?' · jutri: '+(WT_LBL[nextNext]||nextNext):''}</div>
-    </div>
-    <div class="next-up-actions">
-      <button class="next-up-btn" onclick="togBpManual()" title="Izberi drugo vadbo za danes">Spremeni</button>
-      ${isDone?'':`<button class="next-up-btn primary" onclick="markWorkoutDone()" title="Označi kot opravljeno in pojdi na naslednjo">✓ Opravljeno</button>`}
-    </div>
+	<div class="wo-overview">
+	  <div class="wo-section-head">DANAŠNJA VADBA</div>
+	  <div class="wo-overview-top">
+		<div class="wo-icon-wrap"><div class="wo-icon">${WT_EMOJI[showing]||'🏋️'}</div></div>
+		<div class="wo-overview-body">
+		  <div class="wo-overview-lbl">${restMode?'Danes je na planu':planLabel}${isDone?' · ✓ opravljeno':''}</div>
+		  <div class="wo-overview-name">${WT_LBL[showing]||showing}</div>
+		  ${pills.length?`<div class="wo-pills">${pills.join('')}</div>`:''}
+		</div>
+		<div class="wo-overview-actions">
+		  <button class="next-up-btn" onclick="togBpManual()" title="Izberi drugo vadbo za danes">Spremeni</button>
+		  ${showOpravljeno?`<button class="next-up-btn primary" onclick="markWorkoutDone()" title="Označi kot opravljeno in pojdi na naslednjo">✓ Opravljeno</button>`:''}
+		</div>
+	  </div>
+	  <div class="wo-focus-banner ${fb.cls}">
+		<div class="wo-fb-icon">${fb.icon}</div>
+		<div class="wo-fb-text">
+		  <div class="wo-fb-title">${fb.title}</div>
+		  <div class="wo-fb-sub">${fb.sub}</div>
+		</div>
+	  </div>
+	</div>
   `;
 }
 
@@ -2162,6 +2204,63 @@ function renderBp(){
 function selBp(id){S.wt=id;initWorkout();save();renderBp();renderWorkout();renderNextUp();renderTracker();}
 
 // ─── RENDER MEALS ───────────────────────────────────────────
+// ─── DANAŠNJI OBROKI — overview module ─────────────────
+function renderMealsOverview(){
+  const el=document.getElementById('meals-overview');
+  if(!el)return;
+  const meals=S.meals||[];
+  const md=S.md||[];
+  const totalMeals=meals.length;
+  const eatenMeals=md.filter(Boolean).length;
+  const totalKcal=meals.reduce((s,m)=>s+(parseInt(m.k||m.kcal)||0),0);
+  const eatenKcal=meals.reduce((s,m,i)=>s+(md[i]?(parseInt(m.k||m.kcal)||0):0),0);
+
+  // Find next unfinished meal
+  const nextIdx=meals.findIndex((_,i)=>!md[i]);
+  const nextMeal=nextIdx>=0?meals[nextIdx]:null;
+  const nextKcal=nextMeal?(parseInt(nextMeal.k||nextMeal.kcal)||0):0;
+  const nextLabel=nextMeal?(nextMeal.label||'Naslednji obrok'):'';
+
+  // Focus banner content
+  let fb;
+  if(totalMeals===0){
+	fb={cls:'fb-go',icon:'🍽',title:'Še ni obrokov',sub:'Dodaj obrok ali počakaj na predloge.'};
+  }else if(eatenMeals===0){
+	fb={cls:'fb-go',icon:'🍽',title:'Začni z zajtrkom',sub:'Označi obroke ko jih poješ — sledil bo dnevni cilj.'};
+  }else if(eatenMeals<totalMeals&&nextMeal){
+	fb={cls:'fb-go',icon:'➜',title:`Naslednji: ${nextLabel.toLowerCase()}`,sub:`~${nextKcal} kcal · ${nextMeal.f||nextMeal.food||''}`};
+  }else{
+	fb={cls:'fb-good',icon:'✓',title:'Vsi obroki opravljeni',sub:'Bravo — jutri spet!'};
+  }
+
+  el.innerHTML=`
+	<div class="wo-overview">
+	  <div class="wo-section-head">DANAŠNJI OBROKI</div>
+	  <div class="wo-overview-top">
+		<div class="wo-icon-wrap"><div class="wo-icon" style="background:#FDECE6;">🍽</div></div>
+		<div class="wo-overview-body">
+		  <div class="wo-overview-lbl">Plan za danes${eatenMeals>0?' · '+eatenMeals+'/'+totalMeals+' opravljenih':''}</div>
+		  <div class="wo-overview-name">${totalMeals} obrokov</div>
+		  <div class="wo-pills">
+			<span class="wo-pill"><span class="wo-pill-icon">🔥</span> ~${totalKcal} kcal načrtovano</span>
+			${eatenKcal>0?`<span class="wo-pill"><span class="wo-pill-icon">✓</span> ${eatenKcal} kcal zaužito</span>`:''}
+		  </div>
+		</div>
+		<div class="wo-overview-actions">
+		  <button class="next-up-btn" onclick="document.getElementById('extra-inp')?.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>document.getElementById('extra-inp')?.focus(),300);" title="Dodaj nov obrok">+ Dodaj</button>
+		</div>
+	  </div>
+	  <div class="wo-focus-banner ${fb.cls}">
+		<div class="wo-fb-icon">${fb.icon}</div>
+		<div class="wo-fb-text">
+		  <div class="wo-fb-title">${fb.title}</div>
+		  <div class="wo-fb-sub">${fb.sub}</div>
+		</div>
+	  </div>
+	</div>
+  `;
+}
+
 function renderMeals(){
   const pinned=getPinned();
   document.getElementById('mc').innerHTML=S.meals.map((m,i)=>{
@@ -2390,6 +2489,7 @@ function calcKcal(){
   if(tkPlan)tkPlan.textContent=goalKcal?'/ '+goalKcal+' kcal cilj':'';
 
   renderMacros();
+  renderMealsOverview();
 }
 
 function togMeal(i){
