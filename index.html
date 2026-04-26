@@ -811,6 +811,29 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 .kcal-summary.over .kcal-hero-icon::before{color:var(--orn) !important;}
 .kcal-summary.over .arc-fill{stroke:var(--orn) !important;}
 
+
+/* Compact user dropdown menu */
+.user-bar{position:relative;z-index:40;}
+.user-menu-wrap{position:relative;display:inline-flex;align-items:center;}
+.user-menu-trigger{display:flex;align-items:center;gap:9px;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;color:var(--md);}
+.user-menu-trigger:hover .user-name{color:var(--dk);}
+.user-menu-chevron{font-size:15px;color:var(--lt);transition:transform .18s ease;}
+.user-menu-wrap.open .user-menu-chevron{transform:rotate(180deg);}
+.user-menu{position:absolute;top:44px;left:0;width:260px;background:var(--w);border:1px solid var(--br);border-radius:22px;padding:12px;box-shadow:0 24px 70px rgba(20,18,13,.14);display:none;z-index:80;}
+.user-menu-wrap.open .user-menu{display:block;}
+.user-menu-top{display:flex;align-items:center;gap:11px;padding:8px 8px 12px;margin-bottom:6px;border-bottom:1px solid var(--br);}
+.user-menu-avatar{width:34px;height:34px;border-radius:50%;background:var(--grn);color:var(--w);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;letter-spacing:.02em;flex-shrink:0;}
+.user-menu-name{font-size:15px;font-weight:600;color:var(--dk);line-height:1.15;}
+.user-menu-sub{font-size:12px;color:var(--lt);margin-top:2px;}
+.user-menu-item{width:100%;display:flex;align-items:center;gap:12px;border:none;background:none;border-radius:14px;padding:10px 9px;font-size:15px;color:var(--dk);font-family:inherit;cursor:pointer;text-align:left;transition:background .15s,color .15s;}
+.user-menu-item:hover{background:var(--bg);}
+.user-menu-item.danger{color:var(--red);}
+.umi-ico{width:22px;text-align:center;color:var(--md);font-size:17px;line-height:1;}
+.user-menu-item.danger .umi-ico{color:var(--red);}
+.user-menu-sep{height:1px;background:var(--br);margin:7px 4px;}
+.user-sync{margin-left:10px;}
+@media(max-width:500px){.user-menu{width:245px;top:43px;border-radius:20px;}.user-menu-item{font-size:14px;padding:10px 8px;}}
+
 </style>
 </head>
 <body>
@@ -895,15 +918,36 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 
 <div class="app" id="main-app" style="display:none">
   <div class="user-bar">
-	<div style="display:flex;align-items:center;">
-	  <div class="user-avatar" id="u-avatar">?</div>
-	  <span class="user-name" id="u-name">—</span>
-	  <span class="user-sync" id="u-sync"></span>
+	<div class="user-menu-wrap" id="user-menu-wrap">
+	  <button class="user-menu-trigger" onclick="toggleUserMenu(event)" aria-label="Odpri uporabniški meni">
+		<div class="user-avatar" id="u-avatar">?</div>
+		<span class="user-name" id="u-name">—</span>
+		<span class="user-menu-chevron">⌄</span>
+	  </button>
+	  <div class="user-menu" id="user-menu">
+		<div class="user-menu-top">
+		  <div class="user-menu-avatar" id="um-avatar">?</div>
+		  <div>
+			<div class="user-menu-name" id="um-name">Asja</div>
+			<div class="user-menu-sub">Tvoj dnevni načrt</div>
+		  </div>
+		</div>
+		<button class="user-menu-item" onclick="closeUserMenu();openGoals();">
+		  <span class="umi-ico">◎</span><span>Moj profil</span>
+		</button>
+		<button class="user-menu-item" onclick="closeUserMenu();openGoals();">
+		  <span class="umi-ico">◌</span><span>Moj cilj</span>
+		</button>
+		<button class="user-menu-item" onclick="closeUserMenu();openSplitPicker();">
+		  <span class="umi-ico">⚙</span><span>Plan vadb</span>
+		</button>
+		<div class="user-menu-sep"></div>
+		<button class="user-menu-item danger" onclick="closeUserMenu();logout();">
+		  <span class="umi-ico">↪</span><span>Odjava</span>
+		</button>
+	  </div>
 	</div>
-	<div style="display:flex;gap:7px;align-items:center;">
-	  <button class="logout-btn" onclick="openGoals()" style="color:var(--md);">⚙ Profil</button>
-	  <button class="logout-btn" onclick="logout()">Odjava</button>
-	</div>
+	<span class="user-sync" id="u-sync"></span>
   </div>
   <div class="hdate" id="ds"></div>
   <div class="htitle">En dan bližje <em>sanjski</em> postavi</div>
@@ -1489,6 +1533,21 @@ let exExp={};  // UI state: which exercises are expanded
 // ─── STATE ──────────────────────────────────────────────────
 let S={meals:[],exp:[false,false,false,false,false],md:[false,false,false,false,false],exd:[],lf:false,diet:[],easy:true,wt:'',ex:[],extras:[]};
 
+// ─── USER MENU ───────────────────────────────────────────────
+function toggleUserMenu(e){
+  if(e)e.stopPropagation();
+  const w=document.getElementById('user-menu-wrap');
+  if(w)w.classList.toggle('open');
+}
+function closeUserMenu(){
+  const w=document.getElementById('user-menu-wrap');
+  if(w)w.classList.remove('open');
+}
+document.addEventListener('click',function(e){
+  const w=document.getElementById('user-menu-wrap');
+  if(w && !w.contains(e.target))closeUserMenu();
+});
+
 // ─── AUTH ────────────────────────────────────────────────────
 let AUTH = null; // {username, pin, displayName}
 
@@ -1606,8 +1665,16 @@ async function initApp(){
   // Update user bar
   const av=document.getElementById('u-avatar');
   const nm=document.getElementById('u-name');
-  if(av)av.textContent=(AUTH.displayName||AUTH.username).charAt(0).toUpperCase();
-  if(nm)nm.textContent=AUTH.displayName||AUTH.username;
+  const displayName=AUTH.displayName||AUTH.username;
+  if(av)av.textContent=displayName.charAt(0).toUpperCase();
+  if(nm)nm.textContent=displayName;
+  const umAv=document.getElementById('um-avatar');
+  const umNm=document.getElementById('um-name');
+  if(umAv){
+    const parts=displayName.trim().split(/\s+/);
+    umAv.textContent=(parts[0]?.charAt(0)||'?').toUpperCase()+(parts[1]?.charAt(0)||'').toUpperCase();
+  }
+  if(umNm)umNm.textContent=displayName;
 
   // Try load from cloud first, fall back to localStorage
   setSyncStatus('↺ nalagam...');
