@@ -24,6 +24,16 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .sec.is-collapsed .sec-head{margin-bottom:0;}
 .sec-lbl{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--md);}
 .sec-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+
+/* Dashboard collapse cards */
+.sec[id^="sec-"]{background:transparent;}
+.sec[id^="sec-"]>.sec-head{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:13px 15px;margin-bottom:8px;}
+#sec-meals .kcal-summary{margin-top:8px;}
+#sec-meals.is-collapsed .kcal-summary{margin-top:10px;}
+.workout-sec.is-collapsed #wc,.workout-sec.is-collapsed #bpsel,.workout-sec.is-collapsed #add-ex-row{display:none!important;}
+.workout-sec.is-collapsed .workout-actions-row .ghost-btn:first-child::after{content:"";}
+.sec-toggle{min-width:36px;}
+
 /* toggles */
 .tog{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--md);cursor:pointer;user-select:none;}
 .tog-track{position:relative;width:34px;height:19px;background:#D5D3CB;border-radius:10px;transition:background .2s;flex-shrink:0;}
@@ -574,9 +584,9 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
   <div class="hdate" id="ds"></div>
   <div class="htitle">En dan bližje <em>sanjski</em> postavi</div>
 
-  <div class="sec">
+  <div class="sec is-collapsed" id="sec-meals">
 	<div class="sec-head">
-	  <span class="sec-lbl">Jedilnik</span>
+	  <span class="sec-lbl">Jedilnik<span class="sec-summary" id="sec-meals-sum"></span></span>
 	  <div class="sec-right">
 		<label class="tog" onclick="toggleEasy()">
 		  <div class="tog-track on-grn" id="et"><div class="tog-thumb"></div></div>
@@ -595,8 +605,10 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 		</div>
 		<button class="rbtn" id="bam" onclick="refreshMeals()">↺ Zamenjaj vse</button>
 		<button class="pers-btn" id="pers-btn" onclick="togPers()">✦ Ideje</button>
+		<button class="sec-toggle" onclick="togSec('sec-meals')" aria-label="Prikaži/skrij jedilnik">▾</button>
 	  </div>
 	</div>
+	<div class="sec-body">
 	<div class="diet-note" id="diet-note"></div>
 	<!-- Ideas panel -->
 	<div class="pers-panel" id="pers-panel">
@@ -616,6 +628,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 	  <input class="add-meal-inp" id="extra-inp" placeholder="+ Dodaj obrok (sladoled, kava, banana...)" onkeydown="if(event.key==='Enter')addExtraMeal()">
 	  <button class="add-meal-btn" id="extra-btn" onclick="addExtraMeal()">Dodaj</button>
 	</div>
+	</div><!-- /sec-body meal details -->
 	<!-- Lifesum-style calorie summary -->
 	<div class="kcal-summary" id="kcal-summary">
 	  <div class="kcal-arc-wrap">
@@ -663,9 +676,10 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 		<div class="macro-goal" id="mg-f"></div>
 	  </div>
 	</div>
+  </div><!-- /sec-meals -->
 
 
-  <div class="sec" id="sec-steps">
+  <div class="sec is-collapsed" id="sec-steps">
 	<div class="sec-head">
 	  <span class="sec-lbl">Dnevni koraki<span class="sec-summary" id="sec-steps-sum"></span></span>
 	  <button class="sec-toggle" onclick="togSec('sec-steps')" aria-label="Razširi/skrči">▾</button>
@@ -694,11 +708,13 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 	</div>
   </div>
 
-  <div class="sec workout-sec">
+  <div class="sec workout-sec is-collapsed" id="sec-workout">
 	<div class="next-up" id="next-up"></div>
 	<div class="workout-actions-row">
+	  <button class="ghost-btn" onclick="togSec('sec-workout')">Prikaži vaje ▾</button>
 	  <button class="ghost-btn" id="baw" onclick="refreshWorkout()">↺ Zamenjaj vaje</button>
 	</div>
+	<div class="sec-body">
 	<div class="bpsel" id="bpsel" style="display:none;"></div>
 	<div id="wc"></div>
 	<div class="add-ex-row" id="add-ex-row" style="display:none">
@@ -707,6 +723,8 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 	  <input class="add-ex-sm" id="aer" placeholder="ponovitve" value="12">
 	  <button class="add-ex-btn" onclick="addCustomEx()">+ Dodaj</button>
 	</div>
+	</div><!-- /sec-workout body -->
+  </div><!-- /sec-workout -->
 
 <!-- SPLIT PICKER MODAL -->
 <div class="modal-overlay hide" id="split-overlay">
@@ -733,7 +751,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
   </div>
 </div>
 
-  <div class="sec" id="sec-tracker">
+  <div class="sec is-collapsed" id="sec-tracker">
 	<div class="sec-head">
 	  <span class="sec-lbl">Tedenski pregled<span class="sec-summary" id="sec-tracker-sum"></span></span>
 	  <button class="sec-toggle" onclick="togSec('sec-tracker')" aria-label="Razširi/skrči">▾</button>
@@ -757,12 +775,14 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 
   <div class="err" id="eb"></div>
 
-  <div class="sec">
+  <div class="sec is-collapsed" id="sec-history">
 	<div class="sec-head">
-	  <span class="sec-lbl">Zgodovina</span>
-	  <span style="font-size:12px;color:var(--lt);">zadnjih 14 dni</span>
+	  <span class="sec-lbl">Zgodovina<span class="sec-summary" id="sec-history-sum"> · zadnjih 14 dni</span></span>
+	  <button class="sec-toggle" onclick="togSec('sec-history')" aria-label="Razširi/skrči">▾</button>
 	</div>
-	<div id="hist"><div class="hist-empty">Ni še podatkov za pretekle dneve.</div></div>
+	<div class="sec-body">
+	  <div id="hist"><div class="hist-empty">Ni še podatkov za pretekle dneve.</div></div>
+	</div>
   </div>
 </div>
 
@@ -1738,6 +1758,7 @@ function renderMeals(){
 	</div>`;
   }).join('');
   calcKcal();
+  if(typeof updateSecSummaries==='function')updateSecSummaries();
 }
 
 // ─── CALORIE BURN PER EXERCISE ─────────────────────────────
@@ -1768,18 +1789,38 @@ function togSec(id){
   try{localStorage.setItem(lsKey('sec_'+id),isCollapsed?'1':'0');}catch(e){}
 }
 function loadSecStates(){
-  ['sec-steps','sec-tracker'].forEach(id=>{
+  ['sec-meals','sec-steps','sec-workout','sec-tracker','sec-history'].forEach(id=>{
 	const sec=document.getElementById(id);
 	if(!sec)return;
 	let saved=null;
 	try{saved=localStorage.getItem(lsKey('sec_'+id));}catch(e){}
 	// Default: collapsed (per user's "vse sekcije skrijeva" idea)
-	if(saved===null||saved==='1'){
+	if(saved==='0'){
+	  sec.classList.remove('is-collapsed');
+	}else{
 	  sec.classList.add('is-collapsed');
 	}
   });
 }
 function updateSecSummaries(){
+  // Meals summary
+  const msum=document.getElementById('sec-meals-sum');
+  if(msum){
+	const md=S.md||[];
+	const done=md.filter(Boolean).length;
+	const kcal=(S.meals||[]).reduce((a,m,i)=>a+(md[i]?+(m.k||m.kcal||0):0),0);
+	msum.textContent=` · ${done}/5 · ${Math.round(kcal)} kcal`;
+  }
+  // Workout summary
+  const wsum=document.getElementById('sec-workout-sum');
+  if(wsum){
+	const count=(S.ex||[]).length;
+	const done=(S.exd||[]).filter(Boolean).length;
+	wsum.textContent=` · ${done}/${count||0} vaj`;
+  }
+  // History summary
+  const hsum=document.getElementById('sec-history-sum');
+  if(hsum){hsum.textContent=' · zadnjih 14 dni';}
   // Steps summary
   const stsum=document.getElementById('sec-steps-sum');
   if(stsum){
@@ -2070,6 +2111,7 @@ function renderWorkout(){
 	  </div>
 	</div>
 	<div style="margin-top:8px;font-size:12px;color:var(--lt);">Klikni ↺ pri posamezni vaji za zamenjavo, ali "Nov WOD" za cel nov trening.</div>`;
+	if(typeof updateSecSummaries==='function')updateSecSummaries();
 	return;
   }
   if(S.wt==='cardio'){
@@ -2113,6 +2155,7 @@ function renderWorkout(){
 		  </div>
 		</div>`;
 	  }).join('');
+	if(typeof updateSecSummaries==='function')updateSecSummaries();
 	return;
   }
   else if(S.wt==='rest'){setBaw(true);c.innerHTML=`<div class="info-box" style="text-align:center;">😌 <b>Danes je počitek</b><br><br>Telo se regenerira in mišice rastejo.<br>Lahka hoja ali raztezanje sta vedno dobrodošla.</div>`;document.getElementById('add-ex-row').style.display='none';}
@@ -2219,6 +2262,7 @@ function renderWorkout(){
 		</div>`;
 	  }).join('');
   }
+  if(typeof updateSecSummaries==='function')updateSecSummaries();
 }
 function togWodDesc(i){
   const p=document.getElementById('wdp'+i);
@@ -3148,5 +3192,3 @@ function renderHistory(){
 </script>
 </body>
 </html>
-
-	  
