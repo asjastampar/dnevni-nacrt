@@ -2616,8 +2616,14 @@ async function refreshMeals(){
 	  }
 	  return m;
 	}):p;
-	if(Array.isArray(cleaned)&&cleaned.length===5){S.meals=LBLS.map((l,i)=>({label:l,...cleaned[i]}));S.md=[false,false,false,false,false];save();renderMeals();}
-  }catch(e){err('Generiranje ni uspelo.');}
+if(Array.isArray(cleaned)&&cleaned.length===5){
+  S.meals = S.meals.map((oldMeal,i)=>{
+    if(S.md[i]) return oldMeal; // obkljukane obroke pusti pri miru
+    return {label:LBLS[i], ...cleaned[i]};
+  });
+  save();
+  renderMeals();
+}  }catch(e){err('Generiranje ni uspelo.');}
   btn.disabled=false;btn.innerHTML='↺ Zamenjaj vse';
 }
 async function swapCfEx(i){
