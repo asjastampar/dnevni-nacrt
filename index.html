@@ -1494,8 +1494,8 @@ function initWorkout(){
 function toggleEasy(){
   S.easy=!S.easy;
   document.getElementById('et').className='tog-track'+(S.easy?' on-grn':'');
-  applyDietToCurrentMeals();
-  save();renderMeals();
+  save();
+  renderMeals();
 }
 function toggleLF(){
   toggleDiet('lactoseFree');
