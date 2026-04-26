@@ -2072,17 +2072,6 @@ function renderWorkout(){
 		<span class="ws-stat">~<b>${estMin}</b> min</span>
 	  </div>
 	  <button class="ws-overview-btn" onclick="togAllExercises()" id="ws-toggle-all">Razširi vse ▾</button>
-	</div>
-	<div class="workout-preview show" id="workout-preview">
-	  ${S.ex.map((e,i)=>{
-		const [rl,rh]=getRepRange(e.n,S.wt);
-		const sg=suggestProgression(e.n,rl,rh,(getExInfo(e.n)||{}).kg||0);
-		return `<div class="wp-row" onclick="togExInfo(${i})" style="cursor:pointer;">
-		  <span class="wp-num">${i+1}.</span>
-		  <span class="wp-name">${e.n}</span>
-		  <span class="wp-target-mini">${sg.sets}×${sg.reps} · ${sg.kg||'—'}kg</span>
-		</div>`;
-	  }).join('')}
 	</div>`+
 	  S.ex.map((e,i)=>{
 		const done=S.exd[i];const pk=S.wt==='glute';const open=!!exExp[i];
