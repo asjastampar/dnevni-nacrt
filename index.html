@@ -1802,35 +1802,52 @@ function renderDietUI(){
   if(note){const d=getDiet();note.classList.toggle('show',d.length>0);note.innerHTML=d.length?'✓ '+d.map(x=>`<span class="diet-chip">${DIET_LABELS[x]||x}</span>`).join(' '):'';}
 }
 function applyDietToCurrentMeals(){
+  // Initial fill only. This must NOT overwrite existing user-entered meals.
+  // Called from initMeals() when S.meals is empty.
+  if(Array.isArray(S.meals)&&S.meals.length)return;
   const src=getMealSrc();
   const pinned=getPinned();
   S.meals=src.map((m,i)=>{
 	if(pinned[i])return {label:m.l,...pinned[i],pinned:true};
 	return mealVariant(m,i);
   });
-  S.md=[false,false,false,false,false];
+  if(!Array.isArray(S.md)||!S.md.length)S.md=[false,false,false,false,false];
 }
 function toggleDietPanel(e){if(e)e.stopPropagation();renderDietUI();document.getElementById('diet-panel')?.classList.toggle('open');}
 function closeDietPanel(e){if(e)e.stopPropagation();document.getElementById('diet-panel')?.classList.remove('open');renderDietUI();}
-function clearDiet(e){if(e)e.stopPropagation();S.diet=[];S.lf=false;applyDietToCurrentMeals();save();renderDietUI();renderMeals();}
+function clearDiet(e){
+  if(e)e.stopPropagation();
+  S.diet=[];
+  S.lf=false;
+  save();
+  renderDietUI();
+  renderMeals();
+}
 function toggleDiet(id,e){
   if(e)e.stopPropagation();
   const d=getDiet();
   const exists=d.includes(id);
-  S.diet=exists?d.filter(x=>x!==id):[...d,id];
- // Če izbere vegetarijansko, naj vključuje tudi veganske predloge
-if(id==='vegetarian' && !exists){
-  S.diet = S.diet.filter(x=>x!=='vegan').concat('vegan');
-}
 
-// Če izbere vegansko, naj ostane strogo vegansko
-if(id==='vegan' && !exists){
-  S.diet = S.diet.filter(x=>x!=='vegetarian');
-}
+  S.diet=exists?d.filter(x=>x!==id):[...d,id];
+
+  // Vegetarijansko naj vključuje tudi veganske predloge.
+  // Vegansko pa je strogo vegansko, zato odstrani vegetarijansko.
+  if(id==='vegetarian'&&!exists){
+    S.diet=S.diet.filter(x=>x!=='vegan').concat('vegan');
+  }
+  if(id==='vegan'&&!exists){
+    S.diet=S.diet.filter(x=>x!=='vegetarian');
+  }
+
   S.diet=[...new Set(S.diet)];
   S.lf=S.diet.includes('lactoseFree');
-  applyDietToCurrentMeals();
-  save();renderDietUI();renderMeals();
+
+  // Ne kličemo applyDietToCurrentMeals() tukaj.
+  // Spreminjanje filtrov mora vplivati samo na naslednje predloge/zamenjave,
+  // ne pa prepisati že vnesenih ali ročno zamenjanih obrokov.
+  save();
+  renderDietUI();
+  renderMeals();
 }
 document.addEventListener('click',e=>{const p=document.getElementById('diet-panel');if(p&&!e.target.closest('.diet-wrap'))p.classList.remove('open');});
 
