@@ -742,49 +742,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
   <div class="hdate" id="ds"></div>
   <div class="htitle">En dan bližje <em>sanjski</em> postavi</div>
 
-  <div class="sec">
-	<div class="sec-head">
-	  <span class="sec-lbl">Jedilnik</span>
-	  <div class="sec-right">
-		<label class="tog" onclick="toggleEasy()">
-		  <div class="tog-track on-grn" id="et"><div class="tog-thumb"></div></div>
-		  <span>Enostavno</span>
-		</label>
-		<div class="diet-wrap">
-		  <button class="diet-btn" id="diet-btn" onclick="toggleDietPanel(event)">Prehrana ▾</button>
-		  <div class="diet-panel" id="diet-panel">
-			<div class="diet-panel-title">Prehranske posebnosti</div>
-			<div id="diet-options"></div>
-			<div class="diet-actions">
-			  <button class="diet-mini" onclick="clearDiet(event)">Počisti</button>
-			  <button class="diet-mini primary" onclick="closeDietPanel(event)">Shrani</button>
-			</div>
-		  </div>
-		</div>
-		<button class="rbtn" id="bam" onclick="refreshMeals()">↺ Zamenjaj vse</button>
-		<button class="pers-btn" id="pers-btn" onclick="togPers()">✦ Ideje</button>
-	  </div>
-	</div>
-	<div class="diet-note" id="diet-note"></div>
-	<!-- Ideas panel -->
-	<div class="pers-panel" id="pers-panel">
-	  <div class="pers-title">Predlogi za tebe</div>
-	  <div class="pers-tabs">
-		<button class="pers-tab active" id="ptab-fav" onclick="showPersTab('fav')">⭐ Tvoje jedi</button>
-		<button class="pers-tab" id="ptab-new" onclick="showPersTab('new')">✦ Novo za tebe</button>
-	  </div>
-	  <div class="pers-suggestions" id="pers-suggestions">
-		<div style="font-size:13px;color:var(--lt);padding:8px 0;">Generiram predloge...</div>
-	  </div>
-	</div>
-	<div id="mc"></div>
-	<div id="extra-meals"></div>
-	<!-- Add extra meal - always at bottom -->
-	<div class="add-meal-row" style="margin-top:10px;">
-	  <input class="add-meal-inp" id="extra-inp" placeholder="+ Dodaj obrok (sladoled, kava, banana...)" onkeydown="if(event.key==='Enter')addExtraMeal()">
-	  <button class="add-meal-btn" id="extra-btn" onclick="addExtraMeal()">Dodaj</button>
-	</div>
-	<!-- Dashboard-style calorie summary -->
+  <!-- Dashboard-style calorie summary -->
 	<div class="kcal-summary" id="kcal-summary">
 	  <div class="kcal-hero">
 		<div class="kcal-hero-icon">🔥</div>
@@ -846,6 +804,50 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 		<div class="macro-status" id="ms-f">—</div>
 		<div class="macro-tip" id="mt-f">Danes se izogibaj mastnim jedem.</div>
 	  </div>
+	</div>
+
+
+  <div class="sec">
+	<div class="sec-head">
+	  <span class="sec-lbl">Jedilnik</span>
+	  <div class="sec-right">
+		<label class="tog" onclick="toggleEasy()">
+		  <div class="tog-track on-grn" id="et"><div class="tog-thumb"></div></div>
+		  <span>Enostavno</span>
+		</label>
+		<div class="diet-wrap">
+		  <button class="diet-btn" id="diet-btn" onclick="toggleDietPanel(event)">Prehrana ▾</button>
+		  <div class="diet-panel" id="diet-panel">
+			<div class="diet-panel-title">Prehranske posebnosti</div>
+			<div id="diet-options"></div>
+			<div class="diet-actions">
+			  <button class="diet-mini" onclick="clearDiet(event)">Počisti</button>
+			  <button class="diet-mini primary" onclick="closeDietPanel(event)">Shrani</button>
+			</div>
+		  </div>
+		</div>
+		<button class="rbtn" id="bam" onclick="refreshMeals()">↺ Zamenjaj vse</button>
+		<button class="pers-btn" id="pers-btn" onclick="togPers()">✦ Ideje</button>
+	  </div>
+	</div>
+	<div class="diet-note" id="diet-note"></div>
+	<!-- Ideas panel -->
+	<div class="pers-panel" id="pers-panel">
+	  <div class="pers-title">Predlogi za tebe</div>
+	  <div class="pers-tabs">
+		<button class="pers-tab active" id="ptab-fav" onclick="showPersTab('fav')">⭐ Tvoje jedi</button>
+		<button class="pers-tab" id="ptab-new" onclick="showPersTab('new')">✦ Novo za tebe</button>
+	  </div>
+	  <div class="pers-suggestions" id="pers-suggestions">
+		<div style="font-size:13px;color:var(--lt);padding:8px 0;">Generiram predloge...</div>
+	  </div>
+	</div>
+	<div id="mc"></div>
+	<div id="extra-meals"></div>
+	<!-- Add extra meal - always at bottom -->
+	<div class="add-meal-row" style="margin-top:10px;">
+	  <input class="add-meal-inp" id="extra-inp" placeholder="+ Dodaj obrok (sladoled, kava, banana...)" onkeydown="if(event.key==='Enter')addExtraMeal()">
+	  <button class="add-meal-btn" id="extra-btn" onclick="addExtraMeal()">Dodaj</button>
 	</div>
 
 
