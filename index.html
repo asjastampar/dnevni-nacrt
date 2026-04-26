@@ -1812,27 +1812,25 @@ function applyDietToCurrentMeals(){
 }
 function toggleDietPanel(e){if(e)e.stopPropagation();renderDietUI();document.getElementById('diet-panel')?.classList.toggle('open');}
 function closeDietPanel(e){if(e)e.stopPropagation();document.getElementById('diet-panel')?.classList.remove('open');renderDietUI();}
-function clearDiet(e){
-  if(e)e.stopPropagation();
-  S.diet=[];
-  S.lf=false;
-  save();
-  renderDietUI();
-  renderMeals();
-}
-
+function clearDiet(e){if(e)e.stopPropagation();S.diet=[];S.lf=false;applyDietToCurrentMeals();save();renderDietUI();renderMeals();}
 function toggleDiet(id,e){
   if(e)e.stopPropagation();
   const d=getDiet();
   const exists=d.includes(id);
   S.diet=exists?d.filter(x=>x!==id):[...d,id];
-  if(id==='vegan'&&!exists)S.diet=S.diet.filter(x=>x!=='vegetarian').concat('vegetarian');
-  if(id==='vegetarian'&&!exists&&hasDiet('vegan'))S.diet=S.diet.filter(x=>x!=='vegetarian').concat('vegetarian');
+ // Če izbere vegetarijansko, naj vključuje tudi veganske predloge
+if(id==='vegetarian' && !exists){
+  S.diet = S.diet.filter(x=>x!=='vegan').concat('vegan');
+}
+
+// Če izbere vegansko, naj ostane strogo vegansko
+if(id==='vegan' && !exists){
+  S.diet = S.diet.filter(x=>x!=='vegetarian');
+}
   S.diet=[...new Set(S.diet)];
   S.lf=S.diet.includes('lactoseFree');
-  save();
-  renderDietUI();
-  renderMeals();
+  applyDietToCurrentMeals();
+  save();renderDietUI();renderMeals();
 }
 document.addEventListener('click',e=>{const p=document.getElementById('diet-panel');if(p&&!e.target.closest('.diet-wrap'))p.classList.remove('open');});
 
@@ -3473,4 +3471,3 @@ function renderHistory(){
 </script>
 </body>
 </html>
-
