@@ -487,6 +487,161 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .spin{display:inline-block;animation:spin .7s linear infinite;}
 @keyframes fi{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:translateY(0);}}
 .fi{animation:fi .3s ease;}
+
+
+/* Mobile dashboard fix — nutrition hero + macro cards */
+@media (max-width: 700px){
+  .kcal-summary{
+    padding:16px 16px 18px !important;
+    border-radius:18px;
+    margin-top:12px;
+  }
+  .kcal-hero{
+    display:grid !important;
+    grid-template-columns:44px 1fr 88px !important;
+    gap:12px !important;
+    align-items:center !important;
+  }
+  .kcal-hero-icon{
+    width:44px !important;
+    height:44px !important;
+    font-size:21px !important;
+  }
+  .kcal-hero-title{
+    font-size:16px !important;
+    margin-bottom:4px !important;
+  }
+  .kcal-arc-remaining{
+    font-size:36px !important;
+    line-height:.95 !important;
+  }
+  .kcal-hero-unit{
+    font-size:20px !important;
+  }
+  .kcal-arc-goal{
+    font-size:12px !important;
+    line-height:1.35 !important;
+    margin-top:8px !important;
+  }
+  .kcal-arc-wrap,
+  .kcal-arc-svg{
+    width:88px !important;
+    height:88px !important;
+  }
+  .kcal-arc-svg circle{
+    stroke-width:8 !important;
+  }
+  .kcal-arc-num{
+    font-size:20px !important;
+  }
+  .kcal-arc-sub{
+    font-size:11px !important;
+    margin-top:4px !important;
+    max-width:70px;
+  }
+  .kcal-focus{
+    margin-top:14px !important;
+    padding:11px 12px !important;
+    gap:10px !important;
+  }
+  .kcal-focus-icon{
+    width:36px !important;
+    height:36px !important;
+    font-size:15px !important;
+  }
+  .kcal-focus-title{
+    font-size:14px !important;
+  }
+  .kcal-focus-text{
+    font-size:13px !important;
+  }
+
+  .macro-bar{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:10px !important;
+    padding:12px !important;
+    border-radius:18px !important;
+    overflow:visible !important;
+  }
+  .macro-item{
+    width:100% !important;
+    min-height:auto !important;
+    padding:13px 14px !important;
+    display:grid !important;
+    grid-template-columns:auto 1fr auto !important;
+    grid-template-areas:
+      "head head status"
+      "value value value"
+      "bar bar bar"
+      "tip tip tip" !important;
+    column-gap:10px !important;
+    row-gap:7px !important;
+    overflow:visible !important;
+  }
+  .macro-head{
+    grid-area:head !important;
+    margin:0 !important;
+    min-width:0 !important;
+  }
+  .macro-ico{
+    width:30px !important;
+    height:30px !important;
+    font-size:14px !important;
+  }
+  .macro-lbl{
+    font-size:15px !important;
+    white-space:normal !important;
+    overflow-wrap:anywhere !important;
+  }
+  .macro-val-row{
+    grid-area:value !important;
+    margin:0 !important;
+    align-items:baseline !important;
+  }
+  .macro-val{
+    font-size:26px !important;
+  }
+  .macro-goal{
+    font-size:16px !important;
+  }
+  .macro-prog{
+    grid-area:bar !important;
+    margin:0 !important;
+  }
+  .macro-status{
+    grid-area:status !important;
+    align-self:center !important;
+    justify-self:end !important;
+    margin:0 !important;
+    font-size:12px !important;
+    white-space:nowrap !important;
+  }
+  .macro-tip{
+    grid-area:tip !important;
+    margin:0 !important;
+    font-size:13px !important;
+    line-height:1.35 !important;
+  }
+}
+
+@media (max-width: 380px){
+  .kcal-hero{
+    grid-template-columns:40px 1fr !important;
+  }
+  .kcal-arc-wrap{
+    display:none !important;
+  }
+  .kcal-hero-icon{
+    width:40px !important;
+    height:40px !important;
+  }
+  .macro-status{
+    font-size:11px !important;
+    padding:3px 7px !important;
+  }
+}
+
 </style>
 </head>
 <body>
