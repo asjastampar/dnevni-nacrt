@@ -41,6 +41,14 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .next-up{background:linear-gradient(135deg,#FDFCF9 0%,#F5F1E8 100%);border:.5px solid var(--br);border-radius:var(--r);padding:16px 18px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
 /* Subtle action row below next-up */
 .workout-actions-row{display:flex;gap:6px;justify-content:flex-end;margin-bottom:12px;}
+/* Workout collapse toggle below next-up */
+.workout-expand-btn{width:100%;background:none;border:.5px dashed var(--br);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--md);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;margin-top:-4px;}
+.workout-expand-btn:hover{background:var(--w);border-style:solid;color:var(--dk);}
+.workout-expand-btn .we-chev{transition:transform .25s ease;display:inline-block;font-size:11px;}
+.sec-workout .workout-expand-btn{}
+.sec.is-collapsed .we-hide{display:none;}
+.sec:not(.is-collapsed) .we-show{display:none;}
+.sec:not(.is-collapsed) .we-chev{transform:rotate(180deg);}
 .ghost-btn{background:none;border:.5px solid var(--br);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;color:var(--lt);font-family:inherit;transition:all .15s;}
 .ghost-btn:hover{color:var(--dk);background:var(--bg);}
 .ghost-btn:disabled{opacity:.4;cursor:not-allowed;}
@@ -816,19 +824,28 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 	</div>
   </div>
 
-  <div class="sec workout-sec">
+  <div class="sec workout-sec" id="sec-workout">
 	<div class="next-up" id="next-up"></div>
-	<div class="workout-actions-row">
-	  <button class="ghost-btn" id="baw" onclick="refreshWorkout()">↺ Zamenjaj vaje</button>
+	<div class="sec-body">
+	  <div class="workout-actions-row">
+		<button class="ghost-btn" id="baw" onclick="refreshWorkout()">↺ Zamenjaj vaje</button>
+	  </div>
+	  <div class="bpsel" id="bpsel" style="display:none;"></div>
+	  <div id="wc"></div>
+	  <div class="add-ex-row" id="add-ex-row" style="display:none">
+		<input class="add-ex-name" id="aen" placeholder="Ime vaje (npr. hip thrust)...">
+		<input class="add-ex-sm" id="aes" placeholder="serije" value="3">
+		<input class="add-ex-sm" id="aer" placeholder="ponovitve" value="12">
+		<button class="add-ex-btn" onclick="addCustomEx()">+ Dodaj</button>
+	  </div>
 	</div>
-	<div class="bpsel" id="bpsel" style="display:none;"></div>
-	<div id="wc"></div>
-	<div class="add-ex-row" id="add-ex-row" style="display:none">
-	  <input class="add-ex-name" id="aen" placeholder="Ime vaje (npr. hip thrust)...">
-	  <input class="add-ex-sm" id="aes" placeholder="serije" value="3">
-	  <input class="add-ex-sm" id="aer" placeholder="ponovitve" value="12">
-	  <button class="add-ex-btn" onclick="addCustomEx()">+ Dodaj</button>
-	</div>
+	<!-- Toggle button below next-up -->
+	<button class="workout-expand-btn" onclick="togSec('sec-workout')">
+	  <span class="we-show">Pokaži vaje</span>
+	  <span class="we-hide">Skrij vaje</span>
+	  <span class="we-chev">▾</span>
+	</button>
+  </div>
 
 <!-- SPLIT PICKER MODAL -->
 <div class="modal-overlay hide" id="split-overlay">
@@ -1890,7 +1907,7 @@ function togSec(id){
   try{localStorage.setItem(lsKey('sec_'+id),isCollapsed?'1':'0');}catch(e){}
 }
 function loadSecStates(){
-  ['sec-steps','sec-tracker'].forEach(id=>{
+  ['sec-steps','sec-tracker','sec-workout'].forEach(id=>{
 	const sec=document.getElementById(id);
 	if(!sec)return;
 	let saved=null;
@@ -3122,8 +3139,8 @@ function renderMacros(){
   });
   const bar=document.getElementById('macro-bar');
   if(!bar)return;
-  // Always show macro bar if goals set
-  bar.style.display=(targets||totP>0)?'flex':'none';
+  // LEGACY: macro-bar replaced by .macros-row dashboard cards. Keep hidden.
+  bar.style.display='none';
   document.getElementById('mk-p').textContent=totP+'g';
   document.getElementById('mk-c').textContent=totC+'g';
   document.getElementById('mk-f').textContent=totF+'g';
