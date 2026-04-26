@@ -15,6 +15,13 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .htitle em{font-style:italic;color:var(--red);}
 .sec{margin-bottom:2rem;}
 .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
+/* Collapsible section toggle */
+.sec-summary{font-weight:400;font-size:12px;color:var(--lt);margin-left:6px;letter-spacing:0;}
+.sec-toggle{background:none;border:.5px solid var(--br);border-radius:8px;cursor:pointer;padding:4px 10px;font-size:13px;color:var(--md);font-family:inherit;transition:transform .25s ease,background .15s,color .15s;line-height:1;flex-shrink:0;}
+.sec-toggle:hover{background:var(--bg);color:var(--dk);}
+.sec.is-collapsed .sec-body{display:none;}
+.sec.is-collapsed .sec-toggle{transform:rotate(-90deg);}
+.sec.is-collapsed .sec-head{margin-bottom:0;}
 .sec-lbl{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--md);}
 .sec-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 /* toggles */
@@ -658,26 +665,31 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 	</div>
 
 
-  <div class="sec">
-	<div class="sec-lbl" style="margin-bottom:10px;">Dnevni koraki</div>
-	<div class="steps-card">
-	  <div class="steps-icon">🚶‍♀️</div>
-	  <div class="steps-body">
-		<div class="steps-top">
-		  <span class="steps-val" id="st-val">0</span>
-		  <input class="steps-inp" id="st-inp" type="number" min="0" max="100000" step="500"
-			onblur="saveSteps()" onkeydown="if(event.key==='Enter')saveSteps()">
-		  <span class="steps-lbl">/ <span id="st-goal" onclick="changeStepsGoal()" style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px;" title="Klikni za spremembo cilja">10.000</span> korakov</span>
+  <div class="sec" id="sec-steps">
+	<div class="sec-head">
+	  <span class="sec-lbl">Dnevni koraki<span class="sec-summary" id="sec-steps-sum"></span></span>
+	  <button class="sec-toggle" onclick="togSec('sec-steps')" aria-label="Razširi/skrči">▾</button>
+	</div>
+	<div class="sec-body">
+	  <div class="steps-card">
+		<div class="steps-icon">🚶‍♀️</div>
+		<div class="steps-body">
+		  <div class="steps-top">
+			<span class="steps-val" id="st-val">0</span>
+			<input class="steps-inp" id="st-inp" type="number" min="0" max="100000" step="500"
+			  onblur="saveSteps()" onkeydown="if(event.key==='Enter')saveSteps()">
+			<span class="steps-lbl">/ <span id="st-goal" onclick="changeStepsGoal()" style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px;" title="Klikni za spremembo cilja">10.000</span> korakov</span>
+		  </div>
+		  <div class="steps-prog"><div class="steps-fill" id="st-fill" style="width:0%"></div></div>
+		  <div class="steps-sub">
+			<span id="st-pct">0%</span>
+			<span id="st-kcal" style="color:var(--grn);display:none">🔥 — kcal</span>
+		  </div>
 		</div>
-		<div class="steps-prog"><div class="steps-fill" id="st-fill" style="width:0%"></div></div>
-		<div class="steps-sub">
-		  <span id="st-pct">0%</span>
-		  <span id="st-kcal" style="color:var(--grn);display:none">🔥 — kcal</span>
+		<div class="steps-actions">
+		  <button class="steps-ebtn" id="st-ebtn" onclick="togStepsEdit()" title="Uredi korake">✏ vnesi</button>
+		  <button class="chk" id="st-chk" onclick="togStepsDone()" title="Cilj dosežen">○</button>
 		</div>
-	  </div>
-	  <div class="steps-actions">
-		<button class="steps-ebtn" id="st-ebtn" onclick="togStepsEdit()" title="Uredi korake">✏ vnesi</button>
-		<button class="chk" id="st-chk" onclick="togStepsDone()" title="Cilj dosežen">○</button>
 	  </div>
 	</div>
   </div>
@@ -721,18 +733,23 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
   </div>
 </div>
 
-  <div class="sec">
-	<div class="sec-lbl" style="margin-bottom:12px;">Tedenski pregled</div>
-	<div class="tracker">
-	  <div class="week-row" id="week-row"></div>
-	  <div class="progress-bars">
-		<div class="pb-item">
-		  <div style="display:flex;justify-content:space-between;"><span class="pb-lbl">Obroki danes</span><span class="pb-val" id="pb-ml">0/5</span></div>
-		  <div class="pb-track"><div class="pb-fill" id="pb-mf" style="background:var(--red);width:0%"></div></div>
-		</div>
-		<div class="pb-item">
-		  <div style="display:flex;justify-content:space-between;"><span class="pb-lbl">Vadba danes</span><span class="pb-val" id="pb-wl">0/6</span></div>
-		  <div class="pb-track"><div class="pb-fill" id="pb-wf" style="background:var(--grn);width:0%"></div></div>
+  <div class="sec" id="sec-tracker">
+	<div class="sec-head">
+	  <span class="sec-lbl">Tedenski pregled<span class="sec-summary" id="sec-tracker-sum"></span></span>
+	  <button class="sec-toggle" onclick="togSec('sec-tracker')" aria-label="Razširi/skrči">▾</button>
+	</div>
+	<div class="sec-body">
+	  <div class="tracker">
+		<div class="week-row" id="week-row"></div>
+		<div class="progress-bars">
+		  <div class="pb-item">
+			<div style="display:flex;justify-content:space-between;"><span class="pb-lbl">Obroki danes</span><span class="pb-val" id="pb-ml">0/5</span></div>
+			<div class="pb-track"><div class="pb-fill" id="pb-mf" style="background:var(--red);width:0%"></div></div>
+		  </div>
+		  <div class="pb-item">
+			<div style="display:flex;justify-content:space-between;"><span class="pb-lbl">Vadba danes</span><span class="pb-val" id="pb-wl">0/6</span></div>
+			<div class="pb-track"><div class="pb-fill" id="pb-wf" style="background:var(--grn);width:0%"></div></div>
+		  </div>
 		</div>
 	  </div>
 	</div>
@@ -1280,6 +1297,7 @@ async function initApp(){
   if(S.easy)document.getElementById('et').classList.add('on-grn');
 
   renderBp();renderMeals();renderWorkout();renderTracker();renderSteps();renderExtras();renderNextUp();
+  loadSecStates();updateSecSummaries();
   loadGoals();bindGoalsInputs();
   // Show goals setup only if never set before
   if(!G.age||!G.weight){
@@ -1742,6 +1760,43 @@ const CARDIO_BURN_PER_MIN=7; // kcal/min zmerne intenzivnosti
 
 const STEPS_KEY='steps_'+now.toISOString().split('T')[0];
 let ST={goal:10000,done:false,val:0};
+// ─── COLLAPSIBLE SECTIONS ───────────────────────────────────
+function togSec(id){
+  const sec=document.getElementById(id);
+  if(!sec)return;
+  const isCollapsed=sec.classList.toggle('is-collapsed');
+  try{localStorage.setItem(lsKey('sec_'+id),isCollapsed?'1':'0');}catch(e){}
+}
+function loadSecStates(){
+  ['sec-steps','sec-tracker'].forEach(id=>{
+	const sec=document.getElementById(id);
+	if(!sec)return;
+	let saved=null;
+	try{saved=localStorage.getItem(lsKey('sec_'+id));}catch(e){}
+	// Default: collapsed (per user's "vse sekcije skrijeva" idea)
+	if(saved===null||saved==='1'){
+	  sec.classList.add('is-collapsed');
+	}
+  });
+}
+function updateSecSummaries(){
+  // Steps summary
+  const stsum=document.getElementById('sec-steps-sum');
+  if(stsum){
+	const v=ST.val||0,g=ST.goal||10000;
+	const pct=g?Math.round(v/g*100):0;
+	stsum.textContent=` · ${v.toLocaleString('sl-SI')} / ${g.toLocaleString('sl-SI')} (${pct}%)`;
+  }
+  // Tracker summary — week count of completed days
+  const trsum=document.getElementById('sec-tracker-sum');
+  if(trsum){
+	const md=S.md||[];const ed=S.exd||[];
+	const mDone=md.filter(Boolean).length;
+	const eDone=ed.filter(Boolean).length;
+	trsum.textContent=` · ${mDone}/5 obrokov · ${eDone} vaj`;
+  }
+}
+
 function loadSteps(){try{const s=localStorage.getItem(lsKey(STEPS_KEY));if(s)ST=JSON.parse(s);}catch(e){}}
 function saveStepsState(){try{localStorage.setItem(lsKey(STEPS_KEY),JSON.stringify(ST));}catch(e){}}
 
@@ -1766,6 +1821,7 @@ function renderSteps(){
   else{kcalEl.style.display='none';}
   const chk=document.getElementById('st-chk');
   if(chk){chk.classList.toggle('on',isDone);chk.textContent=isDone?'✓':'○';}
+  if(typeof updateSecSummaries==='function')updateSecSummaries();
 }
 
 function togStepsEdit(){
@@ -2325,6 +2381,7 @@ function renderTracker(){
 	document.getElementById('pb-wl').textContent=eDone+'/'+eTotal;
 	document.getElementById('pb-wf').style.width=ePct+'%';
   }
+  if(typeof updateSecSummaries==='function')updateSecSummaries();
 }
 
 // ─── API CALLS ──────────────────────────────────────────────
