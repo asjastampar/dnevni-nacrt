@@ -30,6 +30,33 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .rbtn:disabled{opacity:.35;pointer-events:none;}
 /* body part selector */
 .bpsel{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+/* Next workout header */
+.next-up{background:linear-gradient(135deg,#FDFCF9 0%,#F5F1E8 100%);border:.5px solid var(--br);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.next-up-body{flex:1;min-width:0;}
+.next-up-lbl{font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px;}
+.next-up-name{font-size:18px;font-weight:500;color:var(--dk);line-height:1.2;}
+.next-up-meta{font-size:12px;color:var(--md);margin-top:3px;}
+.next-up-skip{background:var(--w);border:.5px solid var(--br);border-radius:8px;padding:6px 10px;font-size:11px;cursor:pointer;color:var(--lt);font-family:inherit;flex-shrink:0;line-height:1.4;}
+.next-up-skip:hover{color:var(--md);background:var(--bg);}
+.bp-toggle{margin-bottom:10px;}
+.bp-toggle-btn{background:none;border:none;font-size:12px;color:var(--lt);cursor:pointer;font-family:inherit;padding:4px 0;text-decoration:underline dotted;text-underline-offset:3px;}
+.bp-toggle-btn:hover{color:var(--md);}
+/* Split options */
+.split-opt{background:var(--w);border:.5px solid var(--br);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .15s;text-align:left;font-family:inherit;}
+.split-opt:hover{border-color:rgba(0,0,0,.2);background:var(--bg);}
+.split-opt.active{background:var(--dk);color:var(--w);border-color:var(--dk);}
+.split-opt.active .split-opt-desc{color:rgba(255,255,255,.7);}
+.split-opt.active .split-opt-days{color:rgba(255,255,255,.85);}
+.split-opt-name{font-size:14px;font-weight:500;margin-bottom:3px;}
+.split-opt-desc{font-size:12px;color:var(--lt);line-height:1.5;}
+.split-opt-days{font-size:11px;color:var(--md);margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;}
+.split-opt-days span{background:rgba(0,0,0,.05);padding:2px 7px;border-radius:5px;}
+.split-opt.active .split-opt-days span{background:rgba(255,255,255,.15);}
+.custom-day-row{display:flex;align-items:center;gap:6px;background:var(--w);border-radius:7px;padding:5px 9px;font-size:13px;}
+.custom-day-row .cdr-num{color:var(--lt);font-size:11px;width:18px;}
+.custom-day-row .cdr-name{flex:1;color:var(--dk);}
+.custom-day-row .cdr-x{background:none;border:none;color:var(--lt);cursor:pointer;font-size:14px;padding:2px 6px;}
+.custom-day-row .cdr-x:hover{color:var(--red);}
 .bpb{padding:6px 13px;border:.5px solid var(--br);border-radius:20px;background:var(--w);font-size:13px;color:var(--md);cursor:pointer;font-family:inherit;transition:all .15s;}
 .bpb:hover{color:var(--dk);border-color:rgba(0,0,0,.18);}
 .bpb.ag{background:#EBF4EF;color:var(--grn);border-color:#B8D9C6;font-weight:500;}
@@ -116,6 +143,39 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .wp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
 .wp-week{font-size:11px;font-weight:500;color:var(--lt);text-transform:uppercase;letter-spacing:.07em;}
 .wp-target{font-size:14px;color:var(--dk);font-weight:500;}
+/* Workout summary at top */
+.workout-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.ws-overview-btn{background:none;border:.5px solid var(--br);border-radius:8px;padding:6px 11px;font-size:12px;cursor:pointer;color:var(--md);font-family:inherit;transition:all .15s;}
+.ws-overview-btn:hover{background:var(--bg);color:var(--dk);}
+.ws-overview-btn.open{background:var(--dk);color:var(--w);border-color:var(--dk);}
+.ws-stats{display:flex;gap:12px;font-size:12px;color:var(--lt);}
+.ws-stat{}
+.ws-stat b{color:var(--dk);font-weight:500;}
+.workout-preview{background:var(--w);border:.5px solid var(--br);border-radius:9px;padding:0;margin-bottom:12px;display:none;overflow:hidden;}
+.workout-preview.show{display:block;}
+.wp-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:.5px solid var(--br);font-size:13px;}
+.wp-row:last-child{border-bottom:none;}
+.wp-num{color:var(--lt);font-size:11px;width:18px;flex-shrink:0;}
+.wp-name{flex:1;color:var(--dk);}
+.wp-target-mini{font-size:12px;color:var(--md);font-weight:500;flex-shrink:0;}
+/* Double progression card */
+.prog-card{background:var(--bg);border-radius:9px;padding:10px 12px;margin-top:8px;border:.5px solid var(--br);}
+.prog-card.prog-inc{background:#EBF4EF;border-color:#B8D9C6;}
+.prog-card.prog-deload{background:#FFF3E0;border-color:#F5C88A;}
+.prog-card.prog-first{background:#FBE8F5;border-color:#E4ABCF;}
+.prog-card.prog-hold{background:#EAF0F9;border-color:#B8C9DD;}
+.prog-card.prog-push{background:var(--w);}
+.prog-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;flex-wrap:wrap;}
+.prog-lbl{font-size:11px;color:var(--md);text-transform:uppercase;letter-spacing:.06em;font-weight:500;}
+.prog-target{font-size:14px;color:var(--dk);}
+.prog-target b{font-weight:500;}
+.prog-note{font-size:12px;color:var(--md);line-height:1.5;}
+/* Exercise history */
+.ex-hist{margin-top:8px;background:var(--w);border:.5px solid var(--br);border-radius:9px;padding:9px 12px;}
+.ex-hist-title{font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.06em;font-weight:500;margin-bottom:5px;}
+.ex-hist-row{display:flex;justify-content:space-between;font-size:13px;color:var(--dk);padding:2px 0;}
+.ex-hist-date{color:var(--lt);font-size:12px;}
+.ex-hist-val{font-weight:500;}
 .wp-note{font-size:12px;color:var(--md);line-height:1.5;}
 /* log section */
 .log-sec{border-top:.5px solid var(--br);padding-top:11px;}
@@ -396,244 +456,276 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 <!-- AUTH MODAL -->
 <div class="modal-overlay" id="auth-overlay">
   <div class="modal">
-    <div class="modal-logo">En dan bližje <em>sanjski</em> postavi</div>
-    <div class="modal-sub">Prijavi se ali ustvari profil</div>
-    <div class="modal-tabs">
-      <button class="modal-tab active" id="tab-login" onclick="switchTab('login')">Prijava</button>
-      <button class="modal-tab" id="tab-register" onclick="switchTab('register')">Registracija</button>
-    </div>
-    <div class="modal-field">
-      <label>Ime</label>
-      <input type="text" id="auth-name" placeholder="npr. Maja" maxlength="30" autocomplete="username">
-    </div>
-    <div class="modal-field">
-      <label>PIN (4–8 znakov)</label>
-      <input type="password" id="auth-pin" placeholder="••••" maxlength="8" inputmode="numeric" autocomplete="current-password"
-        onkeydown="if(event.key==='Enter')submitAuth()">
-    </div>
-    <button class="modal-btn" id="auth-btn" onclick="submitAuth()">Prijava →</button>
-    <div class="modal-err" id="auth-err"></div>
+	<div class="modal-logo">En dan bližje <em>sanjski</em> postavi</div>
+	<div class="modal-sub">Prijavi se ali ustvari profil</div>
+	<div class="modal-tabs">
+	  <button class="modal-tab active" id="tab-login" onclick="switchTab('login')">Prijava</button>
+	  <button class="modal-tab" id="tab-register" onclick="switchTab('register')">Registracija</button>
+	</div>
+	<div class="modal-field">
+	  <label>Ime</label>
+	  <input type="text" id="auth-name" placeholder="npr. Maja" maxlength="30" autocomplete="username">
+	</div>
+	<div class="modal-field">
+	  <label>PIN (4–8 znakov)</label>
+	  <input type="password" id="auth-pin" placeholder="••••" maxlength="8" inputmode="numeric" autocomplete="current-password"
+		onkeydown="if(event.key==='Enter')submitAuth()">
+	</div>
+	<button class="modal-btn" id="auth-btn" onclick="submitAuth()">Prijava →</button>
+	<div class="modal-err" id="auth-err"></div>
   </div>
 </div>
 
 <!-- GOALS MODAL -->
 <div class="modal-overlay hide" id="goals-overlay">
   <div class="modal" style="max-width:420px;">
-    <button class="modal-close-x" onclick="closeGoals()" aria-label="Zapri">✕</button>
-    <div class="modal-logo">Moj <em>profil</em></div>
-    <div class="modal-sub">Nastavi svoje podatke za natančen izračun</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-      <div class="modal-field" style="margin-bottom:0;">
-        <label>Starost</label>
-        <input type="number" id="g-age" placeholder="npr. 30" min="15" max="80" style="text-align:center;">
-      </div>
-      <div class="modal-field" style="margin-bottom:0;">
-        <label>Višina (cm)</label>
-        <input type="number" id="g-height" placeholder="npr. 168" min="140" max="220" style="text-align:center;">
-      </div>
-      <div class="modal-field" style="margin-bottom:0;">
-        <label>Teža (kg)</label>
-        <input type="number" id="g-weight" placeholder="npr. 68" min="40" max="200" step="0.1" style="text-align:center;">
-      </div>
-      <div class="modal-field" style="margin-bottom:0;">
-        <label>Ciljna teža (kg)</label>
-        <input type="number" id="g-target" placeholder="npr. 63" min="40" max="200" step="0.1" style="text-align:center;">
-      </div>
-    </div>
-    <div class="modal-field">
-      <label>Cilj</label>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;">
-        <button class="goal-opt" id="go-lose" onclick="selGoal('lose')">📉<br>Hujšanje</button>
-        <button class="goal-opt" id="go-maintain" onclick="selGoal('maintain')">⚖️<br>Vzdrževanje</button>
-        <button class="goal-opt" id="go-gain" onclick="selGoal('gain')">📈<br>Pridobivanje</button>
-      </div>
-    </div>
-    <div class="modal-field">
-      <label>Aktivnost</label>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
-        <button class="goal-opt" id="ga-sed" onclick="selAct('sed')">🪑 Pretežno sedem</button>
-        <button class="goal-opt" id="ga-light" onclick="selAct('light')">🚶 Malo gibanja</button>
-        <button class="goal-opt" id="ga-mod" onclick="selAct('mod')">🏃 Zmerno aktiven</button>
-        <button class="goal-opt" id="ga-high" onclick="selAct('high')">💪 Zelo aktiven</button>
-      </div>
-    </div>
-    <div class="goals-calc" id="goals-calc"></div>
-    <div style="display:flex;gap:8px;margin-top:4px;">
-      <button onclick="closeGoals()" style="flex:0 0 auto;background:var(--bg);color:var(--md);border:.5px solid var(--br);border-radius:9px;padding:12px 18px;font-size:14px;cursor:pointer;font-family:inherit;">Zapri</button>
-      <button class="modal-btn" style="flex:1;margin-top:0;" onclick="saveGoals()">Shrani profil →</button>
-    </div>
+	<button class="modal-close-x" onclick="closeGoals()" aria-label="Zapri">✕</button>
+	<div class="modal-logo">Moj <em>profil</em></div>
+	<div class="modal-sub">Nastavi svoje podatke za natančen izračun</div>
+	<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+	  <div class="modal-field" style="margin-bottom:0;">
+		<label>Starost</label>
+		<input type="number" id="g-age" placeholder="npr. 30" min="15" max="80" style="text-align:center;">
+	  </div>
+	  <div class="modal-field" style="margin-bottom:0;">
+		<label>Višina (cm)</label>
+		<input type="number" id="g-height" placeholder="npr. 168" min="140" max="220" style="text-align:center;">
+	  </div>
+	  <div class="modal-field" style="margin-bottom:0;">
+		<label>Teža (kg)</label>
+		<input type="number" id="g-weight" placeholder="npr. 68" min="40" max="200" step="0.1" style="text-align:center;">
+	  </div>
+	  <div class="modal-field" style="margin-bottom:0;">
+		<label>Ciljna teža (kg)</label>
+		<input type="number" id="g-target" placeholder="npr. 63" min="40" max="200" step="0.1" style="text-align:center;">
+	  </div>
+	</div>
+	<div class="modal-field">
+	  <label>Cilj</label>
+	  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;">
+		<button class="goal-opt" id="go-lose" onclick="selGoal('lose')">📉<br>Hujšanje</button>
+		<button class="goal-opt" id="go-maintain" onclick="selGoal('maintain')">⚖️<br>Vzdrževanje</button>
+		<button class="goal-opt" id="go-gain" onclick="selGoal('gain')">📈<br>Pridobivanje</button>
+	  </div>
+	</div>
+	<div class="modal-field">
+	  <label>Aktivnost</label>
+	  <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+		<button class="goal-opt" id="ga-sed" onclick="selAct('sed')">🪑 Pretežno sedem</button>
+		<button class="goal-opt" id="ga-light" onclick="selAct('light')">🚶 Malo gibanja</button>
+		<button class="goal-opt" id="ga-mod" onclick="selAct('mod')">🏃 Zmerno aktiven</button>
+		<button class="goal-opt" id="ga-high" onclick="selAct('high')">💪 Zelo aktiven</button>
+	  </div>
+	</div>
+	<div class="goals-calc" id="goals-calc"></div>
+	<div style="display:flex;gap:8px;margin-top:4px;">
+	  <button onclick="closeGoals()" style="flex:0 0 auto;background:var(--bg);color:var(--md);border:.5px solid var(--br);border-radius:9px;padding:12px 18px;font-size:14px;cursor:pointer;font-family:inherit;">Zapri</button>
+	  <button class="modal-btn" style="flex:1;margin-top:0;" onclick="saveGoals()">Shrani profil →</button>
+	</div>
   </div>
 </div>
 
 <div class="app" id="main-app" style="display:none">
   <div class="user-bar">
-    <div style="display:flex;align-items:center;">
-      <div class="user-avatar" id="u-avatar">?</div>
-      <span class="user-name" id="u-name">—</span>
-      <span class="user-sync" id="u-sync"></span>
-    </div>
-    <div style="display:flex;gap:7px;align-items:center;">
-      <button class="logout-btn" onclick="openGoals()" style="color:var(--md);">⚙ Profil</button>
-      <button class="logout-btn" onclick="logout()">Odjava</button>
-    </div>
+	<div style="display:flex;align-items:center;">
+	  <div class="user-avatar" id="u-avatar">?</div>
+	  <span class="user-name" id="u-name">—</span>
+	  <span class="user-sync" id="u-sync"></span>
+	</div>
+	<div style="display:flex;gap:7px;align-items:center;">
+	  <button class="logout-btn" onclick="openGoals()" style="color:var(--md);">⚙ Profil</button>
+	  <button class="logout-btn" onclick="logout()">Odjava</button>
+	</div>
   </div>
   <div class="hdate" id="ds"></div>
   <div class="htitle">En dan bližje <em>sanjski</em> postavi</div>
 
   <div class="sec">
-    <div class="sec-head">
-      <span class="sec-lbl">Jedilnik</span>
-      <div class="sec-right">
-        <label class="tog" onclick="toggleEasy()">
-          <div class="tog-track on-grn" id="et"><div class="tog-thumb"></div></div>
-          <span>Enostavno</span>
-        </label>
-        <div class="diet-wrap">
-          <button class="diet-btn" id="diet-btn" onclick="toggleDietPanel(event)">Prehrana ▾</button>
-          <div class="diet-panel" id="diet-panel">
-            <div class="diet-panel-title">Prehranske posebnosti</div>
-            <div id="diet-options"></div>
-            <div class="diet-actions">
-              <button class="diet-mini" onclick="clearDiet(event)">Počisti</button>
-              <button class="diet-mini primary" onclick="closeDietPanel(event)">Shrani</button>
-            </div>
-          </div>
-        </div>
-        <button class="rbtn" id="bam" onclick="refreshMeals()">↺ Zamenjaj vse</button>
-        <button class="pers-btn" id="pers-btn" onclick="togPers()">✦ Ideje</button>
-      </div>
-    </div>
-    <div class="diet-note" id="diet-note"></div>
-    <!-- Ideas panel -->
-    <div class="pers-panel" id="pers-panel">
-      <div class="pers-title">Predlogi za tebe</div>
-      <div class="pers-tabs">
-        <button class="pers-tab active" id="ptab-fav" onclick="showPersTab('fav')">⭐ Tvoje jedi</button>
-        <button class="pers-tab" id="ptab-new" onclick="showPersTab('new')">✦ Novo za tebe</button>
-      </div>
-      <div class="pers-suggestions" id="pers-suggestions">
-        <div style="font-size:13px;color:var(--lt);padding:8px 0;">Generiram predloge...</div>
-      </div>
-    </div>
-    <div id="mc"></div>
-    <div id="extra-meals"></div>
-    <!-- Add extra meal - always at bottom -->
-    <div class="add-meal-row" style="margin-top:10px;">
-      <input class="add-meal-inp" id="extra-inp" placeholder="+ Dodaj obrok (sladoled, kava, banana...)" onkeydown="if(event.key==='Enter')addExtraMeal()">
-      <button class="add-meal-btn" id="extra-btn" onclick="addExtraMeal()">Dodaj</button>
-    </div>
-    <!-- Lifesum-style calorie summary -->
-    <div class="kcal-summary" id="kcal-summary">
-      <div class="kcal-arc-wrap">
-        <svg class="kcal-arc-svg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
-          <path class="arc-bg" d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke-width="14" stroke-linecap="round"/>
-          <path class="arc-fill" id="arc-fill" d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke-width="14" stroke-linecap="round" stroke-dasharray="0 251"/>
-        </svg>
-        <div class="kcal-arc-center">
-          <div class="kcal-arc-remaining" id="arc-remaining">—</div>
-          <div class="kcal-arc-lbl">ostalo</div>
-          <div class="kcal-arc-goal" id="arc-goal"></div>
-        </div>
-      </div>
-      <div class="kcal-arc-cols">
-        <div class="kcal-arc-col">
-          <div class="kcal-arc-num" id="arc-eaten">0</div>
-          <div class="kcal-arc-sub">zaužito</div>
-        </div>
-        <div class="kcal-arc-col" id="arc-burn-col" style="display:none">
-          <div class="kcal-arc-num green" id="arc-burn">+0</div>
-          <div class="kcal-arc-sub">porabljeno</div>
-        </div>
-      </div>
-    </div>
-    <!-- Macro cards -->
-    <div class="macro-bar" id="macro-bar" style="display:none">
-      <div class="macro-item">
-        <div class="macro-prog"><div class="macro-prog-fill p-fill" id="mpf-p"></div></div>
-        <div class="macro-val" id="mk-p">0g</div>
-        <div class="macro-lbl">beljakovine</div>
-        <div class="macro-goal" id="mg-p"></div>
-      </div>
-      <div class="macro-sep"></div>
-      <div class="macro-item">
-        <div class="macro-prog"><div class="macro-prog-fill c-fill" id="mpf-c"></div></div>
-        <div class="macro-val" id="mk-c">0g</div>
-        <div class="macro-lbl">ogljikovi hidrati</div>
-        <div class="macro-goal" id="mg-c"></div>
-      </div>
-      <div class="macro-sep"></div>
-      <div class="macro-item">
-        <div class="macro-prog"><div class="macro-prog-fill f-fill" id="mpf-f"></div></div>
-        <div class="macro-val" id="mk-f">0g</div>
-        <div class="macro-lbl">maščobe</div>
-        <div class="macro-goal" id="mg-f"></div>
-      </div>
-    </div>
+	<div class="sec-head">
+	  <span class="sec-lbl">Jedilnik</span>
+	  <div class="sec-right">
+		<label class="tog" onclick="toggleEasy()">
+		  <div class="tog-track on-grn" id="et"><div class="tog-thumb"></div></div>
+		  <span>Enostavno</span>
+		</label>
+		<div class="diet-wrap">
+		  <button class="diet-btn" id="diet-btn" onclick="toggleDietPanel(event)">Prehrana ▾</button>
+		  <div class="diet-panel" id="diet-panel">
+			<div class="diet-panel-title">Prehranske posebnosti</div>
+			<div id="diet-options"></div>
+			<div class="diet-actions">
+			  <button class="diet-mini" onclick="clearDiet(event)">Počisti</button>
+			  <button class="diet-mini primary" onclick="closeDietPanel(event)">Shrani</button>
+			</div>
+		  </div>
+		</div>
+		<button class="rbtn" id="bam" onclick="refreshMeals()">↺ Zamenjaj vse</button>
+		<button class="pers-btn" id="pers-btn" onclick="togPers()">✦ Ideje</button>
+	  </div>
+	</div>
+	<div class="diet-note" id="diet-note"></div>
+	<!-- Ideas panel -->
+	<div class="pers-panel" id="pers-panel">
+	  <div class="pers-title">Predlogi za tebe</div>
+	  <div class="pers-tabs">
+		<button class="pers-tab active" id="ptab-fav" onclick="showPersTab('fav')">⭐ Tvoje jedi</button>
+		<button class="pers-tab" id="ptab-new" onclick="showPersTab('new')">✦ Novo za tebe</button>
+	  </div>
+	  <div class="pers-suggestions" id="pers-suggestions">
+		<div style="font-size:13px;color:var(--lt);padding:8px 0;">Generiram predloge...</div>
+	  </div>
+	</div>
+	<div id="mc"></div>
+	<div id="extra-meals"></div>
+	<!-- Add extra meal - always at bottom -->
+	<div class="add-meal-row" style="margin-top:10px;">
+	  <input class="add-meal-inp" id="extra-inp" placeholder="+ Dodaj obrok (sladoled, kava, banana...)" onkeydown="if(event.key==='Enter')addExtraMeal()">
+	  <button class="add-meal-btn" id="extra-btn" onclick="addExtraMeal()">Dodaj</button>
+	</div>
+	<!-- Lifesum-style calorie summary -->
+	<div class="kcal-summary" id="kcal-summary">
+	  <div class="kcal-arc-wrap">
+		<svg class="kcal-arc-svg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+		  <path class="arc-bg" d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke-width="14" stroke-linecap="round"/>
+		  <path class="arc-fill" id="arc-fill" d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke-width="14" stroke-linecap="round" stroke-dasharray="0 251"/>
+		</svg>
+		<div class="kcal-arc-center">
+		  <div class="kcal-arc-remaining" id="arc-remaining">—</div>
+		  <div class="kcal-arc-lbl">ostalo</div>
+		  <div class="kcal-arc-goal" id="arc-goal"></div>
+		</div>
+	  </div>
+	  <div class="kcal-arc-cols">
+		<div class="kcal-arc-col">
+		  <div class="kcal-arc-num" id="arc-eaten">0</div>
+		  <div class="kcal-arc-sub">zaužito</div>
+		</div>
+		<div class="kcal-arc-col" id="arc-burn-col" style="display:none">
+		  <div class="kcal-arc-num green" id="arc-burn">+0</div>
+		  <div class="kcal-arc-sub">porabljeno</div>
+		</div>
+	  </div>
+	</div>
+	<!-- Macro cards -->
+	<div class="macro-bar" id="macro-bar" style="display:none">
+	  <div class="macro-item">
+		<div class="macro-prog"><div class="macro-prog-fill p-fill" id="mpf-p"></div></div>
+		<div class="macro-val" id="mk-p">0g</div>
+		<div class="macro-lbl">beljakovine</div>
+		<div class="macro-goal" id="mg-p"></div>
+	  </div>
+	  <div class="macro-sep"></div>
+	  <div class="macro-item">
+		<div class="macro-prog"><div class="macro-prog-fill c-fill" id="mpf-c"></div></div>
+		<div class="macro-val" id="mk-c">0g</div>
+		<div class="macro-lbl">ogljikovi hidrati</div>
+		<div class="macro-goal" id="mg-c"></div>
+	  </div>
+	  <div class="macro-sep"></div>
+	  <div class="macro-item">
+		<div class="macro-prog"><div class="macro-prog-fill f-fill" id="mpf-f"></div></div>
+		<div class="macro-val" id="mk-f">0g</div>
+		<div class="macro-lbl">maščobe</div>
+		<div class="macro-goal" id="mg-f"></div>
+	  </div>
+	</div>
 
 
   <div class="sec">
-    <div class="sec-lbl" style="margin-bottom:10px;">Dnevni koraki</div>
-    <div class="steps-card">
-      <div class="steps-icon">🚶‍♀️</div>
-      <div class="steps-body">
-        <div class="steps-top">
-          <span class="steps-val" id="st-val">0</span>
-          <input class="steps-inp" id="st-inp" type="number" min="0" max="100000" step="500"
-            onblur="saveSteps()" onkeydown="if(event.key==='Enter')saveSteps()">
-          <span class="steps-lbl">/ <span id="st-goal" onclick="changeStepsGoal()" style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px;" title="Klikni za spremembo cilja">10.000</span> korakov</span>
-        </div>
-        <div class="steps-prog"><div class="steps-fill" id="st-fill" style="width:0%"></div></div>
-        <div class="steps-sub">
-          <span id="st-pct">0%</span>
-          <span id="st-kcal" style="color:var(--grn);display:none">🔥 — kcal</span>
-        </div>
-      </div>
-      <div class="steps-actions">
-        <button class="steps-ebtn" id="st-ebtn" onclick="togStepsEdit()" title="Uredi korake">✏ vnesi</button>
-        <button class="chk" id="st-chk" onclick="togStepsDone()" title="Cilj dosežen">○</button>
-      </div>
-    </div>
+	<div class="sec-lbl" style="margin-bottom:10px;">Dnevni koraki</div>
+	<div class="steps-card">
+	  <div class="steps-icon">🚶‍♀️</div>
+	  <div class="steps-body">
+		<div class="steps-top">
+		  <span class="steps-val" id="st-val">0</span>
+		  <input class="steps-inp" id="st-inp" type="number" min="0" max="100000" step="500"
+			onblur="saveSteps()" onkeydown="if(event.key==='Enter')saveSteps()">
+		  <span class="steps-lbl">/ <span id="st-goal" onclick="changeStepsGoal()" style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px;" title="Klikni za spremembo cilja">10.000</span> korakov</span>
+		</div>
+		<div class="steps-prog"><div class="steps-fill" id="st-fill" style="width:0%"></div></div>
+		<div class="steps-sub">
+		  <span id="st-pct">0%</span>
+		  <span id="st-kcal" style="color:var(--grn);display:none">🔥 — kcal</span>
+		</div>
+	  </div>
+	  <div class="steps-actions">
+		<button class="steps-ebtn" id="st-ebtn" onclick="togStepsEdit()" title="Uredi korake">✏ vnesi</button>
+		<button class="chk" id="st-chk" onclick="togStepsDone()" title="Cilj dosežen">○</button>
+	  </div>
+	</div>
   </div>
 
   <div class="sec">
-    <div class="sec-head">
-      <span class="sec-lbl">Vadba</span>
-      <button class="rbtn" id="baw" onclick="refreshWorkout()">↺ Zamenjaj vaje</button>
-    </div>
-    <div class="bpsel" id="bpsel"></div>
-    <div id="wc"></div>
-    <div class="add-ex-row" id="add-ex-row" style="display:none">
-      <input class="add-ex-name" id="aen" placeholder="Ime vaje (npr. hip thrust)...">
-      <input class="add-ex-sm" id="aes" placeholder="serije" value="3">
-      <input class="add-ex-sm" id="aer" placeholder="ponovitve" value="12">
-      <button class="add-ex-btn" onclick="addCustomEx()">+ Dodaj</button>
-    </div>
+	<div class="sec-head">
+	  <span class="sec-lbl">Vadba</span>
+	  <div style="display:flex;gap:6px;">
+		<button class="rbtn" id="baw" onclick="refreshWorkout()">↺ Zamenjaj vaje</button>
+		<button class="rbtn" id="split-edit-btn" onclick="openSplitPicker()">⚙ Plan</button>
+	  </div>
+	</div>
+	<div class="next-up" id="next-up"></div>
+	<div class="bp-toggle" id="bp-toggle">
+	  <button class="bp-toggle-btn" onclick="togBpManual()">Druga vadba ▾</button>
+	</div>
+	<div class="bpsel" id="bpsel" style="display:none;"></div>
+	<div id="wc"></div>
+	<div class="add-ex-row" id="add-ex-row" style="display:none">
+	  <input class="add-ex-name" id="aen" placeholder="Ime vaje (npr. hip thrust)...">
+	  <input class="add-ex-sm" id="aes" placeholder="serije" value="3">
+	  <input class="add-ex-sm" id="aer" placeholder="ponovitve" value="12">
+	  <button class="add-ex-btn" onclick="addCustomEx()">+ Dodaj</button>
+	</div>
 
-  <div class="sec">
-    <div class="sec-lbl" style="margin-bottom:12px;">Tedenski pregled</div>
-    <div class="tracker">
-      <div class="week-row" id="week-row"></div>
-      <div class="progress-bars">
-        <div class="pb-item">
-          <div style="display:flex;justify-content:space-between;"><span class="pb-lbl">Obroki danes</span><span class="pb-val" id="pb-ml">0/5</span></div>
-          <div class="pb-track"><div class="pb-fill" id="pb-mf" style="background:var(--red);width:0%"></div></div>
-        </div>
-        <div class="pb-item">
-          <div style="display:flex;justify-content:space-between;"><span class="pb-lbl">Vadba danes</span><span class="pb-val" id="pb-wl">0/6</span></div>
-          <div class="pb-track"><div class="pb-fill" id="pb-wf" style="background:var(--grn);width:0%"></div></div>
-        </div>
+<!-- SPLIT PICKER MODAL -->
+<div class="modal-overlay hide" id="split-overlay">
+  <div class="modal" style="max-width:440px;">
+    <button class="modal-close-x" onclick="closeSplitPicker()" aria-label="Zapri">✕</button>
+    <div class="modal-logo">Tvoj <em>plan</em> vadb</div>
+    <div class="modal-sub">Izberi razdelitev — naslednji trening se bo prikazal samodejno</div>
+    <div id="split-options" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
+    <div id="custom-split-edit" style="display:none;background:var(--bg);border-radius:9px;padding:12px;margin-bottom:12px;">
+      <div style="font-size:12px;color:var(--md);margin-bottom:8px;">Vrstni red treningov (rotacija):</div>
+      <div id="custom-days-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px;"></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="bpb" onclick="addCustomDay('upper')">+ Zgornji</button>
+        <button class="bpb" onclick="addCustomDay('lower')">+ Spodnji</button>
+        <button class="bpb" onclick="addCustomDay('full')">+ Celo telo</button>
+        <button class="bpb" onclick="addCustomDay('glute')">+ Glute</button>
+        <button class="bpb" onclick="addCustomDay('cardio')">+ Kardio</button>
       </div>
     </div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="closeSplitPicker()" style="flex:0 0 auto;background:var(--bg);color:var(--md);border:.5px solid var(--br);border-radius:9px;padding:12px 18px;font-size:14px;cursor:pointer;font-family:inherit;">Zapri</button>
+      <button class="modal-btn" style="flex:1;margin-top:0;" onclick="saveSplitChoice()">Shrani plan →</button>
+    </div>
+  </div>
+</div>
+
+  <div class="sec">
+	<div class="sec-lbl" style="margin-bottom:12px;">Tedenski pregled</div>
+	<div class="tracker">
+	  <div class="week-row" id="week-row"></div>
+	  <div class="progress-bars">
+		<div class="pb-item">
+		  <div style="display:flex;justify-content:space-between;"><span class="pb-lbl">Obroki danes</span><span class="pb-val" id="pb-ml">0/5</span></div>
+		  <div class="pb-track"><div class="pb-fill" id="pb-mf" style="background:var(--red);width:0%"></div></div>
+		</div>
+		<div class="pb-item">
+		  <div style="display:flex;justify-content:space-between;"><span class="pb-lbl">Vadba danes</span><span class="pb-val" id="pb-wl">0/6</span></div>
+		  <div class="pb-track"><div class="pb-fill" id="pb-wf" style="background:var(--grn);width:0%"></div></div>
+		</div>
+	  </div>
+	</div>
   </div>
 
   <div class="err" id="eb"></div>
 
   <div class="sec">
-    <div class="sec-head">
-      <span class="sec-lbl">Zgodovina</span>
-      <span style="font-size:12px;color:var(--lt);">zadnjih 14 dni</span>
-    </div>
-    <div id="hist"><div class="hist-empty">Ni še podatkov za pretekle dneve.</div></div>
+	<div class="sec-head">
+	  <span class="sec-lbl">Zgodovina</span>
+	  <span style="font-size:12px;color:var(--lt);">zadnjih 14 dni</span>
+	</div>
+	<div id="hist"><div class="hist-empty">Ni še podatkov za pretekle dneve.</div></div>
   </div>
 </div>
 
@@ -732,25 +824,82 @@ const WKT={
   full:{title:'Celo telo',badge:'gym',ex:[{n:'Počep z ročkami',s:'3',r:'12'},{n:'Potisk z ročkami leže',s:'3',r:'10'},{n:'Mrtvetek z ročkami (RDL)',s:'3',r:'10'},{n:'Veslanje v upognjenem položaju',s:'3',r:'12'},{n:'Vzdolžni potisk nad glavo',s:'3',r:'10'},{n:'Plank',s:'3',r:'30 sek'}]},
   glute:{title:'Glute day',badge:'glute',ex:[{n:'Hip thrust z palico',s:'4',r:'12'},{n:'Donkey kicks pri kablu',s:'3',r:'15/nogo'},{n:'Cable pull-through',s:'3',r:'15'},{n:'Sumo počep z ročko',s:'3',r:'12'},{n:'Frog pumps',s:'3',r:'20'},{n:'Abduktor stroj (odmik nog)',s:'3',r:'20'}]},
   crossfit:{title:'CrossFit WOD',badge:'cf',wods:[
-    {type:'AMRAP',time:15,name:'Začetniški Cindy',ex:[{n:'Push-up (na kolenih ali polni)',r:'10'},{n:'Air squat',r:'15'},{n:'Sit-up',r:'20'}],note:'Naredi čim več krogov v 15 minutah. Beležiš skupno število krogov.'},
-    {type:'For Time',rounds:null,name:'21-15-9',ex:[{n:'Kettlebell swing (12 kg)',r:'21 / 15 / 9'},{n:'Goblet squat (12 kg)',r:'21 / 15 / 9'}],note:'Naredi 21 ponovitev obeh vaj, nato 15, nato 9. Izmeri čas.'},
-    {type:'EMOM',time:16,name:'EMOM 16',ex:[{n:'Min 1 — Air squat',r:'12'},{n:'Min 2 — Push-up',r:'8'},{n:'Min 3 — Kettlebell swing (12 kg)',r:'10'},{n:'Min 4 — Počitek',r:'—'}],note:'Vsako minuto začneš naslednji blok. Kar ostane od minute je tvoj počitek.'},
-    {type:'For Time',rounds:5,name:'5 krogov',ex:[{n:'Box step-up (z ročkama 4 kg)',r:'10/nogo'},{n:'Push-up',r:'10'},{n:'Sit-up',r:'15'},{n:'Air squat',r:'20'}],note:'5 krogov za čas. Brez odmorov med vajami, kratek odmor med krogi.'},
-    {type:'AMRAP',time:12,name:'KB Chipper',ex:[{n:'Kettlebell swing (12 kg)',r:'12'},{n:'Goblet squat (12 kg)',r:'10'},{n:'Push-up',r:'8'},{n:'Burpee (step-out različica)',r:'5'}],note:'Čim več krogov v 12 minutah. Fokus na tehniki, ne na hitrosti.'},
-    {type:'EMOM',time:20,name:'EMOM 20 Strength',ex:[{n:'Min 1&3 — Goblet squat (14 kg)',r:'8'},{n:'Min 2&4 — Dumbbell push press',r:'10'},{n:'Min 5 — Počitek',r:'—'}],note:'Menjuješ vsakih 5 minut. Odličen trening za moč + vzdržljivost.'},
-    {type:'For Time',rounds:3,name:'3 runde',ex:[{n:'Veslanje (400m ali 2 min)',r:'1×'},{n:'Kettlebell swing (12 kg)',r:'15'},{n:'Air squat',r:'20'},{n:'Push-up',r:'10'}],note:'3 krogi za čas. Veslanje na ergometru ali alternativno: 200m tek.'}
+	{type:'AMRAP',time:15,name:'Začetniški Cindy',ex:[{n:'Push-up (na kolenih ali polni)',r:'10'},{n:'Air squat',r:'15'},{n:'Sit-up',r:'20'}],note:'Naredi čim več krogov v 15 minutah. Beležiš skupno število krogov.'},
+	{type:'For Time',rounds:null,name:'21-15-9',ex:[{n:'Kettlebell swing (12 kg)',r:'21 / 15 / 9'},{n:'Goblet squat (12 kg)',r:'21 / 15 / 9'}],note:'Naredi 21 ponovitev obeh vaj, nato 15, nato 9. Izmeri čas.'},
+	{type:'EMOM',time:16,name:'EMOM 16',ex:[{n:'Min 1 — Air squat',r:'12'},{n:'Min 2 — Push-up',r:'8'},{n:'Min 3 — Kettlebell swing (12 kg)',r:'10'},{n:'Min 4 — Počitek',r:'—'}],note:'Vsako minuto začneš naslednji blok. Kar ostane od minute je tvoj počitek.'},
+	{type:'For Time',rounds:5,name:'5 krogov',ex:[{n:'Box step-up (z ročkama 4 kg)',r:'10/nogo'},{n:'Push-up',r:'10'},{n:'Sit-up',r:'15'},{n:'Air squat',r:'20'}],note:'5 krogov za čas. Brez odmorov med vajami, kratek odmor med krogi.'},
+	{type:'AMRAP',time:12,name:'KB Chipper',ex:[{n:'Kettlebell swing (12 kg)',r:'12'},{n:'Goblet squat (12 kg)',r:'10'},{n:'Push-up',r:'8'},{n:'Burpee (step-out različica)',r:'5'}],note:'Čim več krogov v 12 minutah. Fokus na tehniki, ne na hitrosti.'},
+	{type:'EMOM',time:20,name:'EMOM 20 Strength',ex:[{n:'Min 1&3 — Goblet squat (14 kg)',r:'8'},{n:'Min 2&4 — Dumbbell push press',r:'10'},{n:'Min 5 — Počitek',r:'—'}],note:'Menjuješ vsakih 5 minut. Odličen trening za moč + vzdržljivost.'},
+	{type:'For Time',rounds:3,name:'3 runde',ex:[{n:'Veslanje (400m ali 2 min)',r:'1×'},{n:'Kettlebell swing (12 kg)',r:'15'},{n:'Air squat',r:'20'},{n:'Push-up',r:'10'}],note:'3 krogi za čas. Veslanje na ergometru ali alternativno: 200m tek.'}
   ]},
   cardio:{title:'Kardio',badge:'cardio',ex:[
-    {n:'Tek (zunaj ali tekalna steza)',s:'1',r:'30 min',kcal:210},
-    {n:'Kolesarjenje (zunaj ali sobno kolo)',s:'1',r:'45 min',kcal:270},
-    {n:'Elipsa',s:'1',r:'40 min',kcal:240},
-    {n:'Veslalni ergometer',s:'1',r:'20 min',kcal:180},
-    {n:'Plavanje',s:'1',r:'30 min',kcal:220},
-    {n:'Hoja (hiter tempo, zunaj)',s:'1',r:'45 min',kcal:160},
-    {n:'Pohod na Pohorje 🏔',s:'1',r:'vzpenjača → Bellevue (1h 15min)',kcal:420}
+	{n:'Tek (zunaj ali tekalna steza)',s:'1',r:'30 min',kcal:210},
+	{n:'Kolesarjenje (zunaj ali sobno kolo)',s:'1',r:'45 min',kcal:270},
+	{n:'Elipsa',s:'1',r:'40 min',kcal:240},
+	{n:'Veslalni ergometer',s:'1',r:'20 min',kcal:180},
+	{n:'Plavanje',s:'1',r:'30 min',kcal:220},
+	{n:'Hoja (hiter tempo, zunaj)',s:'1',r:'45 min',kcal:160},
+	{n:'Pohod na Pohorje 🏔',s:'1',r:'vzpenjača → Bellevue (1h 15min)',kcal:420}
   ]},
   rest:{title:'Počitek',badge:'rest',ex:null}
 };
+// ─── WORKOUT SPLITS ──────────────────────────────────────────
+// Predefined splits — each cycles through workouts in order
+const SPLITS={
+  'glute_focus':{
+    name:'Glute Focus',
+    desc:'2× spodnji del + 1× zgornji. Za izklesano zadnjico.',
+    days:['lower','upper','glute']
+  },
+  'upper_lower':{
+    name:'Upper/Lower 3x',
+    desc:'Klasičen split — zgornji, spodnji, celo telo.',
+    days:['upper','lower','full']
+  },
+  'full_body':{
+    name:'Full Body 3x',
+    desc:'Celotno telo vsako sejo. Idealno za začetnice.',
+    days:['full','full','full']
+  },
+  'ppl':{
+    name:'Push / Pull / Legs',
+    desc:'Klasičen bodybuilding split (push=zgornji potisk, pull=zgornji vlek).',
+    days:['upper','upper','lower']
+  },
+  'mix':{
+    name:'Mešano (4x)',
+    desc:'4× tedensko — zgornji, glute, celo, spodnji.',
+    days:['upper','glute','full','lower']
+  },
+  'custom':{
+    name:'Po meri',
+    desc:'Določi sama svoj zaporedje vadb.',
+    days:['lower','upper','glute']
+  }
+};
+
+const SPLIT_KEY='workout_split';
+function getSplit(){
+  try{
+    const s=localStorage.getItem(lsKey(SPLIT_KEY));
+    if(s)return JSON.parse(s);
+  }catch(e){}
+  return {id:'glute_focus',days:SPLITS.glute_focus.days,position:0};
+}
+function saveSplit(sp){
+  try{localStorage.setItem(lsKey(SPLIT_KEY),JSON.stringify(sp));}catch(e){}
+}
+function nextWorkoutInSplit(){
+  const sp=getSplit();
+  return sp.days[sp.position%sp.days.length];
+}
+function advanceSplit(){
+  const sp=getSplit();
+  sp.position=(sp.position+1)%sp.days.length;
+  saveSplit(sp);
+}
+
+
 const BP=[{id:'upper',l:'Zgornji del'},{id:'lower',l:'Spodnji del'},{id:'full',l:'Celo telo'},{id:'glute',l:'Glute day'},{id:'crossfit',l:'CrossFit'},{id:'cardio',l:'Kardio'},{id:'rest',l:'Počitek'}];
 const DEF={0:'rest',1:'upper',2:'cardio',3:'upper',4:'rest',5:'lower',6:'cardio'};
 
@@ -808,8 +957,8 @@ function getExInfo(name){
   // Partial match — check if any key is contained in name or vice versa
   const nl=noW.toLowerCase();
   for(const key of Object.keys(XI)){
-    const kl=key.toLowerCase();
-    if(nl.includes(kl)||kl.includes(nl))return XI[key];
+	const kl=key.toLowerCase();
+	if(nl.includes(kl)||kl.includes(nl))return XI[key];
   }
   return null;
 }
@@ -824,8 +973,8 @@ async function fetchExDesc(name){
   const cache=getDescCache();
   if(cache[name])return cache[name];
   const txt=await api(
-    'Si fitnes trener. Opiši vajo za začetnico v fitnesu. Vrni SAMO veljavni JSON: {"desc":"opis izvedbe v slovenščini (2-3 stavki)","tip":"začetniški nasvet z začetno težo","kg":0,"yt":"youtube search query v angleščini"}',
-    `Opiši vajo: "${name}"`
+	'Si fitnes trener. Opiši vajo za začetnico v fitnesu. Vrni SAMO veljavni JSON: {"desc":"opis izvedbe v slovenščini (2-3 stavki)","tip":"začetniški nasvet z začetno težo","kg":0,"yt":"youtube search query v angleščini"}',
+	`Opiši vajo: "${name}"`
   );
   const info=JSON.parse(txt);
   saveDescCache(name,info);
@@ -847,6 +996,110 @@ function getWeekPlan(w){
   return{s:'4',r:'10-12',note:'Teden 13+ — Nadaljuj s postopnim povečevanjem teže (+1–2 kg vsaka 2 tedna).'};
 }
 
+// ─── DOUBLE PROGRESSION ENGINE ──────────────────────────────
+// Find historical logs for an exercise (last 14 days)
+function getExerciseHistory(name){
+  const history=[];
+  for(let i=0;i<=30;i++){
+    const d=new Date(now);d.setDate(now.getDate()-i);
+    const key=d.toISOString().split('T')[0];
+    try{
+      const s=localStorage.getItem(lsKey('exlog_'+key));
+      if(!s)continue;
+      const log=JSON.parse(s);
+      if(log[name]){
+        history.push({date:key,daysAgo:i,...log[name]});
+      }
+    }catch(e){}
+  }
+  return history; // newest first
+}
+
+// Calculate suggested next weight/reps based on history
+// Double progression: hit top of range twice → +2.5kg
+// Otherwise → keep weight, add 1 rep
+function suggestProgression(name,targetRepLow,targetRepHigh,startKg){
+  // Filter to valid logs only — must have reps and either kg>0 or be bodyweight context
+  const allHist=getExerciseHistory(name);
+  const hist=allHist.filter(h=>{
+    const r=parseInt(h.r)||0;
+    return r>0; // must have logged at least 1 rep
+  });
+  if(hist.length===0){
+    return {kg:startKg,reps:targetRepLow,sets:3,note:'Začni rahlo — fokus na tehniko',type:'first'};
+  }
+  const last=hist[0];
+  const lastReps=parseInt(last.r)||0;
+  const lastKg=parseFloat(last.kg)||startKg;
+  // Cap sets at sensible bounds: 2–5 for hypertrophy
+  const rawSets=parseInt(last.s)||3;
+  const lastSets=Math.max(2,Math.min(5,rawSets));
+  const daysSince=last.daysAgo;
+
+  // Deload if more than 10 days
+  if(daysSince>=10){
+    return {
+      kg:Math.max(startKg,Math.round(lastKg*0.9*2)/2),
+      reps:targetRepLow,
+      sets:lastSets,
+      note:`Deload — ${daysSince} dni pavze, gremo z lažjo težo`,
+      type:'deload'
+    };
+  }
+
+  // Hit top of range with all sets — check 2 sessions at SAME weight
+  const hitTop=lastReps>=targetRepHigh&&lastSets>=3;
+  const prevHitTop=hist.length>1&&
+    parseInt(hist[1].r)>=targetRepHigh&&
+    Math.abs(parseFloat(hist[1].kg||0)-lastKg)<0.01;
+
+  if(hitTop&&prevHitTop){
+    return {
+      kg:lastKg+2.5,
+      reps:targetRepLow,
+      sets:lastSets,
+      note:`✨ +2.5 kg — 2× zaporedoma si naredila ${targetRepHigh}+ ponovitev`,
+      type:'increase'
+    };
+  }
+
+  if(hitTop){
+    return {
+      kg:lastKg,
+      reps:targetRepHigh,
+      sets:lastSets,
+      note:`Še 1× ponovi ${targetRepHigh} pon. → naslednjič +2.5 kg`,
+      type:'consolidate'
+    };
+  }
+
+  // Otherwise — same weight, +1 rep (but never below low end)
+  const nextReps=Math.max(targetRepLow,Math.min(targetRepHigh,lastReps+1));
+  return {
+    kg:lastKg,
+    reps:nextReps,
+    sets:lastSets,
+    note:`Cilj: še ${nextReps} pon. (zadnjič ${lastReps})`,
+    type:'rep_push'
+  };
+}
+
+// Get rep range for exercise based on type
+function getRepRange(exName,wt){
+  // Glute compound exercises — moderate reps
+  if(/hip thrust|squat|po(č|c)ep|deadlift|mrtv/i.test(exName))return [6,10];
+  // Isolation glute — higher reps
+  if(/donkey|abduktor|frog|bridge|kickback/i.test(exName))return [10,15];
+  // Upper compound
+  if(/potisk|press|veslan|row|pull/i.test(exName))return [6,10];
+  // Upper isolation
+  if(/curl|raise|fly|extension|triceps|biceps/i.test(exName))return [10,15];
+  // Bodyweight / core
+  if(/plank|sit-?up|crunch|leg raise/i.test(exName))return [12,20];
+  // Default hypertrophy range
+  return [8,12];
+}
+
 // exercise log: store per day, per exercise name
 const ELKEY='exlog_'+now.toISOString().split('T')[0];
 function loadElog(){try{return JSON.parse(localStorage.getItem(lsKey(ELKEY)))||{};}catch(e){return{};}}
@@ -855,7 +1108,7 @@ function saveElog(name,data){const l=loadElog();l[name]=data;try{localStorage.se
 let exExp={};  // UI state: which exercises are expanded
 
 // ─── STATE ──────────────────────────────────────────────────
-let S={meals:[],exp:[false,false,false,false,false],md:[false,false,false,false,false],exd:[],lf:false,diet:[],easy:true,wt:DEF[DOW],ex:[],extras:[]};
+let S={meals:[],exp:[false,false,false,false,false],md:[false,false,false,false,false],exd:[],lf:false,diet:[],easy:true,wt:'lower',ex:[],extras:[]};
 
 // ─── AUTH ────────────────────────────────────────────────────
 let AUTH = null; // {username, pin, displayName}
@@ -895,12 +1148,12 @@ async function submitAuth(){
   if(!name||!pin){errEl.textContent='Vnesi ime in PIN.';errEl.classList.add('show');return;}
   btn.disabled=true;btn.textContent='...';
   try{
-    const r=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:switchTab._mode||'login',username:name,pin})});
-    const d=await r.json();
-    if(!r.ok){errEl.textContent=d.error||'Napaka';errEl.classList.add('show');btn.disabled=false;btn.textContent=switchTab._mode==='login'?'Prijava →':'Ustvari profil →';return;}
-    setAuth({username:d.username,pin,displayName:d.displayName});
-    await initApp();
+	const r=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},
+	  body:JSON.stringify({action:switchTab._mode||'login',username:name,pin})});
+	const d=await r.json();
+	if(!r.ok){errEl.textContent=d.error||'Napaka';errEl.classList.add('show');btn.disabled=false;btn.textContent=switchTab._mode==='login'?'Prijava →':'Ustvari profil →';return;}
+	setAuth({username:d.username,pin,displayName:d.displayName});
+	await initApp();
   }catch(e){errEl.textContent='Napaka pri povezavi.';errEl.classList.add('show');btn.disabled=false;btn.textContent='Poskusi znova';}
 }
 
@@ -925,38 +1178,38 @@ function cloudSave(){
   // Debounce — sync 2s after last change
   clearTimeout(_syncTimer);
   _syncTimer=setTimeout(async()=>{
-    if(!AUTH)return;
-    const today=now.toISOString().split('T')[0];
-    const payload={
-      main:S,
-      track:{md:S.md,ed:S.exd,wt:S.wt},
-      elog:loadElog(),
-      wod:localStorage.getItem(lsKey('wodlog_'+today))||'',
-      steps:ST
-    };
-    try{
-      await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({action:'save',username:AUTH.username,pin:AUTH.pin,date:today,payload})});
-      setSyncStatus('✓ sinhronizirano');
-    }catch(e){setSyncStatus('⚠ offline');}
+	if(!AUTH)return;
+	const today=now.toISOString().split('T')[0];
+	const payload={
+	  main:S,
+	  track:{md:S.md,ed:S.exd,wt:S.wt},
+	  elog:loadElog(),
+	  wod:localStorage.getItem(lsKey('wodlog_'+today))||'',
+	  steps:ST
+	};
+	try{
+	  await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},
+		body:JSON.stringify({action:'save',username:AUTH.username,pin:AUTH.pin,date:today,payload})});
+	  setSyncStatus('✓ sinhronizirano');
+	}catch(e){setSyncStatus('⚠ offline');}
   },2000);
 }
 
 async function cloudLoad(date){
   if(!AUTH)return null;
   try{
-    const r=await fetch(`/api/data?action=load&username=${AUTH.username}&pin=${AUTH.pin}&date=${date}`);
-    const d=await r.json();
-    return d.ok?d.data:null;
+	const r=await fetch(`/api/data?action=load&username=${AUTH.username}&pin=${AUTH.pin}&date=${date}`);
+	const d=await r.json();
+	return d.ok?d.data:null;
   }catch(e){return null;}
 }
 
 async function cloudHistory(){
   if(!AUTH)return null;
   try{
-    const r=await fetch(`/api/data?action=history&username=${AUTH.username}&pin=${AUTH.pin}`);
-    const d=await r.json();
-    return d.ok?d.history:null;
+	const r=await fetch(`/api/data?action=history&username=${AUTH.username}&pin=${AUTH.pin}`);
+	const d=await r.json();
+	return d.ok?d.history:null;
   }catch(e){return null;}
 }
 
@@ -982,19 +1235,22 @@ async function initApp(){
   const today=now.toISOString().split('T')[0];
   const cloudData=await cloudLoad(today);
   if(cloudData){
-    if(cloudData.main){S={...S,...cloudData.main};getDiet();}
-    if(cloudData.steps)ST={...ST,...cloudData.steps};
-    if(cloudData.elog)try{localStorage.setItem(lsKey(ELKEY),JSON.stringify(cloudData.elog));}catch(e){}
-    if(cloudData.wod)try{localStorage.setItem(lsKey('wodlog_'+today),cloudData.wod);}catch(e){}
-    setSyncStatus('✓ naloženo');
+	if(cloudData.main){S={...S,...cloudData.main};getDiet();}
+	if(cloudData.steps)ST={...ST,...cloudData.steps};
+	if(cloudData.elog)try{localStorage.setItem(lsKey(ELKEY),JSON.stringify(cloudData.elog));}catch(e){}
+	if(cloudData.wod)try{localStorage.setItem(lsKey('wodlog_'+today),cloudData.wod);}catch(e){}
+	setSyncStatus('✓ naloženo');
   } else {
-    load();
-    // If still no meals (first time), initialize defaults
-    if(!S.meals||!S.meals.length){initMeals();}
-    if(!S.ex||(!S.ex.length&&S.wt!=='crossfit'&&S.wt!=='cardio')){initWorkout();}
-    loadSteps();
-    setSyncStatus('');
+	load();
+	loadSteps();
+	setSyncStatus('');
   }
+  // Common init — runs whether data came from cloud or local
+  if(!S.meals||!S.meals.length){initMeals();}
+  // Set workout from split if no valid workout type yet (or it's the empty default 'rest')
+  const validWt=['upper','lower','full','glute','cardio','crossfit','rest'].includes(S.wt);
+  if(!validWt||!S.wt){S.wt=nextWorkoutInSplit();}
+  if(!S.ex||(!S.ex.length&&S.wt!=='crossfit'&&S.wt!=='cardio'&&S.wt!=='rest')){initWorkout();}
 
   // Date display
   document.getElementById('ds').textContent=SLD[DOW]+', '+now.getDate()+'. '+SLM[now.getMonth()]+' '+now.getFullYear();
@@ -1003,26 +1259,26 @@ async function initApp(){
   renderDietUI();
   if(S.easy)document.getElementById('et').classList.add('on-grn');
 
-  renderBp();renderMeals();renderWorkout();renderTracker();renderSteps();renderExtras();
+  renderBp();renderMeals();renderWorkout();renderTracker();renderSteps();renderExtras();renderNextUp();
   loadGoals();bindGoalsInputs();
   // Show goals setup only if never set before
   if(!G.age||!G.weight){
-    const seen=localStorage.getItem(lsKey('goals_seen'));
-    if(!seen)setTimeout(()=>openGoals(),1500);
+	const seen=localStorage.getItem(lsKey('goals_seen'));
+	if(!seen)setTimeout(()=>openGoals(),1500);
   }
 
   // Load history from cloud async
   cloudHistory().then(hist=>{
-    if(hist){
-      // Store in localStorage for renderHistory
-      Object.entries(hist).forEach(([date,data])=>{
-        if(data.main)try{localStorage.setItem(lsKey('dp_v6_'+date),JSON.stringify(data.main));}catch(e){}
-        if(data.track)try{localStorage.setItem(lsKey('track_'+date),JSON.stringify(data.track));}catch(e){}
-        if(data.elog)try{localStorage.setItem(lsKey('exlog_'+date),JSON.stringify(data.elog));}catch(e){}
-        if(data.wod)try{localStorage.setItem(lsKey('wodlog_'+date),data.wod);}catch(e){}
-      });
-    }
-    renderHistory();
+	if(hist){
+	  // Store in localStorage for renderHistory
+	  Object.entries(hist).forEach(([date,data])=>{
+		if(data.main)try{localStorage.setItem(lsKey('dp_v6_'+date),JSON.stringify(data.main));}catch(e){}
+		if(data.track)try{localStorage.setItem(lsKey('track_'+date),JSON.stringify(data.track));}catch(e){}
+		if(data.elog)try{localStorage.setItem(lsKey('exlog_'+date),JSON.stringify(data.elog));}catch(e){}
+		if(data.wod)try{localStorage.setItem(lsKey('wodlog_'+date),data.wod);}catch(e){}
+	  });
+	}
+	renderHistory();
   });
 }
 
@@ -1054,60 +1310,60 @@ const DIET_OPTS=[
 const DIET_LABELS=Object.fromEntries(DIET_OPTS.map(o=>[o.id,o.l]));
 const DIET_PRESETS={
   stableEnergy:[
-    {f:'Jajčna omleta s puranjimi prsmi, špinačo in avokadom',k:430,i:[{n:'Jajca',a:'2 kos'},{n:'Puranje prsi',a:'80 g'},{n:'Špinača',a:'70 g'},{n:'Avokado',a:'60 g'},{n:'Olivno olje',a:'5 ml'}]},
-    {f:'Skyr z borovnicami in chia semeni',k:230,i:[{n:'Skyr',a:'180 g'},{n:'Borovnice',a:'70 g'},{n:'Chia semena',a:'12 g'}]},
-    {f:'Piščančja bowl skleda z rižem, zelenjavo in olivnim oljem',k:540,i:[{n:'Piščančji file',a:'180 g'},{n:'Riž',a:'70 g'},{n:'Mešana zelenjava',a:'220 g'},{n:'Olivno olje',a:'10 ml'}]},
-    {f:'Tuna z riževimi krekerji in kumaro',k:210,i:[{n:'Tuna v lastnem soku',a:'120 g'},{n:'Riževi krekerji',a:'25 g'},{n:'Kumara',a:'120 g'}]},
-    {f:'Losos s krompirjem, brokolijem in zeleno solato',k:505,i:[{n:'Losos',a:'180 g'},{n:'Krompir',a:'180 g'},{n:'Brokoli',a:'180 g'},{n:'Zelena solata',a:'80 g'},{n:'Olivno olje',a:'8 ml'}]}
+	{f:'Jajčna omleta s puranjimi prsmi, špinačo in avokadom',k:430,i:[{n:'Jajca',a:'2 kos'},{n:'Puranje prsi',a:'80 g'},{n:'Špinača',a:'70 g'},{n:'Avokado',a:'60 g'},{n:'Olivno olje',a:'5 ml'}]},
+	{f:'Skyr z borovnicami in chia semeni',k:230,i:[{n:'Skyr',a:'180 g'},{n:'Borovnice',a:'70 g'},{n:'Chia semena',a:'12 g'}]},
+	{f:'Piščančja bowl skleda z rižem, zelenjavo in olivnim oljem',k:540,i:[{n:'Piščančji file',a:'180 g'},{n:'Riž',a:'70 g'},{n:'Mešana zelenjava',a:'220 g'},{n:'Olivno olje',a:'10 ml'}]},
+	{f:'Tuna z riževimi krekerji in kumaro',k:210,i:[{n:'Tuna v lastnem soku',a:'120 g'},{n:'Riževi krekerji',a:'25 g'},{n:'Kumara',a:'120 g'}]},
+	{f:'Losos s krompirjem, brokolijem in zeleno solato',k:505,i:[{n:'Losos',a:'180 g'},{n:'Krompir',a:'180 g'},{n:'Brokoli',a:'180 g'},{n:'Zelena solata',a:'80 g'},{n:'Olivno olje',a:'8 ml'}]}
   ],
   lactoseFreeStable:[
-    {f:'Jajčna omleta s puranjimi prsmi, špinačo in avokadom',k:430,i:[{n:'Jajca',a:'2 kos'},{n:'Puranje prsi',a:'80 g'},{n:'Špinača',a:'70 g'},{n:'Avokado',a:'60 g'},{n:'Olivno olje',a:'5 ml'}]},
-    {f:'Tuna z riževimi krekerji in kumaro',k:210,i:[{n:'Tuna v lastnem soku',a:'120 g'},{n:'Riževi krekerji',a:'25 g'},{n:'Kumara',a:'120 g'}]},
-    {f:'Piščančja bowl skleda z rižem, zelenjavo in olivnim oljem',k:540,i:[{n:'Piščančji file',a:'180 g'},{n:'Riž',a:'70 g'},{n:'Mešana zelenjava',a:'220 g'},{n:'Olivno olje',a:'10 ml'}]},
-    {f:'Brezlaktozni proteinski jogurt z borovnicami',k:210,i:[{n:'Brezlaktozni proteinski jogurt',a:'180 g'},{n:'Borovnice',a:'70 g'},{n:'Chia semena',a:'10 g'}]},
-    {f:'Puranji zrezek z ajdo in brokolijem',k:495,i:[{n:'Puranje prsi',a:'190 g'},{n:'Ajda',a:'70 g'},{n:'Brokoli',a:'200 g'},{n:'Olivno olje',a:'10 ml'}]}
+	{f:'Jajčna omleta s puranjimi prsmi, špinačo in avokadom',k:430,i:[{n:'Jajca',a:'2 kos'},{n:'Puranje prsi',a:'80 g'},{n:'Špinača',a:'70 g'},{n:'Avokado',a:'60 g'},{n:'Olivno olje',a:'5 ml'}]},
+	{f:'Tuna z riževimi krekerji in kumaro',k:210,i:[{n:'Tuna v lastnem soku',a:'120 g'},{n:'Riževi krekerji',a:'25 g'},{n:'Kumara',a:'120 g'}]},
+	{f:'Piščančja bowl skleda z rižem, zelenjavo in olivnim oljem',k:540,i:[{n:'Piščančji file',a:'180 g'},{n:'Riž',a:'70 g'},{n:'Mešana zelenjava',a:'220 g'},{n:'Olivno olje',a:'10 ml'}]},
+	{f:'Brezlaktozni proteinski jogurt z borovnicami',k:210,i:[{n:'Brezlaktozni proteinski jogurt',a:'180 g'},{n:'Borovnice',a:'70 g'},{n:'Chia semena',a:'10 g'}]},
+	{f:'Puranji zrezek z ajdo in brokolijem',k:495,i:[{n:'Puranje prsi',a:'190 g'},{n:'Ajda',a:'70 g'},{n:'Brokoli',a:'200 g'},{n:'Olivno olje',a:'10 ml'}]}
   ],
   vegan:[
-    {f:'Tofu scramble s špinačo, paradižnikom in riževim toastom',k:390,i:[{n:'Čvrsti tofu',a:'180 g'},{n:'Špinača',a:'60 g'},{n:'Paradižnik',a:'120 g'},{n:'Rižev toast',a:'2 rezini'},{n:'Olivno olje',a:'8 ml'}]},
-    {f:'Sojin jogurt z borovnicami in chia semeni',k:210,i:[{n:'Sojin jogurt',a:'180 g'},{n:'Borovnice',a:'80 g'},{n:'Chia semena',a:'12 g'}]},
-    {f:'Buddha bowl s čičeriko, quinoo in tahini prelivom',k:540,i:[{n:'Čičerika',a:'150 g'},{n:'Quinoa',a:'70 g'},{n:'Mešana zelenjava',a:'200 g'},{n:'Tahini',a:'18 g'},{n:'Limonin sok',a:'1/2 limone'}]},
-    {f:'Riževi krekerji s humusom in kumaro',k:180,i:[{n:'Riževi krekerji',a:'30 g'},{n:'Humus',a:'55 g'},{n:'Kumara',a:'100 g'}]},
-    {f:'Lečina enolončnica s krompirjem in korenjem',k:465,i:[{n:'Leča',a:'90 g suha'},{n:'Krompir',a:'180 g'},{n:'Korenje',a:'120 g'},{n:'Paradižnikova omaka',a:'120 g'},{n:'Olivno olje',a:'10 ml'}]}
+	{f:'Tofu scramble s špinačo, paradižnikom in riževim toastom',k:390,i:[{n:'Čvrsti tofu',a:'180 g'},{n:'Špinača',a:'60 g'},{n:'Paradižnik',a:'120 g'},{n:'Rižev toast',a:'2 rezini'},{n:'Olivno olje',a:'8 ml'}]},
+	{f:'Sojin jogurt z borovnicami in chia semeni',k:210,i:[{n:'Sojin jogurt',a:'180 g'},{n:'Borovnice',a:'80 g'},{n:'Chia semena',a:'12 g'}]},
+	{f:'Buddha bowl s čičeriko, quinoo in tahini prelivom',k:540,i:[{n:'Čičerika',a:'150 g'},{n:'Quinoa',a:'70 g'},{n:'Mešana zelenjava',a:'200 g'},{n:'Tahini',a:'18 g'},{n:'Limonin sok',a:'1/2 limone'}]},
+	{f:'Riževi krekerji s humusom in kumaro',k:180,i:[{n:'Riževi krekerji',a:'30 g'},{n:'Humus',a:'55 g'},{n:'Kumara',a:'100 g'}]},
+	{f:'Lečina enolončnica s krompirjem in korenjem',k:465,i:[{n:'Leča',a:'90 g suha'},{n:'Krompir',a:'180 g'},{n:'Korenje',a:'120 g'},{n:'Paradižnikova omaka',a:'120 g'},{n:'Olivno olje',a:'10 ml'}]}
   ],
   vegetarian:[
-    {f:'Skyr bowl z jagodami in ovsenimi kosmiči',k:380,i:[{n:'Skyr',a:'180 g'},{n:'Ovseni kosmiči',a:'50 g'},{n:'Jagode',a:'100 g'},{n:'Med',a:'10 g'}]},
-    {f:'Kuhano jajce, riževi krekerji in paradižnik',k:190,i:[{n:'Jajce',a:'1 kos'},{n:'Riževi krekerji',a:'25 g'},{n:'Paradižnik',a:'120 g'}]},
-    {f:'Quinoa solata s feto, čičeriko in kumaro',k:515,i:[{n:'Quinoa',a:'70 g'},{n:'Čičerika',a:'120 g'},{n:'Feta',a:'45 g'},{n:'Kumara',a:'100 g'},{n:'Olivno olje',a:'12 ml'}]},
-    {f:'Grški jogurt z medom in sadjem',k:180,i:[{n:'Grški jogurt',a:'150 g'},{n:'Med',a:'10 g'},{n:'Sadje',a:'100 g'}]},
-    {f:'Tofu stir-fry z rižem in zelenjavo',k:465,i:[{n:'Tofu',a:'170 g'},{n:'Riž',a:'70 g'},{n:'Mešana zelenjava',a:'220 g'},{n:'Sojina omaka',a:'15 ml'},{n:'Sezamovo olje',a:'8 ml'}]}
+	{f:'Skyr bowl z jagodami in ovsenimi kosmiči',k:380,i:[{n:'Skyr',a:'180 g'},{n:'Ovseni kosmiči',a:'50 g'},{n:'Jagode',a:'100 g'},{n:'Med',a:'10 g'}]},
+	{f:'Kuhano jajce, riževi krekerji in paradižnik',k:190,i:[{n:'Jajce',a:'1 kos'},{n:'Riževi krekerji',a:'25 g'},{n:'Paradižnik',a:'120 g'}]},
+	{f:'Quinoa solata s feto, čičeriko in kumaro',k:515,i:[{n:'Quinoa',a:'70 g'},{n:'Čičerika',a:'120 g'},{n:'Feta',a:'45 g'},{n:'Kumara',a:'100 g'},{n:'Olivno olje',a:'12 ml'}]},
+	{f:'Grški jogurt z medom in sadjem',k:180,i:[{n:'Grški jogurt',a:'150 g'},{n:'Med',a:'10 g'},{n:'Sadje',a:'100 g'}]},
+	{f:'Tofu stir-fry z rižem in zelenjavo',k:465,i:[{n:'Tofu',a:'170 g'},{n:'Riž',a:'70 g'},{n:'Mešana zelenjava',a:'220 g'},{n:'Sojina omaka',a:'15 ml'},{n:'Sezamovo olje',a:'8 ml'}]}
   ],
   glutenFree:[
-    {f:'Omleta s špinačo, avokadom in paradižnikom',k:405,i:[{n:'Jajca',a:'3 kos'},{n:'Špinača',a:'60 g'},{n:'Avokado',a:'60 g'},{n:'Paradižnik',a:'120 g'}]},
-    {f:'Brezlaktozni jogurt z banano in chia semeni',k:190,i:[{n:'Brezlaktozni jogurt',a:'160 g'},{n:'Banana',a:'80 g'},{n:'Chia semena',a:'10 g'}]},
-    {f:'Piščančja riževa skleda z zelenjavo',k:525,i:[{n:'Piščančji file',a:'160 g'},{n:'Riž',a:'80 g'},{n:'Zelenjava',a:'200 g'},{n:'Olivno olje',a:'12 ml'}]},
-    {f:'Jabolko in temna čokolada',k:155,i:[{n:'Jabolko',a:'150 g'},{n:'Temna čokolada 70%',a:'15 g'}]},
-    {f:'Losos s krompirjem in brokolijem',k:500,i:[{n:'Losos',a:'180 g'},{n:'Krompir',a:'220 g'},{n:'Brokoli',a:'180 g'},{n:'Olivno olje',a:'10 ml'}]}
+	{f:'Omleta s špinačo, avokadom in paradižnikom',k:405,i:[{n:'Jajca',a:'3 kos'},{n:'Špinača',a:'60 g'},{n:'Avokado',a:'60 g'},{n:'Paradižnik',a:'120 g'}]},
+	{f:'Brezlaktozni jogurt z banano in chia semeni',k:190,i:[{n:'Brezlaktozni jogurt',a:'160 g'},{n:'Banana',a:'80 g'},{n:'Chia semena',a:'10 g'}]},
+	{f:'Piščančja riževa skleda z zelenjavo',k:525,i:[{n:'Piščančji file',a:'160 g'},{n:'Riž',a:'80 g'},{n:'Zelenjava',a:'200 g'},{n:'Olivno olje',a:'12 ml'}]},
+	{f:'Jabolko in temna čokolada',k:155,i:[{n:'Jabolko',a:'150 g'},{n:'Temna čokolada 70%',a:'15 g'}]},
+	{f:'Losos s krompirjem in brokolijem',k:500,i:[{n:'Losos',a:'180 g'},{n:'Krompir',a:'220 g'},{n:'Brokoli',a:'180 g'},{n:'Olivno olje',a:'10 ml'}]}
   ],
   highProtein:[
-    {f:'Proteinski shake z whey izolatom, banano in ovsenimi kosmiči',k:420,i:[{n:'Whey izolat',a:'30 g'},{n:'Banana',a:'120 g'},{n:'Ovseni kosmiči',a:'45 g'},{n:'Voda ali mandljevo mleko',a:'250 ml'}]},
-    {f:'Skyr z borovnicami',k:180,i:[{n:'Skyr',a:'180 g'},{n:'Borovnice',a:'80 g'}]},
-    {f:'Piščančja bowl skleda z rižem in zelenjavo',k:540,i:[{n:'Piščančji file',a:'190 g'},{n:'Riž',a:'75 g'},{n:'Zelenjava',a:'220 g'},{n:'Olivno olje',a:'10 ml'}]},
-    {f:'Tuna z riževimi krekerji in kumaro',k:210,i:[{n:'Tuna v lastnem soku',a:'120 g'},{n:'Riževi krekerji',a:'25 g'},{n:'Kumara',a:'100 g'}]},
-    {f:'Puranji zrezek z ajdo in brokolijem',k:495,i:[{n:'Puranje prsi',a:'190 g'},{n:'Ajda',a:'70 g'},{n:'Brokoli',a:'200 g'},{n:'Olivno olje',a:'10 ml'}]}
+	{f:'Proteinski shake z whey izolatom, banano in ovsenimi kosmiči',k:420,i:[{n:'Whey izolat',a:'30 g'},{n:'Banana',a:'120 g'},{n:'Ovseni kosmiči',a:'45 g'},{n:'Voda ali mandljevo mleko',a:'250 ml'}]},
+	{f:'Skyr z borovnicami',k:180,i:[{n:'Skyr',a:'180 g'},{n:'Borovnice',a:'80 g'}]},
+	{f:'Piščančja bowl skleda z rižem in zelenjavo',k:540,i:[{n:'Piščančji file',a:'190 g'},{n:'Riž',a:'75 g'},{n:'Zelenjava',a:'220 g'},{n:'Olivno olje',a:'10 ml'}]},
+	{f:'Tuna z riževimi krekerji in kumaro',k:210,i:[{n:'Tuna v lastnem soku',a:'120 g'},{n:'Riževi krekerji',a:'25 g'},{n:'Kumara',a:'100 g'}]},
+	{f:'Puranji zrezek z ajdo in brokolijem',k:495,i:[{n:'Puranje prsi',a:'190 g'},{n:'Ajda',a:'70 g'},{n:'Brokoli',a:'200 g'},{n:'Olivno olje',a:'10 ml'}]}
   ],
   lowCarb:[
-    {f:'Jajčna omleta z avokadom in špinačo',k:410,i:[{n:'Jajca',a:'3 kos'},{n:'Avokado',a:'80 g'},{n:'Špinača',a:'70 g'},{n:'Olivno olje',a:'6 ml'}]},
-    {f:'Grški jogurt z borovnicami',k:170,i:[{n:'Grški jogurt',a:'170 g'},{n:'Borovnice',a:'70 g'}]},
-    {f:'Piščančja solata z bučnimi semeni',k:480,i:[{n:'Piščančji file',a:'180 g'},{n:'Zelena solata',a:'120 g'},{n:'Kumara',a:'100 g'},{n:'Bučna semena',a:'18 g'},{n:'Olivno olje',a:'15 ml'}]},
-    {f:'Sirni krožnik z zelenjavo',k:190,i:[{n:'Sir',a:'45 g'},{n:'Paprika',a:'100 g'},{n:'Kumara',a:'100 g'}]},
-    {f:'Losos z bučkinimi rezanci',k:470,i:[{n:'Losos',a:'190 g'},{n:'Bučke',a:'250 g'},{n:'Olivno olje',a:'12 ml'},{n:'Limonin sok',a:'1/2 limone'}]}
+	{f:'Jajčna omleta z avokadom in špinačo',k:410,i:[{n:'Jajca',a:'3 kos'},{n:'Avokado',a:'80 g'},{n:'Špinača',a:'70 g'},{n:'Olivno olje',a:'6 ml'}]},
+	{f:'Grški jogurt z borovnicami',k:170,i:[{n:'Grški jogurt',a:'170 g'},{n:'Borovnice',a:'70 g'}]},
+	{f:'Piščančja solata z bučnimi semeni',k:480,i:[{n:'Piščančji file',a:'180 g'},{n:'Zelena solata',a:'120 g'},{n:'Kumara',a:'100 g'},{n:'Bučna semena',a:'18 g'},{n:'Olivno olje',a:'15 ml'}]},
+	{f:'Sirni krožnik z zelenjavo',k:190,i:[{n:'Sir',a:'45 g'},{n:'Paprika',a:'100 g'},{n:'Kumara',a:'100 g'}]},
+	{f:'Losos z bučkinimi rezanci',k:470,i:[{n:'Losos',a:'190 g'},{n:'Bučke',a:'250 g'},{n:'Olivno olje',a:'12 ml'},{n:'Limonin sok',a:'1/2 limone'}]}
   ],
   safe:[
-    {f:'Chia puding s sojinim jogurtom in jagodami',k:330,i:[{n:'Sojin jogurt',a:'180 g'},{n:'Chia semena',a:'25 g'},{n:'Jagode',a:'100 g'},{n:'Javorjev sirup',a:'10 ml'}]},
-    {f:'Banana in riževi krekerji',k:180,i:[{n:'Banana',a:'120 g'},{n:'Riževi krekerji',a:'25 g'}]},
-    {f:'Riževa skleda s tofujem in zelenjavo',k:510,i:[{n:'Tofu',a:'180 g'},{n:'Riž',a:'80 g'},{n:'Zelenjava',a:'220 g'},{n:'Olivno olje',a:'10 ml'}]},
-    {f:'Humus s korenjem in kumaro',k:175,i:[{n:'Humus',a:'60 g'},{n:'Korenje',a:'120 g'},{n:'Kumara',a:'100 g'}]},
-    {f:'Krompirjeva ponev s fižolom in zelenjavo',k:455,i:[{n:'Krompir',a:'240 g'},{n:'Beli fižol',a:'130 g'},{n:'Paprika',a:'120 g'},{n:'Olivno olje',a:'12 ml'}]}
+	{f:'Chia puding s sojinim jogurtom in jagodami',k:330,i:[{n:'Sojin jogurt',a:'180 g'},{n:'Chia semena',a:'25 g'},{n:'Jagode',a:'100 g'},{n:'Javorjev sirup',a:'10 ml'}]},
+	{f:'Banana in riževi krekerji',k:180,i:[{n:'Banana',a:'120 g'},{n:'Riževi krekerji',a:'25 g'}]},
+	{f:'Riževa skleda s tofujem in zelenjavo',k:510,i:[{n:'Tofu',a:'180 g'},{n:'Riž',a:'80 g'},{n:'Zelenjava',a:'220 g'},{n:'Olivno olje',a:'10 ml'}]},
+	{f:'Humus s korenjem in kumaro',k:175,i:[{n:'Humus',a:'60 g'},{n:'Korenje',a:'120 g'},{n:'Kumara',a:'100 g'}]},
+	{f:'Krompirjeva ponev s fižolom in zelenjavo',k:455,i:[{n:'Krompir',a:'240 g'},{n:'Beli fižol',a:'130 g'},{n:'Paprika',a:'120 g'},{n:'Olivno olje',a:'12 ml'}]}
   ]
 };
 function getDiet(){
@@ -1177,8 +1433,8 @@ function applyDietToCurrentMeals(){
   const src=getMealSrc();
   const pinned=getPinned();
   S.meals=src.map((m,i)=>{
-    if(pinned[i])return {label:m.l,...pinned[i],pinned:true};
-    return mealVariant(m,i);
+	if(pinned[i])return {label:m.l,...pinned[i],pinned:true};
+	return mealVariant(m,i);
   });
   S.md=[false,false,false,false,false];
 }
@@ -1226,53 +1482,188 @@ function toggleLF(){
 }
 
 // ─── BODY PART SELECTOR ─────────────────────────────────────
+// ─── SPLIT SYSTEM UI ────────────────────────────────────────
+const WT_LBL={upper:'Zgornji del',lower:'Spodnji del',full:'Celo telo',glute:'Glute day',cardio:'Kardio',crossfit:'CrossFit',rest:'Počitek'};
+const WT_EMOJI={upper:'💪',lower:'🦵',full:'🔥',glute:'🍑',cardio:'🏃‍♀️',crossfit:'⚡',rest:'😌'};
+
+let _customDays=null; // tracks edits while modal is open
+
+function renderNextUp(){
+  const sp=getSplit();
+  const next=nextWorkoutInSplit();
+  const nextNext=sp.days[(sp.position+1)%sp.days.length];
+  const el=document.getElementById('next-up');
+  if(!el)return;
+  // If user picked a different workout manually for today (not matching split), show that
+  const showing=S.wt;
+  const isOnPlan=showing===next;
+  const w=WKT[showing];
+  const exCount=w?.ex?.length||0;
+  el.innerHTML=`
+    <div class="next-up-body">
+      <div class="next-up-lbl">${isOnPlan?'Tvoj naslednji trening':'Trening (ročno izbran)'}</div>
+      <div class="next-up-name">${WT_EMOJI[showing]||'◆'} ${WT_LBL[showing]||showing}</div>
+      <div class="next-up-meta">${exCount?exCount+' vaj':''} ${isOnPlan?' · nato: '+(WT_LBL[nextNext]||nextNext):''}</div>
+    </div>
+    ${isOnPlan?`<button class="next-up-skip" onclick="markWorkoutDone()" title="Označi kot opravljeno in pojdi na naslednjo">✓ končano</button>`:`<button class="next-up-skip" onclick="resetToPlan()" title="Vrni na plan">↺ na plan</button>`}
+  `;
+}
+
+function markWorkoutDone(){
+  if(!confirm('Označi kot opravljeno in pojdi na naslednji trening v planu?'))return;
+  advanceSplit();
+  const next=nextWorkoutInSplit();
+  S.wt=next;initWorkout();save();
+  renderBp();renderWorkout();renderNextUp();renderTracker();
+}
+
+function resetToPlan(){
+  S.wt=nextWorkoutInSplit();initWorkout();save();
+  renderBp();renderWorkout();renderNextUp();renderTracker();
+}
+
+function togBpManual(){
+  const sel=document.getElementById('bpsel');
+  const tog=document.querySelector('.bp-toggle-btn');
+  if(sel.style.display==='none'){
+    sel.style.display='flex';
+    tog.textContent='Skrij ▴';
+  }else{
+    sel.style.display='none';
+    tog.textContent='Druga vadba ▾';
+  }
+}
+
+function openSplitPicker(){
+  document.getElementById('split-overlay').classList.remove('hide');
+  _customDays=null;
+  renderSplitOptions();
+}
+function closeSplitPicker(){
+  document.getElementById('split-overlay').classList.add('hide');
+  _customDays=null;
+  document.getElementById('custom-split-edit').style.display='none';
+}
+
+function renderSplitOptions(){
+  const sp=getSplit();
+  const c=document.getElementById('split-options');
+  c.innerHTML=Object.entries(SPLITS).map(([id,split])=>{
+    const isActive=sp.id===id;
+    const days=(id==='custom'&&_customDays?_customDays:split.days).map(d=>WT_LBL[d]||d);
+    return `<button class="split-opt${isActive?' active':''}" onclick="pickSplit('${id}')">
+      <div class="split-opt-name">${split.name}</div>
+      <div class="split-opt-desc">${split.desc}</div>
+      <div class="split-opt-days">${days.map(d=>`<span>${d}</span>`).join('')}</div>
+    </button>`;
+  }).join('');
+  // Show custom editor if custom selected
+  document.getElementById('custom-split-edit').style.display=sp.id==='custom'||_customDays?'block':'none';
+  if(_customDays)renderCustomDays();
+}
+
+function pickSplit(id){
+  const sp=getSplit();
+  const wasActive=sp.id===id;
+  sp.id=id;
+  if(id==='custom'){
+    if(!_customDays)_customDays=sp.days&&sp.id==='custom'?[...sp.days]:[...SPLITS.custom.days];
+    document.getElementById('custom-split-edit').style.display='block';
+    renderCustomDays();
+  }else{
+    _customDays=null;
+    sp.days=[...SPLITS[id].days];
+    sp.position=0;
+    document.getElementById('custom-split-edit').style.display='none';
+  }
+  saveSplit(sp);
+  renderSplitOptions();
+}
+
+function renderCustomDays(){
+  const c=document.getElementById('custom-days-list');
+  if(!c||!_customDays)return;
+  c.innerHTML=_customDays.map((d,i)=>`
+    <div class="custom-day-row">
+      <span class="cdr-num">${i+1}.</span>
+      <span class="cdr-name">${WT_EMOJI[d]||''} ${WT_LBL[d]||d}</span>
+      <button class="cdr-x" onclick="removeCustomDay(${i})">✕</button>
+    </div>`).join('');
+}
+
+function addCustomDay(type){
+  if(!_customDays)_customDays=[];
+  _customDays.push(type);
+  renderCustomDays();
+}
+function removeCustomDay(i){
+  if(!_customDays)return;
+  _customDays.splice(i,1);
+  renderCustomDays();
+}
+
+function saveSplitChoice(){
+  const sp=getSplit();
+  if(sp.id==='custom'&&_customDays&&_customDays.length>0){
+    sp.days=[..._customDays];
+    sp.position=0;
+    saveSplit(sp);
+  }
+  // Switch to first workout in new plan
+  S.wt=nextWorkoutInSplit();
+  initWorkout();save();
+  closeSplitPicker();
+  renderBp();renderWorkout();renderNextUp();renderTracker();
+}
+
+// ─── BP RENDER ──────────────────────────────────────────────
 function renderBp(){
   document.getElementById('bpsel').innerHTML=BP.map(b=>{
-    const active=S.wt===b.id;
-    const w=WKT[b.id];
-    let cls='bpb';
-    if(active){if(b.id==='cardio')cls+=' ac';else if(b.id==='rest')cls+=' ar';else if(b.id==='glute')cls+=' ap';else if(b.id==='crossfit')cls+=' acf';else cls+=' ag';}
-    return `<button class="${cls}" onclick="selBp('${b.id}')">${b.l}</button>`;
+	const active=S.wt===b.id;
+	const w=WKT[b.id];
+	let cls='bpb';
+	if(active){if(b.id==='cardio')cls+=' ac';else if(b.id==='rest')cls+=' ar';else if(b.id==='glute')cls+=' ap';else if(b.id==='crossfit')cls+=' acf';else cls+=' ag';}
+	return `<button class="${cls}" onclick="selBp('${b.id}')">${b.l}</button>`;
   }).join('');
 }
-function selBp(id){S.wt=id;initWorkout();save();renderBp();renderWorkout();renderTracker();}
+function selBp(id){S.wt=id;initWorkout();save();renderBp();renderWorkout();renderNextUp();renderTracker();}
 
 // ─── RENDER MEALS ───────────────────────────────────────────
 function renderMeals(){
   const pinned=getPinned();
   document.getElementById('mc').innerHTML=S.meals.map((m,i)=>{
-    const ingH=m.i?m.i.map(x=>`<div class="in">${x.n}</div><div class="ia">${x.a}</div>`).join(''):'';
-    const done=S.md[i];const open=S.exp[i];const editOpen=S.editOpen&&S.editOpen[i];
-    const easyMark=S.easy&&!m.pinned?`<span class="easy-badge">hitro</span>`:'';
-    const custom=m.custom?`<span style="font-size:11px;color:var(--red);margin-left:4px;">ročni vnos</span>`:'';
-    const isPinned=!!m.pinned||!!pinned[i];
-    const pinnedBadge=isPinned?`<span class="pinned-badge">📌 privzeto</span>`:'';
-    return `<div class="meal-card fi${done?' done':''}" id="mc${i}">
-      <div class="meal-top" onclick="if(!event.target.closest('.meal-actions'))togIng(${i})">
-        <div class="mdot"></div>
-        <div class="mbody">
-          <div class="mlbl">${m.label}${easyMark}${custom}${pinnedBadge}</div>
-          <div class="mfood" id="mfood${i}">${m.f||m.food}</div>
-          <div class="mkcal" id="mkcal${i}">~${m.k||m.kcal} kcal</div>
-        </div>
-        <div class="meal-actions">
-          <button class="pin-btn${isPinned?' pinned':''}" onclick="togPin(${i})" title="${isPinned?'Odstrani privzeto':'Nastavi kot privzeto vsak dan'}">📌</button>
-          <button class="del-btn" onclick="deleteMeal(${i})" title="Izbriši obrok">✕</button>
-          <button class="ebtn${editOpen?' open':''}" id="eb${i}" onclick="togEdit(${i})" title="Uredi vsebino">✏</button>
-          <button class="ibtn${open?' open':''}" id="ib${i}" onclick="togIng(${i})">${open?'skrij':'sestavine'}</button>
-          <button class="sbtn" onclick="swapMeal(${i})">↺</button>
-          <button class="chk${done?' on':''}" id="chk${i}" onclick="togMeal(${i})" title="Zaužito">${done?'✓':'○'}</button>
-        </div>
-      </div>
-      <div class="edit-panel${editOpen?' open':''}" id="editp${i}">
-        <input class="edit-input" id="ei${i}" placeholder="Zamenjaj z... (npr. 'skyr z borovnicami', '30g whey + mleko')..." onkeydown="if(event.key==='Enter')submitCustom(${i})">
-        <button class="edit-go" id="ego${i}" onclick="submitCustom(${i})">Izračunaj →</button>
-      </div>
-      <div class="ing-panel${open?' open':''}" id="ip${i}">
-        <div class="ing-title">Sestavine</div>
-        <div class="ing-grid">${ingH}</div>
-      </div>
-    </div>`;
+	const ingH=m.i?m.i.map(x=>`<div class="in">${x.n}</div><div class="ia">${x.a}</div>`).join(''):'';
+	const done=S.md[i];const open=S.exp[i];const editOpen=S.editOpen&&S.editOpen[i];
+	const easyMark=S.easy&&!m.pinned?`<span class="easy-badge">hitro</span>`:'';
+	const custom=m.custom?`<span style="font-size:11px;color:var(--red);margin-left:4px;">ročni vnos</span>`:'';
+	const isPinned=!!m.pinned||!!pinned[i];
+	const pinnedBadge=isPinned?`<span class="pinned-badge">📌 privzeto</span>`:'';
+	return `<div class="meal-card fi${done?' done':''}" id="mc${i}">
+	  <div class="meal-top" onclick="if(!event.target.closest('.meal-actions'))togIng(${i})">
+		<div class="mdot"></div>
+		<div class="mbody">
+		  <div class="mlbl">${m.label}${easyMark}${custom}${pinnedBadge}</div>
+		  <div class="mfood" id="mfood${i}">${m.f||m.food}</div>
+		  <div class="mkcal" id="mkcal${i}">~${m.k||m.kcal} kcal</div>
+		</div>
+		<div class="meal-actions">
+		  <button class="pin-btn${isPinned?' pinned':''}" onclick="togPin(${i})" title="${isPinned?'Odstrani privzeto':'Nastavi kot privzeto vsak dan'}">📌</button>
+		  <button class="del-btn" onclick="deleteMeal(${i})" title="Izbriši obrok">✕</button>
+		  <button class="ebtn${editOpen?' open':''}" id="eb${i}" onclick="togEdit(${i})" title="Uredi vsebino">✏</button>
+		  <button class="ibtn${open?' open':''}" id="ib${i}" onclick="togIng(${i})">${open?'skrij':'sestavine'}</button>
+		  <button class="sbtn" onclick="swapMeal(${i})">↺</button>
+		  <button class="chk${done?' on':''}" id="chk${i}" onclick="togMeal(${i})" title="Zaužito">${done?'✓':'○'}</button>
+		</div>
+	  </div>
+	  <div class="edit-panel${editOpen?' open':''}" id="editp${i}">
+		<input class="edit-input" id="ei${i}" placeholder="Zamenjaj z... (npr. 'skyr z borovnicami', '30g whey + mleko')..." onkeydown="if(event.key==='Enter')submitCustom(${i})">
+		<button class="edit-go" id="ego${i}" onclick="submitCustom(${i})">Izračunaj →</button>
+	  </div>
+	  <div class="ing-panel${open?' open':''}" id="ip${i}">
+		<div class="ing-title">Sestavine</div>
+		<div class="ing-grid">${ingH}</div>
+	  </div>
+	</div>`;
   }).join('');
   calcKcal();
 }
@@ -1329,15 +1720,15 @@ function togStepsEdit(){
   const isEditing=inp.classList.toggle('show');
   const valEl=document.getElementById('st-val');
   if(isEditing){
-    // Show input prefilled with current val, hide display
-    inp.value=ST.val||'';
-    valEl.style.display='none';
-    btn.textContent='✓ shrani';
-    setTimeout(()=>inp.focus(),50);
+	// Show input prefilled with current val, hide display
+	inp.value=ST.val||'';
+	valEl.style.display='none';
+	btn.textContent='✓ shrani';
+	setTimeout(()=>inp.focus(),50);
   } else {
-    valEl.style.display='';
-    btn.textContent='✏ vnesi';
-    saveSteps();
+	valEl.style.display='';
+	btn.textContent='✏ vnesi';
+	saveSteps();
   }
 }
 
@@ -1358,11 +1749,11 @@ function saveSteps(){
 function togStepsDone(){
   // Toggle: if not done, mark as done at goal; if done, reset
   if(ST.done||ST.val>=ST.goal){
-    ST.done=false;
-    if(ST.val>=ST.goal)ST.val=0;
+	ST.done=false;
+	if(ST.val>=ST.goal)ST.val=0;
   } else {
-    ST.done=true;
-    if(ST.val===0)ST.val=ST.goal;
+	ST.done=true;
+	if(ST.val===0)ST.val=ST.goal;
   }
   saveStepsState();renderSteps();calcKcal();
 }
@@ -1377,26 +1768,26 @@ loadSteps();
 
 function calcExBurn(){
   if(S.wt==='cardio'){
-    return S.ex.reduce((sum,ex,i)=>{
-      if(!S.exd[i])return sum;
-      return sum+(ex.customKcal||ex.kcal||CARDIO_BURN_PER_MIN*parseInt(ex.r)||150);
-    },0);
+	return S.ex.reduce((sum,ex,i)=>{
+	  if(!S.exd[i])return sum;
+	  return sum+(ex.customKcal||ex.kcal||CARDIO_BURN_PER_MIN*parseInt(ex.r)||150);
+	},0);
   }
   if(S.wt==='crossfit'){
-    const wod=S.cfWod||(WKT.crossfit?.wods?.[DOW%7]);
-    if(!wod||!S.exd.length)return 0;
-    const done=S.exd.filter(Boolean).length;
-    const total=wod.ex?.length||1;
-    const timeMin=(wod.time||15);
-    return Math.round((done/total)*timeMin*9); // ~9 kcal/min CrossFit
+	const wod=S.cfWod||(WKT.crossfit?.wods?.[DOW%7]);
+	if(!wod||!S.exd.length)return 0;
+	const done=S.exd.filter(Boolean).length;
+	const total=wod.ex?.length||1;
+	const timeMin=(wod.time||15);
+	return Math.round((done/total)*timeMin*9); // ~9 kcal/min CrossFit
   }
   // Strength training: sum by exercise
   return S.ex.reduce((sum,ex,i)=>{
-    if(!S.exd[i])return sum;
-    const logged=loadElog()[ex.n]||{};
-    const sets=parseInt(logged.s)||parseInt(ex.s)||3;
-    const kcalPerSet=BURN[ex.n]||BURN_DEFAULT;
-    return sum+sets*kcalPerSet;
+	if(!S.exd[i])return sum;
+	const logged=loadElog()[ex.n]||{};
+	const sets=parseInt(logged.s)||parseInt(ex.s)||3;
+	const kcalPerSet=BURN[ex.n]||BURN_DEFAULT;
+	return sum+sets*kcalPerSet;
   },0);
 }
 
@@ -1427,22 +1818,22 @@ function calcKcal(){
   if(goalKcal&&arcGoalEl)arcGoalEl.textContent='cilj: '+goalKcal+' kcal';
 
   if(remaining!==null&&arcRemEl){
-    arcRemEl.textContent=(remaining>=0?remaining:remaining)+' kcal';
-    arcRemEl.className='kcal-arc-remaining'+(remaining<0?' over':'');
-    const pct=Math.min(1,totalEaten/goalKcal);
-    const dashLen=Math.round(pct*ARC_LEN);
-    if(arcFill){
-      arcFill.setAttribute('stroke-dasharray',dashLen+' '+(ARC_LEN-dashLen));
-      arcFill.className='arc-fill'+(remaining<0?' over':'');
-    }
+	arcRemEl.textContent=(remaining>=0?remaining:remaining)+' kcal';
+	arcRemEl.className='kcal-arc-remaining'+(remaining<0?' over':'');
+	const pct=Math.min(1,totalEaten/goalKcal);
+	const dashLen=Math.round(pct*ARC_LEN);
+	if(arcFill){
+	  arcFill.setAttribute('stroke-dasharray',dashLen+' '+(ARC_LEN-dashLen));
+	  arcFill.className='arc-fill'+(remaining<0?' over':'');
+	}
   }else if(arcRemEl){
-    arcRemEl.textContent='—';
-    if(arcFill)arcFill.setAttribute('stroke-dasharray','0 '+ARC_LEN);
+	arcRemEl.textContent='—';
+	if(arcFill)arcFill.setAttribute('stroke-dasharray','0 '+ARC_LEN);
   }
 
   if(totalBurned>0&&arcBurnCol&&arcBurnEl){
-    arcBurnCol.style.display='block';
-    arcBurnEl.textContent='+'+totalBurned;
+	arcBurnCol.style.display='block';
+	arcBurnEl.textContent='+'+totalBurned;
   }else if(arcBurnCol){arcBurnCol.style.display='none';}
 
   // Also keep legacy elements if still present
@@ -1476,17 +1867,17 @@ async function submitCustom(i){
   if(!val.trim())return;
   go.disabled=true;go.textContent='...';
   try{
-    const txt=await api(
-      'Si prehranjevalni svetovalec. Izračunaj kalorije in sestavine z gramaturami za vneseno hrano. Vrni SAMO veljavni JSON: {"f":"opis hrane v slovenščini","k":450,"i":[{"n":"sestavina","a":"100 g"}]}',
-      `Izračunaj kalorije za: "${val}"`
-    );
-    const p=JSON.parse(txt);
-    S.meals[i]={...S.meals[i],f:p.f,k:parseInt(p.k)||S.meals[i].k,i:p.i||S.meals[i].i,custom:true};
-    // If meal was pinned, update the pin too
-    const pinned=getPinned();
-    if(pinned[i]){pinned[i]={f:p.f,k:parseInt(p.k)||0,i:p.i||[]};savePinned(pinned);}
-    if(S.editOpen)S.editOpen[i]=false;
-    save();renderMeals();
+	const txt=await api(
+	  'Si prehranjevalni svetovalec. Izračunaj kalorije in sestavine z gramaturami za vneseno hrano. Vrni SAMO veljavni JSON: {"f":"opis hrane v slovenščini","k":450,"i":[{"n":"sestavina","a":"100 g"}]}',
+	  `Izračunaj kalorije za: "${val}"`
+	);
+	const p=JSON.parse(txt);
+	S.meals[i]={...S.meals[i],f:p.f,k:parseInt(p.k)||S.meals[i].k,i:p.i||S.meals[i].i,custom:true};
+	// If meal was pinned, update the pin too
+	const pinned=getPinned();
+	if(pinned[i]){pinned[i]={f:p.f,k:parseInt(p.k)||0,i:p.i||[]};savePinned(pinned);}
+	if(S.editOpen)S.editOpen[i]=false;
+	save();renderMeals();
   }catch(e){err('Izračun ni uspel. Poskusi znova.');}
   if(go){go.disabled=false;go.textContent='Izračunaj →';}
 }
@@ -1500,12 +1891,12 @@ function togPin(i){
   const pinned=getPinned();
   const m=S.meals[i];
   if(pinned[i]){
-    delete pinned[i];
-    S.meals[i]={...S.meals[i],pinned:false};
+	delete pinned[i];
+	S.meals[i]={...S.meals[i],pinned:false};
   }else{
-    // Save current meal (food + kcal + ingredients) as pinned for this slot
-    pinned[i]={f:m.f||m.food,k:m.k||m.kcal,i:m.i||[]};
-    S.meals[i]={...S.meals[i],pinned:true};
+	// Save current meal (food + kcal + ingredients) as pinned for this slot
+	pinned[i]={f:m.f||m.food,k:m.k||m.kcal,i:m.i||[]};
+	S.meals[i]={...S.meals[i],pinned:true};
   }
   savePinned(pinned);save();renderMeals();
 }
@@ -1523,162 +1914,207 @@ function deleteMeal(i){
 // ─── RENDER WORKOUT ─────────────────────────────────────────
 function renderWorkout(){
   const c=document.getElementById('wc'),baw=document.getElementById('baw'),w=WKT[S.wt];
+  // Defensive helper — set disabled/innerHTML safely
+  const setBaw=(disabled,html)=>{
+	if(!baw)return;
+	baw.disabled=disabled;
+	if(html!==undefined)baw.innerHTML=html;
+  };
 
   // ── CrossFit WOD ──
   if(S.wt==='crossfit'){
-    baw.disabled=false;baw.innerHTML='↺ Nov WOD';document.getElementById('add-ex-row').style.display='none';
-    const wods=w.wods;
-    // Use stored custom WOD if available, else default for today
-    if(!S.cfWod) S.cfWod={...wods[DOW%wods.length]};
-    const wod=S.cfWod;
-    const typeClass=wod.type==='AMRAP'?'amrap':wod.type==='EMOM'?'emom':'';
-    const timeLabel=wod.type==='AMRAP'?`${wod.time} min`:wod.type==='EMOM'?`${wod.time} min`:wod.rounds?`${wod.rounds} krogov`:'';
-    const savedResult=localStorage.getItem(lsKey('wodlog_'+now.toISOString().split('T')[0]))||'';
-    const exRows=wod.ex.map((e,i)=>{
-      const info=getExInfo(e.n)||{};
-      const descHtml=info.desc?`<div class="wod-desc-panel" id="wdp${i}"><div class="ex-desc" style="margin-bottom:6px;">${info.desc}</div><div class="ex-tip">💡 ${info.tip}</div><a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent((info.yt||e.n))}" target="_blank">▶ Video</a></div>`:'';
-      return `<div id="wex${i}">
-        <div class="wod-ex">
-          <div class="wod-ex-n">${e.n}</div>
-          <div class="wod-ex-r">${e.r}</div>
-          ${info.desc?`<button class="wod-ex-info" onclick="togWodDesc(${i})">info</button>`:''}
-          <button class="sbtn" onclick="swapCfEx(${i})" title="Zamenjaj vajo" style="margin-left:4px;">↺</button>
-        </div>
-        ${descHtml}
-      </div>`;
-    }).join('');
-    c.innerHTML=`<div class="badge cf">⚡ CrossFit WOD — Teden ${WEEK_NUM}</div>
-    <div class="wod-card" id="wod-card">
-      <div class="wod-head">
-        <span class="wod-type ${typeClass}">${wod.type}</span>
-        <span class="wod-title">${wod.name}</span>
-        <span class="wod-time">${timeLabel}</span>
-      </div>
-      <div class="wod-note">${wod.note}</div>
-      <div class="wod-exes">${exRows}</div>
-      <div class="wod-log">
-        <span class="wod-log-lbl">${wod.type==='AMRAP'?'Krogi':'Čas'}</span>
-        <input class="wod-result" id="wod-res" placeholder="${wod.type==='AMRAP'?'npr. 8 krogov':'npr. 12:34'}" value="${savedResult}">
-        <button class="log-save" onclick="saveWodResult()">Shrani</button>
-        <span class="log-ok" id="wod-ok"></span>
-      </div>
-    </div>
-    <div style="margin-top:8px;font-size:12px;color:var(--lt);">Klikni ↺ pri posamezni vaji za zamenjavo, ali "Nov WOD" za cel nov trening.</div>`;
-    return;
+	setBaw(false,'↺ Nov WOD');document.getElementById('add-ex-row').style.display='none';
+	const wods=w.wods;
+	// Use stored custom WOD if available, else default for today
+	if(!S.cfWod) S.cfWod={...wods[DOW%wods.length]};
+	const wod=S.cfWod;
+	const typeClass=wod.type==='AMRAP'?'amrap':wod.type==='EMOM'?'emom':'';
+	const timeLabel=wod.type==='AMRAP'?`${wod.time} min`:wod.type==='EMOM'?`${wod.time} min`:wod.rounds?`${wod.rounds} krogov`:'';
+	const savedResult=localStorage.getItem(lsKey('wodlog_'+now.toISOString().split('T')[0]))||'';
+	const exRows=wod.ex.map((e,i)=>{
+	  const info=getExInfo(e.n)||{};
+	  const descHtml=info.desc?`<div class="wod-desc-panel" id="wdp${i}"><div class="ex-desc" style="margin-bottom:6px;">${info.desc}</div><div class="ex-tip">💡 ${info.tip}</div><a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent((info.yt||e.n))}" target="_blank">▶ Video</a></div>`:'';
+	  return `<div id="wex${i}">
+		<div class="wod-ex">
+		  <div class="wod-ex-n">${e.n}</div>
+		  <div class="wod-ex-r">${e.r}</div>
+		  ${info.desc?`<button class="wod-ex-info" onclick="togWodDesc(${i})">info</button>`:''}
+		  <button class="sbtn" onclick="swapCfEx(${i})" title="Zamenjaj vajo" style="margin-left:4px;">↺</button>
+		</div>
+		${descHtml}
+	  </div>`;
+	}).join('');
+	c.innerHTML=`<div class="badge cf">⚡ CrossFit WOD — Teden ${WEEK_NUM}</div>
+	<div class="wod-card" id="wod-card">
+	  <div class="wod-head">
+		<span class="wod-type ${typeClass}">${wod.type}</span>
+		<span class="wod-title">${wod.name}</span>
+		<span class="wod-time">${timeLabel}</span>
+	  </div>
+	  <div class="wod-note">${wod.note}</div>
+	  <div class="wod-exes">${exRows}</div>
+	  <div class="wod-log">
+		<span class="wod-log-lbl">${wod.type==='AMRAP'?'Krogi':'Čas'}</span>
+		<input class="wod-result" id="wod-res" placeholder="${wod.type==='AMRAP'?'npr. 8 krogov':'npr. 12:34'}" value="${savedResult}">
+		<button class="log-save" onclick="saveWodResult()">Shrani</button>
+		<span class="log-ok" id="wod-ok"></span>
+	  </div>
+	</div>
+	<div style="margin-top:8px;font-size:12px;color:var(--lt);">Klikni ↺ pri posamezni vaji za zamenjavo, ali "Nov WOD" za cel nov trening.</div>`;
+	return;
   }
   if(S.wt==='cardio'){
-    baw.disabled=false;document.getElementById('add-ex-row').style.display='none';
-    c.innerHTML=`<div class="badge cardio">◈ Kardio dan</div>
-      <div style="font-size:12px;color:var(--lt);margin-bottom:10px;">Izberi kaj boš naredila, nastavi čas in odkljukaj ob koncu.</div>`+
-      S.ex.map((e,i)=>{
-        const done=S.exd[i];const open=!!exExp[i];
-        const info=getExInfo(e.n)||{};
-        // Parse duration in minutes from e.r (supports "30 min", "45 min", etc.)
-        const parsedMin=parseInt(e.r)||30;
-        const kcalEst=e.customKcal||Math.round((e.kcal||0)*(parsedMin/(parseInt(e.origR||e.r)||30)))||CARDIO_BURN_PER_MIN*parsedMin||150;
-        const descHtml=info.desc?`
-          <div class="ex-desc">${info.desc}</div>
-          <div class="ex-tip">💡 ${info.tip}</div>
-          <a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent((info.yt||e.n))}" target="_blank">▶ Video navodila</a>
-        `:`<div class="no-desc"></div>`;
-        return `<div class="ex-wrap" id="ew${i}">
-          <div class="ex-top${done?' done':''}" id="et${i}">
-            <div class="edot" style="background:#1E4E8C"></div>
-            <div class="ename">${e.n}</div>
-            <button class="ep cardio-time" onclick="togCardioTime(${i})" style="background:#EAF0F9;color:#1E4E8C;border:none;cursor:pointer;padding:3px 8px;border-radius:5px;font-size:12px;font-family:inherit;">${parsedMin} min</button>
-            <button class="sbtn" onclick="swapEx(${i})">↺</button>
-            <button class="chk${done?' on':''}" id="echk${i}" onclick="togEx(${i})">${done?'✓':'○'}</button>
-            <button class="ex-xbtn${open?' open':''}" id="exb${i}" onclick="togExInfo(${i})">▾</button>
-          </div>
-          <div class="cardio-time-edit" id="cte${i}" style="display:none;padding:10px 14px;background:#FDFCF9;border-top:.5px solid var(--br);">
-            <div style="font-size:12px;color:var(--md);margin-bottom:6px;">Koliko minut si (boš) naredila?</div>
-            <div style="display:flex;gap:6px;align-items:center;">
-              <input type="number" id="cti${i}" value="${parsedMin}" min="5" max="300" step="5" style="border:.5px solid var(--br);border-radius:8px;padding:7px 10px;font-size:14px;font-family:inherit;background:var(--w);width:80px;text-align:center;outline:none;">
-              <span style="font-size:13px;color:var(--md);">min</span>
-              <button class="add-meal-btn" style="padding:7px 12px;font-size:13px;" onclick="saveCardioTime(${i})">Shrani</button>
-              <span style="font-size:12px;color:var(--grn);margin-left:auto;">🔥 ~<span id="cte-kcal${i}">${kcalEst}</span> kcal</span>
-            </div>
-          </div>
-          <div class="ex-detail${open?' open':''}" id="exd${i}">
-            ${descHtml}
-            <div style="font-size:12px;color:var(--grn);background:#EBF4EF;padding:5px 10px;border-radius:7px;margin-top:4px;">🔥 Pri ${parsedMin} min: ~${kcalEst} kcal</div>
-          </div>
-        </div>`;
-      }).join('');
-    return;
+	setBaw(false);document.getElementById('add-ex-row').style.display='none';
+	c.innerHTML=`<div class="badge cardio">◈ Kardio dan</div>
+	  <div style="font-size:12px;color:var(--lt);margin-bottom:10px;">Izberi kaj boš naredila, nastavi čas in odkljukaj ob koncu.</div>`+
+	  S.ex.map((e,i)=>{
+		const done=S.exd[i];const open=!!exExp[i];
+		const info=getExInfo(e.n)||{};
+		// Parse duration in minutes from e.r (supports "30 min", "45 min", etc.)
+		const parsedMin=parseInt(e.r)||30;
+		const kcalEst=e.customKcal||Math.round((e.kcal||0)*(parsedMin/(parseInt(e.origR||e.r)||30)))||CARDIO_BURN_PER_MIN*parsedMin||150;
+		const descHtml=info.desc?`
+		  <div class="ex-desc">${info.desc}</div>
+		  <div class="ex-tip">💡 ${info.tip}</div>
+		  <a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent((info.yt||e.n))}" target="_blank">▶ Video navodila</a>
+		`:`<div class="no-desc"></div>`;
+		return `<div class="ex-wrap" id="ew${i}">
+		  <div class="ex-top${done?' done':''}" id="et${i}">
+			<div class="edot" style="background:#1E4E8C"></div>
+			<div class="ename">${e.n}</div>
+			<button class="ep cardio-time" onclick="togCardioTime(${i})" style="background:#EAF0F9;color:#1E4E8C;border:none;cursor:pointer;padding:3px 8px;border-radius:5px;font-size:12px;font-family:inherit;">${parsedMin} min</button>
+			<button class="sbtn" onclick="swapEx(${i})">↺</button>
+			<button class="chk${done?' on':''}" id="echk${i}" onclick="togEx(${i})">${done?'✓':'○'}</button>
+			<button class="ex-xbtn${open?' open':''}" id="exb${i}" onclick="togExInfo(${i})">▾</button>
+		  </div>
+		  <div class="cardio-time-edit" id="cte${i}" style="display:none;padding:10px 14px;background:#FDFCF9;border-top:.5px solid var(--br);">
+			<div style="font-size:12px;color:var(--md);margin-bottom:6px;">Koliko minut si (boš) naredila?</div>
+			<div style="display:flex;gap:6px;align-items:center;">
+			  <input type="number" id="cti${i}" value="${parsedMin}" min="5" max="300" step="5" style="border:.5px solid var(--br);border-radius:8px;padding:7px 10px;font-size:14px;font-family:inherit;background:var(--w);width:80px;text-align:center;outline:none;">
+			  <span style="font-size:13px;color:var(--md);">min</span>
+			  <button class="add-meal-btn" style="padding:7px 12px;font-size:13px;" onclick="saveCardioTime(${i})">Shrani</button>
+			  <span style="font-size:12px;color:var(--grn);margin-left:auto;">🔥 ~<span id="cte-kcal${i}">${kcalEst}</span> kcal</span>
+			</div>
+		  </div>
+		  <div class="ex-detail${open?' open':''}" id="exd${i}">
+			${descHtml}
+			<div style="font-size:12px;color:var(--grn);background:#EBF4EF;padding:5px 10px;border-radius:7px;margin-top:4px;">🔥 Pri ${parsedMin} min: ~${kcalEst} kcal</div>
+		  </div>
+		</div>`;
+	  }).join('');
+	return;
   }
-  else if(S.wt==='rest'){baw.disabled=true;c.innerHTML=`<div class="badge rest">○ Počitek</div><div class="info-box">Danes je dan počitka. Telo se regenerira in mišice rastejo.<br><br>Lahka hoja ali raztezanje sta vedno dobrodošla.</div>`;document.getElementById('add-ex-row').style.display='none';}
+  else if(S.wt==='rest'){setBaw(true);c.innerHTML=`<div class="badge rest">○ Počitek</div><div class="info-box">Danes je dan počitka. Telo se regenerira in mišice rastejo.<br><br>Lahka hoja ali raztezanje sta vedno dobrodošla.</div>`;document.getElementById('add-ex-row').style.display='none';}
   else{
-    baw.disabled=false;document.getElementById('add-ex-row').style.display='flex';
-    const bc=S.wt==='glute'?'glute':'gym';
-    const wp=getWeekPlan(WEEK_NUM);
-    const elog=loadElog();
-    c.innerHTML=`<div class="badge ${bc}">${S.wt==='glute'?'◉':S.wt==='full'?'◈':'◆'} ${w.title} <span style="font-size:11px;opacity:.7;margin-left:4px;">Teden ${WEEK_NUM}</span></div>`+
-      S.ex.map((e,i)=>{
-        const done=S.exd[i];const pk=S.wt==='glute';const open=!!exExp[i];
-        const info=getExInfo(e.n)||{};const logged=elog[e.n]||{};
-        const startKg=info.kg||0;
-        // Week target for this exercise
-        const targetS=wp.s,targetR=wp.r;
-        const ingHtml=info.desc?`
-          <div class="ex-desc">${info.desc}</div>
-          <div class="ex-tip">💡 ${info.tip||''}</div>
-          <a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent((info.yt||e.n)+' tutorial')}" target="_blank">▶ Poglej video navodila</a>
-          <div class="week-plan">
-            <div class="wp-head">
-              <span class="wp-week">Teden ${WEEK_NUM} — cilj danes</span>
-              <span class="wp-target">${targetS} serije × ${targetR} ponovitev${startKg>0?' · '+startKg+' kg start':''}</span>
-            </div>
-            <div class="wp-note">${wp.note}</div>
-          </div>
-          <div class="log-sec">
-            <div class="log-title">Danes sem naredila</div>
-            <div class="log-row">
-              <span class="log-lbl">Teža</span>
-              <input class="log-inp w" id="lkg${i}" type="number" min="0" step="0.5" placeholder="${startKg||'—'}" value="${logged.kg||''}"> <span class="log-lbl">kg</span>
-              <span class="log-lbl" style="margin-left:4px;">Serije</span>
-              <input class="log-inp n" id="ls${i}" type="number" min="0" max="10" placeholder="${targetS}" value="${logged.s||''}">
-              <span class="log-lbl">×</span>
-              <input class="log-inp n" id="lr${i}" type="number" min="0" max="50" placeholder="${targetR.split('-')[0]}" value="${logged.r||''}">
-              <span class="log-lbl">pon.</span>
-              <button class="log-save" onclick="logEx(${i},'${e.n.replace(/'/g,'&#39;')}')">Shrani</button>
-              <span class="log-ok" id="lok${i}">${logged.kg?'✓ shranjeno':''}</span>
-            </div>
-          </div>`:`
-          <div class="no-desc" style="margin-bottom:9px;"></div>
-          <div class="week-plan">
-            <div class="wp-head">
-              <span class="wp-week">Teden ${WEEK_NUM} — cilj danes</span>
-              <span class="wp-target">${targetS} serije × ${targetR} ponovitev</span>
-            </div>
-            <div class="wp-note">${wp.note}</div>
-          </div>
-          <div class="log-sec">
-            <div class="log-title">Danes sem naredila</div>
-            <div class="log-row">
-              <span class="log-lbl">Teža</span>
-              <input class="log-inp w" id="lkg${i}" type="number" min="0" step="0.5" placeholder="kg" value="${logged.kg||''}"> <span class="log-lbl">kg</span>
-              <span class="log-lbl" style="margin-left:4px;">Serije</span>
-              <input class="log-inp n" id="ls${i}" type="number" min="0" max="10" placeholder="${targetS}" value="${logged.s||''}">
-              <span class="log-lbl">×</span>
-              <input class="log-inp n" id="lr${i}" type="number" min="0" max="50" placeholder="${targetR.split('-')[0]}" value="${logged.r||''}">
-              <span class="log-lbl">pon.</span>
-              <button class="log-save" onclick="logEx(${i},'${e.n.replace(/'/g,'&#39;')}')">Shrani</button>
-              <span class="log-ok" id="lok${i}">${logged.kg?'✓ shranjeno':''}</span>
-            </div>
-          </div>`;
-        return `<div class="ex-wrap" id="ew${i}">
-          <div class="ex-top${done?' done':''}" id="et${i}">
-            <div class="edot"></div>
-            <div class="ename">${e.n}${e.custom?` <span style="font-size:11px;color:var(--red);">ročno</span>`:''}${logged.kg?` <span style="font-size:11px;color:var(--grn);">${logged.s||'?'}×${logged.r||'?'} · ${logged.kg}kg</span>`:''}</div>
-            <div class="epills"><span class="ep${pk?' pk':''}">${targetS}×</span><span class="ep${pk?' pk':''}">${targetR}</span></div>
-            <button class="sbtn" onclick="swapEx(${i})">↺</button>
-            <button class="chk${done?' on':''}" id="echk${i}" onclick="togEx(${i})">${done?'✓':'○'}</button>
-            <button class="ex-xbtn${open?' open':''}" id="exb${i}" onclick="togExInfo(${i})" title="Navodila in log">▾</button>
-          </div>
-          <div class="ex-detail${open?' open':''}" id="exd${i}">${ingHtml}</div>
-        </div>`;
-      }).join('');
+	setBaw(false,'↺ Zamenjaj vaje');document.getElementById('add-ex-row').style.display='flex';
+	const bc=S.wt==='glute'?'glute':'gym';
+	const elog=loadElog();
+	// Workout summary stats
+	const totalSets=S.ex.reduce((sum,e)=>{
+	  const [rl,rh]=getRepRange(e.n,S.wt);
+	  const sg=suggestProgression(e.n,rl,rh,(getExInfo(e.n)||{}).kg||0);
+	  return sum+sg.sets;
+	},0);
+	const estMin=Math.round(totalSets*2.5);  // ~2.5 min per set incl. rest
+	c.innerHTML=`<div class="badge ${bc}">${S.wt==='glute'?'◉':S.wt==='full'?'◈':'◆'} ${w.title}</div>
+	<div class="workout-summary">
+	  <button class="ws-overview-btn" onclick="togWorkoutPreview()">📋 Hitri pregled vaj <span id="ws-arrow">▾</span></button>
+	  <div class="ws-stats">
+		<span class="ws-stat"><b>${S.ex.length}</b> vaj</span>
+		<span class="ws-stat"><b>${totalSets}</b> serij</span>
+		<span class="ws-stat">~<b>${estMin}</b> min</span>
+	  </div>
+	</div>
+	<div class="workout-preview" id="workout-preview">
+	  ${S.ex.map((e,i)=>{
+		const [rl,rh]=getRepRange(e.n,S.wt);
+		const sg=suggestProgression(e.n,rl,rh,(getExInfo(e.n)||{}).kg||0);
+		return `<div class="wp-row">
+		  <span class="wp-num">${i+1}.</span>
+		  <span class="wp-name">${e.n}</span>
+		  <span class="wp-target-mini">${sg.sets}×${sg.reps} · ${sg.kg||'—'}kg</span>
+		</div>`;
+	  }).join('')}
+	</div>`+
+	  S.ex.map((e,i)=>{
+		const done=S.exd[i];const pk=S.wt==='glute';const open=!!exExp[i];
+		const info=getExInfo(e.n)||{};const logged=elog[e.n]||{};
+		const startKg=info.kg||0;
+		// Double progression suggestion
+		const [repLow,repHigh]=getRepRange(e.n,S.wt);
+		const sugg=suggestProgression(e.n,repLow,repHigh,startKg);
+		const hist=getExerciseHistory(e.n);
+		const targetS=String(sugg.sets);const targetR=repLow+'-'+repHigh;
+		// History display (last 3 sessions)
+		const histHtml=hist.length>0?`
+		  <div class="ex-hist">
+			<div class="ex-hist-title">Zgodovina</div>
+			${hist.slice(0,3).map(h=>`<div class="ex-hist-row"><span class="ex-hist-date">${h.daysAgo===0?'danes':h.daysAgo+'d nazaj'}</span><span class="ex-hist-val">${h.kg||'—'}kg × ${h.s||'?'} × ${h.r||'?'}</span></div>`).join('')}
+		  </div>`:'';
+		// Progression hint badge
+		const sugClassMap={first:'first',deload:'deload',consolidate:'hold',rep_push:'push',increase:'inc'};
+		const sugClass=sugClassMap[sugg.type]||'';
+		const ingHtml=info.desc?`
+		  <div class="ex-desc">${info.desc}</div>
+		  <div class="ex-tip">💡 ${info.tip||''}</div>
+		  <a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent((info.yt||e.n)+' tutorial')}" target="_blank">▶ Poglej video navodila</a>
+		  <div class="prog-card prog-${sugClass}">
+			<div class="prog-head">
+			  <span class="prog-lbl">Cilj danes</span>
+			  <span class="prog-target">${sugg.sets} × ${sugg.reps} pon. · <b>${sugg.kg||'—'} kg</b></span>
+			</div>
+			<div class="prog-note">${sugg.note}</div>
+		  </div>
+		  ${histHtml}
+		  <div class="log-sec">
+			<div class="log-title">Danes sem naredila</div>
+			<div class="log-row">
+			  <span class="log-lbl">Teža</span>
+			  <input class="log-inp w" id="lkg${i}" type="number" min="0" step="0.5" placeholder="${sugg.kg||'kg'}" value="${logged.kg||''}"> <span class="log-lbl">kg</span>
+			  <span class="log-lbl" style="margin-left:4px;">Serije</span>
+			  <input class="log-inp n" id="ls${i}" type="number" min="0" max="10" placeholder="${sugg.sets}" value="${logged.s||''}">
+			  <span class="log-lbl">×</span>
+			  <input class="log-inp n" id="lr${i}" type="number" min="0" max="50" placeholder="${sugg.reps}" value="${logged.r||''}">
+			  <span class="log-lbl">pon.</span>
+			  <button class="log-save" onclick="logEx(${i},'${e.n.replace(/'/g,'&#39;')}')">Shrani</button>
+			  <span class="log-ok" id="lok${i}">${logged.kg?'✓ shranjeno':''}</span>
+			</div>
+		  </div>`:`
+		  <div class="no-desc" style="margin-bottom:9px;"></div>
+		  <div class="prog-card prog-${sugClass}">
+			<div class="prog-head">
+			  <span class="prog-lbl">Cilj danes</span>
+			  <span class="prog-target">${sugg.sets} × ${sugg.reps} pon. · <b>${sugg.kg||'—'} kg</b></span>
+			</div>
+			<div class="prog-note">${sugg.note}</div>
+		  </div>
+		  ${histHtml}
+		  <div class="log-sec">
+			<div class="log-title">Danes sem naredila</div>
+			<div class="log-row">
+			  <span class="log-lbl">Teža</span>
+			  <input class="log-inp w" id="lkg${i}" type="number" min="0" step="0.5" placeholder="${sugg.kg||'kg'}" value="${logged.kg||''}"> <span class="log-lbl">kg</span>
+			  <span class="log-lbl" style="margin-left:4px;">Serije</span>
+			  <input class="log-inp n" id="ls${i}" type="number" min="0" max="10" placeholder="${sugg.sets}" value="${logged.s||''}">
+			  <span class="log-lbl">×</span>
+			  <input class="log-inp n" id="lr${i}" type="number" min="0" max="50" placeholder="${sugg.reps}" value="${logged.r||''}">
+			  <span class="log-lbl">pon.</span>
+			  <button class="log-save" onclick="logEx(${i},'${e.n.replace(/'/g,'&#39;')}')">Shrani</button>
+			  <span class="log-ok" id="lok${i}">${logged.kg?'✓ shranjeno':''}</span>
+			</div>
+		  </div>`;
+		return `<div class="ex-wrap" id="ew${i}">
+		  <div class="ex-top${done?' done':''}" id="et${i}">
+			<div class="edot"></div>
+			<div class="ename">${e.n}${e.custom?` <span style="font-size:11px;color:var(--red);">ročno</span>`:''}${logged.kg?` <span style="font-size:11px;color:var(--grn);">${logged.s||'?'}×${logged.r||'?'} · ${logged.kg}kg</span>`:''}</div>
+			<div class="epills"><span class="ep${pk?' pk':''}" title="${sugg.note}">${sugg.kg||'—'}kg</span><span class="ep${pk?' pk':''}">${sugg.sets}×${sugg.reps}</span></div>
+			<button class="sbtn" onclick="swapEx(${i})">↺</button>
+			<button class="chk${done?' on':''}" id="echk${i}" onclick="togEx(${i})">${done?'✓':'○'}</button>
+			<button class="ex-xbtn${open?' open':''}" id="exb${i}" onclick="togExInfo(${i})" title="Navodila in log">▾</button>
+		  </div>
+		  <div class="ex-detail${open?' open':''}" id="exd${i}">${ingHtml}</div>
+		</div>`;
+	  }).join('');
   }
 }
 function togWodDesc(i){
@@ -1687,12 +2123,12 @@ function togWodDesc(i){
   const isOpen=p.classList.toggle('open');
   // If opened and empty, fetch AI description
   if(isOpen&&!p.querySelector('.ex-desc')){
-    const name=S.cfWod?.ex?.[i]?.n||(WKT.crossfit.wods[DOW%WKT.crossfit.wods.length]?.ex?.[i]?.n)||'';
-    if(!name)return;
-    p.innerHTML='<span style="color:var(--lt);font-size:13px;"><span class="spin">↺</span> Generiram opis...</span>';
-    fetchExDesc(name).then(info=>{
-      p.innerHTML=`<div class="ex-desc" style="margin-bottom:6px;">${info.desc}</div><div class="ex-tip">💡 ${info.tip}</div><a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent(info.yt||name)}" target="_blank">▶ Video</a>`;
-    }).catch(()=>{p.innerHTML='<span style="color:var(--lt);font-size:13px;">Opis ni na voljo.</span>';});
+	const name=S.cfWod?.ex?.[i]?.n||(WKT.crossfit.wods[DOW%WKT.crossfit.wods.length]?.ex?.[i]?.n)||'';
+	if(!name)return;
+	p.innerHTML='<span style="color:var(--lt);font-size:13px;"><span class="spin">↺</span> Generiram opis...</span>';
+	fetchExDesc(name).then(info=>{
+	  p.innerHTML=`<div class="ex-desc" style="margin-bottom:6px;">${info.desc}</div><div class="ex-tip">💡 ${info.tip}</div><a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent(info.yt||name)}" target="_blank">▶ Video</a>`;
+	}).catch(()=>{p.innerHTML='<span style="color:var(--lt);font-size:13px;">Opis ni na voljo.</span>';});
   }
 }
 function saveWodResult(){
@@ -1702,6 +2138,16 @@ function saveWodResult(){
   const ok=document.getElementById('wod-ok');
   if(ok){ok.textContent='✓ shranjeno';ok.classList.add('show');setTimeout(()=>ok.classList.remove('show'),2500);}
 }
+function togWorkoutPreview(){
+  const p=document.getElementById('workout-preview');
+  const btn=document.querySelector('.ws-overview-btn');
+  const arrow=document.getElementById('ws-arrow');
+  if(!p)return;
+  const isOpen=p.classList.toggle('show');
+  if(btn)btn.classList.toggle('open',isOpen);
+  if(arrow)arrow.textContent=isOpen?'▴':'▾';
+}
+
 function togCardioTime(i){
   const el=document.getElementById('cte'+i);
   if(!el)return;
@@ -1724,13 +2170,13 @@ function togExInfo(i){
   if(btn)btn.classList.toggle('open',exExp[i]);
   // If opened and showing "no description", fetch from AI
   if(exExp[i]&&det&&det.querySelector('.no-desc')){
-    const name=S.ex[i]?.n;
-    if(!name)return;
-    det.querySelector('.no-desc').innerHTML='<span style="color:var(--lt);font-size:13px;"><span class="spin">↺</span> Generiram opis...</span>';
-    fetchExDesc(name).then(info=>{
-      if(!info)return;
-      det.querySelector('.no-desc').outerHTML=`<div class="ex-desc">${info.desc}</div><div class="ex-tip">💡 ${info.tip}</div><a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent(info.yt||name)}" target="_blank">▶ Poglej video navodila</a>`;
-    }).catch(()=>{if(det.querySelector('.no-desc'))det.querySelector('.no-desc').textContent='Opis ni na voljo.';});
+	const name=S.ex[i]?.n;
+	if(!name)return;
+	det.querySelector('.no-desc').innerHTML='<span style="color:var(--lt);font-size:13px;"><span class="spin">↺</span> Generiram opis...</span>';
+	fetchExDesc(name).then(info=>{
+	  if(!info)return;
+	  det.querySelector('.no-desc').outerHTML=`<div class="ex-desc">${info.desc}</div><div class="ex-tip">💡 ${info.tip}</div><a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent(info.yt||name)}" target="_blank">▶ Poglej video navodila</a>`;
+	}).catch(()=>{if(det.querySelector('.no-desc'))det.querySelector('.no-desc').textContent='Opis ni na voljo.';});
   }
 }
 function logEx(i,name){
@@ -1783,31 +2229,31 @@ function renderTracker(){
   const wr=document.getElementById('week-row');
   wr.innerHTML='';
   for(let i=0;i<7;i++){
-    const d=new Date(monday);d.setDate(monday.getDate()+i);
-    const isToday=d.toDateString()===now.toDateString();
-    const isFuture=d>now&&!isToday;
-    const key=d.toISOString().split('T')[0];
-    const td=isToday?{md:S.md,ed:S.exd,wt:S.wt}:getTrackData(key);
-    const score=isFuture?null:getDayScore(td);
-    const pct=score===null?0:Math.round(score*100);
-    // SVG ring
-    const r=14,circ=2*Math.PI*r,dash=circ*(pct/100),gap=circ-dash;
-    let ringColor='#E0DED6';
-    if(score!==null&&pct===100)ringColor='#2A6147';
-    else if(score!==null&&pct>0)ringColor='#C94B2A';
-    const cell=document.createElement('div');
-    cell.className='day-cell'+(isToday?' day-today':'');
-    cell.innerHTML=`<div class="day-name">${WDAYS[d.getDay()]}</div>
-      <div class="day-ring">
-        <svg viewBox="0 0 36 36">
-          <circle cx="18" cy="18" r="${r}" fill="none" stroke="#E0DED6" stroke-width="3"/>
-          ${pct>0?`<circle cx="18" cy="18" r="${r}" fill="none" stroke="${ringColor}" stroke-width="3" stroke-dasharray="${dash.toFixed(1)} ${gap.toFixed(1)}" stroke-linecap="round" transform="rotate(-90 18 18)"/>`:''}
-          ${isToday?`<circle cx="18" cy="18" r="5" fill="${pct>0?ringColor:'#D5D3CB'}"/>`:''}
-          ${!isToday&&pct===100?`<text x="18" y="22" text-anchor="middle" font-size="10" fill="${ringColor}">✓</text>`:''}
-          ${!isToday&&pct>0&&pct<100?`<text x="18" y="22" text-anchor="middle" font-size="9" fill="${ringColor}">${pct}%</text>`:''}
-        </svg>
-      </div>`;
-    wr.appendChild(cell);
+	const d=new Date(monday);d.setDate(monday.getDate()+i);
+	const isToday=d.toDateString()===now.toDateString();
+	const isFuture=d>now&&!isToday;
+	const key=d.toISOString().split('T')[0];
+	const td=isToday?{md:S.md,ed:S.exd,wt:S.wt}:getTrackData(key);
+	const score=isFuture?null:getDayScore(td);
+	const pct=score===null?0:Math.round(score*100);
+	// SVG ring
+	const r=14,circ=2*Math.PI*r,dash=circ*(pct/100),gap=circ-dash;
+	let ringColor='#E0DED6';
+	if(score!==null&&pct===100)ringColor='#2A6147';
+	else if(score!==null&&pct>0)ringColor='#C94B2A';
+	const cell=document.createElement('div');
+	cell.className='day-cell'+(isToday?' day-today':'');
+	cell.innerHTML=`<div class="day-name">${WDAYS[d.getDay()]}</div>
+	  <div class="day-ring">
+		<svg viewBox="0 0 36 36">
+		  <circle cx="18" cy="18" r="${r}" fill="none" stroke="#E0DED6" stroke-width="3"/>
+		  ${pct>0?`<circle cx="18" cy="18" r="${r}" fill="none" stroke="${ringColor}" stroke-width="3" stroke-dasharray="${dash.toFixed(1)} ${gap.toFixed(1)}" stroke-linecap="round" transform="rotate(-90 18 18)"/>`:''}
+		  ${isToday?`<circle cx="18" cy="18" r="5" fill="${pct>0?ringColor:'#D5D3CB'}"/>`:''}
+		  ${!isToday&&pct===100?`<text x="18" y="22" text-anchor="middle" font-size="10" fill="${ringColor}">✓</text>`:''}
+		  ${!isToday&&pct>0&&pct<100?`<text x="18" y="22" text-anchor="middle" font-size="9" fill="${ringColor}">${pct}%</text>`:''}
+		</svg>
+	  </div>`;
+	wr.appendChild(cell);
   }
   // Progress bars today
   const mDone=S.md.filter(Boolean).length;
@@ -1816,13 +2262,13 @@ function renderTracker(){
   document.getElementById('pb-mf').style.width=mPct+'%';
   const wt=WKT[S.wt];
   if(!wt.ex){
-    document.getElementById('pb-wl').textContent=S.wt==='cardio'?'kardio':'počitek';
-    document.getElementById('pb-wf').style.width='0%';
+	document.getElementById('pb-wl').textContent=S.wt==='cardio'?'kardio':'počitek';
+	document.getElementById('pb-wf').style.width='0%';
   }else{
-    const eDone=S.exd.filter(Boolean).length,eTotal=S.exd.length||6;
-    const ePct=Math.round(eDone/eTotal*100);
-    document.getElementById('pb-wl').textContent=eDone+'/'+eTotal;
-    document.getElementById('pb-wf').style.width=ePct+'%';
+	const eDone=S.exd.filter(Boolean).length,eTotal=S.exd.length||6;
+	const ePct=Math.round(eDone/eTotal*100);
+	document.getElementById('pb-wl').textContent=eDone+'/'+eTotal;
+	document.getElementById('pb-wf').style.width=ePct+'%';
   }
 }
 
@@ -1840,10 +2286,10 @@ async function swapMeal(i){
   const ez=S.easy?'Recept mora biti hiter in enostaven (konzerve, jajca, pečena kura, whey shake, mikrovalovna). Ni kompleksnega kuhanja.':'';
   const lfc=dietPrompt()+' '+avoidPrompt();
   try{
-    const txt=await api(`Si prehranjevalni svetovalec. Zamenjaj obrok. ${ez} ${lfc} Kalorična vrednost ±50 kcal. Vrni SAMO JSON: {"f":"opis v slovenščini","k":380,"i":[{"n":"sestavina","a":"100 g"}]}`,
-      `Zamenjaj ${S.meals[i].label.toLowerCase()}: "${S.meals[i].f||S.meals[i].food}" (~${S.meals[i].k||S.meals[i].kcal} kcal). Upoštevaj prehranske posebnosti: ${dietPrompt()} Drugačna alternativa z gramaturami.`);
-    const p=JSON.parse(txt);
-    S.meals[i]={...S.meals[i],...p};save();renderMeals();
+	const txt=await api(`Si prehranjevalni svetovalec. Zamenjaj obrok. ${ez} ${lfc} Kalorična vrednost ±50 kcal. Vrni SAMO JSON: {"f":"opis v slovenščini","k":380,"i":[{"n":"sestavina","a":"100 g"}]}`,
+	  `Zamenjaj ${S.meals[i].label.toLowerCase()}: "${S.meals[i].f||S.meals[i].food}" (~${S.meals[i].k||S.meals[i].kcal} kcal). Upoštevaj prehranske posebnosti: ${dietPrompt()} Drugačna alternativa z gramaturami.`);
+	const p=JSON.parse(txt);
+	S.meals[i]={...S.meals[i],...p};save();renderMeals();
   }catch(e){err('Zamenjava ni uspela.');card.classList.remove('loading');btn.disabled=false;btn.innerHTML='↺';}
 }
 async function swapEx(i){
@@ -1851,18 +2297,18 @@ async function swapEx(i){
   if(!btn||btn.disabled)return;
   btn.disabled=true;btn.innerHTML='<span class="spin">↺</span>';card.classList.add('loading');
   if(S.wt==='cardio'){
-    try{
-      const txt=await api('Si fitnes trener. Predlagaj alternativno kardio aktivnost. Vrni SAMO JSON: {"n":"ime aktivnosti v slovenščini","s":"1","r":"30 min","kcal":200}',
-        `Zamenjaj kardio aktivnost "${S.ex[i].n}" z drugačno alternativo.`);
-      const p=JSON.parse(txt);S.ex[i]={...S.ex[i],...p};save();renderWorkout();
-    }catch(e){err('Zamenjava ni uspela.');card.classList.remove('loading');btn.disabled=false;btn.innerHTML='↺';}
-    return;
+	try{
+	  const txt=await api('Si fitnes trener. Predlagaj alternativno kardio aktivnost. Vrni SAMO JSON: {"n":"ime aktivnosti v slovenščini","s":"1","r":"30 min","kcal":200}',
+		`Zamenjaj kardio aktivnost "${S.ex[i].n}" z drugačno alternativo.`);
+	  const p=JSON.parse(txt);S.ex[i]={...S.ex[i],...p};save();renderWorkout();
+	}catch(e){err('Zamenjava ni uspela.');card.classList.remove('loading');btn.disabled=false;btn.innerHTML='↺';}
+	return;
   }
   const focus=S.wt==='glute'?'zadnjico (glute focus)':'isto mišično skupino';
   try{
-    const txt=await api(`Si fitnes trener za telovadnico. Vrni SAMO JSON: {"n":"ime vaje v slovenščini","s":"3","r":"12"}`,
-      `Zamenjaj vajo "${S.ex[i].n}" (${S.ex[i].s}×${S.ex[i].r}) z alternativo za ${focus}.`);
-    const p=JSON.parse(txt);S.ex[i]={n:p.n,s:p.s,r:p.r};save();renderWorkout();
+	const txt=await api(`Si fitnes trener za telovadnico. Vrni SAMO JSON: {"n":"ime vaje v slovenščini","s":"3","r":"12"}`,
+	  `Zamenjaj vajo "${S.ex[i].n}" (${S.ex[i].s}×${S.ex[i].r}) z alternativo za ${focus}.`);
+	const p=JSON.parse(txt);S.ex[i]={n:p.n,s:p.s,r:p.r};save();renderWorkout();
   }catch(e){err('Zamenjava ni uspela.');card.classList.remove('loading');btn.disabled=false;btn.innerHTML='↺';}
 }
 async function refreshMeals(){
@@ -1871,19 +2317,19 @@ async function refreshMeals(){
   const lfc=dietPrompt()+' '+avoidPrompt();
   const goalKcalTarget=calcGoalKcal()||1600;
   try{
-    const txt=await api(`Si prehranjevalni svetovalec. ${ez} ${lfc} Sestavi dnevni jedilnik ~${goalKcalTarget} kcal za žensko ki želi ${G.goal==='lose'?'shujšati':G.goal==='gain'?'pridobiti mišice':'vzdrževati težo'}. Vrni SAMO veljavni JSON array s 5 elementi. Vsak element mora imeti: "f" = konkretno ime jedi v slovenščini, ne generično "zajtrk", "kosilo", "večerja", "prigrizek"; "k" = kalorije; "i" = seznam sestavin z gramaturami. Format: [{"f":"Skyr z ovsenimi kosmiči, borovnicami in mandlji","k":360,"i":[{"n":"Skyr navadni","a":"170 g"}]}]. Ne uporabljaj generičnih imen obrokov kot naslov jedi.`,
-      'Svež raznovrsten jedilnik za danes z natančnimi gramaturami.');
-    const p=JSON.parse(txt);
-    const genericTitles=['zajtrk','dopoldanski prigrizek','dopold. prig.','kosilo','popoldanski prigrizek','popold. prig.','večerja'];
-    const cleaned=Array.isArray(p)?p.map((m,i)=>{
-      const title=(m.f||'').trim().toLowerCase();
-      if(genericTitles.includes(title)){
-        const ing=(m.i||[]).map(x=>x.n).filter(Boolean).join(', ');
-        return {...m,f:ing?ing:LBLS[i]};
-      }
-      return m;
-    }):p;
-    if(Array.isArray(cleaned)&&cleaned.length===5){S.meals=LBLS.map((l,i)=>({label:l,...cleaned[i]}));S.md=[false,false,false,false,false];save();renderMeals();}
+	const txt=await api(`Si prehranjevalni svetovalec. ${ez} ${lfc} Sestavi dnevni jedilnik ~${goalKcalTarget} kcal za žensko ki želi ${G.goal==='lose'?'shujšati':G.goal==='gain'?'pridobiti mišice':'vzdrževati težo'}. Vrni SAMO veljavni JSON array s 5 elementi. Vsak element mora imeti: "f" = konkretno ime jedi v slovenščini, ne generično "zajtrk", "kosilo", "večerja", "prigrizek"; "k" = kalorije; "i" = seznam sestavin z gramaturami. Format: [{"f":"Skyr z ovsenimi kosmiči, borovnicami in mandlji","k":360,"i":[{"n":"Skyr navadni","a":"170 g"}]}]. Ne uporabljaj generičnih imen obrokov kot naslov jedi.`,
+	  'Svež raznovrsten jedilnik za danes z natančnimi gramaturami.');
+	const p=JSON.parse(txt);
+	const genericTitles=['zajtrk','dopoldanski prigrizek','dopold. prig.','kosilo','popoldanski prigrizek','popold. prig.','večerja'];
+	const cleaned=Array.isArray(p)?p.map((m,i)=>{
+	  const title=(m.f||'').trim().toLowerCase();
+	  if(genericTitles.includes(title)){
+		const ing=(m.i||[]).map(x=>x.n).filter(Boolean).join(', ');
+		return {...m,f:ing?ing:LBLS[i]};
+	  }
+	  return m;
+	}):p;
+	if(Array.isArray(cleaned)&&cleaned.length===5){S.meals=LBLS.map((l,i)=>({label:l,...cleaned[i]}));S.md=[false,false,false,false,false];save();renderMeals();}
   }catch(e){err('Generiranje ni uspelo.');}
   btn.disabled=false;btn.innerHTML='↺ Zamenjaj vse';
 }
@@ -1894,13 +2340,13 @@ async function swapCfEx(i){
   btn.disabled=true;btn.innerHTML='<span class="spin">↺</span>';
   const cur=S.cfWod.ex[i];
   try{
-    const txt=await api(
-      'Si CrossFit trener. Zamenjaj eno vajo v WODu z alternativo primerno za začetnico v fitnesu. Vrni SAMO veljavni JSON: {"n":"ime vaje v slovenščini","r":"10"}',
-      `Zamenjaj CrossFit vajo "${cur.n}" (${cur.r}) z drugačno alternativo za isto območje ali podobno intenzivnost.`
-    );
-    const p=JSON.parse(txt);
-    S.cfWod.ex[i]={n:p.n,r:p.r};
-    save();renderWorkout();
+	const txt=await api(
+	  'Si CrossFit trener. Zamenjaj eno vajo v WODu z alternativo primerno za začetnico v fitnesu. Vrni SAMO veljavni JSON: {"n":"ime vaje v slovenščini","r":"10"}',
+	  `Zamenjaj CrossFit vajo "${cur.n}" (${cur.r}) z drugačno alternativo za isto območje ali podobno intenzivnost.`
+	);
+	const p=JSON.parse(txt);
+	S.cfWod.ex[i]={n:p.n,r:p.r};
+	save();renderWorkout();
   }catch(e){err('Zamenjava ni uspela.');btn.disabled=false;btn.innerHTML='↺';}
 }
 async function refreshWorkout(){
@@ -1908,39 +2354,39 @@ async function refreshWorkout(){
   btn.disabled=true;btn.innerHTML='<span class="spin">↺</span> Generiram...';
 
   if(S.wt==='cardio'){
-    try{
-      const txt=await api(
-        'Si fitnes trener. Predlagaj 7 različnih kardio aktivnosti. Vrni SAMO JSON array: [{"n":"ime aktivnosti v slovenščini","s":"1","r":"30 min","kcal":200},...]',
-        'Sestavi raznovrsten seznam kardio aktivnosti — tek, kolo, plavanje, hoja, planinarjenje, elipsa itd. Vključi pohod na Pohorje z oceno kcal ~800.'
-      );
-      const p=JSON.parse(txt);
-      if(Array.isArray(p)){S.ex=p.slice(0,7);S.exd=S.ex.map(()=>false);save();renderWorkout();}
-    }catch(e){err('Generiranje ni uspelo.');}
-    btn.disabled=false;btn.innerHTML='↺ Zamenjaj vaje';
-    return;
+	try{
+	  const txt=await api(
+		'Si fitnes trener. Predlagaj 7 različnih kardio aktivnosti. Vrni SAMO JSON array: [{"n":"ime aktivnosti v slovenščini","s":"1","r":"30 min","kcal":200},...]',
+		'Sestavi raznovrsten seznam kardio aktivnosti — tek, kolo, plavanje, hoja, planinarjenje, elipsa itd. Vključi pohod na Pohorje z oceno kcal ~800.'
+	  );
+	  const p=JSON.parse(txt);
+	  if(Array.isArray(p)){S.ex=p.slice(0,7);S.exd=S.ex.map(()=>false);save();renderWorkout();}
+	}catch(e){err('Generiranje ni uspelo.');}
+	btn.disabled=false;btn.innerHTML='↺ Zamenjaj vaje';
+	return;
   }
 
   if(S.wt==='crossfit'){
-    const types=['AMRAP','For Time','EMOM'];
-    const t=types[Math.floor(Math.random()*types.length)];
-    try{
-      const txt=await api(
-        'Si CrossFit trener. Sestavi WOD za začetnico v fitnesu — skalirane vaje, dostopna oprema (kettlebell, ročke, veslanje, lastna teža). Vrni SAMO veljavni JSON: {"type":"AMRAP","time":15,"name":"Ime WODa","ex":[{"n":"ime vaje","r":"10"},{"n":"ime vaje","r":"15"}],"note":"kratko navodilo"}',
-        `Sestavi nov ${t} CrossFit WOD za danes. Vaje v slovenščini, skalirane za začetnico.`
-      );
-      const p=JSON.parse(txt);
-      S.cfWod={...p};save();renderWorkout();
-    }catch(e){err('Generiranje ni uspelo.');}
-    btn.disabled=false;btn.innerHTML='↺ Nov WOD';
-    return;
+	const types=['AMRAP','For Time','EMOM'];
+	const t=types[Math.floor(Math.random()*types.length)];
+	try{
+	  const txt=await api(
+		'Si CrossFit trener. Sestavi WOD za začetnico v fitnesu — skalirane vaje, dostopna oprema (kettlebell, ročke, veslanje, lastna teža). Vrni SAMO veljavni JSON: {"type":"AMRAP","time":15,"name":"Ime WODa","ex":[{"n":"ime vaje","r":"10"},{"n":"ime vaje","r":"15"}],"note":"kratko navodilo"}',
+		`Sestavi nov ${t} CrossFit WOD za danes. Vaje v slovenščini, skalirane za začetnico.`
+	  );
+	  const p=JSON.parse(txt);
+	  S.cfWod={...p};save();renderWorkout();
+	}catch(e){err('Generiranje ni uspelo.');}
+	btn.disabled=false;btn.innerHTML='↺ Nov WOD';
+	return;
   }
 
   const w=WKT[S.wt];
   const focus=S.wt==='glute'?'zadnjico (hip thrust, donkey kicks, cable pull-through, sumo počep, glute bridge)':w.title.toLowerCase();
   try{
-    const txt=await api('Si fitnes trener za telovadnico. SAMO JSON array 6 vaj: [{"n":"ime v slovenščini","s":"3","r":"12"},...]',
-      `Svež trening za ${focus}. Drugačen od navadnega.`);
-    const p=JSON.parse(txt);if(Array.isArray(p)){S.ex=p.slice(0,6);S.exd=S.ex.map(()=>false);save();renderWorkout();}
+	const txt=await api('Si fitnes trener za telovadnico. SAMO JSON array 6 vaj: [{"n":"ime v slovenščini","s":"3","r":"12"},...]',
+	  `Svež trening za ${focus}. Drugačen od navadnega.`);
+	const p=JSON.parse(txt);if(Array.isArray(p)){S.ex=p.slice(0,6);S.exd=S.ex.map(()=>false);save();renderWorkout();}
   }catch(e){err('Generiranje ni uspelo.');}
   btn.disabled=false;btn.innerHTML='↺ Zamenjaj vaje';
 }
@@ -1978,9 +2424,9 @@ function calcMacroTargets(){
   const kcal=calcGoalKcal();
   if(!kcal)return null;
   return {
-    p:Math.round(kcal*0.30/4),  // protein: 4 kcal/g
-    c:Math.round(kcal*0.40/4),  // carbs: 4 kcal/g
-    f:Math.round(kcal*0.30/9)   // fat: 9 kcal/g
+	p:Math.round(kcal*0.30/4),  // protein: 4 kcal/g
+	c:Math.round(kcal*0.40/4),  // carbs: 4 kcal/g
+	f:Math.round(kcal*0.30/9)   // fat: 9 kcal/g
   };
 }
 
@@ -2017,27 +2463,27 @@ function updateGoalsCalc(){
 
   box.classList.add('show');
   box.innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
-      <div style="background:var(--w);border-radius:8px;padding:8px 10px;text-align:center;">
-        <div style="font-size:18px;font-weight:500;color:var(--dk);">${bmr}</div>
-        <div style="font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.05em;">BMR (samo življenje)</div>
-      </div>
-      <div style="background:var(--w);border-radius:8px;padding:8px 10px;text-align:center;">
-        <div style="font-size:18px;font-weight:500;color:var(--dk);">${tdee}</div>
-        <div style="font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.05em;">TDEE (skupaj z aktivnostjo)</div>
-      </div>
-    </div>
-    <div style="background:var(--w);border-radius:8px;padding:10px 12px;margin-bottom:8px;">
-      <div style="font-size:13px;color:var(--md);margin-bottom:4px;">Cilj: <b style="color:var(--dk);">${goalLabel[_selGoal]}</b></div>
-      <div style="font-size:22px;font-weight:500;color:var(--dk);">${goalKcal} kcal/dan</div>
-      <div style="font-size:12px;color:var(--lt);margin-top:4px;">B: ${p}g &nbsp;·&nbsp; OH: ${c}g &nbsp;·&nbsp; M: ${f}g</div>
-    </div>
-    ${weeks?`<div style="font-size:12px;color:var(--grn);padding:4px 0;">📅 Do cilja ~${weeks} tednov pri 0.5 kg/teden</div>`:''}
-    <div style="font-size:12px;color:var(--lt);margin-top:4px;line-height:1.6;">
-      BMR = kalorije ki jih telo porabi za dihanje, srce, možgane.<br>
-      TDEE = BMR × faktor aktivnosti = kar telo res porabi vsak dan.<br>
-      Vadba v appu se doda k cilju ("zaslužene" kalorije).
-    </div>`;
+	<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
+	  <div style="background:var(--w);border-radius:8px;padding:8px 10px;text-align:center;">
+		<div style="font-size:18px;font-weight:500;color:var(--dk);">${bmr}</div>
+		<div style="font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.05em;">BMR (samo življenje)</div>
+	  </div>
+	  <div style="background:var(--w);border-radius:8px;padding:8px 10px;text-align:center;">
+		<div style="font-size:18px;font-weight:500;color:var(--dk);">${tdee}</div>
+		<div style="font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.05em;">TDEE (skupaj z aktivnostjo)</div>
+	  </div>
+	</div>
+	<div style="background:var(--w);border-radius:8px;padding:10px 12px;margin-bottom:8px;">
+	  <div style="font-size:13px;color:var(--md);margin-bottom:4px;">Cilj: <b style="color:var(--dk);">${goalLabel[_selGoal]}</b></div>
+	  <div style="font-size:22px;font-weight:500;color:var(--dk);">${goalKcal} kcal/dan</div>
+	  <div style="font-size:12px;color:var(--lt);margin-top:4px;">B: ${p}g &nbsp;·&nbsp; OH: ${c}g &nbsp;·&nbsp; M: ${f}g</div>
+	</div>
+	${weeks?`<div style="font-size:12px;color:var(--grn);padding:4px 0;">📅 Do cilja ~${weeks} tednov pri 0.5 kg/teden</div>`:''}
+	<div style="font-size:12px;color:var(--lt);margin-top:4px;line-height:1.6;">
+	  BMR = kalorije ki jih telo porabi za dihanje, srce, možgane.<br>
+	  TDEE = BMR × faktor aktivnosti = kar telo res porabi vsak dan.<br>
+	  Vadba v appu se doda k cilju ("zaslužene" kalorije).
+	</div>`;
 }
 function openGoals(){
   loadGoals();
@@ -2065,7 +2511,7 @@ function saveGoals(){
 // Add event listeners to recalculate on input change
 function bindGoalsInputs(){
   ['g-age','g-height','g-weight','g-target'].forEach(id=>{
-    document.getElementById(id)?.addEventListener('input',updateGoalsCalc);
+	document.getElementById(id)?.addEventListener('input',updateGoalsCalc);
   });
 }
 
@@ -2076,13 +2522,13 @@ function estimateMacros(mealName, kcal){
   const n=(mealName||'').toLowerCase();
   // Protein-heavy
   if(/whey|skuta|jogurt|piščan|tuna|losos|jajc|tofu|sir|skyr|riba|meso/.test(n))
-    return {p:Math.round(kcal*0.35/4),c:Math.round(kcal*0.30/4),f:Math.round(kcal*0.35/9)};
+	return {p:Math.round(kcal*0.35/4),c:Math.round(kcal*0.30/4),f:Math.round(kcal*0.35/9)};
   // Carb-heavy
   if(/riž|krompir|testenin|kruh|ovseni|kaša|ajda|quinoa|palačink|krekerj/.test(n))
-    return {p:Math.round(kcal*0.12/4),c:Math.round(kcal*0.65/4),f:Math.round(kcal*0.23/9)};
+	return {p:Math.round(kcal*0.12/4),c:Math.round(kcal*0.65/4),f:Math.round(kcal*0.23/9)};
   // Fat-heavy
   if(/avokado|oreščk|mandlj|olivn|smetana|maslo/.test(n))
-    return {p:Math.round(kcal*0.10/4),c:Math.round(kcal*0.15/4),f:Math.round(kcal*0.75/9)};
+	return {p:Math.round(kcal*0.10/4),c:Math.round(kcal*0.15/4),f:Math.round(kcal*0.75/9)};
   // Default balanced
   return {p:Math.round(kcal*0.22/4),c:Math.round(kcal*0.45/4),f:Math.round(kcal*0.33/9)};
 }
@@ -2092,16 +2538,16 @@ function renderMacros(){
   const targets=calcMacroTargets();
   let totP=0,totC=0,totF=0;
   S.meals.forEach((m,i)=>{
-    if(!S.md[i])return;
-    const kcal=parseInt(m.k||m.kcal)||0;
-    const est=estimateMacros(m.f||m.food||'',kcal);
-    totP+=est.p;totC+=est.c;totF+=est.f;
+	if(!S.md[i])return;
+	const kcal=parseInt(m.k||m.kcal)||0;
+	const est=estimateMacros(m.f||m.food||'',kcal);
+	totP+=est.p;totC+=est.c;totF+=est.f;
   });
   (S.extras||[]).forEach(e=>{
-    if(!e.done)return;
-    const kcal=parseInt(e.k)||0;
-    const est=estimateMacros(e.f||'',kcal);
-    totP+=est.p;totC+=est.c;totF+=est.f;
+	if(!e.done)return;
+	const kcal=parseInt(e.k)||0;
+	const est=estimateMacros(e.f||'',kcal);
+	totP+=est.p;totC+=est.c;totF+=est.f;
   });
   const bar=document.getElementById('macro-bar');
   if(!bar)return;
@@ -2111,14 +2557,14 @@ function renderMacros(){
   document.getElementById('mk-c').textContent=totC+'g';
   document.getElementById('mk-f').textContent=totF+'g';
   if(targets){
-    document.getElementById('mg-p').textContent='/ '+targets.p+'g';
-    document.getElementById('mg-c').textContent='/ '+targets.c+'g';
-    document.getElementById('mg-f').textContent='/ '+targets.f+'g';
-    // Progress bars
-    const pP=document.getElementById('mpf-p');const pC=document.getElementById('mpf-c');const pF=document.getElementById('mpf-f');
-    if(pP)pP.style.width=Math.min(100,Math.round(totP/targets.p*100))+'%';
-    if(pC)pC.style.width=Math.min(100,Math.round(totC/targets.c*100))+'%';
-    if(pF)pF.style.width=Math.min(100,Math.round(totF/targets.f*100))+'%';
+	document.getElementById('mg-p').textContent='/ '+targets.p+'g';
+	document.getElementById('mg-c').textContent='/ '+targets.c+'g';
+	document.getElementById('mg-f').textContent='/ '+targets.f+'g';
+	// Progress bars
+	const pP=document.getElementById('mpf-p');const pC=document.getElementById('mpf-c');const pF=document.getElementById('mpf-f');
+	if(pP)pP.style.width=Math.min(100,Math.round(totP/targets.p*100))+'%';
+	if(pC)pC.style.width=Math.min(100,Math.round(totC/targets.c*100))+'%';
+	if(pF)pF.style.width=Math.min(100,Math.round(totF/targets.f*100))+'%';
   }
 }
 function renderExtras(){
@@ -2126,20 +2572,20 @@ function renderExtras(){
   if(!c)return;
   if(!S.extras||!S.extras.length){c.innerHTML='';return;}
   c.innerHTML=S.extras.map((e,i)=>`
-    <div class="meal-card fi${e.done?' done':''}" style="margin-top:0;margin-bottom:7px;" id="xmc${i}">
-      <div class="meal-top">
-        <div class="mdot" style="background:#8B2B6E"></div>
-        <div class="mbody">
-          <div class="mlbl" style="color:#8B2B6E;">Dodano</div>
-          <div class="mfood">${e.f}</div>
-          <div class="mkcal">~${e.k} kcal</div>
-        </div>
-        <div class="meal-actions">
-          <button class="sbtn" onclick="removeExtra(${i})" title="Odstrani" style="font-size:12px;">✕</button>
-          <button class="chk${e.done?' on':''}" id="xchk${i}" onclick="togExtra(${i})">${e.done?'✓':'○'}</button>
-        </div>
-      </div>
-    </div>`).join('');
+	<div class="meal-card fi${e.done?' done':''}" style="margin-top:0;margin-bottom:7px;" id="xmc${i}">
+	  <div class="meal-top">
+		<div class="mdot" style="background:#8B2B6E"></div>
+		<div class="mbody">
+		  <div class="mlbl" style="color:#8B2B6E;">Dodano</div>
+		  <div class="mfood">${e.f}</div>
+		  <div class="mkcal">~${e.k} kcal</div>
+		</div>
+		<div class="meal-actions">
+		  <button class="sbtn" onclick="removeExtra(${i})" title="Odstrani" style="font-size:12px;">✕</button>
+		  <button class="chk${e.done?' on':''}" id="xchk${i}" onclick="togExtra(${i})">${e.done?'✓':'○'}</button>
+		</div>
+	  </div>
+	</div>`).join('');
 }
 function togExtra(i){
   S.extras[i].done=!S.extras[i].done;
@@ -2155,15 +2601,15 @@ async function addExtraMeal(){
   if(!val)return;
   btn.disabled=true;btn.textContent='...';
   try{
-    const txt=await api(
-      'Si prehranjevalni svetovalec. Izračunaj kalorije za vneseno hrano. Vrni SAMO JSON: {"f":"natančen opis v slovenščini","k":250,"i":[{"n":"sestavina","a":"100 g"}]}',
-      `Izračunaj kalorije za: "${val}"`
-    );
-    const p=JSON.parse(txt);
-    if(!S.extras)S.extras=[];
-    S.extras.push({f:p.f,k:parseInt(p.k)||0,i:p.i||[],done:false});
-    inp.value='';
-    save();renderExtras();calcKcal();
+	const txt=await api(
+	  'Si prehranjevalni svetovalec. Izračunaj kalorije za vneseno hrano. Vrni SAMO JSON: {"f":"natančen opis v slovenščini","k":250,"i":[{"n":"sestavina","a":"100 g"}]}',
+	  `Izračunaj kalorije za: "${val}"`
+	);
+	const p=JSON.parse(txt);
+	if(!S.extras)S.extras=[];
+	S.extras.push({f:p.f,k:parseInt(p.k)||0,i:p.i||[],done:false});
+	inp.value='';
+	save();renderExtras();calcKcal();
   }catch(e){err('Izračun ni uspel.');}
   btn.disabled=false;btn.textContent='+ Dodaj';
 }
@@ -2176,21 +2622,21 @@ function getHistoryFoods(){
   // Collect all foods eaten in last 14 days from localStorage
   const foods=[];
   for(let i=1;i<=14;i++){
-    const d=new Date(now);d.setDate(now.getDate()-i);
-    const key=d.toISOString().split('T')[0];
-    try{
-      const s=localStorage.getItem(lsKey('dp_v6_'+key));
-      if(!s)continue;
-      const plan=JSON.parse(s);
-      const track=JSON.parse(localStorage.getItem(lsKey('track_'+key))||'{}');
-      const md=track.md||[];
-      (plan.meals||[]).forEach((m,mi)=>{
-        if(md[mi]&&(m.f||m.food))foods.push({f:m.f||m.food,k:m.k||m.kcal||0,date:key});
-      });
-      (plan.extras||[]).forEach(e=>{
-        if(e.done&&e.f)foods.push({f:e.f,k:e.k||0,date:key,extra:true});
-      });
-    }catch(e){}
+	const d=new Date(now);d.setDate(now.getDate()-i);
+	const key=d.toISOString().split('T')[0];
+	try{
+	  const s=localStorage.getItem(lsKey('dp_v6_'+key));
+	  if(!s)continue;
+	  const plan=JSON.parse(s);
+	  const track=JSON.parse(localStorage.getItem(lsKey('track_'+key))||'{}');
+	  const md=track.md||[];
+	  (plan.meals||[]).forEach((m,mi)=>{
+		if(md[mi]&&(m.f||m.food))foods.push({f:m.f||m.food,k:m.k||m.kcal||0,date:key});
+	  });
+	  (plan.extras||[]).forEach(e=>{
+		if(e.done&&e.f)foods.push({f:e.f,k:e.k||0,date:key,extra:true});
+	  });
+	}catch(e){}
   }
   return foods;
 }
@@ -2221,32 +2667,32 @@ async function loadPers(force){
 
   let prompt='';
   if(persMode==='fav'){
-    if(foods.length){
-      const foodList=foods.slice(-20).map(f=>f.f).join(', ');
-      prompt=`Na podlagi teh jedi ki jih je oseba jedla: ${foodList} — predlagaj 5 podobnih ali enakoh jedi ki bi ji bile všeč. ${ez} ${lfc}`;
-    }else{
-      prompt=`Predlagaj 5 zdravih jedi za žensko ki hoče shujšati. ${ez} ${lfc}`;
-    }
+	if(foods.length){
+	  const foodList=foods.slice(-20).map(f=>f.f).join(', ');
+	  prompt=`Na podlagi teh jedi ki jih je oseba jedla: ${foodList} — predlagaj 5 podobnih ali enakoh jedi ki bi ji bile všeč. ${ez} ${lfc}`;
+	}else{
+	  prompt=`Predlagaj 5 zdravih jedi za žensko ki hoče shujšati. ${ez} ${lfc}`;
+	}
   }else{
-    const eaten=foods.map(f=>f.f).join(', ');
-    prompt=`Predlagaj 5 novih, zanimivih jedi ki jih ta oseba še ni jedla${eaten?` (jedla je: ${eaten.slice(0,200)})`:''} in bi jih bilo vredno poskusiti. ${ez} ${lfc} Naj bodo raznolike in okusne.`;
+	const eaten=foods.map(f=>f.f).join(', ');
+	prompt=`Predlagaj 5 novih, zanimivih jedi ki jih ta oseba še ni jedla${eaten?` (jedla je: ${eaten.slice(0,200)})`:''} in bi jih bilo vredno poskusiti. ${ez} ${lfc} Naj bodo raznolike in okusne.`;
   }
 
   try{
-    const txt=await api(
-      `Si prehranjevalni svetovalec. Vrni SAMO JSON array s 5 predlogi: [{"f":"ime jedi v slovenščini","k":350,"why":"zakaj je dobra (1 stavek)","tag":"${persMode==='fav'?'priljubljena':'novo'}"}]`,
-      prompt
-    );
-    const items=JSON.parse(txt);
-    persLoaded=true;
-    c.innerHTML=items.map((it,i)=>`
-      <div class="pers-item" onclick="applyPers(${i})" id="pi${i}" data-f="${(it.f||'').replace(/"/g,'&quot;')}" data-k="${it.k||300}" data-why="${(it.why||'').replace(/"/g,'&quot;')}">
-        <div class="pers-item-body">
-          <div class="pers-item-name">${it.f}</div>
-          <div class="pers-item-meta">~${it.k} kcal · ${it.why}</div>
-        </div>
-        <span class="pers-item-tag ${it.tag==='novo'?'new':'fav'}">${it.tag==='novo'?'novo ✦':'tvoje ⭐'}</span>
-      </div>`).join('');
+	const txt=await api(
+	  `Si prehranjevalni svetovalec. Vrni SAMO JSON array s 5 predlogi: [{"f":"ime jedi v slovenščini","k":350,"why":"zakaj je dobra (1 stavek)","tag":"${persMode==='fav'?'priljubljena':'novo'}"}]`,
+	  prompt
+	);
+	const items=JSON.parse(txt);
+	persLoaded=true;
+	c.innerHTML=items.map((it,i)=>`
+	  <div class="pers-item" onclick="applyPers(${i})" id="pi${i}" data-f="${(it.f||'').replace(/"/g,'&quot;')}" data-k="${it.k||300}" data-why="${(it.why||'').replace(/"/g,'&quot;')}">
+		<div class="pers-item-body">
+		  <div class="pers-item-name">${it.f}</div>
+		  <div class="pers-item-meta">~${it.k} kcal · ${it.why}</div>
+		</div>
+		<span class="pers-item-tag ${it.tag==='novo'?'new':'fav'}">${it.tag==='novo'?'novo ✦':'tvoje ⭐'}</span>
+	  </div>`).join('');
   }catch(e){c.innerHTML='<div style="font-size:13px;color:var(--lt);">Napaka pri generiranju. Poskusi znova.</div>';persLoaded=false;}
 }
 
@@ -2278,71 +2724,71 @@ function renderHistory(){
   const container=document.getElementById('hist');
   const days=[];
   for(let i=1;i<=14;i++){
-    const d=new Date(now);d.setDate(now.getDate()-i);
-    const key=d.toISOString().split('T')[0];
-    let track=null,plan=null,exlog={},wodRes='';
-    try{const s=localStorage.getItem(lsKey('track_'+key));if(s)track=JSON.parse(s);}catch(e){}
-    if(!track)continue;
-    try{const s=localStorage.getItem(lsKey('dp_v6_'+key));if(s)plan=JSON.parse(s);}catch(e){}
-    try{const s=localStorage.getItem(lsKey('exlog_'+key));if(s)exlog=JSON.parse(s);}catch(e){}
-    try{wodRes=localStorage.getItem(lsKey('wodlog_'+key))||'';}catch(e){}
-    days.push({d,key,track,plan,exlog,wodRes});
+	const d=new Date(now);d.setDate(now.getDate()-i);
+	const key=d.toISOString().split('T')[0];
+	let track=null,plan=null,exlog={},wodRes='';
+	try{const s=localStorage.getItem(lsKey('track_'+key));if(s)track=JSON.parse(s);}catch(e){}
+	if(!track)continue;
+	try{const s=localStorage.getItem(lsKey('dp_v6_'+key));if(s)plan=JSON.parse(s);}catch(e){}
+	try{const s=localStorage.getItem(lsKey('exlog_'+key));if(s)exlog=JSON.parse(s);}catch(e){}
+	try{wodRes=localStorage.getItem(lsKey('wodlog_'+key))||'';}catch(e){}
+	days.push({d,key,track,plan,exlog,wodRes});
   }
   if(!days.length){container.innerHTML='<div class="hist-empty">Ni še podatkov za pretekle dneve. Začni obkljukovati obroke in vaje!</div>';return;}
 
   container.innerHTML=days.map(({d,key,track,plan,exlog,wodRes})=>{
-    const md=track.md||[];const ed=track.ed||[];const wt=track.wt||'rest';
-    const mealsDone=md.filter(Boolean).length;
-    const exDone=ed.filter(Boolean).length;
-    const exTotal=ed.length||0;
+	const md=track.md||[];const ed=track.ed||[];const wt=track.wt||'rest';
+	const mealsDone=md.filter(Boolean).length;
+	const exDone=ed.filter(Boolean).length;
+	const exTotal=ed.length||0;
 
-    // Meals eaten
-    const eatenMeals=plan?plan.meals.filter((_,i)=>md[i]).map(m=>({food:m.f||m.food||'',kcal:parseInt(m.k||m.kcal)||0})):[];
-    const totalKcal=eatenMeals.reduce((s,m)=>s+m.kcal,0);
+	// Meals eaten
+	const eatenMeals=plan?plan.meals.filter((_,i)=>md[i]).map(m=>({food:m.f||m.food||'',kcal:parseInt(m.k||m.kcal)||0})):[];
+	const totalKcal=eatenMeals.reduce((s,m)=>s+m.kcal,0);
 
-    // Exercises done
-    const doneEx=plan?plan.ex.filter((_,i)=>ed[i]).map(e=>({n:e.n,log:exlog[e.n]||null})):[];
+	// Exercises done
+	const doneEx=plan?plan.ex.filter((_,i)=>ed[i]).map(e=>({n:e.n,log:exlog[e.n]||null})):[];
 
-    // Pills
-    const wtLabel=WKT_LABELS[wt]||wt;
-    const wtPill=wt==='rest'?'':wt==='cardio'?`<span class="hist-pill">Kardio</span>`:wt==='crossfit'?`<span class="hist-pill cf">CrossFit${wodRes?' · '+wodRes:''}</span>`:`<span class="hist-pill${doneEx.length>0?' green':''}">${wtLabel}${exTotal>0?' '+exDone+'/'+exTotal:''}</span>`;
-    const kcalPill=totalKcal>0?`<span class="hist-pill">${totalKcal} kcal</span>`:'';
-    const mealPill=`<span class="hist-pill${mealsDone===5?' green':mealsDone>0?'':' red'}">${mealsDone}/5 obrokov</span>`;
+	// Pills
+	const wtLabel=WKT_LABELS[wt]||wt;
+	const wtPill=wt==='rest'?'':wt==='cardio'?`<span class="hist-pill">Kardio</span>`:wt==='crossfit'?`<span class="hist-pill cf">CrossFit${wodRes?' · '+wodRes:''}</span>`:`<span class="hist-pill${doneEx.length>0?' green':''}">${wtLabel}${exTotal>0?' '+exDone+'/'+exTotal:''}</span>`;
+	const kcalPill=totalKcal>0?`<span class="hist-pill">${totalKcal} kcal</span>`:'';
+	const mealPill=`<span class="hist-pill${mealsDone===5?' green':mealsDone>0?'':' red'}">${mealsDone}/5 obrokov</span>`;
 
-    const dayName=SLD[d.getDay()];
-    const dateStr=d.getDate()+'. '+SLM[d.getMonth()];
+	const dayName=SLD[d.getDay()];
+	const dateStr=d.getDate()+'. '+SLM[d.getMonth()];
 
-    // Meals HTML
-    const mealsHtml=eatenMeals.length?eatenMeals.map(m=>`<div class="hist-meal-row"><div class="hist-meal-name">${m.food}</div><div class="hist-meal-kcal">~${m.kcal} kcal</div></div>`).join(''):'<div style="font-size:13px;color:var(--lt);">Ni zabeleženih obrokov ta dan.</div>';
+	// Meals HTML
+	const mealsHtml=eatenMeals.length?eatenMeals.map(m=>`<div class="hist-meal-row"><div class="hist-meal-name">${m.food}</div><div class="hist-meal-kcal">~${m.kcal} kcal</div></div>`).join(''):'<div style="font-size:13px;color:var(--lt);">Ni zabeleženih obrokov ta dan.</div>';
 
-    // Workout HTML
-    let workoutHtml='';
-    if(wt==='rest'){workoutHtml='<div style="font-size:13px;color:var(--lt);">Dan počitka.</div>';}
-    else if(wt==='cardio'){workoutHtml='<div style="font-size:13px;color:var(--md);">Kardio trening.</div>';}
-    else if(wt==='crossfit'){workoutHtml=`<div style="font-size:13px;color:var(--md);">CrossFit WOD${wodRes?' — Rezultat: <b>'+wodRes+'</b>':''}.</div>`;}
-    else if(doneEx.length){
-      workoutHtml=doneEx.map(e=>{
-        const l=e.log;const logStr=l&&l.kg?`${l.s||'?'}×${l.r||'?'} · ${l.kg} kg`:'';
-        return `<div class="hist-ex-row"><div class="hist-ex-name">${e.n}</div><div class="hist-ex-log${logStr?'':' empty'}">${logStr||'opravljeno'}</div></div>`;
-      }).join('');
-    } else {workoutHtml='<div style="font-size:13px;color:var(--lt);">Vadba ni bila zabeležena.</div>';}
+	// Workout HTML
+	let workoutHtml='';
+	if(wt==='rest'){workoutHtml='<div style="font-size:13px;color:var(--lt);">Dan počitka.</div>';}
+	else if(wt==='cardio'){workoutHtml='<div style="font-size:13px;color:var(--md);">Kardio trening.</div>';}
+	else if(wt==='crossfit'){workoutHtml=`<div style="font-size:13px;color:var(--md);">CrossFit WOD${wodRes?' — Rezultat: <b>'+wodRes+'</b>':''}.</div>`;}
+	else if(doneEx.length){
+	  workoutHtml=doneEx.map(e=>{
+		const l=e.log;const logStr=l&&l.kg?`${l.s||'?'}×${l.r||'?'} · ${l.kg} kg`:'';
+		return `<div class="hist-ex-row"><div class="hist-ex-name">${e.n}</div><div class="hist-ex-log${logStr?'':' empty'}">${logStr||'opravljeno'}</div></div>`;
+	  }).join('');
+	} else {workoutHtml='<div style="font-size:13px;color:var(--lt);">Vadba ni bila zabeležena.</div>';}
 
-    const totalLine=totalKcal>0||doneEx.length?`<div class="hist-total"><span>${mealsDone}/5 obrokov · ${exDone>0?exDone+'/'+exTotal+' vaj':'brez vadbe'}</span><b>${totalKcal>0?totalKcal+' kcal':''}</b></div>`:'';
+	const totalLine=totalKcal>0||doneEx.length?`<div class="hist-total"><span>${mealsDone}/5 obrokov · ${exDone>0?exDone+'/'+exTotal+' vaj':'brez vadbe'}</span><b>${totalKcal>0?totalKcal+' kcal':''}</b></div>`:'';
 
-    return `<div class="hist-card">
-      <div class="hist-head" onclick="togHist('${key}')">
-        <div class="hist-dow">${dayName}, ${dateStr}</div>
-        <div class="hist-meta">${mealPill}${kcalPill}${wtPill}</div>
-        <button class="hist-xbtn" id="hx_${key}">▾</button>
-      </div>
-      <div class="hist-body" id="hb_${key}">
-        <div class="hist-section-lbl">Zaužiti obroki</div>
-        ${mealsHtml}
-        <div class="hist-section-lbl">Vadba — ${wtLabel}</div>
-        ${workoutHtml}
-        ${totalLine}
-      </div>
-    </div>`;
+	return `<div class="hist-card">
+	  <div class="hist-head" onclick="togHist('${key}')">
+		<div class="hist-dow">${dayName}, ${dateStr}</div>
+		<div class="hist-meta">${mealPill}${kcalPill}${wtPill}</div>
+		<button class="hist-xbtn" id="hx_${key}">▾</button>
+	  </div>
+	  <div class="hist-body" id="hb_${key}">
+		<div class="hist-section-lbl">Zaužiti obroki</div>
+		${mealsHtml}
+		<div class="hist-section-lbl">Vadba — ${wtLabel}</div>
+		${workoutHtml}
+		${totalLine}
+	  </div>
+	</div>`;
   }).join('');
 }
 
