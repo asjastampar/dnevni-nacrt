@@ -31,11 +31,23 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 /* body part selector */
 .bpsel{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
 /* Next workout header */
-.next-up{background:linear-gradient(135deg,#FDFCF9 0%,#F5F1E8 100%);border:.5px solid var(--br);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.next-up{background:linear-gradient(135deg,#FDFCF9 0%,#F5F1E8 100%);border:.5px solid var(--br);border-radius:var(--r);padding:16px 18px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+/* Subtle action row below next-up */
+.workout-actions-row{display:flex;gap:6px;justify-content:flex-end;margin-bottom:12px;}
+.ghost-btn{background:none;border:.5px solid var(--br);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;color:var(--lt);font-family:inherit;transition:all .15s;}
+.ghost-btn:hover{color:var(--dk);background:var(--bg);}
+.ghost-btn:disabled{opacity:.4;cursor:not-allowed;}
+/* Workout sec — slightly tighter top margin since next-up is the header */
+.workout-sec .sec-head{display:none;}
 .next-up-body{flex:1;min-width:0;}
 .next-up-lbl{font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px;}
 .next-up-name{font-size:18px;font-weight:500;color:var(--dk);line-height:1.2;}
 .next-up-meta{font-size:12px;color:var(--md);margin-top:3px;}
+.next-up-actions{display:flex;flex-direction:column;gap:5px;flex-shrink:0;}
+.next-up-btn{background:var(--w);border:.5px solid var(--br);border-radius:8px;padding:7px 11px;font-size:12px;cursor:pointer;color:var(--md);font-family:inherit;line-height:1.2;white-space:nowrap;transition:all .15s;}
+.next-up-btn:hover{color:var(--dk);background:var(--bg);}
+.next-up-btn.primary{background:var(--dk);color:var(--w);border-color:var(--dk);font-weight:500;}
+.next-up-btn.primary:hover{opacity:.85;background:var(--dk);color:var(--w);}
 .next-up-skip{background:var(--w);border:.5px solid var(--br);border-radius:8px;padding:6px 10px;font-size:11px;cursor:pointer;color:var(--lt);font-family:inherit;flex-shrink:0;line-height:1.4;}
 .next-up-skip:hover{color:var(--md);background:var(--bg);}
 .bp-toggle{margin-bottom:10px;}
@@ -80,6 +92,8 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .chk:hover{border-color:var(--grn);color:var(--grn);}
 .chk.on{background:var(--grn);border-color:var(--grn);color:var(--w);}
 .sbtn{background:none;border:.5px solid var(--br);border-radius:8px;padding:4px 7px;font-size:14px;cursor:pointer;color:var(--lt);line-height:1;font-family:inherit;transition:all .15s;}
+.sbtn.ex-rm-btn{font-size:13px;}
+.sbtn.ex-rm-btn:hover{color:var(--red);border-color:rgba(201,75,42,.3);background:#FDF0EC;}
 .sbtn:hover{color:var(--md);background:var(--bg);}
 .sbtn:disabled{opacity:.3;pointer-events:none;}
 /* ── RESPONSIVE ── */
@@ -134,7 +148,13 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .ex-xbtn.open{transform:rotate(180deg);color:var(--dk);}
 /* exercise detail panel */
 .ex-detail{border-top:.5px solid var(--br);padding:0 14px;max-height:0;overflow:hidden;transition:max-height .35s ease,padding .3s;}
-.ex-detail.open{padding:13px 14px 15px;max-height:700px;}
+.ex-detail.open{padding:13px 14px 15px;max-height:900px;}
+/* Action row inside expanded card — replace + remove */
+.ex-actions{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:.5px dashed var(--br);}
+.ex-action-btn{flex:1;background:none;border:.5px solid var(--br);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--md);cursor:pointer;font-family:inherit;transition:all .15s;}
+.ex-action-btn:hover{background:var(--bg);color:var(--dk);}
+.ex-action-btn.ex-rm{color:var(--lt);}
+.ex-action-btn.ex-rm:hover{background:#FDF0EC;border-color:rgba(201,75,42,.3);color:var(--red);}
 .ex-desc{font-size:13px;color:var(--md);line-height:1.7;margin-bottom:9px;}
 .ex-tip{font-size:12px;color:var(--grn);background:#EBF4EF;padding:6px 10px;border-radius:7px;line-height:1.6;margin-bottom:9px;}
 .yt-btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#1E4E8C;background:#EAF0F9;border:.5px solid #B5CFF0;border-radius:7px;padding:4px 10px;cursor:pointer;text-decoration:none;margin-bottom:11px;}
@@ -655,17 +675,11 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 	</div>
   </div>
 
-  <div class="sec">
-	<div class="sec-head">
-	  <span class="sec-lbl">Vadba</span>
-	  <div style="display:flex;gap:6px;">
-		<button class="rbtn" id="baw" onclick="refreshWorkout()">↺ Zamenjaj vaje</button>
-		<button class="rbtn" id="split-edit-btn" onclick="openSplitPicker()">⚙ Plan</button>
-	  </div>
-	</div>
+  <div class="sec workout-sec">
 	<div class="next-up" id="next-up"></div>
-	<div class="bp-toggle" id="bp-toggle">
-	  <button class="bp-toggle-btn" onclick="togBpManual()">Druga vadba ▾</button>
+	<div class="workout-actions-row">
+	  <button class="ghost-btn" id="baw" onclick="refreshWorkout()">↺ Zamenjaj vaje</button>
+	  <button class="ghost-btn" id="split-edit-btn" onclick="openSplitPicker()">⚙ Plan vadb</button>
 	</div>
 	<div class="bpsel" id="bpsel" style="display:none;"></div>
 	<div id="wc"></div>
@@ -1108,7 +1122,7 @@ function saveElog(name,data){const l=loadElog();l[name]=data;try{localStorage.se
 let exExp={};  // UI state: which exercises are expanded
 
 // ─── STATE ──────────────────────────────────────────────────
-let S={meals:[],exp:[false,false,false,false,false],md:[false,false,false,false,false],exd:[],lf:false,diet:[],easy:true,wt:'lower',ex:[],extras:[]};
+let S={meals:[],exp:[false,false,false,false,false],md:[false,false,false,false,false],exd:[],lf:false,diet:[],easy:true,wt:'',ex:[],extras:[]};
 
 // ─── AUTH ────────────────────────────────────────────────────
 let AUTH = null; // {username, pin, displayName}
@@ -1494,27 +1508,59 @@ function renderNextUp(){
   const nextNext=sp.days[(sp.position+1)%sp.days.length];
   const el=document.getElementById('next-up');
   if(!el)return;
-  // If user picked a different workout manually for today (not matching split), show that
   const showing=S.wt;
   const isOnPlan=showing===next;
   const w=WKT[showing];
   const exCount=w?.ex?.length||0;
+
+  // REST DAY — special layout, mark-done still advances split
+  if(showing==='rest'){
+    el.innerHTML=`
+      <div class="next-up-body">
+        <div class="next-up-lbl">Danes je na planu</div>
+        <div class="next-up-name">😌 Počitek</div>
+        <div class="next-up-meta">${isOnPlan?'Nato: '+(WT_LBL[nextNext]||nextNext):''}</div>
+      </div>
+      <div class="next-up-actions">
+        <button class="next-up-btn" onclick="togBpManual()" title="Izberi drugo vadbo">Spremeni</button>
+        ${isOnPlan?`<button class="next-up-btn primary" onclick="markWorkoutDone()" title="Potrdi počitek in pojdi na naslednjo">✓ Potrdi</button>`:''}
+      </div>
+    `;
+    return;
+  }
+
+  // ACTIVE WORKOUT — standard layout
+  const planLabel=isOnPlan?'Danes je na planu':'Trening (ročno izbran)';
+  const isDone=!!S.workoutDone;
   el.innerHTML=`
     <div class="next-up-body">
-      <div class="next-up-lbl">${isOnPlan?'Tvoj naslednji trening':'Trening (ročno izbran)'}</div>
+      <div class="next-up-lbl">${planLabel}${isDone?' · ✓ opravljeno':''}</div>
       <div class="next-up-name">${WT_EMOJI[showing]||'◆'} ${WT_LBL[showing]||showing}</div>
-      <div class="next-up-meta">${exCount?exCount+' vaj':''} ${isOnPlan?' · nato: '+(WT_LBL[nextNext]||nextNext):''}</div>
+      <div class="next-up-meta">${exCount?exCount+' vaj':''}${isOnPlan?' · jutri: '+(WT_LBL[nextNext]||nextNext):''}</div>
     </div>
-    ${isOnPlan?`<button class="next-up-skip" onclick="markWorkoutDone()" title="Označi kot opravljeno in pojdi na naslednjo">✓ končano</button>`:`<button class="next-up-skip" onclick="resetToPlan()" title="Vrni na plan">↺ na plan</button>`}
+    <div class="next-up-actions">
+      <button class="next-up-btn" onclick="togBpManual()" title="Izberi drugo vadbo za danes">Spremeni</button>
+      ${isDone?'':`<button class="next-up-btn primary" onclick="markWorkoutDone()" title="Označi kot opravljeno in pojdi na naslednjo">✓ Opravljeno</button>`}
+    </div>
   `;
 }
 
 function markWorkoutDone(){
-  if(!confirm('Označi kot opravljeno in pojdi na naslednji trening v planu?'))return;
+  if(!confirm('Označiti vadbo kot opravljeno?\n\nNaslednji trening v planu se bo prikazal jutri.'))return;
+  // Advance the split position so TOMORROW shows the next workout.
+  // We DO NOT change today's S.wt — user can still see the workout they did.
   advanceSplit();
-  const next=nextWorkoutInSplit();
-  S.wt=next;initWorkout();save();
-  renderBp();renderWorkout();renderNextUp();renderTracker();
+  // Mark today as completed (used by carry-over check across days)
+  S.workoutDone=true;save();
+  renderNextUp(); // update "Nato:" label
+  // Brief visual confirmation
+  const el=document.getElementById('next-up');
+  if(el){
+    el.style.transition='background 0.4s';
+    const orig=el.style.background;
+    el.style.background='#EBF4EF';
+    setTimeout(()=>{el.style.background=orig;},900);
+  }
 }
 
 function resetToPlan(){
@@ -1524,13 +1570,15 @@ function resetToPlan(){
 
 function togBpManual(){
   const sel=document.getElementById('bpsel');
-  const tog=document.querySelector('.bp-toggle-btn');
-  if(sel.style.display==='none'){
+  if(!sel)return;
+  const tog=document.querySelector('.bp-toggle-btn'); // legacy, may not exist
+  const isHidden=sel.style.display==='none'||sel.style.display==='';
+  if(isHidden){
     sel.style.display='flex';
-    tog.textContent='Skrij ▴';
+    if(tog)tog.textContent='Skrij ▴';
   }else{
     sel.style.display='none';
-    tog.textContent='Druga vadba ▾';
+    if(tog)tog.textContent='Druga vadba ▾';
   }
 }
 
@@ -1944,8 +1992,7 @@ function renderWorkout(){
 		${descHtml}
 	  </div>`;
 	}).join('');
-	c.innerHTML=`<div class="badge cf">⚡ CrossFit WOD — Teden ${WEEK_NUM}</div>
-	<div class="wod-card" id="wod-card">
+	c.innerHTML=`<div class="wod-card" id="wod-card">
 	  <div class="wod-head">
 		<span class="wod-type ${typeClass}">${wod.type}</span>
 		<span class="wod-title">${wod.name}</span>
@@ -1965,8 +2012,7 @@ function renderWorkout(){
   }
   if(S.wt==='cardio'){
 	setBaw(false);document.getElementById('add-ex-row').style.display='none';
-	c.innerHTML=`<div class="badge cardio">◈ Kardio dan</div>
-	  <div style="font-size:12px;color:var(--lt);margin-bottom:10px;">Izberi kaj boš naredila, nastavi čas in odkljukaj ob koncu.</div>`+
+	c.innerHTML=`<div style="font-size:12px;color:var(--lt);margin-bottom:10px;">Izberi kaj boš naredila, nastavi čas in odkljukaj ob koncu.</div>`+
 	  S.ex.map((e,i)=>{
 		const done=S.exd[i];const open=!!exExp[i];
 		const info=getExInfo(e.n)||{};
@@ -1983,7 +2029,6 @@ function renderWorkout(){
 			<div class="edot" style="background:#1E4E8C"></div>
 			<div class="ename">${e.n}</div>
 			<button class="ep cardio-time" onclick="togCardioTime(${i})" style="background:#EAF0F9;color:#1E4E8C;border:none;cursor:pointer;padding:3px 8px;border-radius:5px;font-size:12px;font-family:inherit;">${parsedMin} min</button>
-			<button class="sbtn" onclick="swapEx(${i})">↺</button>
 			<button class="chk${done?' on':''}" id="echk${i}" onclick="togEx(${i})">${done?'✓':'○'}</button>
 			<button class="ex-xbtn${open?' open':''}" id="exb${i}" onclick="togExInfo(${i})">▾</button>
 		  </div>
@@ -1999,12 +2044,16 @@ function renderWorkout(){
 		  <div class="ex-detail${open?' open':''}" id="exd${i}">
 			${descHtml}
 			<div style="font-size:12px;color:var(--grn);background:#EBF4EF;padding:5px 10px;border-radius:7px;margin-top:4px;">🔥 Pri ${parsedMin} min: ~${kcalEst} kcal</div>
+			<div class="ex-actions">
+			  <button class="ex-action-btn" onclick="swapEx(${i})" title="Zamenjaj s podobno aktivnostjo">↺ Zamenjaj</button>
+			  <button class="ex-action-btn ex-rm" onclick="removeEx(${i})" title="Odstrani aktivnost">✕ Odstrani</button>
+			</div>
 		  </div>
 		</div>`;
 	  }).join('');
 	return;
   }
-  else if(S.wt==='rest'){setBaw(true);c.innerHTML=`<div class="badge rest">○ Počitek</div><div class="info-box">Danes je dan počitka. Telo se regenerira in mišice rastejo.<br><br>Lahka hoja ali raztezanje sta vedno dobrodošla.</div>`;document.getElementById('add-ex-row').style.display='none';}
+  else if(S.wt==='rest'){setBaw(true);c.innerHTML=`<div class="info-box" style="text-align:center;">😌 <b>Danes je počitek</b><br><br>Telo se regenerira in mišice rastejo.<br>Lahka hoja ali raztezanje sta vedno dobrodošla.</div>`;document.getElementById('add-ex-row').style.display='none';}
   else{
 	setBaw(false,'↺ Zamenjaj vaje');document.getElementById('add-ex-row').style.display='flex';
 	const bc=S.wt==='glute'?'glute':'gym';
@@ -2016,20 +2065,19 @@ function renderWorkout(){
 	  return sum+sg.sets;
 	},0);
 	const estMin=Math.round(totalSets*2.5);  // ~2.5 min per set incl. rest
-	c.innerHTML=`<div class="badge ${bc}">${S.wt==='glute'?'◉':S.wt==='full'?'◈':'◆'} ${w.title}</div>
-	<div class="workout-summary">
-	  <button class="ws-overview-btn" onclick="togWorkoutPreview()">📋 Hitri pregled vaj <span id="ws-arrow">▾</span></button>
+	c.innerHTML=`<div class="workout-summary">
 	  <div class="ws-stats">
 		<span class="ws-stat"><b>${S.ex.length}</b> vaj</span>
 		<span class="ws-stat"><b>${totalSets}</b> serij</span>
 		<span class="ws-stat">~<b>${estMin}</b> min</span>
 	  </div>
+	  <button class="ws-overview-btn" onclick="togAllExercises()" id="ws-toggle-all">Razširi vse ▾</button>
 	</div>
-	<div class="workout-preview" id="workout-preview">
+	<div class="workout-preview show" id="workout-preview">
 	  ${S.ex.map((e,i)=>{
 		const [rl,rh]=getRepRange(e.n,S.wt);
 		const sg=suggestProgression(e.n,rl,rh,(getExInfo(e.n)||{}).kg||0);
-		return `<div class="wp-row">
+		return `<div class="wp-row" onclick="togExInfo(${i})" style="cursor:pointer;">
 		  <span class="wp-num">${i+1}.</span>
 		  <span class="wp-name">${e.n}</span>
 		  <span class="wp-target-mini">${sg.sets}×${sg.reps} · ${sg.kg||'—'}kg</span>
@@ -2108,11 +2156,15 @@ function renderWorkout(){
 			<div class="edot"></div>
 			<div class="ename">${e.n}${e.custom?` <span style="font-size:11px;color:var(--red);">ročno</span>`:''}${logged.kg?` <span style="font-size:11px;color:var(--grn);">${logged.s||'?'}×${logged.r||'?'} · ${logged.kg}kg</span>`:''}</div>
 			<div class="epills"><span class="ep${pk?' pk':''}" title="${sugg.note}">${sugg.kg||'—'}kg</span><span class="ep${pk?' pk':''}">${sugg.sets}×${sugg.reps}</span></div>
-			<button class="sbtn" onclick="swapEx(${i})">↺</button>
 			<button class="chk${done?' on':''}" id="echk${i}" onclick="togEx(${i})">${done?'✓':'○'}</button>
 			<button class="ex-xbtn${open?' open':''}" id="exb${i}" onclick="togExInfo(${i})" title="Navodila in log">▾</button>
 		  </div>
-		  <div class="ex-detail${open?' open':''}" id="exd${i}">${ingHtml}</div>
+		  <div class="ex-detail${open?' open':''}" id="exd${i}">${ingHtml}
+			<div class="ex-actions">
+			  <button class="ex-action-btn" onclick="swapEx(${i})" title="Zamenjaj s podobno vajo">↺ Zamenjaj</button>
+			  <button class="ex-action-btn ex-rm" onclick="removeEx(${i})" title="Odstrani vajo">✕ Odstrani</button>
+			</div>
+		  </div>
 		</div>`;
 	  }).join('');
   }
@@ -2138,15 +2190,23 @@ function saveWodResult(){
   const ok=document.getElementById('wod-ok');
   if(ok){ok.textContent='✓ shranjeno';ok.classList.add('show');setTimeout(()=>ok.classList.remove('show'),2500);}
 }
-function togWorkoutPreview(){
-  const p=document.getElementById('workout-preview');
-  const btn=document.querySelector('.ws-overview-btn');
-  const arrow=document.getElementById('ws-arrow');
-  if(!p)return;
-  const isOpen=p.classList.toggle('show');
-  if(btn)btn.classList.toggle('open',isOpen);
-  if(arrow)arrow.textContent=isOpen?'▴':'▾';
+function togAllExercises(){
+  // Determine current state — if any exercise is expanded, collapse all; else expand all
+  const anyOpen=S.ex.some((_,i)=>!!exExp[i]);
+  S.ex.forEach((_,i)=>{exExp[i]=!anyOpen;});
+  // Update DOM without full re-render to preserve scroll/state
+  S.ex.forEach((_,i)=>{
+	const det=document.getElementById('exd'+i);
+	const btn=document.getElementById('exb'+i);
+	if(det)det.classList.toggle('open',!anyOpen);
+	if(btn)btn.classList.toggle('open',!anyOpen);
+  });
+  const tog=document.getElementById('ws-toggle-all');
+  if(tog)tog.textContent=anyOpen?'Razširi vse ▾':'Skrij vse ▴';
 }
+
+// Backward-compat: old callers
+function togWorkoutPreview(){togAllExercises();}
 
 function togCardioTime(i){
   const el=document.getElementById('cte'+i);
@@ -2279,37 +2339,263 @@ async function api(sys,msg){
   const d=await r.json();
   return (d.text||'').trim();
 }
+// ─── MACRO-AWARE MEAL REFRESH ────────────────────────────────
+// Calculate remaining macros for today (target - eaten + extras eaten)
+// Excludes the meal at index `excludeIdx` so we know what's left WITHOUT counting
+// the one we're about to replace.
+function getRemainingMacros(excludeIdx){
+  const targets=calcMacroTargets();
+  if(!targets)return null;
+  let eatenP=0,eatenC=0,eatenF=0;
+  S.meals.forEach((m,i)=>{
+	if(i===excludeIdx)return; // skip the meal being replaced
+	if(!S.md[i])return;       // only count eaten meals
+	const kcal=parseInt(m.k||m.kcal)||0;
+	const est=estimateMacros(m.f||m.food||'',kcal);
+	eatenP+=est.p;eatenC+=est.c;eatenF+=est.f;
+  });
+  (S.extras||[]).forEach(e=>{
+	if(!e.done)return;
+	const kcal=parseInt(e.k)||0;
+	const est=estimateMacros(e.f||'',kcal);
+	eatenP+=est.p;eatenC+=est.c;eatenF+=est.f;
+  });
+  return {
+	p:targets.p-eatenP,
+	c:targets.c-eatenC,
+	f:targets.f-eatenF,
+	targets,
+	eaten:{p:eatenP,c:eatenC,f:eatenF}
+  };
+}
+
+// Decide what kind of meal to suggest based on remaining macros + context
+// Returns object with `bias` ('protein'|'carb_low'|'fat_low'|'balanced'|'last_meal_protein')
+// and `prompt` text to inject into the AI prompt for swapMeal.
+function getMacroAwareMealSuggestion(mealIdx){
+  const rem=getRemainingMacros(mealIdx);
+  if(!rem)return {bias:'balanced',prompt:''};
+
+  // How many unfinished planned meals are left including this one?
+  const remainingMealCount=S.meals.filter((m,i)=>i===mealIdx||!S.md[i]).length;
+  const isLastUnfinished=remainingMealCount<=1;
+
+  // % of target consumed so far for each macro (excluding this meal)
+  const targets=rem.targets;
+  const pPct=targets.p>0?rem.eaten.p/targets.p:0;
+  const cPct=targets.c>0?rem.eaten.c/targets.c:0;
+  const fPct=targets.f>0?rem.eaten.f/targets.f:0;
+
+  // Last unfinished meal — prioritize protein if behind
+  if(isLastUnfinished&&pPct<0.7){
+	return {
+	  bias:'last_meal_protein',
+	  prompt:`POMEMBNO: To je zadnji obrok za danes. Uporabnica še potrebuje ~${Math.max(0,Math.round(rem.p))}g beljakovin do dnevnega cilja (${targets.p}g). Predlagaj jed z visoko vsebnostjo beljakovin (vsaj 25-35g). Izogni se jedem brez mesa/skute/jajc/whey-a.`
+	};
+  }
+
+  // Carbs significantly over already — restriction takes priority over protein push
+  if(cPct>0.85&&rem.c<20){
+	const proteinNote=pPct<0.5?' Hkrati naj ima jed visoko vsebnost beljakovin (piščanec, tuna, skuta, jajca).':'';
+	return {
+	  bias:'carb_low',
+	  prompt:`POMEMBNO: Uporabnica je že zaužila skoraj vse OH za dan (${rem.eaten.c}g od ${targets.c}g cilja). Izogni se jedem z veliko ogljikovih hidratov (kruh, riž, testenine, krompir, kosmiči, sladko). Predlagaj nekaj z beljakovinami in zelenjavo.${proteinNote}`
+	};
+  }
+
+  // Fat significantly over — restriction takes priority over protein push
+  if(fPct>0.85&&rem.f<10){
+	const proteinNote=pPct<0.5?' Hkrati naj ima jed visoko vsebnost beljakovin.':'';
+	return {
+	  bias:'fat_low',
+	  prompt:`POMEMBNO: Uporabnica je že zaužila skoraj vse maščobe za dan (${rem.eaten.f}g od ${targets.f}g cilja). Izogni se mastnim jedem (oreščki, avokado, smetana, maslo, ocvrto). Predlagaj puste beljakovine in zelenjavo.${proteinNote}`
+	};
+  }
+
+  // Protein significantly behind schedule (only if no carb/fat restriction)
+  if(pPct<0.5&&rem.p>20){
+	return {
+	  bias:'protein',
+	  prompt:`POMEMBNO: Uporabnica je v deficitu beljakovin (zaužila ${rem.eaten.p}g od ${targets.p}g cilja). Predlagaj jed z visoko vsebnostjo beljakovin (piščanec, tuna, skuta, jajca, whey, losos, skyr).`
+	};
+  }
+
+  // Default — balanced
+  return {bias:'balanced',prompt:''};
+}
+
 async function swapMeal(i){
   const card=document.getElementById('mc'+i),btn=card.querySelector('.sbtn');
   btn.disabled=true;btn.innerHTML='<span class="spin">↺</span>';card.classList.add('loading');
   rememberAvoidedMeal(S.meals[i].f||S.meals[i].food);
   const ez=S.easy?'Recept mora biti hiter in enostaven (konzerve, jajca, pečena kura, whey shake, mikrovalovna). Ni kompleksnega kuhanja.':'';
   const lfc=dietPrompt()+' '+avoidPrompt();
+  const macroHint=getMacroAwareMealSuggestion(i);
   try{
-	const txt=await api(`Si prehranjevalni svetovalec. Zamenjaj obrok. ${ez} ${lfc} Kalorična vrednost ±50 kcal. Vrni SAMO JSON: {"f":"opis v slovenščini","k":380,"i":[{"n":"sestavina","a":"100 g"}]}`,
+	const txt=await api(`Si prehranjevalni svetovalec. Zamenjaj obrok. ${ez} ${lfc} ${macroHint.prompt} Kalorična vrednost ±50 kcal. Vrni SAMO JSON: {"f":"opis v slovenščini","k":380,"i":[{"n":"sestavina","a":"100 g"}]}`,
 	  `Zamenjaj ${S.meals[i].label.toLowerCase()}: "${S.meals[i].f||S.meals[i].food}" (~${S.meals[i].k||S.meals[i].kcal} kcal). Upoštevaj prehranske posebnosti: ${dietPrompt()} Drugačna alternativa z gramaturami.`);
 	const p=JSON.parse(txt);
 	S.meals[i]={...S.meals[i],...p};save();renderMeals();
   }catch(e){err('Zamenjava ni uspela.');card.classList.remove('loading');btn.disabled=false;btn.innerHTML='↺';}
 }
+// ─── MOVEMENT PATTERN CLASSIFIER ─────────────────────────────
+// Each exercise belongs to a movement pattern. When swapping, only show
+// alternatives from the same pattern.
+const MOVEMENT_PATTERNS = {
+  squat: {
+    label: 'počep',
+    alternatives: ['Goblet počep','Počep s palico','Bolgarski split squat','Smith squat','Leg press','Hack squat','Sumo počep z ročko']
+  },
+  hip_hinge: {
+    label: 'hip hinge / mrtvetek',
+    alternatives: ['Mrtvetek z ročkami (RDL)','Mrtvetek s palico','Cable pull-through','Single-leg RDL','Good morning','Sumo mrtvetek']
+  },
+  hip_thrust: {
+    label: 'hip thrust / glute bridge',
+    alternatives: ['Hip thrust z palico','Hip thrust na stroju','Glute bridge','Single-leg hip thrust','Frog pumps','Banded hip thrust']
+  },
+  lunge: {
+    label: 'izpadni korak',
+    alternatives: ['Izpadni koraki z ročkami','Reverse lunge','Walking lunges','Bolgarski split squat','Step-up','Curtsy lunge']
+  },
+  glute_isolation: {
+    label: 'glute izolacija',
+    alternatives: ['Donkey kicks pri kablu','Cable kickback','Abduktor stroj','Banded clamshell','Side-lying leg raise','Fire hydrant','Frog pumps']
+  },
+  calf: {
+    label: 'lytka',
+    alternatives: ['Dvig na prste — lýtka','Seated calf raise','Standing calf raise','Single-leg calf raise']
+  },
+  horizontal_push: {
+    label: 'horizontalni potisk',
+    alternatives: ['Potisk z ročkami leže','Bench press','Push-up (na kolenih ali polni)','Incline dumbbell press','Cable chest fly','Machine chest press']
+  },
+  vertical_push: {
+    label: 'vertikalni potisk',
+    alternatives: ['Vzdolžni potisk nad glavo','Dumbbell shoulder press','Arnold press','Seated machine press','Push press','Pike push-up']
+  },
+  horizontal_pull: {
+    label: 'horizontalni vlek',
+    alternatives: ['Veslanje z ročko (enoročno)','Veslanje v upognjenem položaju','Cable row','Seated machine row','TRX veslanje','Inverted row']
+  },
+  vertical_pull: {
+    label: 'vertikalni vlek',
+    alternatives: ['Lat pulldown','Assisted pull-up','Pull-up','Cable pulldown','Straight-arm pulldown']
+  },
+  biceps: {
+    label: 'biceps',
+    alternatives: ['Biceps curl z ročkami','Hammer curl','Cable curl','Preacher curl','Concentration curl','Incline dumbbell curl']
+  },
+  triceps: {
+    label: 'triceps',
+    alternatives: ['Triceps potisk pri kablu','Triceps dip','Overhead triceps extension','Skull crusher','Diamond push-up','Cable rope pushdown']
+  },
+  core: {
+    label: 'jedro / trebuh',
+    alternatives: ['Plank','Sit-up','Crunch','Hanging leg raise','Russian twist','Dead bug','Bird dog','Plank z izmenjevanjem rok']
+  },
+  cardio: {
+    label: 'kardio',
+    alternatives: ['Tek (zunaj ali tekalna steza)','Kolesarjenje (zunaj ali sobno kolo)','Elipsa','Veslalni ergometer','Plavanje','Hoja (hiter tempo, zunaj)','Pohod na Pohorje 🏔']
+  },
+  general: {
+    label: 'splošna',
+    alternatives: []
+  }
+};
+
+function classifyMovement(name){
+  if(!name)return 'general';
+  const n=name.toLowerCase();
+  // Specific patterns FIRST (before cardio) to avoid "mrtvetek" matching "tek"
+  if(/hip thrust|glute bridge|frog pump|bridge/i.test(n))return 'hip_thrust';
+  if(/lunge|izpadn|step.?up|split squat/i.test(n))return 'lunge';
+  if(/deadlift|mrtv(et|v)|\bRDL\b|pull.?through|good morning/i.test(n))return 'hip_hinge';
+  if(/squat|po(č|c)ep|leg press|hack/i.test(n))return 'squat';
+  if(/donkey|kickback|abduktor|clamshell|fire hydrant|side.?lying.*leg|leg raise.*side/i.test(n))return 'glute_isolation';
+  if(/calf|prste.*l(y|ý)tk|l(y|ý)tk/i.test(n))return 'calf';
+  if(/bench press|chest press|chest fly|push.?up|potisk.*ležе?|leže.*potisk|ročkami leže|fly|incline.*press/i.test(n))return 'horizontal_push';
+  if(/shoulder press|overhead press|push press|arnold|vzdolžn.*potisk|nad glavo|pike push/i.test(n))return 'vertical_push';
+  if(/pulldown|pull.?up|pullup|chinup|chin.?up|lat pull/i.test(n))return 'vertical_pull';
+  if(/row|veslan/i.test(n))return 'horizontal_pull';
+  if(/biceps|curl/i.test(n))return 'biceps';
+  if(/triceps|skull crusher|dip|pushdown/i.test(n))return 'triceps';
+  if(/plank|sit.?up|crunch|leg raise|russian twist|dead bug|bird dog|core|trebu/i.test(n))return 'core';
+  // Cardio LAST (broad word "tek" causes false positives)
+  if(/\btek\b|kolesar|elipsa|veslal(ni|ec)|plavanj|\bhoja\b|pohod|kardio|tekaln|bicikel/i.test(n))return 'cardio';
+  return 'general';
+}
+
+function getMovementAlternatives(name){
+  const pattern=classifyMovement(name);
+  const alts=MOVEMENT_PATTERNS[pattern]?.alternatives||[];
+  // Filter out the current exercise (case-insensitive match)
+  const lower=name.toLowerCase();
+  return {
+	pattern,
+	label:MOVEMENT_PATTERNS[pattern]?.label||'splošna',
+	alternatives:alts.filter(a=>a.toLowerCase()!==lower)
+  };
+}
+
 async function swapEx(i){
   const card=document.getElementById('ew'+i),btn=card?.querySelector('.sbtn');
   if(!btn||btn.disabled)return;
+  const cur=S.ex[i];
+  if(!cur)return;
   btn.disabled=true;btn.innerHTML='<span class="spin">↺</span>';card.classList.add('loading');
+
+  // Movement pattern + curated alternatives
+  const mv=getMovementAlternatives(cur.n);
+  // Also avoid other exercises currently in the workout
+  const otherInWorkout=S.ex.filter((_,idx)=>idx!==i).map(e=>e.n.toLowerCase());
+  const candidates=mv.alternatives.filter(a=>!otherInWorkout.includes(a.toLowerCase()));
+
   if(S.wt==='cardio'){
+	const altList=candidates.length?`Izberi eno izmed: ${candidates.join(', ')}.`:'';
 	try{
-	  const txt=await api('Si fitnes trener. Predlagaj alternativno kardio aktivnost. Vrni SAMO JSON: {"n":"ime aktivnosti v slovenščini","s":"1","r":"30 min","kcal":200}',
-		`Zamenjaj kardio aktivnost "${S.ex[i].n}" z drugačno alternativo.`);
-	  const p=JSON.parse(txt);S.ex[i]={...S.ex[i],...p};save();renderWorkout();
+	  const txt=await api(
+		`Si fitnes trener. Predlagaj alternativno kardio aktivnost iz iste kategorije gibanja. ${altList} Vrni SAMO JSON: {"n":"ime aktivnosti v slovenščini","s":"1","r":"30 min","kcal":200}`,
+		`Zamenjaj kardio aktivnost "${cur.n}" z drugačno alternativo iz iste skupine.`
+	  );
+	  const p=JSON.parse(txt);S.ex[i]={...cur,...p};save();renderWorkout();
 	}catch(e){err('Zamenjava ni uspela.');card.classList.remove('loading');btn.disabled=false;btn.innerHTML='↺';}
 	return;
   }
-  const focus=S.wt==='glute'?'zadnjico (glute focus)':'isto mišično skupino';
+
+  // Strength: stay in same movement pattern
+  const altList=candidates.length
+	?`OBVEZNO izberi eno od teh alternativ (vse so iz iste mišične skupine in vzorca giba — ${mv.label}): ${candidates.join(', ')}.`
+	:`Predlagaj alternativo za isti vzorec giba (${mv.label}) in isto mišično skupino.`;
   try{
-	const txt=await api(`Si fitnes trener za telovadnico. Vrni SAMO JSON: {"n":"ime vaje v slovenščini","s":"3","r":"12"}`,
-	  `Zamenjaj vajo "${S.ex[i].n}" (${S.ex[i].s}×${S.ex[i].r}) z alternativo za ${focus}.`);
+	const txt=await api(
+	  `Si fitnes trener za telovadnico. ${altList} Vrni SAMO JSON: {"n":"ime vaje v slovenščini","s":"3","r":"12"}`,
+	  `Zamenjaj vajo "${cur.n}" (${cur.s}×${cur.r}). Vzorec giba: ${mv.label}.`
+	);
 	const p=JSON.parse(txt);S.ex[i]={n:p.n,s:p.s,r:p.r};save();renderWorkout();
   }catch(e){err('Zamenjava ni uspela.');card.classList.remove('loading');btn.disabled=false;btn.innerHTML='↺';}
+}
+
+// ─── REMOVE EXERCISE ────────────────────────────────────────
+// Safely removes an exercise from the workout. Preserves history (exlog
+// is keyed by exercise name, not index, so existing logs remain intact).
+function removeEx(i){
+  if(!S.ex||!S.ex[i])return;
+  const removedName=S.ex[i].n;
+  if(!confirm(`Odstrani "${removedName}" iz današnje vadbe?\n\nZgodovina vaje ostane shranjena.`))return;
+  // Remove from arrays — keep them consistent
+  S.ex.splice(i,1);
+  if(Array.isArray(S.exd))S.exd.splice(i,1);
+  // Clean up UI expansion state for removed index, shift rest down
+  const newExp={};
+  Object.keys(exExp).forEach(k=>{
+	const idx=parseInt(k);
+	if(isNaN(idx))return;
+	if(idx<i)newExp[idx]=exExp[k];
+	else if(idx>i)newExp[idx-1]=exExp[k];
+  });
+  exExp=newExp;
+  save();renderWorkout();renderTracker();
 }
 async function refreshMeals(){
   const btn=document.getElementById('bam');btn.disabled=true;btn.innerHTML='<span class="spin">↺</span> Generiram...';
