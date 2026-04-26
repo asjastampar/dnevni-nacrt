@@ -2528,17 +2528,23 @@ function getMovementAlternatives(name){
 }
 
 async function swapEx(i){
-  const card=document.getElementById('ew'+i),btn=card?.querySelector('.sbtn');
+  const card=document.getElementById('ew'+i);
+  // Find the swap action button (new .ex-action-btn class, exclude the .ex-rm one)
+  // Fall back to legacy .sbtn for any old DOM cases.
+  const btn=card?.querySelector('.ex-action-btn:not(.ex-rm)')||card?.querySelector('.sbtn');
   if(!btn||btn.disabled)return;
   const cur=S.ex[i];
   if(!cur)return;
-  btn.disabled=true;btn.innerHTML='<span class="spin">↺</span>';card.classList.add('loading');
+  const origLabel=btn.innerHTML; // remember to restore on error
+  btn.disabled=true;btn.innerHTML='<span class="spin">↺</span> Zamenjujem...';card.classList.add('loading');
 
   // Movement pattern + curated alternatives
   const mv=getMovementAlternatives(cur.n);
   // Also avoid other exercises currently in the workout
   const otherInWorkout=S.ex.filter((_,idx)=>idx!==i).map(e=>e.n.toLowerCase());
   const candidates=mv.alternatives.filter(a=>!otherInWorkout.includes(a.toLowerCase()));
+
+  const restoreBtn=()=>{card.classList.remove('loading');btn.disabled=false;btn.innerHTML=origLabel;};
 
   if(S.wt==='cardio'){
 	const altList=candidates.length?`Izberi eno izmed: ${candidates.join(', ')}.`:'';
@@ -2548,7 +2554,7 @@ async function swapEx(i){
 		`Zamenjaj kardio aktivnost "${cur.n}" z drugačno alternativo iz iste skupine.`
 	  );
 	  const p=JSON.parse(txt);S.ex[i]={...cur,...p};save();renderWorkout();
-	}catch(e){err('Zamenjava ni uspela.');card.classList.remove('loading');btn.disabled=false;btn.innerHTML='↺';}
+	}catch(e){err('Zamenjava ni uspela.');restoreBtn();}
 	return;
   }
 
@@ -2562,7 +2568,7 @@ async function swapEx(i){
 	  `Zamenjaj vajo "${cur.n}" (${cur.s}×${cur.r}). Vzorec giba: ${mv.label}.`
 	);
 	const p=JSON.parse(txt);S.ex[i]={n:p.n,s:p.s,r:p.r};save();renderWorkout();
-  }catch(e){err('Zamenjava ni uspela.');card.classList.remove('loading');btn.disabled=false;btn.innerHTML='↺';}
+  }catch(e){err('Zamenjava ni uspela.');restoreBtn();}
 }
 
 // ─── REMOVE EXERCISE ────────────────────────────────────────
