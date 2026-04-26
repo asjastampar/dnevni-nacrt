@@ -538,6 +538,13 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 	  </div>
 	</div>
 	<div class="goals-calc" id="goals-calc"></div>
+	<div style="background:var(--bg);border-radius:9px;padding:11px 13px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+	  <div>
+		<div style="font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">Plan vadb</div>
+		<div style="font-size:13px;color:var(--md);" id="profile-split-summary">—</div>
+	  </div>
+	  <button onclick="closeGoals();openSplitPicker();" style="background:var(--w);color:var(--md);border:.5px solid var(--br);border-radius:9px;padding:8px 12px;font-size:12px;cursor:pointer;font-family:inherit;flex-shrink:0;">⚙ Uredi</button>
+	</div>
 	<div style="display:flex;gap:8px;margin-top:4px;">
 	  <button onclick="closeGoals()" style="flex:0 0 auto;background:var(--bg);color:var(--md);border:.5px solid var(--br);border-radius:9px;padding:12px 18px;font-size:14px;cursor:pointer;font-family:inherit;">Zapri</button>
 	  <button class="modal-btn" style="flex:1;margin-top:0;" onclick="saveGoals()">Shrani profil →</button>
@@ -679,7 +686,6 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 	<div class="next-up" id="next-up"></div>
 	<div class="workout-actions-row">
 	  <button class="ghost-btn" id="baw" onclick="refreshWorkout()">↺ Zamenjaj vaje</button>
-	  <button class="ghost-btn" id="split-edit-btn" onclick="openSplitPicker()">⚙ Plan vadb</button>
 	</div>
 	<div class="bpsel" id="bpsel" style="display:none;"></div>
 	<div id="wc"></div>
@@ -2774,6 +2780,14 @@ function openGoals(){
   document.getElementById('g-target').value=G.target||'';
   _selGoal=G.goal||'lose';_selAct=G.act||'light';
   selGoal(_selGoal);selAct(_selAct);
+  // Populate split summary
+  const sumEl=document.getElementById('profile-split-summary');
+  if(sumEl){
+	const sp=getSplit();
+	const splitName=SPLITS[sp.id]?.name||'Po meri';
+	const days=sp.days.map(d=>WT_LBL[d]||d).join(' · ');
+	sumEl.innerHTML=`<b style="color:var(--dk);">${splitName}</b><br><span style="font-size:11px;">${days}</span>`;
+  }
   document.getElementById('goals-overlay').classList.remove('hide');
 }
 function closeGoals(){document.getElementById('goals-overlay').classList.add('hide');}
