@@ -645,6 +645,19 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
     padding:3px 6px !important;
   }
 }
+
+/* Spacing polish: section labels/actions should not touch card edges */
+.sec-head{padding-left:8px;padding-right:8px;}
+.sec > .sec-lbl{display:block;padding-left:8px;padding-right:8px;}
+.kcal-summary + .macro-bar{margin-bottom:28px;}
+.macro-bar + .sec{margin-top:4px;}
+.steps-card,.next-up,.tracker,.hist-card{margin-left:0;margin-right:0;}
+@media(max-width:700px){
+  .sec-head{padding-left:10px;padding-right:10px;}
+  .sec > .sec-lbl{padding-left:10px;padding-right:10px;}
+  .kcal-summary + .macro-bar{margin-bottom:24px;}
+}
+
 </style>
 </head>
 <body>
@@ -849,7 +862,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 	  <input class="add-meal-inp" id="extra-inp" placeholder="+ Dodaj obrok (sladoled, kava, banana...)" onkeydown="if(event.key==='Enter')addExtraMeal()">
 	  <button class="add-meal-btn" id="extra-btn" onclick="addExtraMeal()">Dodaj</button>
 	</div>
-
+  </div>
 
   <div class="sec">
 	<div class="sec-lbl" style="margin-bottom:10px;">Dnevni koraki</div>
