@@ -410,36 +410,53 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .diet-chip{display:inline-flex;align-items:center;background:rgba(255,255,255,.55);border-radius:5px;padding:1px 5px;}
 @media(max-width:500px){.diet-panel{position:fixed;left:.85rem;right:.85rem;top:auto;bottom:1rem;width:auto;}.diet-wrap{position:static;}}
 
-/* calorie budget block */
-/* arc summary */
-.kcal-summary{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:20px 16px 16px;margin-top:8px;}
-.kcal-arc-wrap{position:relative;width:220px;margin:0 auto 4px;}
-.kcal-arc-svg{width:100%;display:block;}
-.arc-bg{stroke:#EDECEA;}
-.arc-fill{stroke:var(--grn);transition:stroke-dasharray .5s ease;}
-.arc-fill.over{stroke:var(--red);}
-.kcal-arc-center{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);text-align:center;width:140px;}
-.kcal-arc-remaining{font-size:32px;font-weight:500;color:var(--dk);line-height:1.1;}
+/* calorie + macro dashboard */
+.kcal-summary{background:var(--w);border:.5px solid var(--br);border-radius:18px;padding:22px 22px 20px;margin-top:12px;box-shadow:0 8px 28px rgba(0,0,0,.025);}
+.kcal-hero{display:grid;grid-template-columns:54px 1fr 150px;gap:18px;align-items:center;}
+.kcal-hero-icon{width:54px;height:54px;border-radius:50%;background:#EEF4EF;color:var(--grn);display:flex;align-items:center;justify-content:center;font-size:25px;flex-shrink:0;}
+.kcal-hero-title{font-size:17px;color:var(--dk);font-weight:500;margin-bottom:3px;}
+.kcal-hero-main{display:flex;align-items:baseline;gap:8px;line-height:1;}
+.kcal-arc-remaining{font-size:42px;font-weight:600;color:var(--grn);letter-spacing:-.04em;line-height:1;}
 .kcal-arc-remaining.over{color:var(--red);}
-.kcal-arc-lbl{font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.07em;}
-.kcal-arc-goal{font-size:11px;color:var(--lt);margin-top:2px;}
-.kcal-arc-cols{display:flex;justify-content:center;gap:40px;margin-top:10px;}
-.kcal-arc-col{text-align:center;}
-.kcal-arc-num{font-size:18px;font-weight:500;color:var(--dk);}
+.kcal-hero-unit{font-size:24px;font-weight:500;color:var(--dk);}
+.kcal-arc-goal{font-size:13px;color:var(--md);margin-top:8px;}
+.kcal-arc-wrap{position:relative;width:142px;height:142px;margin-left:auto;}
+.kcal-arc-svg{width:142px;height:142px;transform:rotate(-90deg);display:block;}
+.arc-bg{stroke:#EDECEA;}
+.arc-fill{stroke:var(--grn);transition:stroke-dasharray .5s ease;filter:drop-shadow(0 4px 8px rgba(42,97,71,.18));}
+.arc-fill.over{stroke:var(--red);}
+.kcal-arc-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.kcal-arc-num{font-size:28px;font-weight:600;color:var(--dk);line-height:1.05;letter-spacing:-.03em;}
 .kcal-arc-num.green{color:var(--grn);}
-.kcal-arc-sub{font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.06em;margin-top:1px;}
-/* macro bar */
-.macro-bar{background:var(--w);border:.5px solid var(--br);border-radius:10px;padding:12px 14px;margin-top:8px;display:flex;align-items:flex-start;justify-content:space-around;}
-.macro-item{text-align:center;flex:1;}
-.macro-val{font-size:15px;font-weight:500;color:var(--dk);}
-.macro-lbl{font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.05em;margin-top:1px;}
-.macro-goal{font-size:11px;color:var(--lt);margin-top:1px;}
-.macro-sep{width:.5px;background:var(--br);align-self:stretch;flex-shrink:0;}
-.macro-prog{height:3px;background:var(--bg);border-radius:2px;overflow:hidden;margin:5px auto 4px;width:80%;}
-.macro-prog-fill{height:3px;border-radius:2px;width:0%;transition:width .4s ease;}
-.p-fill{background:#4A90D9;}
-.c-fill{background:#F5A623;}
-.f-fill{background:#7ED321;}
+.kcal-arc-sub{font-size:13px;color:var(--md);margin-top:8px;line-height:1.2;text-transform:none;letter-spacing:0;}
+.kcal-arc-cols{display:none;}
+.kcal-focus{margin-top:20px;background:linear-gradient(90deg,#EEF6F1 0%,#F8FAF8 100%);border-radius:13px;padding:12px 14px;display:flex;align-items:center;gap:12px;}
+.kcal-focus-icon{width:38px;height:38px;border-radius:50%;background:var(--grn);color:var(--w);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.kcal-focus-title{font-size:15px;font-weight:600;color:var(--grn);margin-bottom:2px;}
+.kcal-focus-text{font-size:13px;color:var(--dk);line-height:1.35;}
+.macro-bar{background:var(--w);border:.5px solid var(--br);border-radius:18px;padding:16px;margin-top:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;box-shadow:0 8px 28px rgba(0,0,0,.02);}
+.macro-item{text-align:left;border-radius:14px;padding:14px 12px 15px;min-height:138px;display:flex;flex-direction:column;background:#FDF8F7;border:none;position:relative;overflow:hidden;}
+.macro-item:nth-child(3){background:#FFF9ED;}
+.macro-item:nth-child(5){background:#FFF6F1;}
+.macro-head{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
+.macro-ico{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;background:#FDE0DD;color:#D93030;flex-shrink:0;}
+.macro-item:nth-child(3) .macro-ico{background:#FFEBC2;color:#F5A623;}
+.macro-item:nth-child(5) .macro-ico{background:#FFE1D4;color:#E95420;}
+.macro-lbl{font-size:15px;color:#D93030;text-transform:none;letter-spacing:0;margin-top:0;font-weight:600;line-height:1.15;}
+.macro-item:nth-child(3) .macro-lbl{color:#E89500;}
+.macro-item:nth-child(5) .macro-lbl{color:#E95420;}
+.macro-val-row{display:flex;align-items:baseline;gap:4px;margin-bottom:8px;}
+.macro-val{font-size:24px;font-weight:600;color:var(--dk);letter-spacing:-.02em;}
+.macro-goal{font-size:16px;color:var(--dk);margin-top:0;}
+.macro-prog{height:4px;background:rgba(0,0,0,.06);border-radius:4px;overflow:hidden;margin:0 0 10px;width:100%;}
+.macro-prog-fill{height:4px;border-radius:4px;width:0%;transition:width .4s ease;}
+.p-fill{background:#E33434;}.c-fill{background:#F5A623;}.f-fill{background:#58B72D;}
+.macro-status{display:inline-flex;align-self:flex-start;margin:0 0 10px;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:600;color:#fff;background:#E33434;line-height:1.2;}
+.macro-item:nth-child(3) .macro-status{background:#F5C84B;color:#1A1A17;}
+.macro-item:nth-child(5) .macro-status{background:#F05A1A;color:#fff;}
+.macro-tip{font-size:13px;color:var(--dk);line-height:1.45;margin-top:auto;}
+.macro-sep{display:none;}
+@media(max-width:500px){.kcal-summary{padding:18px 16px;}.kcal-hero{grid-template-columns:46px 1fr 112px;gap:12px;}.kcal-hero-icon{width:46px;height:46px;font-size:22px;}.kcal-arc-wrap,.kcal-arc-svg{width:112px;height:112px;}.kcal-arc-remaining{font-size:35px;}.kcal-hero-unit{font-size:20px;}.kcal-arc-num{font-size:23px;}.macro-bar{grid-template-columns:1fr;gap:10px;}.macro-item{min-height:auto;}}
 .goal-opt{padding:9px 5px;border:.5px solid var(--br);border-radius:9px;background:none;font-size:13px;color:var(--md);cursor:pointer;font-family:inherit;transition:all .15s;text-align:center;line-height:1.4;}
 .goal-opt:hover{border-color:rgba(0,0,0,.2);color:var(--dk);}
 .goal-opt.active{background:var(--dk);color:var(--w);border-color:var(--dk);}
@@ -609,24 +626,37 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 	  <input class="add-meal-inp" id="extra-inp" placeholder="+ Dodaj obrok (sladoled, kava, banana...)" onkeydown="if(event.key==='Enter')addExtraMeal()">
 	  <button class="add-meal-btn" id="extra-btn" onclick="addExtraMeal()">Dodaj</button>
 	</div>
-	<!-- Lifesum-style calorie summary -->
+	<!-- Dashboard-style calorie summary -->
 	<div class="kcal-summary" id="kcal-summary">
-	  <div class="kcal-arc-wrap">
-		<svg class="kcal-arc-svg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
-		  <path class="arc-bg" d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke-width="14" stroke-linecap="round"/>
-		  <path class="arc-fill" id="arc-fill" d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke-width="14" stroke-linecap="round" stroke-dasharray="0 251"/>
-		</svg>
-		<div class="kcal-arc-center">
-		  <div class="kcal-arc-remaining" id="arc-remaining">—</div>
-		  <div class="kcal-arc-lbl">ostalo</div>
+	  <div class="kcal-hero">
+		<div class="kcal-hero-icon">🔥</div>
+		<div class="kcal-hero-body">
+		  <div class="kcal-hero-title">Še lahko poješ</div>
+		  <div class="kcal-hero-main">
+			<div class="kcal-arc-remaining" id="arc-remaining">—</div>
+			<div class="kcal-hero-unit">kcal</div>
+		  </div>
 		  <div class="kcal-arc-goal" id="arc-goal"></div>
 		</div>
-	  </div>
-	  <div class="kcal-arc-cols">
-		<div class="kcal-arc-col">
-		  <div class="kcal-arc-num" id="arc-eaten">0</div>
-		  <div class="kcal-arc-sub">zaužito</div>
+		<div class="kcal-arc-wrap">
+		  <svg class="kcal-arc-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+			<circle class="arc-bg" cx="50" cy="50" r="40" fill="none" stroke-width="10"/>
+			<circle class="arc-fill" id="arc-fill" cx="50" cy="50" r="40" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="0 251"/>
+		  </svg>
+		  <div class="kcal-arc-center">
+			<div class="kcal-arc-num" id="arc-eaten">0</div>
+			<div class="kcal-arc-sub">kcal zaužito</div>
+		  </div>
 		</div>
+	  </div>
+	  <div class="kcal-focus" id="kcal-focus">
+		<div class="kcal-focus-icon">▮▮▮</div>
+		<div>
+		  <div class="kcal-focus-title" id="kcal-focus-title">Fokus danes</div>
+		  <div class="kcal-focus-text" id="kcal-focus-text">Ko vpišeš obroke, ti pokažem naslednji pameten korak.</div>
+		</div>
+	  </div>
+	  <div class="kcal-arc-cols" style="display:none">
 		<div class="kcal-arc-col" id="arc-burn-col" style="display:none">
 		  <div class="kcal-arc-num green" id="arc-burn">+0</div>
 		  <div class="kcal-arc-sub">porabljeno</div>
@@ -636,24 +666,27 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 	<!-- Macro cards -->
 	<div class="macro-bar" id="macro-bar" style="display:none">
 	  <div class="macro-item">
+		<div class="macro-head"><div class="macro-ico">▮</div><div class="macro-lbl">Beljakovine</div></div>
+		<div class="macro-val-row"><div class="macro-val" id="mk-p">0g</div><div class="macro-goal" id="mg-p"></div></div>
 		<div class="macro-prog"><div class="macro-prog-fill p-fill" id="mpf-p"></div></div>
-		<div class="macro-val" id="mk-p">0g</div>
-		<div class="macro-lbl">beljakovine</div>
-		<div class="macro-goal" id="mg-p"></div>
+		<div class="macro-status" id="ms-p">—</div>
+		<div class="macro-tip" id="mt-p">Dodaj vir beljakovin.</div>
 	  </div>
 	  <div class="macro-sep"></div>
 	  <div class="macro-item">
+		<div class="macro-head"><div class="macro-ico">💧</div><div class="macro-lbl">Ogljikovi hidrati</div></div>
+		<div class="macro-val-row"><div class="macro-val" id="mk-c">0g</div><div class="macro-goal" id="mg-c"></div></div>
 		<div class="macro-prog"><div class="macro-prog-fill c-fill" id="mpf-c"></div></div>
-		<div class="macro-val" id="mk-c">0g</div>
-		<div class="macro-lbl">ogljikovi hidrati</div>
-		<div class="macro-goal" id="mg-c"></div>
+		<div class="macro-status" id="ms-c">—</div>
+		<div class="macro-tip" id="mt-c">Prostor za kompleksne OH.</div>
 	  </div>
 	  <div class="macro-sep"></div>
 	  <div class="macro-item">
+		<div class="macro-head"><div class="macro-ico">💧</div><div class="macro-lbl">Maščobe</div></div>
+		<div class="macro-val-row"><div class="macro-val" id="mk-f">0g</div><div class="macro-goal" id="mg-f"></div></div>
 		<div class="macro-prog"><div class="macro-prog-fill f-fill" id="mpf-f"></div></div>
-		<div class="macro-val" id="mk-f">0g</div>
-		<div class="macro-lbl">maščobe</div>
-		<div class="macro-goal" id="mg-f"></div>
+		<div class="macro-status" id="ms-f">—</div>
+		<div class="macro-tip" id="mt-f">Danes se izogibaj mastnim jedem.</div>
 	  </div>
 	</div>
 
@@ -1494,8 +1527,8 @@ function initWorkout(){
 function toggleEasy(){
   S.easy=!S.easy;
   document.getElementById('et').className='tog-track'+(S.easy?' on-grn':'');
-  save();
-  renderMeals();
+  applyDietToCurrentMeals();
+  save();renderMeals();
 }
 function toggleLF(){
   toggleDiet('lactoseFree');
@@ -1869,10 +1902,10 @@ function calcKcal(){
   const arcBurnEl=document.getElementById('arc-burn');
 
   if(arcEatenEl)arcEatenEl.textContent=totalEaten;
-  if(goalKcal&&arcGoalEl)arcGoalEl.textContent='cilj: '+goalKcal+' kcal';
+  if(goalKcal&&arcGoalEl)arcGoalEl.textContent='Cilj: '+goalKcal+' kcal • Zaužito: '+totalEaten+' kcal';
 
   if(remaining!==null&&arcRemEl){
-	arcRemEl.textContent=(remaining>=0?remaining:remaining)+' kcal';
+	arcRemEl.textContent=(remaining>=0?remaining:remaining);
 	arcRemEl.className='kcal-arc-remaining'+(remaining<0?' over':'');
 	const pct=Math.min(1,totalEaten/goalKcal);
 	const dashLen=Math.round(pct*ARC_LEN);
@@ -2616,14 +2649,8 @@ async function refreshMeals(){
 	  }
 	  return m;
 	}):p;
-if(Array.isArray(cleaned)&&cleaned.length===5){
-  S.meals = S.meals.map((oldMeal,i)=>{
-    if(S.md[i]) return oldMeal; // obkljukane obroke pusti pri miru
-    return {label:LBLS[i], ...cleaned[i]};
-  });
-  save();
-  renderMeals();
-}  }catch(e){err('Generiranje ni uspelo.');}
+	if(Array.isArray(cleaned)&&cleaned.length===5){S.meals=LBLS.map((l,i)=>({label:l,...cleaned[i]}));S.md=[false,false,false,false,false];save();renderMeals();}
+  }catch(e){err('Generiranje ni uspelo.');}
   btn.disabled=false;btn.innerHTML='↺ Zamenjaj vse';
 }
 async function swapCfEx(i){
@@ -2866,6 +2893,20 @@ function renderMacros(){
 	if(pP)pP.style.width=Math.min(100,Math.round(totP/targets.p*100))+'%';
 	if(pC)pC.style.width=Math.min(100,Math.round(totC/targets.c*100))+'%';
 	if(pF)pF.style.width=Math.min(100,Math.round(totF/targets.f*100))+'%';
+	const remP=Math.max(0,targets.p-totP), remC=Math.max(0,targets.c-totC), remF=Math.max(0,targets.f-totF);
+	const setTxt=(id,txt)=>{const el=document.getElementById(id);if(el)el.textContent=txt;};
+	setTxt('ms-p',remP>0?remP+' g manjka':'Doseženo');
+	setTxt('ms-c',totC>targets.c?'Čez cilj':remC+' g do cilja');
+	setTxt('ms-f',totF>=targets.f?'Na zgornji meji':remF+' g do cilja');
+	setTxt('mt-p',remP>0?'Dodaj vir beljakovin, npr. skuta, piščanec, tuna.':'Beljakovine so pokrite — super.');
+	setTxt('mt-c',totC>targets.c?'Danes raje izberi manj OH.':'Prostor za kompleksne OH, npr. riž, krompir, ovseni kosmiči.');
+	setTxt('mt-f',totF>=targets.f?'Danes se izogibaj mastnim jedem.':'Maščobe so še v redu.');
+	let focusTitle='Fokus danes', focusText='Danes si lepo na poti.';
+	if(remP>=20){focusTitle='Fokus danes: Beljakovine';focusText='Manjka ti še '+remP+' g beljakovin do cilja.';}
+	else if(totF>=targets.f){focusTitle='Fokus danes: Lahkotnejši obroki';focusText='Maščobe so na zgornji meji — izberi bolj puste vire.';}
+	else if(totC>targets.c){focusTitle='Fokus danes: Manj ogljikovih hidratov';focusText='Ogljikovi hidrati so že čez cilj — izberi bolj proteinsko opcijo.';}
+	setTxt('kcal-focus-title',focusTitle);
+	setTxt('kcal-focus-text',focusText);
   }
 }
 function renderExtras(){
