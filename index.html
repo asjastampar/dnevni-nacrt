@@ -306,12 +306,38 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 /* weekly tracker */
 .tracker{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:16px;}
 .tracker-head{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--md);margin-bottom:14px;}
-.week-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:14px;}
-.day-cell{display:flex;flex-direction:column;align-items:center;gap:5px;}
-.day-name{font-size:11px;color:var(--lt);}
+/* Weekly tracker rings + streak */
+.week-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px;}
+.week-row + .week-row{margin-bottom:14px;}
+.day-cell{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;padding:6px 2px;cursor:pointer;font-family:inherit;border-radius:10px;transition:background .15s;}
+.day-cell:hover{background:rgba(0,0,0,.03);}
+.day-cell.day-future{opacity:.45;cursor:default;}
+.day-cell.day-future:hover{background:none;}
+.day-cell.day-selected{background:rgba(42,97,71,.07);}
+.day-cell.day-today.day-selected{background:rgba(42,97,71,.12);}
+.day-name{font-size:10.5px;color:var(--lt);letter-spacing:.04em;display:flex;flex-direction:column;align-items:center;line-height:1.1;gap:1px;}
+.day-name .day-num{font-size:9.5px;color:var(--lt);opacity:.7;font-weight:400;}
+.day-cell.day-today .day-name{color:var(--dk);font-weight:600;}
+.day-cell.day-today .day-num{color:var(--md);opacity:1;}
 .day-ring{position:relative;width:36px;height:36px;}
 .day-ring svg{width:36px;height:36px;}
-.day-today .day-name{color:var(--dk);font-weight:500;}
+.day-cell.day-today .day-ring{width:42px;height:42px;}
+.day-cell.day-today .day-ring svg{width:42px;height:42px;}
+/* Streak badge */
+.streak-badge{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#FFEDD5 0%,#FED7AA 100%);color:#9A3412;font-size:12.5px;padding:4px 10px;border-radius:999px;font-weight:500;border:.5px solid rgba(154,52,18,.15);}
+.streak-badge b{font-weight:700;font-size:13.5px;}
+/* Selected day detail card */
+.day-detail{margin-top:8px;}
+.day-detail-card{background:var(--w);border:.5px solid var(--br);border-radius:14px;padding:16px 18px;}
+.day-detail-empty{padding:22px 18px;text-align:center;color:var(--lt);font-size:13px;background:var(--w);border:.5px dashed var(--br);border-radius:14px;}
+.dde-day{font-size:14px;font-weight:600;color:var(--dk);margin-bottom:4px;}
+.dde-msg{font-size:12.5px;color:var(--lt);}
+.dd-head{margin-bottom:14px;}
+.dd-day{font-size:15px;font-weight:600;color:var(--dk);margin-bottom:6px;}
+.dd-pills{display:flex;flex-wrap:wrap;gap:6px;}
+.dd-section-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--lt);margin-top:14px;margin-bottom:8px;font-weight:500;}
+.dd-section-lbl:first-of-type{margin-top:8px;}
+.dd-empty{font-size:13px;color:var(--lt);padding:4px 0;}
 .progress-bars{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .pb-item{display:flex;flex-direction:column;gap:4px;}
 .pb-lbl{font-size:12px;color:var(--md);}
@@ -1183,31 +1209,18 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 </div>
 
   <div class="sec">
-	<div class="sec-lbl" style="margin-bottom:12px;">Tedenski pregled</div>
+	<div class="sec-head">
+	  <span class="sec-lbl">Tedenski pregled</span>
+	  <span class="streak-badge" id="streak-badge" style="display:none;"></span>
+	</div>
 	<div class="tracker">
+	  <div class="week-row" id="week-row-prev"></div>
 	  <div class="week-row" id="week-row"></div>
-	  <div class="progress-bars">
-		<div class="pb-item">
-		  <div style="display:flex;justify-content:space-between;"><span class="pb-lbl">Obroki danes</span><span class="pb-val" id="pb-ml">0/5</span></div>
-		  <div class="pb-track"><div class="pb-fill" id="pb-mf" style="background:var(--red);width:0%"></div></div>
-		</div>
-		<div class="pb-item">
-		  <div style="display:flex;justify-content:space-between;"><span class="pb-lbl">Vadba danes</span><span class="pb-val" id="pb-wl">0/6</span></div>
-		  <div class="pb-track"><div class="pb-fill" id="pb-wf" style="background:var(--grn);width:0%"></div></div>
-		</div>
-	  </div>
+	  <div class="day-detail" id="day-detail"></div>
 	</div>
   </div>
 
   <div class="err" id="eb"></div>
-
-  <div class="sec">
-	<div class="sec-head">
-	  <span class="sec-lbl">Zgodovina</span>
-	  <span style="font-size:12px;color:var(--lt);">zadnjih 14 dni</span>
-	</div>
-	<div id="hist"><div class="hist-empty">Ni še podatkov za pretekle dneve.</div></div>
-  </div>
 </div>
 
 <script>
@@ -1822,7 +1835,8 @@ async function initApp(){
   // Load history from cloud async
   cloudHistory().then(hist=>{
 	if(hist){
-	  // Store in localStorage for renderHistory
+	  // Cache historical day snapshots in localStorage so the weekly tracker
+	  // and per-day detail panel can read them instantly on click.
 	  Object.entries(hist).forEach(([date,data])=>{
 		if(data.main)try{localStorage.setItem(lsKey('dp_v6_'+date),JSON.stringify(data.main));}catch(e){}
 		if(data.track)try{localStorage.setItem(lsKey('track_'+date),JSON.stringify(data.track));}catch(e){}
@@ -1830,7 +1844,8 @@ async function initApp(){
 		if(data.wod)try{localStorage.setItem(lsKey('wodlog_'+date),data.wod);}catch(e){}
 	  });
 	}
-	renderHistory();
+	// Re-render tracker so newly loaded past days light up
+	renderTracker();
   });
 }
 
@@ -2885,7 +2900,9 @@ function addCustomEx(){
 }
 
 // ─── WEEKLY TRACKER ─────────────────────────────────────────
-const WDAYS=['P','T','S','Č','P','S','N'];
+// WDAYS indexed by JS getDay() where Sunday=0. Previous version used
+// Monday-first order which made every day appear shifted by one.
+const WDAYS=['N','P','T','S','Č','P','S'];
 function getTrackData(d){
   try{const s=localStorage.getItem(lsKey('track_'+d));return s?JSON.parse(s):null;}catch(e){return null;}
 }
@@ -2898,54 +2915,174 @@ function getDayScore(d){
   const eTotal=ed.length||6,eDone=ed.filter(Boolean).length;
   return(mDone+eDone)/(mTotal+eTotal);
 }
+
+// Count consecutive days (today backwards) with any progress (score > 0).
+// Today counts if there's live progress in S; previous days come from saved track data.
+function getStreak(){
+  let streak=0;
+  for(let i=0;i<=60;i++){
+	const d=new Date(now);d.setDate(now.getDate()-i);
+	const key=d.toISOString().split('T')[0];
+	const td=i===0?{md:S.md,ed:S.exd,wt:S.wt}:getTrackData(key);
+	if(!td)break;
+	const score=getDayScore(td);
+	if(score===null||score<=0)break;
+	streak++;
+  }
+  return streak;
+}
+
+let _selectedDay=null; // YYYY-MM-DD of currently expanded day, or null
+
 function renderTracker(){
-  // Get Mon of current week
+  const wr=document.getElementById('week-row');
+  const wrPrev=document.getElementById('week-row-prev');
+  if(!wr)return;
+  const todayKey=now.toISOString().split('T')[0];
+  // Default-select today on first render (so the panel shows immediately)
+  if(_selectedDay===null)_selectedDay=todayKey;
+
+  // Get Monday of current week
   const monday=new Date(now);
   monday.setDate(now.getDate()-((now.getDay()+6)%7));
-  const wr=document.getElementById('week-row');
-  wr.innerHTML='';
-  for(let i=0;i<7;i++){
-	const d=new Date(monday);d.setDate(monday.getDate()+i);
+  // And Monday of previous week (for top row)
+  const prevMonday=new Date(monday);prevMonday.setDate(monday.getDate()-7);
+
+  function buildCell(d){
 	const isToday=d.toDateString()===now.toDateString();
 	const isFuture=d>now&&!isToday;
 	const key=d.toISOString().split('T')[0];
 	const td=isToday?{md:S.md,ed:S.exd,wt:S.wt}:getTrackData(key);
 	const score=isFuture?null:getDayScore(td);
 	const pct=score===null?0:Math.round(score*100);
-	// SVG ring
-	const r=14,circ=2*Math.PI*r,dash=circ*(pct/100),gap=circ-dash;
+	const isSelected=key===_selectedDay;
 	let ringColor='#E0DED6';
 	if(score!==null&&pct===100)ringColor='#2A6147';
 	else if(score!==null&&pct>0)ringColor='#C94B2A';
-	const cell=document.createElement('div');
-	cell.className='day-cell'+(isToday?' day-today':'');
-	cell.innerHTML=`<div class="day-name">${WDAYS[d.getDay()]}</div>
+	const r=14,circ=2*Math.PI*r,dash=circ*(pct/100),gap=circ-dash;
+	const cls=['day-cell',isToday?'day-today':'',isFuture?'day-future':'',isSelected?'day-selected':''].filter(Boolean).join(' ');
+	const dateNum=d.getDate();
+	const center = isToday
+	  ? `<circle cx="18" cy="18" r="5.5" fill="${pct>0?ringColor:'#9C9A91'}"/>`
+	  : (pct===100
+		  ? `<text x="18" y="22" text-anchor="middle" font-size="11" fill="${ringColor}">✓</text>`
+		  : (pct>0
+			  ? `<text x="18" y="22" text-anchor="middle" font-size="9" fill="${ringColor}">${pct}%</text>`
+			  : ''));
+	return `<button class="${cls}" onclick="selectDay('${key}')" type="button">
+	  <div class="day-name">${WDAYS[d.getDay()]}<span class="day-num">${dateNum}</span></div>
 	  <div class="day-ring">
 		<svg viewBox="0 0 36 36">
 		  <circle cx="18" cy="18" r="${r}" fill="none" stroke="#E0DED6" stroke-width="3"/>
 		  ${pct>0?`<circle cx="18" cy="18" r="${r}" fill="none" stroke="${ringColor}" stroke-width="3" stroke-dasharray="${dash.toFixed(1)} ${gap.toFixed(1)}" stroke-linecap="round" transform="rotate(-90 18 18)"/>`:''}
-		  ${isToday?`<circle cx="18" cy="18" r="5" fill="${pct>0?ringColor:'#D5D3CB'}"/>`:''}
-		  ${!isToday&&pct===100?`<text x="18" y="22" text-anchor="middle" font-size="10" fill="${ringColor}">✓</text>`:''}
-		  ${!isToday&&pct>0&&pct<100?`<text x="18" y="22" text-anchor="middle" font-size="9" fill="${ringColor}">${pct}%</text>`:''}
+		  ${center}
 		</svg>
-	  </div>`;
-	wr.appendChild(cell);
+	  </div>
+	</button>`;
   }
-  // Progress bars today
-  const mDone=S.md.filter(Boolean).length;
-  const mPct=Math.round(mDone/5*100);
-  document.getElementById('pb-ml').textContent=mDone+'/5';
-  document.getElementById('pb-mf').style.width=mPct+'%';
-  const wt=WKT[S.wt];
-  if(!wt.ex){
-	document.getElementById('pb-wl').textContent=S.wt==='cardio'?'kardio':'počitek';
-	document.getElementById('pb-wf').style.width='0%';
-  }else{
-	const eDone=S.exd.filter(Boolean).length,eTotal=S.exd.length||6;
-	const ePct=Math.round(eDone/eTotal*100);
-	document.getElementById('pb-wl').textContent=eDone+'/'+eTotal;
-	document.getElementById('pb-wf').style.width=ePct+'%';
+
+  // Build previous week + this week
+  let prevHtml='',thisHtml='';
+  for(let i=0;i<7;i++){
+	const dPrev=new Date(prevMonday);dPrev.setDate(prevMonday.getDate()+i);
+	const dThis=new Date(monday);dThis.setDate(monday.getDate()+i);
+	prevHtml+=buildCell(dPrev);
+	thisHtml+=buildCell(dThis);
   }
+  if(wrPrev)wrPrev.innerHTML=prevHtml;
+  wr.innerHTML=thisHtml;
+
+  // Streak badge
+  const streakEl=document.getElementById('streak-badge');
+  if(streakEl){
+	const s=getStreak();
+	if(s>=2){
+	  streakEl.style.display='inline-flex';
+	  streakEl.innerHTML=`🔥 <span><b>${s}</b> dni v vrsti</span>`;
+	} else {
+	  streakEl.style.display='none';
+	}
+  }
+
+  // Render selected day detail panel
+  renderDayDetail(_selectedDay);
+}
+
+function selectDay(key){
+  _selectedDay=key;
+  renderTracker();
+}
+
+// Render a single day's detail card (replaces the long history list).
+// Pulls saved snapshot for past days, live state for today.
+function renderDayDetail(key){
+  const c=document.getElementById('day-detail');
+  if(!c)return;
+  if(!key){c.innerHTML='';return;}
+  const todayKey=now.toISOString().split('T')[0];
+  const isToday=key===todayKey;
+  const d=new Date(key+'T12:00:00');
+  const dayName=SLD[d.getDay()];
+  const dateStr=d.getDate()+'. '+SLM[d.getMonth()];
+  let track=null,plan=null,exlog={},wodRes='';
+  if(isToday){
+	track={md:S.md,ed:S.exd,wt:S.wt};
+	plan={meals:S.meals,ex:S.ex};
+	exlog=loadElog();
+	wodRes=localStorage.getItem(lsKey('wodlog_'+key))||'';
+  } else {
+	try{const s=localStorage.getItem(lsKey('track_'+key));if(s)track=JSON.parse(s);}catch(e){}
+	try{const s=localStorage.getItem(lsKey('dp_v6_'+key));if(s)plan=JSON.parse(s);}catch(e){}
+	try{const s=localStorage.getItem(lsKey('exlog_'+key));if(s)exlog=JSON.parse(s);}catch(e){}
+	try{wodRes=localStorage.getItem(lsKey('wodlog_'+key))||'';}catch(e){}
+  }
+  if(!track){
+	c.innerHTML=`<div class="day-detail-empty"><div class="dde-day">${dayName}, ${dateStr}</div><div class="dde-msg">Za ta dan ni zabeleženih podatkov.</div></div>`;
+	return;
+  }
+  const md=track.md||[];const ed=track.ed||[];const wt=track.wt||'rest';
+  const mealsDone=md.filter(Boolean).length;
+  const exDone=ed.filter(Boolean).length;
+  const exTotal=ed.length||0;
+  const eatenMeals=plan&&plan.meals?plan.meals.filter((_,i)=>md[i]).map(m=>({food:m.f||m.food||'',kcal:parseInt(m.k||m.kcal)||0})):[];
+  const totalKcal=eatenMeals.reduce((s,m)=>s+m.kcal,0);
+  const doneEx=plan&&plan.ex?plan.ex.filter((_,i)=>ed[i]).map(e=>({n:e.n,log:exlog[e.n]||null})):[];
+  const wtLabel=(WKT_LABELS&&WKT_LABELS[wt])||wt;
+  // Workout detail
+  let workoutHtml='';
+  if(wt==='rest')workoutHtml='<div class="dd-empty">Dan počitka.</div>';
+  else if(wt==='cardio')workoutHtml='<div class="dd-empty">Kardio trening.</div>';
+  else if(wt==='crossfit')workoutHtml=`<div class="dd-empty">CrossFit WOD${wodRes?' — Rezultat: <b>'+wodRes+'</b>':''}.</div>`;
+  else if(doneEx.length){
+	workoutHtml=doneEx.map(e=>{
+	  const l=e.log;const logStr=l&&l.kg?`${l.s||'?'}×${l.r||'?'} · ${l.kg} kg`:'';
+	  return `<div class="hist-ex-row"><div class="hist-ex-name">${e.n}</div><div class="hist-ex-log${logStr?'':' empty'}">${logStr||'opravljeno'}</div></div>`;
+	}).join('');
+  } else workoutHtml='<div class="dd-empty">Vadba ni bila zabeležena.</div>';
+  // Meals detail
+  const mealsHtml=eatenMeals.length
+	?eatenMeals.map(m=>`<div class="hist-meal-row"><div class="hist-meal-name">${m.food}</div><div class="hist-meal-kcal">~${m.kcal} kcal</div></div>`).join('')
+	:'<div class="dd-empty">Ni zabeleženih obrokov ta dan.</div>';
+  // Pillsi
+  const pills=[];
+  pills.push(`<span class="hist-pill${mealsDone===5?' green':mealsDone>0?'':' red'}">${mealsDone}/5 obrokov</span>`);
+  if(totalKcal>0)pills.push(`<span class="hist-pill">${totalKcal} kcal</span>`);
+  if(wt!=='rest')pills.push(`<span class="hist-pill${doneEx.length>0?' green':''}">${wtLabel}${exTotal>0?' '+exDone+'/'+exTotal:''}</span>`);
+
+  c.innerHTML=`
+	<div class="day-detail-card">
+	  <div class="dd-head">
+		<div>
+		  <div class="dd-day">${isToday?'Danes':dayName}, ${dateStr}</div>
+		  <div class="dd-pills">${pills.join('')}</div>
+		</div>
+	  </div>
+	  <div class="dd-section-lbl">Obroki</div>
+	  ${mealsHtml}
+	  <div class="dd-section-lbl">Vadba — ${wtLabel}</div>
+	  ${workoutHtml}
+	</div>
+  `;
 }
 
 // ─── API CALLS ──────────────────────────────────────────────
@@ -3674,77 +3811,10 @@ function togHist(key){
   if(btn)btn.classList.toggle('open',HIST_OPEN[key]);
 }
 
-function renderHistory(){
-  const container=document.getElementById('hist');
-  const days=[];
-  for(let i=1;i<=14;i++){
-	const d=new Date(now);d.setDate(now.getDate()-i);
-	const key=d.toISOString().split('T')[0];
-	let track=null,plan=null,exlog={},wodRes='';
-	try{const s=localStorage.getItem(lsKey('track_'+key));if(s)track=JSON.parse(s);}catch(e){}
-	if(!track)continue;
-	try{const s=localStorage.getItem(lsKey('dp_v6_'+key));if(s)plan=JSON.parse(s);}catch(e){}
-	try{const s=localStorage.getItem(lsKey('exlog_'+key));if(s)exlog=JSON.parse(s);}catch(e){}
-	try{wodRes=localStorage.getItem(lsKey('wodlog_'+key))||'';}catch(e){}
-	days.push({d,key,track,plan,exlog,wodRes});
-  }
-  if(!days.length){container.innerHTML='<div class="hist-empty">Ni še podatkov za pretekle dneve. Začni obkljukovati obroke in vaje!</div>';return;}
-
-  container.innerHTML=days.map(({d,key,track,plan,exlog,wodRes})=>{
-	const md=track.md||[];const ed=track.ed||[];const wt=track.wt||'rest';
-	const mealsDone=md.filter(Boolean).length;
-	const exDone=ed.filter(Boolean).length;
-	const exTotal=ed.length||0;
-
-	// Meals eaten
-	const eatenMeals=plan?plan.meals.filter((_,i)=>md[i]).map(m=>({food:m.f||m.food||'',kcal:parseInt(m.k||m.kcal)||0})):[];
-	const totalKcal=eatenMeals.reduce((s,m)=>s+m.kcal,0);
-
-	// Exercises done
-	const doneEx=plan?plan.ex.filter((_,i)=>ed[i]).map(e=>({n:e.n,log:exlog[e.n]||null})):[];
-
-	// Pills
-	const wtLabel=WKT_LABELS[wt]||wt;
-	const wtPill=wt==='rest'?'':wt==='cardio'?`<span class="hist-pill">Kardio</span>`:wt==='crossfit'?`<span class="hist-pill cf">CrossFit${wodRes?' · '+wodRes:''}</span>`:`<span class="hist-pill${doneEx.length>0?' green':''}">${wtLabel}${exTotal>0?' '+exDone+'/'+exTotal:''}</span>`;
-	const kcalPill=totalKcal>0?`<span class="hist-pill">${totalKcal} kcal</span>`:'';
-	const mealPill=`<span class="hist-pill${mealsDone===5?' green':mealsDone>0?'':' red'}">${mealsDone}/5 obrokov</span>`;
-
-	const dayName=SLD[d.getDay()];
-	const dateStr=d.getDate()+'. '+SLM[d.getMonth()];
-
-	// Meals HTML
-	const mealsHtml=eatenMeals.length?eatenMeals.map(m=>`<div class="hist-meal-row"><div class="hist-meal-name">${m.food}</div><div class="hist-meal-kcal">~${m.kcal} kcal</div></div>`).join(''):'<div style="font-size:13px;color:var(--lt);">Ni zabeleženih obrokov ta dan.</div>';
-
-	// Workout HTML
-	let workoutHtml='';
-	if(wt==='rest'){workoutHtml='<div style="font-size:13px;color:var(--lt);">Dan počitka.</div>';}
-	else if(wt==='cardio'){workoutHtml='<div style="font-size:13px;color:var(--md);">Kardio trening.</div>';}
-	else if(wt==='crossfit'){workoutHtml=`<div style="font-size:13px;color:var(--md);">CrossFit WOD${wodRes?' — Rezultat: <b>'+wodRes+'</b>':''}.</div>`;}
-	else if(doneEx.length){
-	  workoutHtml=doneEx.map(e=>{
-		const l=e.log;const logStr=l&&l.kg?`${l.s||'?'}×${l.r||'?'} · ${l.kg} kg`:'';
-		return `<div class="hist-ex-row"><div class="hist-ex-name">${e.n}</div><div class="hist-ex-log${logStr?'':' empty'}">${logStr||'opravljeno'}</div></div>`;
-	  }).join('');
-	} else {workoutHtml='<div style="font-size:13px;color:var(--lt);">Vadba ni bila zabeležena.</div>';}
-
-	const totalLine=totalKcal>0||doneEx.length?`<div class="hist-total"><span>${mealsDone}/5 obrokov · ${exDone>0?exDone+'/'+exTotal+' vaj':'brez vadbe'}</span><b>${totalKcal>0?totalKcal+' kcal':''}</b></div>`:'';
-
-	return `<div class="hist-card">
-	  <div class="hist-head" onclick="togHist('${key}')">
-		<div class="hist-dow">${dayName}, ${dateStr}</div>
-		<div class="hist-meta">${mealPill}${kcalPill}${wtPill}</div>
-		<button class="hist-xbtn" id="hx_${key}">▾</button>
-	  </div>
-	  <div class="hist-body" id="hb_${key}">
-		<div class="hist-section-lbl">Zaužiti obroki</div>
-		${mealsHtml}
-		<div class="hist-section-lbl">Vadba — ${wtLabel}</div>
-		${workoutHtml}
-		${totalLine}
-	  </div>
-	</div>`;
-  }).join('');
-}
+// renderHistory is no longer used — the standalone "Zgodovina" section was
+// replaced by the click-to-expand day detail panel inside the weekly tracker.
+// Kept as a no-op stub in case any code path still calls it.
+function renderHistory(){}
 
 // ─── INIT called from initApp() above ────────────────────────
 </script>
