@@ -7,15 +7,113 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-:root{--bg:#F8F6F1;--w:#fff;--dk:#1A1A17;--md:#6B6A63;--lt:#B0AFA6;--br:rgba(0,0,0,0.09);--red:#C94B2A;--grn:#2A6147;--r:14px;}
+:root{
+  --bg:#F0F5F2;
+  --w:#ffffff;
+  --card:#ffffff;
+  --dk:#1C2B24;
+  --md:#5A7A6A;
+  --lt:#9BB8A8;
+  --br:rgba(42,97,71,0.12);
+  --red:#E05A3A;
+  --grn:#2A6147;
+  --grn-lt:#EBF4EF;
+  --grn-mid:#4D8C6F;
+  --accent:#34795A;
+  --r:16px;
+  --shadow:0 2px 12px rgba(42,97,71,0.10);
+}
 body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-serif;min-height:100vh;}
-.app{max-width:640px;margin:0 auto;padding:2rem 1.25rem 4rem;}
-.hdate{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--lt);margin-bottom:6px;}
-.htitle{font-family:'Playfair Display',Georgia,serif;font-size:28px;font-weight:500;line-height:1.2;margin-bottom:2rem;}
-.htitle em{font-style:italic;color:var(--red);}
-.sec{margin-bottom:2rem;}
+.app{max-width:640px;margin:0 auto;padding:1.5rem 1rem 4rem;}
+.hdate{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--lt);margin-bottom:5px;}
+.htitle{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:500;line-height:1.2;margin-bottom:1.5rem;}
+.htitle em{font-style:italic;color:var(--grn);}
+
+/* ── KCAL HERO CARD (top summary) ── */
+.kcal-hero{background:var(--w);border-radius:var(--r);padding:18px 18px 14px;margin-bottom:10px;box-shadow:var(--shadow);border:.5px solid var(--br);}
+.kcal-hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;}
+.kcal-hero-left{}
+.kcal-hero-lbl{font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.09em;margin-bottom:3px;}
+.kcal-hero-num{font-size:42px;font-weight:600;color:var(--grn);line-height:1;letter-spacing:-1px;}
+.kcal-hero-unit{font-size:14px;font-weight:500;color:var(--grn);margin-left:3px;}
+.kcal-hero-sub{font-size:12px;color:var(--lt);margin-top:4px;}
+.kcal-hero-ring{position:relative;width:90px;height:90px;flex-shrink:0;}
+.kcal-hero-ring svg{width:90px;height:90px;}
+.kcal-ring-bg{stroke:#E8F0EC;}
+.kcal-ring-fill{stroke:var(--grn);transition:stroke-dasharray .5s ease;}
+.kcal-ring-fill.over{stroke:var(--red);}
+.kcal-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.kcal-ring-val{font-size:16px;font-weight:600;color:var(--dk);line-height:1;}
+.kcal-ring-lbl{font-size:9px;color:var(--lt);text-transform:uppercase;letter-spacing:.06em;margin-top:1px;}
+
+/* Focus bar */
+.focus-bar{background:var(--grn-lt);border-radius:10px;padding:10px 13px;display:flex;align-items:center;gap:10px;}
+.focus-icon{width:28px;height:28px;background:var(--grn);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.focus-title{font-size:12px;font-weight:600;color:var(--grn);}
+.focus-text{font-size:12px;color:var(--md);}
+
+/* Add meal CTA */
+.add-meal-cta{background:var(--grn);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:500;width:100%;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;transition:opacity .15s;box-shadow:0 4px 14px rgba(42,97,71,0.25);}
+.add-meal-cta:hover{opacity:.9;}
+
+/* MACRO TILES */
+.macro-tiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;}
+.macro-tile{background:var(--w);border-radius:14px;padding:13px 12px;box-shadow:var(--shadow);border:.5px solid var(--br);}
+.macro-tile-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:8px;}
+.macro-tile-icon.p{background:#FFE8E3;}
+.macro-tile-icon.c{background:#FFF5E0;}
+.macro-tile-icon.f{background:#FFE3E3;}
+.macro-tile-name{font-size:11px;font-weight:600;margin-bottom:2px;}
+.macro-tile-name.p{color:#D94F3A;}
+.macro-tile-name.c{color:#D4860A;}
+.macro-tile-name.f{color:#D94F3A;}
+.macro-tile-vals{font-size:17px;font-weight:600;color:var(--dk);}
+.macro-tile-vals span{font-size:12px;font-weight:400;color:var(--lt);}
+.macro-tile-badge{display:inline-block;font-size:10px;font-weight:500;padding:2px 7px;border-radius:5px;margin-top:5px;}
+.macro-tile-badge.warn{background:#FFE8E3;color:#D94F3A;}
+.macro-tile-badge.ok{background:#FFF5E0;color:#D4860A;}
+.macro-tile-badge.max{background:var(--grn);color:#fff;}
+.macro-tile-tip{font-size:10px;color:var(--lt);margin-top:4px;line-height:1.4;}
+
+/* ── SECTION ACCORDION ── */
+.section-card{background:var(--w);border-radius:var(--r);margin-bottom:10px;box-shadow:var(--shadow);border:.5px solid var(--br);overflow:hidden;}
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;user-select:none;}
+.section-header:hover{background:#FAFCFA;}
+.section-title{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dk);}
+.section-meta{display:flex;align-items:center;gap:8px;}
+.section-toggle{width:28px;height:28px;border-radius:50%;background:var(--bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--md);font-size:11px;flex-shrink:0;transition:transform .25s,background .15s;}
+.section-toggle.open{transform:rotate(180deg);background:var(--grn-lt);color:var(--grn);}
+.section-body{display:none;padding:0 14px 14px;}
+.section-body.open{display:block;}
+/* Add top border only when open */
+.section-body.open{border-top:.5px solid var(--br);}
+
+/* Workout card inside section */
+.workout-hero{background:var(--grn-lt);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-top:4px;margin-bottom:8px;}
+.workout-hero-left{}
+.workout-hero-lbl{font-size:10px;color:var(--grn);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}
+.workout-hero-name{font-size:20px;font-weight:600;color:var(--dk);}
+.workout-hero-meta{display:flex;gap:8px;margin-top:5px;flex-wrap:wrap;}
+.workout-chip{font-size:11px;background:var(--w);color:var(--grn);border:.5px solid var(--br);border-radius:20px;padding:3px 9px;}
+
+/* Steps card inside section */
+.steps-inner{display:flex;align-items:center;gap:12px;margin-top:4px;}
+
+/* History cards inside section */
+.hist-card{background:var(--bg);border:.5px solid var(--br);border-radius:12px;margin-bottom:7px;overflow:hidden;}
+.hist-head{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;user-select:none;}
+.hist-head:hover{background:#E8F0EC;}
+.hist-dow{font-size:13px;font-weight:500;color:var(--dk);min-width:90px;}
+.hist-meta{flex:1;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.hist-pill{font-size:11px;color:var(--md);background:var(--w);padding:2px 8px;border-radius:5px;white-space:nowrap;}
+.hist-pill.green{background:var(--grn-lt);color:var(--grn);}
+.hist-pill.red{background:#FDF0EC;color:var(--red);}
+.hist-pill.cf{background:#FFF3E0;color:#B45309;}
+.hist-body{border-top:.5px solid var(--br);padding:11px 13px 13px;display:none;}
+.hist-body.open{display:block;}
+.sec{margin-bottom:.6rem;}
 .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
-.sec-lbl{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--md);}
+.sec-lbl{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dk);}
 .sec-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 /* toggles */
 .tog{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--md);cursor:pointer;user-select:none;}
@@ -77,14 +175,14 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .bpb.ap{background:#FBE8F5;color:#8B2B6E;border-color:#E4ABCF;font-weight:500;}
 .bpb.acf{background:#FFF3E0;color:#B45309;border-color:#F5C88A;font-weight:500;}
 /* meal card */
-.meal-card{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);margin-bottom:7px;overflow:hidden;transition:opacity .2s;}
+.meal-card{background:var(--w);border:.5px solid var(--br);border-radius:14px;margin-bottom:7px;overflow:hidden;transition:opacity .2s;box-shadow:0 1px 6px rgba(42,97,71,0.07);}
 .meal-card.loading{opacity:.4;pointer-events:none;}
 .meal-card.done .mfood{text-decoration:line-through;color:var(--lt);}
 .meal-card.done .mdot{background:#A8CFBA;}
 .meal-top{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;}
-.mdot{width:7px;height:7px;border-radius:50%;background:var(--red);margin-top:7px;flex-shrink:0;transition:background .2s;}
+.mdot{width:7px;height:7px;border-radius:50%;background:var(--grn);margin-top:7px;flex-shrink:0;transition:background .2s;}
 .mbody{flex:1;min-width:0;}
-.mlbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--lt);margin-bottom:3px;}
+.mlbl{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--lt);margin-bottom:3px;}
 .mfood{font-size:14px;color:var(--dk);line-height:1.5;}
 .mkcal{font-size:12px;color:var(--lt);margin-top:2px;}
 .meal-actions{display:flex;align-items:center;gap:4px;flex-shrink:0;}
@@ -138,7 +236,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .in{font-size:13px;color:var(--dk);}
 .ia{font-size:13px;color:var(--md);text-align:right;white-space:nowrap;}
 /* exercise card - new expandable structure */
-.ex-wrap{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);margin-bottom:7px;overflow:hidden;transition:opacity .2s;}
+.ex-wrap{background:var(--w);border:.5px solid var(--br);border-radius:14px;margin-bottom:7px;overflow:hidden;transition:opacity .2s;box-shadow:0 1px 6px rgba(42,97,71,0.07);}
 .ex-wrap.loading{opacity:.4;pointer-events:none;}
 .ex-top{display:flex;align-items:center;gap:10px;padding:12px 14px;}
 .ex-top.done .ename{text-decoration:line-through;color:var(--lt);}
@@ -345,7 +443,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .user-sync{font-size:11px;color:var(--lt);margin-left:4px;}
 .logout-btn{font-size:12px;color:var(--lt);background:none;border:.5px solid var(--br);border-radius:7px;padding:4px 9px;cursor:pointer;font-family:inherit;transition:all .15s;}
 .logout-btn:hover{color:var(--red);border-color:rgba(201,75,42,.3);}
-.steps-card{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:13px 15px;display:flex;align-items:center;gap:12px;}
+.steps-card{background:var(--w);border:.5px solid var(--br);border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 6px rgba(42,97,71,0.07);}
 .steps-icon{font-size:20px;flex-shrink:0;line-height:1;}
 .steps-body{flex:1;min-width:0;}
 .steps-top{display:flex;align-items:baseline;gap:6px;margin-bottom:6px;}
@@ -412,7 +510,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 
 /* calorie budget block */
 /* arc summary */
-.kcal-summary{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:20px 16px 16px;margin-top:8px;}
+.kcal-summary{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:20px 16px 16px;margin-top:8px;box-shadow:var(--shadow);}
 .kcal-arc-wrap{position:relative;width:220px;margin:0 auto 4px;}
 .kcal-arc-svg{width:100%;display:block;}
 .arc-bg{stroke:#EDECEA;}
@@ -567,134 +665,208 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
   <div class="hdate" id="ds"></div>
   <div class="htitle">En dan bližje <em>sanjski</em> postavi</div>
 
-  <div class="sec">
-	<div class="sec-head">
-	  <span class="sec-lbl">Jedilnik</span>
-	  <div class="sec-right">
-		<label class="tog" onclick="toggleEasy()">
-		  <div class="tog-track on-grn" id="et"><div class="tog-thumb"></div></div>
-		  <span>Enostavno</span>
-		</label>
-		<div class="diet-wrap">
-		  <button class="diet-btn" id="diet-btn" onclick="toggleDietPanel(event)">Prehrana ▾</button>
-		  <div class="diet-panel" id="diet-panel">
-			<div class="diet-panel-title">Prehranske posebnosti</div>
-			<div id="diet-options"></div>
-			<div class="diet-actions">
-			  <button class="diet-mini" onclick="clearDiet(event)">Počisti</button>
-			  <button class="diet-mini primary" onclick="closeDietPanel(event)">Shrani</button>
-			</div>
-		  </div>
-		</div>
-		<button class="rbtn" id="bam" onclick="refreshMeals()">↺ Zamenjaj vse</button>
-		<button class="pers-btn" id="pers-btn" onclick="togPers()">✦ Ideje</button>
-	  </div>
-	</div>
-	<div class="diet-note" id="diet-note"></div>
-	<!-- Ideas panel -->
-	<div class="pers-panel" id="pers-panel">
-	  <div class="pers-title">Predlogi za tebe</div>
-	  <div class="pers-tabs">
-		<button class="pers-tab active" id="ptab-fav" onclick="showPersTab('fav')">⭐ Tvoje jedi</button>
-		<button class="pers-tab" id="ptab-new" onclick="showPersTab('new')">✦ Novo za tebe</button>
-	  </div>
-	  <div class="pers-suggestions" id="pers-suggestions">
-		<div style="font-size:13px;color:var(--lt);padding:8px 0;">Generiram predloge...</div>
-	  </div>
-	</div>
-	<div id="mc"></div>
-	<div id="extra-meals"></div>
-	<!-- Add extra meal - always at bottom -->
-	<div class="add-meal-row" style="margin-top:10px;">
-	  <input class="add-meal-inp" id="extra-inp" placeholder="+ Dodaj obrok (sladoled, kava, banana...)" onkeydown="if(event.key==='Enter')addExtraMeal()">
-	  <button class="add-meal-btn" id="extra-btn" onclick="addExtraMeal()">Dodaj</button>
-	</div>
-	<!-- Lifesum-style calorie summary -->
-	<div class="kcal-summary" id="kcal-summary">
-	  <div class="kcal-arc-wrap">
-		<svg class="kcal-arc-svg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
-		  <path class="arc-bg" d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke-width="14" stroke-linecap="round"/>
-		  <path class="arc-fill" id="arc-fill" d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke-width="14" stroke-linecap="round" stroke-dasharray="0 251"/>
-		</svg>
-		<div class="kcal-arc-center">
-		  <div class="kcal-arc-remaining" id="arc-remaining">—</div>
-		  <div class="kcal-arc-lbl">ostalo</div>
-		  <div class="kcal-arc-goal" id="arc-goal"></div>
-		</div>
-	  </div>
-	  <div class="kcal-arc-cols">
-		<div class="kcal-arc-col">
-		  <div class="kcal-arc-num" id="arc-eaten">0</div>
-		  <div class="kcal-arc-sub">zaužito</div>
-		</div>
-		<div class="kcal-arc-col" id="arc-burn-col" style="display:none">
-		  <div class="kcal-arc-num green" id="arc-burn">+0</div>
-		  <div class="kcal-arc-sub">porabljeno</div>
-		</div>
-	  </div>
-	</div>
-	<!-- Macro cards -->
-	<div class="macro-bar" id="macro-bar" style="display:none">
-	  <div class="macro-item">
-		<div class="macro-prog"><div class="macro-prog-fill p-fill" id="mpf-p"></div></div>
-		<div class="macro-val" id="mk-p">0g</div>
-		<div class="macro-lbl">beljakovine</div>
-		<div class="macro-goal" id="mg-p"></div>
-	  </div>
-	  <div class="macro-sep"></div>
-	  <div class="macro-item">
-		<div class="macro-prog"><div class="macro-prog-fill c-fill" id="mpf-c"></div></div>
-		<div class="macro-val" id="mk-c">0g</div>
-		<div class="macro-lbl">ogljikovi hidrati</div>
-		<div class="macro-goal" id="mg-c"></div>
-	  </div>
-	  <div class="macro-sep"></div>
-	  <div class="macro-item">
-		<div class="macro-prog"><div class="macro-prog-fill f-fill" id="mpf-f"></div></div>
-		<div class="macro-val" id="mk-f">0g</div>
-		<div class="macro-lbl">maščobe</div>
-		<div class="macro-goal" id="mg-f"></div>
-	  </div>
-	</div>
-
-
-  <div class="sec">
-	<div class="sec-lbl" style="margin-bottom:10px;">Dnevni koraki</div>
-	<div class="steps-card">
-	  <div class="steps-icon">🚶‍♀️</div>
-	  <div class="steps-body">
-		<div class="steps-top">
-		  <span class="steps-val" id="st-val">0</span>
-		  <input class="steps-inp" id="st-inp" type="number" min="0" max="100000" step="500"
-			onblur="saveSteps()" onkeydown="if(event.key==='Enter')saveSteps()">
-		  <span class="steps-lbl">/ <span id="st-goal" onclick="changeStepsGoal()" style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px;" title="Klikni za spremembo cilja">10.000</span> korakov</span>
-		</div>
-		<div class="steps-prog"><div class="steps-fill" id="st-fill" style="width:0%"></div></div>
-		<div class="steps-sub">
-		  <span id="st-pct">0%</span>
-		  <span id="st-kcal" style="color:var(--grn);display:none">🔥 — kcal</span>
-		</div>
-	  </div>
-	  <div class="steps-actions">
-		<button class="steps-ebtn" id="st-ebtn" onclick="togStepsEdit()" title="Uredi korake">✏ vnesi</button>
-		<button class="chk" id="st-chk" onclick="togStepsDone()" title="Cilj dosežen">○</button>
-	  </div>
-	</div>
+  <!-- KCAL HERO SUMMARY CARD -->
+  <div class="kcal-hero" id="kcal-hero-card">
+    <div class="kcal-hero-top">
+      <div class="kcal-hero-left">
+        <div class="kcal-hero-lbl">Še lahko poješ</div>
+        <div><span class="kcal-hero-num" id="hero-remaining">—</span><span class="kcal-hero-unit">kcal</span></div>
+        <div class="kcal-hero-sub">Cilj: <span id="hero-goal">—</span> kcal &nbsp;·&nbsp; Porabljeno: <span id="hero-eaten">0</span> kcal</div>
+      </div>
+      <div class="kcal-hero-ring">
+        <svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="45" cy="45" r="36" fill="none" stroke="#E8F0EC" stroke-width="9"/>
+          <circle id="hero-ring" cx="45" cy="45" r="36" fill="none" stroke="#2A6147" stroke-width="9"
+            stroke-dasharray="0 226" stroke-linecap="round" transform="rotate(-90 45 45)"
+            style="transition:stroke-dasharray .5s ease;"/>
+        </svg>
+        <div class="kcal-ring-center">
+          <div class="kcal-ring-val" id="hero-ring-val">0</div>
+          <div class="kcal-ring-lbl">kcal</div>
+        </div>
+      </div>
+    </div>
+    <!-- Focus bar -->
+    <div class="focus-bar" id="focus-bar" style="display:none">
+      <div class="focus-icon">📊</div>
+      <div>
+        <div class="focus-title" id="focus-title">Fokus danes</div>
+        <div class="focus-text" id="focus-text"></div>
+      </div>
+    </div>
   </div>
 
-  <div class="sec workout-sec">
-	<div class="next-up" id="next-up"></div>
-	<div class="workout-actions-row">
-	  <button class="ghost-btn" id="baw" onclick="refreshWorkout()">↺ Zamenjaj vaje</button>
-	</div>
-	<div class="bpsel" id="bpsel" style="display:none;"></div>
-	<div id="wc"></div>
-	<div class="add-ex-row" id="add-ex-row" style="display:none">
-	  <input class="add-ex-name" id="aen" placeholder="Ime vaje (npr. hip thrust)...">
-	  <input class="add-ex-sm" id="aes" placeholder="serije" value="3">
-	  <input class="add-ex-sm" id="aer" placeholder="ponovitve" value="12">
-	  <button class="add-ex-btn" onclick="addCustomEx()">+ Dodaj</button>
-	</div>
+  <!-- MACRO TILES -->
+  <div class="macro-tiles" id="macro-tiles" style="display:none">
+    <div class="macro-tile">
+      <div class="macro-tile-icon p">🔴</div>
+      <div class="macro-tile-name p">Beljakovine</div>
+      <div class="macro-tile-vals"><span id="mt-p">0</span> <span>/ <span id="mt-pg">—</span> g</span></div>
+      <div class="macro-tile-badge warn" id="mt-pb">— g manjka</div>
+      <div class="macro-tile-tip" id="mt-pt">Dodaj vir beljakovin</div>
+    </div>
+    <div class="macro-tile">
+      <div class="macro-tile-icon c">🟡</div>
+      <div class="macro-tile-name c">Ogljikovi hidrati</div>
+      <div class="macro-tile-vals"><span id="mt-c">0</span> <span>/ <span id="mt-cg">—</span> g</span></div>
+      <div class="macro-tile-badge ok" id="mt-cb">— g do cilja</div>
+      <div class="macro-tile-tip" id="mt-ct">Prostor za kompleksne OH</div>
+    </div>
+    <div class="macro-tile">
+      <div class="macro-tile-icon f">🔴</div>
+      <div class="macro-tile-name f">Maščobe</div>
+      <div class="macro-tile-vals"><span id="mt-f">0</span> <span>/ <span id="mt-fg">—</span> g</span></div>
+      <div class="macro-tile-badge max" id="mt-fb">Na zgornji meji</div>
+      <div class="macro-tile-tip" id="mt-ft">Danes se izogibaj mastnim jedem</div>
+    </div>
+  </div>
+    <div class="section-header" onclick="toggleSection('jedilnik')">
+      <span class="section-title">Jedilnik</span>
+      <div class="section-meta">
+        <div class="sec-right" id="sec-jedilnik-right" style="display:flex;" onclick="event.stopPropagation()">
+          <label class="tog" onclick="toggleEasy()">
+            <div class="tog-track on-grn" id="et"><div class="tog-thumb"></div></div>
+            <span>Enostavno</span>
+          </label>
+          <div class="diet-wrap">
+            <button class="diet-btn" id="diet-btn" onclick="toggleDietPanel(event)">Prehrana ▾</button>
+            <div class="diet-panel" id="diet-panel">
+              <div class="diet-panel-title">Prehranske posebnosti</div>
+              <div id="diet-options"></div>
+              <div class="diet-actions">
+                <button class="diet-mini" onclick="clearDiet(event)">Počisti</button>
+                <button class="diet-mini primary" onclick="closeDietPanel(event)">Shrani</button>
+              </div>
+            </div>
+          </div>
+          <button class="rbtn" id="bam" onclick="refreshMeals()">↺ Zamenjaj vse</button>
+          <button class="pers-btn" id="pers-btn" onclick="togPers()">✦ Ideje</button>
+        </div>
+        <button class="section-toggle open" id="tog-jedilnik">▾</button>
+      </div>
+    </div>
+    <div class="section-body open" id="body-jedilnik">
+    <div class="diet-note" id="diet-note"></div>
+    <!-- Ideas panel -->
+    <div class="pers-panel" id="pers-panel">
+      <div class="pers-title">Predlogi za tebe</div>
+      <div class="pers-tabs">
+        <button class="pers-tab active" id="ptab-fav" onclick="showPersTab('fav')">⭐ Tvoje jedi</button>
+        <button class="pers-tab" id="ptab-new" onclick="showPersTab('new')">✦ Novo za tebe</button>
+      </div>
+      <div class="pers-suggestions" id="pers-suggestions">
+        <div style="font-size:13px;color:var(--lt);padding:8px 0;">Generiram predloge...</div>
+      </div>
+    </div>
+    <div id="mc"></div>
+    <div id="extra-meals"></div>
+    <!-- Add extra meal - always at bottom -->
+    <div class="add-meal-row" style="margin-top:10px;">
+      <input class="add-meal-inp" id="extra-inp" placeholder="+ Dodaj obrok (sladoled, kava, banana...)" onkeydown="if(event.key==='Enter')addExtraMeal()">
+      <button class="add-meal-btn" id="extra-btn" onclick="addExtraMeal()">Dodaj</button>
+    </div>
+    <!-- Lifesum-style calorie summary -->
+    <div class="kcal-summary" id="kcal-summary">
+      <div class="kcal-arc-wrap">
+        <svg class="kcal-arc-svg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+          <path class="arc-bg" d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke-width="14" stroke-linecap="round"/>
+          <path class="arc-fill" id="arc-fill" d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke-width="14" stroke-linecap="round" stroke-dasharray="0 251"/>
+        </svg>
+        <div class="kcal-arc-center">
+          <div class="kcal-arc-remaining" id="arc-remaining">—</div>
+          <div class="kcal-arc-lbl">ostalo</div>
+          <div class="kcal-arc-goal" id="arc-goal"></div>
+        </div>
+      </div>
+      <div class="kcal-arc-cols">
+        <div class="kcal-arc-col">
+          <div class="kcal-arc-num" id="arc-eaten">0</div>
+          <div class="kcal-arc-sub">zaužito</div>
+        </div>
+        <div class="kcal-arc-col" id="arc-burn-col" style="display:none">
+          <div class="kcal-arc-num green" id="arc-burn">+0</div>
+          <div class="kcal-arc-sub">porabljeno</div>
+        </div>
+      </div>
+    </div>
+    <!-- Macro cards -->
+    <div class="macro-bar" id="macro-bar" style="display:none">
+      <div class="macro-item">
+        <div class="macro-prog"><div class="macro-prog-fill p-fill" id="mpf-p"></div></div>
+        <div class="macro-val" id="mk-p">0g</div>
+        <div class="macro-lbl">beljakovine</div>
+        <div class="macro-goal" id="mg-p"></div>
+      </div>
+      <div class="macro-sep"></div>
+      <div class="macro-item">
+        <div class="macro-prog"><div class="macro-prog-fill c-fill" id="mpf-c"></div></div>
+        <div class="macro-val" id="mk-c">0g</div>
+        <div class="macro-lbl">ogljikovi hidrati</div>
+        <div class="macro-goal" id="mg-c"></div>
+      </div>
+      <div class="macro-sep"></div>
+      <div class="macro-item">
+        <div class="macro-prog"><div class="macro-prog-fill f-fill" id="mpf-f"></div></div>
+        <div class="macro-val" id="mk-f">0g</div>
+        <div class="macro-lbl">maščobe</div>
+        <div class="macro-goal" id="mg-f"></div>
+      </div>
+    </div>
+    </div><!-- /section-body -->
+  </div><!-- /section-card jedilnik -->
+  <!-- DNEVNI KORAKI ACCORDION -->
+  <div class="section-card" id="sec-koraki">
+    <div class="section-header" onclick="toggleSection('koraki')">
+      <span class="section-title">Dnevni koraki</span>
+      <div class="section-meta">
+        <button class="section-toggle open" id="tog-koraki">▾</button>
+      </div>
+    </div>
+    <div class="section-body open" id="body-koraki">
+      <div class="steps-card" style="margin-top:2px;">
+        <div class="steps-icon">🚶‍♀️</div>
+        <div class="steps-body">
+          <div class="steps-top">
+            <span class="steps-val" id="st-val">0</span>
+            <input class="steps-inp" id="st-inp" type="number" min="0" max="100000" step="500"
+              onblur="saveSteps()" onkeydown="if(event.key==='Enter')saveSteps()">
+            <span class="steps-lbl">/ <span id="st-goal" onclick="changeStepsGoal()" style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px;" title="Klikni za spremembo cilja">10.000</span> korakov</span>
+          </div>
+          <div class="steps-prog"><div class="steps-fill" id="st-fill" style="width:0%"></div></div>
+          <div class="steps-sub">
+            <span id="st-pct">0%</span>
+            <span id="st-kcal" style="color:var(--grn);display:none">🔥 — kcal</span>
+          </div>
+        </div>
+        <div class="steps-actions">
+          <button class="steps-ebtn" id="st-ebtn" onclick="togStepsEdit()" title="Uredi korake">✏ vnesi</button>
+          <button class="chk" id="st-chk" onclick="togStepsDone()" title="Cilj dosežen">○</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VADBA ACCORDION -->
+  <div class="section-card" id="sec-vadba">
+    <div class="section-header" onclick="toggleSection('vadba')">
+      <span class="section-title">Današnja vadba</span>
+      <div class="section-meta">
+        <button class="ghost-btn" id="baw" onclick="refreshWorkout();event.stopPropagation()">↺ Zamenjaj vaje</button>
+        <button class="section-toggle open" id="tog-vadba">▾</button>
+      </div>
+    </div>
+    <div class="section-body open" id="body-vadba">
+      <div class="next-up" id="next-up" style="margin-top:2px;"></div>
+      <div class="bpsel" id="bpsel" style="display:none;margin-top:4px;"></div>
+      <div id="wc"></div>
+      <div class="add-ex-row" id="add-ex-row" style="display:none">
+        <input class="add-ex-name" id="aen" placeholder="Ime vaje (npr. hip thrust)...">
+        <input class="add-ex-sm" id="aes" placeholder="serije" value="3">
+        <input class="add-ex-sm" id="aer" placeholder="ponovitve" value="12">
+        <button class="add-ex-btn" onclick="addCustomEx()">+ Dodaj</button>
+      </div>
+    </div>
+  </div>
 
 <!-- SPLIT PICKER MODAL -->
 <div class="modal-overlay hide" id="split-overlay">
@@ -721,36 +893,57 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
   </div>
 </div>
 
-  <div class="sec">
-	<div class="sec-lbl" style="margin-bottom:12px;">Tedenski pregled</div>
-	<div class="tracker">
-	  <div class="week-row" id="week-row"></div>
-	  <div class="progress-bars">
-		<div class="pb-item">
-		  <div style="display:flex;justify-content:space-between;"><span class="pb-lbl">Obroki danes</span><span class="pb-val" id="pb-ml">0/5</span></div>
-		  <div class="pb-track"><div class="pb-fill" id="pb-mf" style="background:var(--red);width:0%"></div></div>
-		</div>
-		<div class="pb-item">
-		  <div style="display:flex;justify-content:space-between;"><span class="pb-lbl">Vadba danes</span><span class="pb-val" id="pb-wl">0/6</span></div>
-		  <div class="pb-track"><div class="pb-fill" id="pb-wf" style="background:var(--grn);width:0%"></div></div>
-		</div>
-	  </div>
-	</div>
+  <!-- TEDENSKI PREGLED ACCORDION -->
+  <div class="section-card" id="sec-teden">
+    <div class="section-header" onclick="toggleSection('teden')">
+      <span class="section-title">Tedenski pregled</span>
+      <div class="section-meta">
+        <button class="section-toggle open" id="tog-teden">▾</button>
+      </div>
+    </div>
+    <div class="section-body open" id="body-teden">
+      <div class="tracker" style="margin-top:2px;">
+        <div class="week-row" id="week-row"></div>
+        <div class="progress-bars">
+          <div class="pb-item">
+            <div style="display:flex;justify-content:space-between;"><span class="pb-lbl">Obroki danes</span><span class="pb-val" id="pb-ml">0/5</span></div>
+            <div class="pb-track"><div class="pb-fill" id="pb-mf" style="background:var(--grn);width:0%"></div></div>
+          </div>
+          <div class="pb-item">
+            <div style="display:flex;justify-content:space-between;"><span class="pb-lbl">Vadba danes</span><span class="pb-val" id="pb-wl">0/6</span></div>
+            <div class="pb-track"><div class="pb-fill" id="pb-wf" style="background:var(--grn);width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="err" id="eb"></div>
 
-  <div class="sec">
-	<div class="sec-head">
-	  <span class="sec-lbl">Zgodovina</span>
-	  <span style="font-size:12px;color:var(--lt);">zadnjih 14 dni</span>
-	</div>
-	<div id="hist"><div class="hist-empty">Ni še podatkov za pretekle dneve.</div></div>
+  <!-- ZGODOVINA ACCORDION -->
+  <div class="section-card" id="sec-zgodovina">
+    <div class="section-header" onclick="toggleSection('zgodovina')">
+      <span class="section-title">Zgodovina</span>
+      <div class="section-meta">
+        <span style="font-size:11px;color:var(--lt);">zadnjih 14 dni</span>
+        <button class="section-toggle" id="tog-zgodovina">▾</button>
+      </div>
+    </div>
+    <div class="section-body" id="body-zgodovina">
+      <div id="hist" style="margin-top:2px;"><div class="hist-empty">Ni še podatkov za pretekle dneve.</div></div>
+    </div>
   </div>
 </div>
 
 <script>
-const SLD=['Nedelja','Ponedeljek','Torek','Sreda','Četrtek','Petek','Sobota'];
+// ─── ACCORDION TOGGLE ────────────────────────────────────────
+function toggleSection(id){
+  const body=document.getElementById('body-'+id);
+  const tog=document.getElementById('tog-'+id);
+  if(!body||!tog)return;
+  const isOpen=body.classList.toggle('open');
+  tog.classList.toggle('open',isOpen);
+}
 const SLM=['januar','februar','marec','april','maj','junij','julij','avgust','september','oktober','november','december'];
 const LBLS=['Zajtrk','Dopoldanski prigrizek','Kosilo','Popoldanski prigrizek','Večerja'];
 const now=new Date(),DOW=now.getDay();
@@ -1896,6 +2089,27 @@ function calcKcal(){
   if(tkEaten)tkEaten.textContent=totalEaten+' kcal';
   if(tkPlan)tkPlan.textContent=goalKcal?'/ '+goalKcal+' kcal cilj':'';
 
+  // Update hero card
+  const heroRem=document.getElementById('hero-remaining');
+  const heroGoal=document.getElementById('hero-goal');
+  const heroEaten=document.getElementById('hero-eaten');
+  const heroRing=document.getElementById('hero-ring');
+  const heroRingVal=document.getElementById('hero-ring-val');
+  if(heroEaten)heroEaten.textContent=totalEaten;
+  if(heroGoal)heroGoal.textContent=goalKcal||'—';
+  if(heroRem&&remaining!==null){
+    heroRem.textContent=remaining>=0?remaining:remaining;
+    heroRem.style.color=remaining<0?'var(--red)':'var(--grn)';
+  }
+  if(heroRingVal)heroRingVal.textContent=totalEaten;
+  if(heroRing&&goalKcal){
+    const RING_LEN=226;
+    const pctR=Math.min(1,totalEaten/(goalKcal+totalBurned));
+    const dl=Math.round(pctR*RING_LEN);
+    heroRing.setAttribute('stroke-dasharray',dl+' '+(RING_LEN-dl));
+    heroRing.style.stroke=remaining<0?'var(--red)':'var(--grn)';
+  }
+
   renderMacros();
 }
 
@@ -2860,9 +3074,55 @@ function renderMacros(){
 	if(pP)pP.style.width=Math.min(100,Math.round(totP/targets.p*100))+'%';
 	if(pC)pC.style.width=Math.min(100,Math.round(totC/targets.c*100))+'%';
 	if(pF)pF.style.width=Math.min(100,Math.round(totF/targets.f*100))+'%';
+  // Update macro TILES (new UI)
+  const tilesEl=document.getElementById('macro-tiles');
+  if(tilesEl){
+    tilesEl.style.display=(targets||totP>0)?'grid':'none';
+    const setTile=(pfx,val,goal)=>{
+      const vEl=document.getElementById('mt-'+pfx);
+      const gEl=document.getElementById('mt-'+pfx+'g');
+      const bEl=document.getElementById('mt-'+pfx+'b');
+      if(vEl)vEl.textContent=val;
+      if(gEl)gEl.textContent=goal||'—';
+      if(bEl&&goal){
+        const diff=goal-val;
+        if(diff>2){bEl.textContent=diff+' g manjka';bEl.className='macro-tile-badge warn';}
+        else if(diff<-2){bEl.textContent='Preseženо';bEl.className='macro-tile-badge max';}
+        else{bEl.textContent='Cilj dosežen ✓';bEl.className='macro-tile-badge ok';}
+      }
+    };
+    if(targets){
+      setTile('p',totP,targets.p);
+      setTile('c',totC,targets.c);
+      setTile('f',totF,targets.f);
+    }
+  }
+
+  // Update focus bar
+  const focusBar=document.getElementById('focus-bar');
+  const focusTitle=document.getElementById('focus-title');
+  const focusText=document.getElementById('focus-text');
+  if(focusBar&&targets&&focusTitle&&focusText){
+    const pDiff=targets.p-totP;
+    const cDiff=targets.c-totC;
+    const fOver=totF-targets.f;
+    if(pDiff>5){
+      focusBar.style.display='flex';
+      focusTitle.textContent='Fokus danes: Beljakovine';
+      focusText.textContent='Manjka ti še '+pDiff+' g beljakovin do cilja.';
+    } else if(cDiff>10){
+      focusBar.style.display='flex';
+      focusTitle.textContent='Fokus danes: Ogljikovi hidrati';
+      focusText.textContent='Prostor za '+cDiff+' g kompleksnih OH (riž, krompir...).';
+    } else if(fOver>3){
+      focusBar.style.display='flex';
+      focusTitle.textContent='Pozor: Maščobe';
+      focusText.textContent='Za '+fOver+' g preseženа meja — danes se izogibaj mastnim jedem.';
+    } else {
+      focusBar.style.display='none';
+    }
   }
 }
-function renderExtras(){
   const c=document.getElementById('extra-meals');
   if(!c)return;
   if(!S.extras||!S.extras.length){c.innerHTML='';return;}
