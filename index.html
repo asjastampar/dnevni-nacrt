@@ -1781,7 +1781,16 @@ async function initApp(){
   loadSteps();
   if(cloudData){
 	if(cloudData.main){S={...S,...cloudData.main};getDiet();}
-	if(cloudData.steps)ST={...ST,...cloudData.steps};
+	if(cloudData.steps){
+	  // Take the higher of cloud vs local val. Steps only go up during a day,
+	  // so the bigger number is the freshest one. This handles the case where
+	  // user logged steps and refreshed within the 2s cloudSave debounce window.
+	  const cv=parseInt(cloudData.steps.val)||0;
+	  const lv=parseInt(ST.val)||0;
+	  ST={...ST,...cloudData.steps,val:Math.max(cv,lv)};
+	  // If max value already meets goal, keep done flag set
+	  if(ST.val>=ST.goal)ST.done=true;
+	}
 	if(cloudData.elog)try{localStorage.setItem(lsKey(ELKEY),JSON.stringify(cloudData.elog));}catch(e){}
 	if(cloudData.wod)try{localStorage.setItem(lsKey('wodlog_'+today),cloudData.wod);}catch(e){}
 	setSyncStatus('✓ naloženo');
@@ -2331,7 +2340,13 @@ const CARDIO_BURN_PER_MIN=7; // kcal/min zmerne intenzivnosti
 const STEPS_KEY='steps_'+now.toISOString().split('T')[0];
 let ST={goal:10000,done:false,val:0};
 function loadSteps(){try{const s=localStorage.getItem(lsKey(STEPS_KEY));if(s)ST=JSON.parse(s);}catch(e){}}
-function saveStepsState(){try{localStorage.setItem(lsKey(STEPS_KEY),JSON.stringify(ST));}catch(e){}}
+function saveStepsState(){
+  try{localStorage.setItem(lsKey(STEPS_KEY),JSON.stringify(ST));}catch(e){}
+  // Trigger cloud sync so steps propagate to other devices and survive refresh.
+  // Without this, ST changes never reached cloud (only localStorage), so cloudLoad
+  // on next refresh would overwrite fresh local steps with stale cloud values.
+  if(typeof cloudSave==='function')cloudSave();
+}
 
 function stepsKcal(steps){
   // ~0.04 kcal/korak za 65kg žensko
@@ -2378,7 +2393,9 @@ function saveSteps(){
   const inp=document.getElementById('st-inp');
   const v=parseInt(inp.value)||0;
   ST.val=Math.max(0,Math.min(100000,v));
-  if(ST.val>=ST.goal)ST.done=true;
+  // Any logged number counts as "done" — user shouldn't also need to click ✓
+  // (Resets to false if value cleared back to 0.)
+  ST.done=ST.val>0;
   saveStepsState();
   // Hide input, show value
   inp.classList.remove('show');
