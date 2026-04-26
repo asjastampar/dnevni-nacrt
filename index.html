@@ -1463,9 +1463,29 @@ async function fetchExDesc(name){
 }
 
 // ─── WEEK TRACKING & PROGRESSIVE OVERLOAD ──────────────────
-let fitStart=localStorage.getItem('fit_start');
-if(!fitStart){fitStart=now.toISOString().split('T')[0];localStorage.setItem('fit_start',fitStart);}
-const WEEK_NUM=Math.max(1,Math.floor((now-new Date(fitStart))/(7*24*60*60*1000))+1);
+// fitStart is user-namespaced via lsKey('fit_start'). Set after auth in initApp().
+let fitStart=null;
+let WEEK_NUM=1;
+function ensureFitStart(){
+  // Reads/writes user-namespaced fit_start. Migrates legacy global key on first run.
+  const k=lsKey('fit_start');
+  let s=null;
+  try{s=localStorage.getItem(k);}catch(e){}
+  if(!s){
+    // One-time migration: previously fit_start was stored without namespace.
+    let legacy=null;
+    try{legacy=localStorage.getItem('fit_start');}catch(e){}
+    if(legacy){
+      s=legacy;
+      try{localStorage.setItem(k,s);}catch(e){}
+    } else {
+      s=now.toISOString().split('T')[0];
+      try{localStorage.setItem(k,s);}catch(e){}
+    }
+  }
+  fitStart=s;
+  WEEK_NUM=Math.max(1,Math.floor((now-new Date(fitStart))/(7*24*60*60*1000))+1);
+}
 
 function getWeekPlan(w){
   if(w<=2)return{s:'2',r:'10',note:'Teden 1–2 — Učenje giba. Lahka teža, fokus na pravilni tehniki.'};
@@ -1617,7 +1637,22 @@ function setAuth(a){
   try{ localStorage.setItem('fit_auth', JSON.stringify(a)); }catch(e){}
 }
 function logout(){
-  localStorage.removeItem('fit_auth');
+  // Clear current user's namespaced localStorage keys (data isolation on shared device).
+  // NOTE: cloudSave is debounced 2s — any unsaved local changes from the last 2 seconds
+  // before logout may not have been synced yet. Acceptable trade-off for explicit logout.
+  if(AUTH&&AUTH.username){
+    const prefix=AUTH.username+'__';
+    try{
+      const toRemove=[];
+      for(let i=0;i<localStorage.length;i++){
+        const k=localStorage.key(i);
+        if(k&&k.startsWith(prefix))toRemove.push(k);
+      }
+      toRemove.forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});
+    }catch(e){}
+  }
+  // Then remove the auth record itself.
+  try{localStorage.removeItem('fit_auth');}catch(e){}
   AUTH=null;
   document.getElementById('main-app').style.display='none';
   document.getElementById('auth-overlay').classList.remove('hide');
@@ -1718,6 +1753,9 @@ async function initApp(){
   // Show app, hide modal
   document.getElementById('auth-overlay').classList.add('hide');
   document.getElementById('main-app').style.display='block';
+
+  // Initialize user-namespaced fit_start (must happen after AUTH is set)
+  ensureFitStart();
 
   // Update user bar
   const av=document.getElementById('u-avatar');
@@ -2891,10 +2929,27 @@ function renderTracker(){
 
 // ─── API CALLS ──────────────────────────────────────────────
 async function api(sys,msg){
-  const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:sys,message:msg})});
-  if(!r.ok) throw new Error('API '+r.status);
-  const d=await r.json();
-  return (d.text||'').trim();
+  // 30s timeout — prevents the UI from hanging if the AI server stalls or is unreachable.
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),30000);
+  try{
+    const r=await fetch('/api/ai',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({system:sys,message:msg}),
+      signal:controller.signal
+    });
+    if(!r.ok) throw new Error('API '+r.status);
+    const d=await r.json();
+    return (d.text||'').trim();
+  }catch(e){
+    if(e&&e.name==='AbortError'){
+      throw new Error('Časovna omejitev — strežnik se ni odzval pravočasno.');
+    }
+    throw e;
+  }finally{
+    clearTimeout(timer);
+  }
 }
 // ─── MACRO-AWARE MEAL REFRESH ────────────────────────────────
 // Calculate remaining macros for today (target - eaten + extras eaten)
