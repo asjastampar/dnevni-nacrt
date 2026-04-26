@@ -1775,6 +1775,10 @@ async function initApp(){
   setSyncStatus('↺ nalagam...');
   const today=now.toISOString().split('T')[0];
   const cloudData=await cloudLoad(today);
+  // Always read local storage first (user-namespaced now that AUTH is set).
+  // Cloud overrides on top — if cloudData has fresher values they win.
+  load();
+  loadSteps();
   if(cloudData){
 	if(cloudData.main){S={...S,...cloudData.main};getDiet();}
 	if(cloudData.steps)ST={...ST,...cloudData.steps};
@@ -1782,8 +1786,6 @@ async function initApp(){
 	if(cloudData.wod)try{localStorage.setItem(lsKey('wodlog_'+today),cloudData.wod);}catch(e){}
 	setSyncStatus('✓ naloženo');
   } else {
-	load();
-	loadSteps();
 	setSyncStatus('');
   }
   // Common init — runs whether data came from cloud or local
@@ -2404,7 +2406,9 @@ function changeStepsGoal(){
   if(newGoal&&parseInt(newGoal)>0){ST.goal=parseInt(newGoal);saveStepsState();renderSteps();calcKcal();}
 }
 
-loadSteps();
+// loadSteps() is now called from initApp() after AUTH is set, so localStorage keys
+// are properly user-namespaced via lsKey(). The previous top-level call ran before
+// AUTH and read an un-namespaced key that never matched any saved data.
 
 function calcExBurn(){
   if(S.wt==='cardio'){
