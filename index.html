@@ -1445,38 +1445,88 @@ const WKT={
 };
 // ─── WORKOUT SPLITS ──────────────────────────────────────────
 // Predefined splits — each cycles through workouts in order
+// Each split has frequency-specific templates. When the user picks a freq,
+// we generate sp.days from templates[freq]. This keeps the rotation length
+// equal to the weekly target so a "3×/week" plan rotates every week instead
+// of every 5/7/etc days, and lets each plan offer a sensibly-arranged week.
+//
+// All templates use these workout types: 'lower','upper','glute','full',
+// 'cardio','rest'. The exercises themselves come from WKT[type].
 const SPLITS={
   'glute_focus':{
 	name:'Glute Focus',
-	desc:'2× spodnji del + 1× zgornji. Za izklesano zadnjico.',
-	days:['lower','upper','glute']
+	desc:'Trening z poudarkom na zadnjici.',
+	templates:{
+	  2:['glute','lower'],                          // 2× heavy zadnjica
+	  3:['lower','glute','upper'],                  // klasično
+	  4:['lower','upper','glute','full'],           // glute + accessory
+	  5:['lower','upper','glute','full','glute']    // 5× pumpa
+	}
   },
   'upper_lower':{
-	name:'Upper/Lower 3x',
-	desc:'Klasičen split — zgornji, spodnji, celo telo.',
-	days:['upper','lower','full']
+	name:'Upper/Lower',
+	desc:'Klasičen split — zgornji in spodnji del telesa.',
+	templates:{
+	  2:['upper','lower'],
+	  3:['upper','lower','full'],
+	  4:['upper','lower','upper','lower'],
+	  5:['upper','lower','upper','lower','full']
+	}
   },
   'full_body':{
-	name:'Full Body 3x',
+	name:'Full Body',
 	desc:'Celotno telo vsako sejo. Idealno za začetnice.',
-	days:['full','full','full']
+	templates:{
+	  2:['full','full'],
+	  3:['full','full','full'],
+	  4:['full','full','full','full'],
+	  5:['full','full','full','full','full']
+	}
   },
   'ppl':{
 	name:'Push / Pull / Legs',
-	desc:'Klasičen bodybuilding split (push=zgornji potisk, pull=zgornji vlek).',
-	days:['upper','upper','lower']
+	desc:'Klasičen bodybuilding split.',
+	templates:{
+	  2:['upper','lower'],
+	  3:['upper','upper','lower'],
+	  4:['upper','upper','lower','full'],
+	  5:['upper','upper','lower','upper','lower']
+	}
   },
   'mix':{
-	name:'Mešano (4x)',
-	desc:'4× tedensko — zgornji, glute, celo, spodnji.',
-	days:['upper','glute','full','lower']
+	name:'Mešano',
+	desc:'Vse vrste treningov — uravnoteženo.',
+	templates:{
+	  2:['upper','lower'],
+	  3:['upper','glute','full'],
+	  4:['upper','glute','full','lower'],
+	  5:['upper','lower','glute','full','upper']
+	}
   },
   'custom':{
 	name:'Po meri',
-	desc:'Določi sama svoj zaporedje vadb.',
-	days:['lower','upper','glute']
+	desc:'Določi sama svoje zaporedje vadb.',
+	templates:{
+	  2:['lower','upper'],
+	  3:['lower','upper','glute'],
+	  4:['lower','upper','glute','full'],
+	  5:['lower','upper','glute','full','lower']
+	}
   }
 };
+
+// Resolve days for a given split id + frequency. Used both at split selection
+// time and during one-time migration from older single-`days` splits.
+function templateDaysFor(splitId,freq){
+  const sp=SPLITS[splitId]||SPLITS.glute_focus;
+  if(sp.templates&&sp.templates[freq])return sp.templates[freq].slice();
+  // Fallback: pad-or-trim the 3× template to match desired freq
+  const base=(sp.templates&&sp.templates[3])||['lower','upper','glute'];
+  if(freq<=base.length)return base.slice(0,freq);
+  const out=[];
+  for(let i=0;i<freq;i++)out.push(base[i%base.length]);
+  return out;
+}
 
 const SPLIT_KEY='workout_split';
 // Auto-suggested training days for each frequency (0=Sun, 1=Mon, ..., 6=Sat).
@@ -1501,7 +1551,7 @@ function getSplit(){
 	const s=localStorage.getItem(lsKey(SPLIT_KEY));
 	if(s)sp=JSON.parse(s);
   }catch(e){}
-  if(!sp)sp={id:'glute_focus',days:SPLITS.glute_focus.days,position:0};
+  if(!sp)sp={id:'glute_focus',days:templateDaysFor('glute_focus',3),position:0};
   // Backfill new fields for users who upgraded from the old model
   if(typeof sp.freq!=='number')sp.freq=3;
   if(!Array.isArray(sp.trainingDays))sp.trainingDays=null; // null = auto
@@ -1514,6 +1564,17 @@ function getSplit(){
   if((sp.weeklyDone||0)===0&&(sp.position||0)>0&&!sp._migrated){
 	sp.position=0;
 	sp._migrated=true;
+	try{localStorage.setItem(lsKey(SPLIT_KEY),JSON.stringify(sp));}catch(e){}
+  }
+  // Migration: if days array length doesn't match freq AND we're not in custom
+  // (custom can have any length the user wants), regenerate from template.
+  // This catches users who upgraded from the old fixed-3 model into the new
+  // freq-aware one — their stored 3-day array would otherwise rotate weirdly
+  // under freq=4 or freq=5.
+  if(sp.id!=='custom'&&Array.isArray(sp.days)&&sp.days.length!==sp.freq&&!sp._daysMigrated){
+	sp.days=templateDaysFor(sp.id,sp.freq);
+	sp.position=0;
+	sp._daysMigrated=true;
 	try{localStorage.setItem(lsKey(SPLIT_KEY),JSON.stringify(sp));}catch(e){}
   }
   return sp;
@@ -2558,12 +2619,23 @@ function closeSplitPicker(){
 
 function renderSplitOptions(){
   const sp=getSplit();
+  const freq=sp.freq||3;
   const c=document.getElementById('split-options');
   c.innerHTML=Object.entries(SPLITS).map(([id,split])=>{
 	const isActive=sp.id===id;
-	const days=(id==='custom'&&_customDays?_customDays:split.days).map(d=>WT_LBL[d]||d);
+	// Resolve the days preview based on current user frequency, so the pills
+	// match how this plan would actually rotate for THIS user. Custom uses
+	// the in-progress _customDays (or stored sp.days if same id).
+	let dayKeys;
+	if(id==='custom'){
+	  dayKeys=_customDays?_customDays:(sp.id==='custom'?sp.days:templateDaysFor('custom',freq));
+	} else {
+	  dayKeys=templateDaysFor(id,freq);
+	}
+	const days=dayKeys.map(d=>WT_LBL[d]||d);
+	const freqLabel=`${freq}× tedensko`;
 	return `<button class="split-opt${isActive?' active':''}" onclick="pickSplit('${id}')">
-	  <div class="split-opt-name">${split.name}</div>
+	  <div class="split-opt-name">${split.name} <span style="font-weight:400;color:var(--lt);font-size:11px;">— ${freqLabel}</span></div>
 	  <div class="split-opt-desc">${split.desc}</div>
 	  <div class="split-opt-days">${days.map(d=>`<span>${d}</span>`).join('')}</div>
 	</button>`;
@@ -2578,12 +2650,13 @@ function pickSplit(id){
   const wasActive=sp.id===id;
   sp.id=id;
   if(id==='custom'){
-	if(!_customDays)_customDays=sp.days&&sp.id==='custom'?[...sp.days]:[...SPLITS.custom.days];
+	if(!_customDays)_customDays=sp.days&&sp.id==='custom'?[...sp.days]:templateDaysFor('custom',sp.freq||3);
 	document.getElementById('custom-split-edit').style.display='block';
 	renderCustomDays();
   }else{
 	_customDays=null;
-	sp.days=[...SPLITS[id].days];
+	// Resolve days from the freq-specific template
+	sp.days=templateDaysFor(id,sp.freq||3);
 	sp.position=0;
 	document.getElementById('custom-split-edit').style.display='none';
   }
@@ -4041,6 +4114,12 @@ function saveGoals(){
 function selFreq(n){
   const sp=getSplit();
   sp.freq=n;
+  // Regenerate the rotation length to match the new frequency. This way a
+  // 4×/week plan rotates through 4 distinct sessions per week (instead of
+  // duplicating sessions or leaving gaps from a fixed 3-element array).
+  // Reset position to 0 so the user starts the new rotation cleanly.
+  sp.days=templateDaysFor(sp.id,n);
+  sp.position=0;
   saveSplit(sp);
   refreshFreqUI();
   refreshTrainDaysUI();
