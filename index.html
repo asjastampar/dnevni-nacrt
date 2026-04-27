@@ -197,6 +197,12 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
   .week-row{gap:4px;}
   .meal-card.compact-done .meal-top{padding:14px !important;}
   .meal-card.compact-done .meal-summary-title{font-size:13px;}
+  .sg-title{font-size:18px;}
+  .sg-sub{font-size:12px;line-height:1.5;}
+  .sg-grid{grid-template-columns:1fr;}
+  .sg-footer{grid-template-columns:1fr;}
+  .sg-card,.sg-mini,.sg-rule{padding:11px 12px;}
+  .sg-step-body{font-size:12.5px;}
 }
 .ibtn{background:none;border:.5px solid var(--br);border-radius:7px;padding:3px 8px;font-size:11px;cursor:pointer;color:var(--lt);font-family:inherit;transition:all .15s;}
 .ibtn:hover{color:var(--md);background:var(--bg);}
@@ -243,6 +249,30 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .ws-stats{display:flex;gap:12px;font-size:12px;color:var(--lt);}
 .ws-stat{}
 .ws-stat b{color:var(--dk);font-weight:500;}
+.session-guide{background:linear-gradient(180deg,#FFFEFC 0%,#F8F5EE 100%);border:.5px solid rgba(23,23,19,.06);border-radius:18px;padding:15px 16px;margin-bottom:12px;}
+.sg-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
+.sg-kicker{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--lt);margin-bottom:5px;}
+.sg-title{font-size:21px;line-height:1.15;color:var(--dk);font-weight:600;margin-bottom:5px;}
+.sg-sub{font-size:13px;color:var(--md);line-height:1.55;max-width:64ch;}
+.sg-trust{display:inline-flex;align-items:center;gap:6px;background:#EBF4EF;color:var(--grn);border:.5px solid rgba(42,97,71,.16);border-radius:999px;padding:6px 10px;font-size:11.5px;font-weight:500;}
+.sg-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:10px;margin-bottom:10px;}
+.sg-card{background:rgba(255,255,255,.74);border:.5px solid rgba(23,23,19,.06);border-radius:14px;padding:12px 13px;}
+.sg-card-title{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--lt);margin-bottom:8px;}
+.sg-list{display:grid;gap:7px;}
+.sg-step{display:grid;grid-template-columns:24px minmax(0,1fr);gap:9px;align-items:flex-start;}
+.sg-step-no{width:24px;height:24px;border-radius:999px;background:#EBF4EF;color:var(--grn);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+.sg-step-body{font-size:13px;color:var(--md);line-height:1.5;}
+.sg-step-body b{color:var(--dk);font-weight:600;}
+.sg-tags{display:flex;flex-wrap:wrap;gap:6px;}
+.sg-tag{display:inline-flex;align-items:center;gap:4px;background:var(--w);border:.5px solid var(--br);border-radius:999px;padding:5px 10px;font-size:11.5px;color:var(--md);}
+.sg-rule{background:#FFF7EA;border:.5px solid #F1D4A0;border-radius:12px;padding:11px 12px;font-size:13px;color:#6D5A31;line-height:1.55;margin-bottom:10px;}
+.sg-rule b{color:#5B4825;}
+.sg-rule.ok{background:#EBF4EF;border-color:#B8D9C6;color:var(--grn);}
+.sg-footer{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+.sg-mini{background:var(--w);border:.5px solid rgba(23,23,19,.06);border-radius:12px;padding:10px 11px;}
+.sg-mini-lbl{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--lt);margin-bottom:4px;}
+.sg-mini-copy{font-size:12.5px;color:var(--md);line-height:1.45;}
+.sg-mini-copy b{color:var(--dk);}
 .workout-preview{background:var(--w);border:.5px solid var(--br);border-radius:9px;padding:0;margin-bottom:12px;display:none;overflow:hidden;}
 .workout-preview.show{display:block;}
 .wp-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:.5px solid var(--br);font-size:13px;}
@@ -3492,6 +3522,182 @@ function setActivePanel(key){
   renderPanelSwitcher();
 }
 
+function getWorkoutPrimer(wt){
+  const commonSafety='Če čutiš ostro bolečino v sklepu, vrtoglavico ali izgubiš kontrolo nad gibom, takoj ustavi in znižaj težo ali preskoči vajo.';
+  const commonEffort='Prva vadba naj bo namerno lažja. Cilj danes ni junaštvo, ampak da vse vaje razumeš in jutri brez panike prideš nazaj.';
+  const advancedNote='Za naprednejše ostane spodaj isti log: cilji v rep range-u, shranjevanje kg/serij/ponovitev in progresivna obremenitev skozi tedne.';
+  if(wt==='rest'){
+    return {
+      title:'Danes je regeneracija del plana',
+      sub:'Mišica ne raste med serijo, ampak ko se po dobrem treningu spočiješ. Počitek tukaj ni lenoba, ampak del napredka.',
+      trust:'Plan te danes namerno ne sili v težko vadbo.',
+      flow:[
+        'Naredi <b>20–40 min lahke hoje</b> ali zelo umirjeno kolo.',
+        'Dodaj <b>5–8 min mobilnosti</b> za boke, zadnjo ložo in ramena.',
+        'Če si trda od včeraj, naredi <b>1 lahek krog</b>: 10 glute bridge, 10 bodyweight squat, 30 sek dihanja.'
+      ],
+      warmup:['3 min lahka hoja','2 min odpiranje bokov in ramen','1 min globoko dihanje'],
+      rule:`<b>Pravilo dneva:</b> jutri želiš biti bolj sveža, ne bolj zdelana. ${commonSafety}`,
+      footer:[
+        {lbl:'Zakaj',copy:'Tako lažje držiš <b>ritem 3–5 treningov</b> na teden.'},
+        {lbl:'Minimum',copy:'Če danes narediš <b>vsaj sprehod</b>, je plan še vedno na tirnicah.'},
+        {lbl:'Napredno',copy:advancedNote}
+      ]
+    };
+  }
+  if(wt==='cardio'){
+    return {
+      title:'Danes je cilj baza, ne izčrpavanje',
+      sub:'Kardio tukaj dela podporo za formo, regeneracijo in kondicijo, da lažje napreduješ tudi pri nogah, zadnjici in hrbtu.',
+      trust:'Preverjen začetniški pristop: lahek začetek, enakomeren glavni del, miren iztek.',
+      flow:[
+        'Začni z <b>5 min res lahkega tempa</b>. Če si na stezi, najprej hodí, šele potem teci.',
+        'Glavni del naredi v tempu, kjer še <b>lahko govoriš v kratkih stavkih</b>.',
+        'Zaključi z <b>3–5 min počasnejšega tempa</b>, ne ustavi se naenkrat.'
+      ],
+      warmup:['3 min hoja ali zelo lahka elipsa','1 min kroženje ramen','1 min dinamičen korak + gležnji'],
+      rule:`<b>Pravilo tempa:</b> če po 2 minutah ne moreš izgovoriti kratkega stavka, si prehitro začela. ${commonSafety}`,
+      footer:[
+        {lbl:'Začetek',copy:'Raje <b>20 mirnih minut</b> kot 8 minut na silo.'},
+        {lbl:'Napredek',copy:'Napredek lovi z <b>več časa ali bolj mirnim pulzom</b>, ne samo z večjo hitrostjo.'},
+        {lbl:'Napredno',copy:advancedNote}
+      ]
+    };
+  }
+  if(wt==='crossfit'){
+    return {
+      title:'CrossFit naj bo prvič tehničen, ne herojski',
+      sub:'Ta modul je uporaben šele, ko razumeš osnovne gibe. Če si prvič v fitnesu, je čisto ok izbrati glute, lower ali full body namesto WOD-a.',
+      trust:'Najboljši začetniški CrossFit je skaliran in čist izvedbeno.',
+      flow:[
+        'Ogrej se <b>5–7 min</b>, nato naredi <b>1 lahek testni krog</b> vseh vaj brez časovnega pritiska.',
+        'Vsako vajo raje <b>skaliraj</b> kot goljufaš gib. Kakovost > ego.',
+        'Pravi WOD začni šele, ko veš, kako izgleda vsaka vaja in kam boš odložila opremo.'
+      ],
+      warmup:['3 min veslanje ali hoja','1 krog: 8 počepov, 8 hinge, 8 potiskov na klop','1 lahek testni krog WOD-a'],
+      rule:`<b>Pravilo danes:</b> če ti srce prehiti tehniko, upočasni. Če si prvič v gymu, je pametna izbira tudi navaden strength trening. ${commonSafety}`,
+      footer:[
+        {lbl:'Skaliranje',copy:'Step-out burpee, lažja teža, manj ponovitev: vse to <b>še vedno šteje</b>.'},
+        {lbl:'Cilj',copy:'Najprej osvoji gibanje, potem tempo.'},
+        {lbl:'Napredno',copy:advancedNote}
+      ]
+    };
+  }
+
+  const byType={
+    glute:{
+      title:'Danes gradimo zadnjico in linijo nog',
+      sub:'To je glavni “shape” trening. Vaje spodaj dajejo največ smisla za rit in noge, če so tehnično čiste in dovolj blizu naporu.',
+      warmup:['5 min hitra hoja z rahlim naklonom ali kolo','10 glute bridge + 10 bodyweight squat','8 reverse lunge na vsako nogo + 15 frog pumps'],
+      flow:[
+        'Po ogrevanju naredi pri prvi veliki vaji <b>1 lahko pripravljalno serijo</b> brez pritiska.',
+        'Nato sledi karticam po vrsti. Pri vsaki delovni seriji pusti približno <b>2–3 ponovitve v rezervi</b>.',
+        'Pri hip thrustu, RDL in počepih si vzemi <b>75–120 sek počitka</b>; pri manjših vajah 45–75 sek.'
+      ],
+      rule:'<b>Kako izbereš težo:</b> zadnje 2–3 ponovitve morajo biti težke, ampak še vedno lepe. Če ti forma razpade, je pretežko.',
+      tags:['glavni fokus: zadnjica','sekundarno: noge','bonus: stabilen spodnji del']
+    },
+    lower:{
+      title:'Danes delamo noge z močnim poudarkom na obliki',
+      sub:'Spodnji del tukaj ni samo “calorie burn”. Namen je zgraditi noge, zadnjico in stabilnost, da bo telo videti bolj čvrsto in simetrično.',
+      warmup:['5 min hoja, kolo ali steper','10 počepov brez teže + 10 hip hinge','8 izpadnih korakov na nogo + 20 sek držanje spodnjega počepa'],
+      flow:[
+        'Začni pri prvi vaji z <b>lažjo testno serijo</b>, da preveriš kolena, boke in ravnotežje.',
+        'Glavne vaje delaj počasi navzdol in odločno gor. Pri izolacijah res <b>stisni mišico na vrhu</b>.',
+        'Če si izgubljena med napravami, nič hudega: najprej naredi proste vaje, stroje pa vmes poišči v miru.'
+      ],
+      rule:'<b>Pravilo izvedbe:</b> kolena naj sledijo prstom, hrbet naj ostane miren, peta pa na tleh kjer je to smiselno.',
+      tags:['glavni fokus: noge','sekundarno: zadnjica','bonus: stabilnost']
+    },
+    upper:{
+      title:'Danes gradimo hrbet in zgornji del brez nepotrebnega balasta',
+      sub:'Za tvoj cilj je zgornji del tukaj zato, da dobiš lep hrbet, ramena in držo, medtem ko ostane telo vizualno uravnoteženo.',
+      warmup:['4–5 min veslanje ali lahka hoja','10 kroženj ramen naprej/nazaj','10 band row ali TRX row + 8 wall slide'],
+      flow:[
+        'Pri potiskih in veslanjih najprej naredi <b>1 lahek ogrevalni set</b>.',
+        'Lovimo dober občutek v hrbtu in ramenih, ne samo premikanja uteži. Če čutiš samo roke, znižaj težo in upočasni.',
+        'Med serijami si vzemi toliko časa, da lahko naslednjo serijo izvedeš lepo.'
+      ],
+      rule:'<b>Pravilo drže:</b> lopatice postavi nazaj in dol, rebra mirna, vrat sproščen. Če se zvijaš, je teža prevelika.',
+      tags:['glavni fokus: hrbet','sekundarno: ramena','bonus: drža in simetrija']
+    },
+    full:{
+      title:'Danes narediš celoten, zelo uporaben začetniški trening',
+      sub:'To je najbolj varna izbira, ko si nova v fitnesu ali ko hočeš v eni seji pokriti celo telo brez kompliciranja.',
+      warmup:['5 min lahka hoja ali veslanje','10 počepov brez teže + 10 glute bridge','8 incline push-up na klop + 8 band row'],
+      flow:[
+        'Po ogrevanju pojdi čez vaje po vrsti in si pri prvi dveh vzemi malo več časa za orientacijo.',
+        'Vsaka vaja naj izgleda podobno od prve do zadnje ponovitve. Ko hitrost ali kontrola močno padeta, se serija ustavi.',
+        'Raje končaj z občutkom “lahko bi še malo” kot pa da te prvi trening prestraši.'
+      ],
+      rule:'<b>Pravilo prvega tedna:</b> vse vaje naj bodo približno na občutku 6–7/10 težavnosti. Težje bo prišlo zelo hitro že samo s konsistentnostjo.',
+      tags:['glavni fokus: tehnika','sekundarno: simetrija','bonus: varna baza za napredek']
+    }
+  };
+
+  const cfg=byType[wt]||byType.full;
+  return {
+    title:cfg.title,
+    sub:cfg.sub,
+    trust:'Osnove, ki tukaj držijo plan skupaj: dovolj serij, srednji razpon ponovitev, postopno dvigovanje bremena in čista tehnika pred egom.',
+    flow:cfg.flow,
+    warmup:cfg.warmup,
+    rule:`${cfg.rule} ${commonSafety}`,
+    tags:cfg.tags,
+    footer:[
+      {lbl:'Kako naj bo težko',copy:'Ko končaš serijo, naj imaš občutek, da bi naredila <b>še 2–3 čiste ponovitve</b>.'},
+      {lbl:'Če si izgubljena',copy:'Odpri eno kartico vaje, poglej kratek opis ali video, nato naredi <b>eno lahko serijo za občutek</b>.'},
+      {lbl:'Za napredne',copy:advancedNote}
+    ],
+    note:commonEffort
+  };
+}
+
+function renderWorkoutPrimer(wt){
+  const primer=getWorkoutPrimer(wt);
+  if(!primer)return '';
+  const warmup=(primer.warmup||[]).map((step,i)=>`
+    <div class="sg-step">
+      <div class="sg-step-no">${i+1}</div>
+      <div class="sg-step-body">${step}</div>
+    </div>`).join('');
+  const flow=(primer.flow||[]).map((step,i)=>`
+    <div class="sg-step">
+      <div class="sg-step-no">${i+1}</div>
+      <div class="sg-step-body">${step}</div>
+    </div>`).join('');
+  const tags=(primer.tags||[]).map(tag=>`<span class="sg-tag">${tag}</span>`).join('');
+  const footer=(primer.footer||[]).map(item=>`
+    <div class="sg-mini">
+      <div class="sg-mini-lbl">${item.lbl}</div>
+      <div class="sg-mini-copy">${item.copy}</div>
+    </div>`).join('');
+  return `<div class="session-guide">
+    <div class="sg-top">
+      <div>
+        <div class="sg-kicker">Začni tukaj</div>
+        <div class="sg-title">${primer.title}</div>
+        <div class="sg-sub">${primer.sub}</div>
+      </div>
+      <div class="sg-trust">✓ ${primer.trust||'smiselno za začetnico in uporabno za napredovanje'}</div>
+    </div>
+    <div class="sg-grid">
+      <div class="sg-card">
+        <div class="sg-card-title">Ogrevanje · 5 do 7 min</div>
+        <div class="sg-list">${warmup}</div>
+      </div>
+      <div class="sg-card">
+        <div class="sg-card-title">Kaj narediš v fitnesu po vrsti</div>
+        <div class="sg-list">${flow}</div>
+      </div>
+    </div>
+    ${tags?`<div class="sg-tags" style="margin-bottom:10px;">${tags}</div>`:''}
+    ${primer.note?`<div class="sg-rule ok"><b>Prvi obisk:</b> ${primer.note}</div>`:''}
+    <div class="sg-rule">${primer.rule}</div>
+    <div class="sg-footer">${footer}</div>
+  </div>`;
+}
+
 // ─── BP RENDER ──────────────────────────────────────────────
 function renderBp(){
   document.getElementById('bpsel').innerHTML=BP.map(b=>{
@@ -3908,6 +4114,7 @@ function deleteMeal(i){
 // ─── RENDER WORKOUT ─────────────────────────────────────────
 function renderWorkout(){
   const c=document.getElementById('wc'),baw=document.getElementById('baw'),w=WKT[S.wt];
+  const primerHtml=renderWorkoutPrimer(S.wt);
   // Defensive helper — set disabled/innerHTML safely
   const setBaw=(disabled,html)=>{
 	if(!baw)return;
@@ -3938,7 +4145,7 @@ function renderWorkout(){
 		${descHtml}
 	  </div>`;
 	}).join('');
-	c.innerHTML=`<div class="wod-card" id="wod-card">
+	c.innerHTML=primerHtml+`<div class="wod-card" id="wod-card">
 	  <div class="wod-head">
 		<span class="wod-type ${typeClass}">${wod.type}</span>
 		<span class="wod-title">${wod.name}</span>
@@ -3958,7 +4165,7 @@ function renderWorkout(){
   }
   if(S.wt==='cardio'){
 	setBaw(false);document.getElementById('add-ex-row').style.display='none';
-	c.innerHTML=`<div style="font-size:12px;color:var(--lt);margin-bottom:10px;">Izberi kaj boš naredila, nastavi čas in odkljukaj ob koncu.</div>`+
+	c.innerHTML=primerHtml+`<div style="font-size:12px;color:var(--lt);margin-bottom:10px;">Izberi kaj boš naredila, nastavi čas in odkljukaj ob koncu.</div>`+
 	  S.ex.map((e,i)=>{
 		const done=S.exd[i];const open=!!exExp[i];
 		const info=getExInfo(e.n)||{};
@@ -3999,7 +4206,7 @@ function renderWorkout(){
 	  }).join('');
 	return;
   }
-  else if(S.wt==='rest'){setBaw(true);c.innerHTML=`<div class="info-box" style="text-align:center;">😌 <b>Danes je počitek</b><br><br>Telo se regenerira in mišice rastejo.<br>Lahka hoja ali raztezanje sta vedno dobrodošla.</div>`;document.getElementById('add-ex-row').style.display='none';}
+  else if(S.wt==='rest'){setBaw(true);c.innerHTML=primerHtml+`<div class="info-box" style="text-align:center;">😌 <b>Danes je počitek</b><br><br>Telo se regenerira in mišice rastejo.<br>Lahka hoja ali raztezanje sta vedno dobrodošla.</div>`;document.getElementById('add-ex-row').style.display='none';}
   else{
 	setBaw(false,'↺ Zamenjaj vaje');document.getElementById('add-ex-row').style.display='flex';
 	const bc=S.wt==='glute'?'glute':'gym';
@@ -4011,7 +4218,7 @@ function renderWorkout(){
 	  return sum+sg.sets;
 	},0);
 	const estMin=Math.round(totalSets*2.5);  // ~2.5 min per set incl. rest
-	c.innerHTML=`<div class="workout-summary">
+	c.innerHTML=primerHtml+`<div class="workout-summary">
 	  <div class="ws-stats">
 		<span class="ws-stat"><b>${S.ex.length}</b> vaj</span>
 		<span class="ws-stat"><b>${totalSets}</b> serij</span>
@@ -4348,24 +4555,24 @@ function renderHistoryInsights(){
   const stats=getRecentHistoryStats(28);
   statsEl.innerHTML=`
 	<div class="history-stat">
-	  <div class="history-stat-kicker">Zabeleženi dnevi</div>
+	  <div class="history-stat-kicker">Dnevi</div>
 	  <div class="history-stat-value">${stats.trackedDays}</div>
-	  <div class="history-stat-note">v zadnjih 28 dneh</div>
+	  <div class="history-stat-note">v 28 dneh</div>
 	</div>
 	<div class="history-stat">
-	  <div class="history-stat-kicker">Meal consistency</div>
+	  <div class="history-stat-kicker">Obroki</div>
 	  <div class="history-stat-value">${stats.mealRate}%</div>
-	  <div class="history-stat-note">odkljukanih planiranih obrokov</div>
+	  <div class="history-stat-note">plan odkljukan</div>
 	</div>
 	<div class="history-stat">
-	  <div class="history-stat-kicker">Trening dnevi</div>
+	  <div class="history-stat-kicker">Vadba</div>
 	  <div class="history-stat-value">${stats.workoutDays}</div>
-	  <div class="history-stat-note">aktivnih dni v 4 tednih</div>
+	  <div class="history-stat-note">trening dni</div>
 	</div>
 	<div class="history-stat">
 	  <div class="history-stat-kicker">Povp. kcal</div>
 	  <div class="history-stat-value">${stats.avgKcal||'—'}</div>
-	  <div class="history-stat-note">na dneh z vnosom hrane</div>
+	  <div class="history-stat-note">na vnešen dan</div>
 	</div>`;
   const trends=getProgressiveOverloadStats(3);
   if(!trends.length){
