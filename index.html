@@ -2068,9 +2068,56 @@ function togBpManual(){
   }
 }
 
+// ─── TRAINING SCHEDULE UI HELPERS ───────────────────────────
+const TRAIN_DAY_LABELS={1:'pon',2:'tor',3:'sre',4:'čet',5:'pet',6:'sob',0:'ned'};
+let _planDraft=null;
+
+function defaultTrainDays(freq){
+  const map={2:[2,5],3:[1,3,5],4:[1,2,4,5],5:[1,2,3,4,5]};
+  return [...(map[freq]||map[3])];
+}
+function getPlanDraft(){
+  if(_planDraft)return _planDraft;
+  const sp=getSplit();
+  const freq=sp.freq||Math.min(Math.max((sp.days||[]).length||3,2),5);
+  _planDraft={freq,trainDays:Array.isArray(sp.trainDays)?[...sp.trainDays]:[]};
+  return _planDraft;
+}
+function selFreq(freq){
+  const d=getPlanDraft();
+  d.freq=freq;
+  if(d.trainDays.length>freq)d.trainDays=d.trainDays.slice(0,freq);
+  refreshFreqUI();
+  refreshTrainDaysUI();
+}
+function togTrainDay(day){
+  const d=getPlanDraft();
+  const exists=d.trainDays.includes(day);
+  d.trainDays=exists?d.trainDays.filter(x=>x!==day):[...d.trainDays,day].sort((a,b)=>((a+6)%7)-((b+6)%7));
+  refreshTrainDaysUI();
+}
+function refreshFreqUI(){
+  const d=getPlanDraft();
+  [2,3,4,5].forEach(f=>{const el=document.getElementById('freq-'+f);if(el)el.classList.toggle('active',d.freq===f);});
+}
+function refreshTrainDaysUI(){
+  const d=getPlanDraft();
+  document.querySelectorAll('.day-pick').forEach(btn=>{
+    const day=Number(btn.dataset.day);
+    btn.classList.toggle('active',d.trainDays.includes(day));
+  });
+  const summary=document.getElementById('train-days-summary');
+  if(summary){
+    const days=d.trainDays.length?d.trainDays:defaultTrainDays(d.freq);
+    const prefix=d.trainDays.length?'Izbrano':'Predlagano';
+    summary.textContent=`${prefix}: ${days.map(x=>TRAIN_DAY_LABELS[x]).join(', ')}`;
+  }
+}
+
 function openSplitPicker(){
   document.getElementById('split-overlay').classList.remove('hide');
   _customDays=null;
+  _planDraft=null;
   refreshFreqUI();
   refreshTrainDaysUI();
   renderSplitOptions();
@@ -2078,6 +2125,7 @@ function openSplitPicker(){
 function closeSplitPicker(){
   document.getElementById('split-overlay').classList.add('hide');
   _customDays=null;
+  _planDraft=null;
   document.getElementById('custom-split-edit').style.display='none';
 }
 
@@ -2140,11 +2188,14 @@ function removeCustomDay(i){
 
 function saveSplitChoice(){
   const sp=getSplit();
+  const draft=getPlanDraft();
+  sp.freq=draft.freq;
+  sp.trainDays=draft.trainDays.length?[...draft.trainDays]:defaultTrainDays(draft.freq);
   if(sp.id==='custom'&&_customDays&&_customDays.length>0){
     sp.days=[..._customDays];
     sp.position=0;
-    saveSplit(sp);
   }
+  saveSplit(sp);
   // Switch to first workout in new plan
   S.wt=nextWorkoutInSplit();
   initWorkout();save();
