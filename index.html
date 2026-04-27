@@ -17,6 +17,18 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
 .sec-lbl{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--md);}
 .sec-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.panel-switcher{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:1.5rem 0 1rem;}
+.panel-tab{background:rgba(255,255,255,.72);border:1px solid rgba(23,23,19,.075);border-radius:24px;padding:16px 18px;text-align:left;cursor:pointer;font-family:inherit;transition:all .18s;box-shadow:0 8px 24px rgba(28,25,18,.03);}
+.panel-tab:hover{transform:translateY(-1px);border-color:rgba(23,23,19,.12);}
+.panel-tab.active{background:#fff;border-color:rgba(42,97,71,.24);box-shadow:0 14px 34px rgba(28,25,18,.05);}
+.panel-tab-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.panel-tab-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--md);}
+.panel-tab-state{font-size:11px;color:var(--grn);background:#EBF4EF;border-radius:999px;padding:4px 9px;white-space:nowrap;}
+.panel-tab.active .panel-tab-state{background:var(--grn);color:#fff;}
+.panel-tab-title{font-size:20px;line-height:1.15;color:var(--dk);font-weight:600;margin-bottom:5px;}
+.panel-tab-meta{font-size:13px;color:var(--md);line-height:1.45;}
+.panel-view{display:none;}
+.panel-view.active{display:block;}
 /* toggles */
 .tog{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--md);cursor:pointer;user-select:none;}
 .tog-track{position:relative;width:34px;height:19px;background:#D5D3CB;border-radius:10px;transition:background .2s;flex-shrink:0;}
@@ -146,6 +158,11 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 @media(max-width:500px){
   .app{padding:1.1rem .85rem 3rem;}
   .htitle{font-size:22px;margin-bottom:1.4rem;}
+  .panel-switcher{display:flex;gap:8px;overflow-x:auto;margin:1.15rem 0 .9rem;padding-bottom:2px;scrollbar-width:none;}
+  .panel-switcher::-webkit-scrollbar{display:none;}
+  .panel-tab{flex:0 0 auto;min-width:150px;padding:13px 14px;border-radius:20px;}
+  .panel-tab-title{font-size:16px;}
+  .panel-tab-meta{font-size:12px;}
   .sec-right{gap:5px;}
   .rbtn,.pers-btn{padding:4px 9px;font-size:11px;}
   .bp-btn{padding:5px 9px;font-size:12px;}
@@ -1360,6 +1377,34 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 	</div>
 
 
+  <div class="panel-switcher" id="panel-switcher">
+	<button class="panel-tab active" id="panel-tab-meals" onclick="setActivePanel('meals')">
+	  <div class="panel-tab-top">
+		<span class="panel-tab-label">Sekcija</span>
+		<span class="panel-tab-state">odprto</span>
+	  </div>
+	  <div class="panel-tab-title">Jedilnik</div>
+	  <div class="panel-tab-meta" id="panel-meta-meals">Današnji obroki</div>
+	</button>
+	<button class="panel-tab" id="panel-tab-workout" onclick="setActivePanel('workout')">
+	  <div class="panel-tab-top">
+		<span class="panel-tab-label">Sekcija</span>
+		<span class="panel-tab-state">odpri</span>
+	  </div>
+	  <div class="panel-tab-title">Vadba</div>
+	  <div class="panel-tab-meta" id="panel-meta-workout">Današnji trening</div>
+	</button>
+	<button class="panel-tab" id="panel-tab-history" onclick="setActivePanel('history')">
+	  <div class="panel-tab-top">
+		<span class="panel-tab-label">Sekcija</span>
+		<span class="panel-tab-state">odpri</span>
+	  </div>
+	  <div class="panel-tab-title">Zgodovina</div>
+	  <div class="panel-tab-meta" id="panel-meta-history">Pretekli dnevi</div>
+	</button>
+  </div>
+
+  <div class="panel-view active" id="panel-meals">
   <div class="sec">
 	<div class="sec-head">
 	  <span class="sec-lbl">Jedilnik</span>
@@ -1411,7 +1456,9 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 		  <button class="add-meal-btn" id="plan-btn" onclick="addPlannedMeal()">Dodaj v plan</button>
 		</div>
   </div>
+  </div>
 
+  <div class="panel-view" id="panel-workout">
   <div class="sec">
 	<div class="sec-lbl" style="margin-bottom:10px;">Dnevni koraki</div>
 	<div class="steps-card">
@@ -1450,6 +1497,7 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 	  <button class="add-ex-btn" onclick="addCustomEx()">+ Dodaj</button>
 	</div>
   </div>
+  </div>
 
 <!-- SPLIT PICKER MODAL -->
 <div class="modal-overlay hide" id="split-overlay">
@@ -1476,6 +1524,7 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
   </div>
 </div>
 
+  <div class="panel-view" id="panel-history">
   <div class="sec">
 	<div class="sec-head">
 	  <span class="sec-lbl">Tedenski pregled</span>
@@ -1490,6 +1539,7 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 	  <div class="week-row" id="week-row"></div>
 	  <div class="day-detail" id="day-detail"></div>
 	</div>
+  </div>
   </div>
 
   <div class="err" id="eb"></div>
@@ -2076,7 +2126,7 @@ function saveElog(name,data){const l=loadElog();l[name]=data;try{localStorage.se
 let exExp={};  // UI state: which exercises are expanded
 
 // ─── STATE ──────────────────────────────────────────────────
-let S={meals:[],exp:[false,false,false,false,false],md:[false,false,false,false,false],exd:[],lf:false,diet:[],easy:false,wt:'',ex:[],extras:[]};
+let S={meals:[],exp:[false,false,false,false,false],md:[false,false,false,false,false],exd:[],lf:false,diet:[],easy:false,wt:'',ex:[],extras:[],activePanel:'meals'};
 
 // ─── USER MENU ───────────────────────────────────────────────
 function toggleUserMenu(e){
@@ -2363,8 +2413,9 @@ async function initApp(){
   getDiet();
   renderDietUI();
   if(S.easy)document.getElementById('et').classList.add('on-grn');
+  if(!S.activePanel)S.activePanel='meals';
 
-  renderBp();renderMeals();renderWorkout();renderTracker();renderSteps();renderExtras();renderNextUp();
+  renderBp();renderMeals();renderWorkout();renderTracker();renderSteps();renderExtras();renderNextUp();renderPanelSwitcher();
   loadGoals();bindGoalsInputs();
   // Show goals setup only if never set before
   if(!G.age||!G.weight){
@@ -3367,6 +3418,43 @@ function mealDescription(text){
   rest=rest.replace(/^[,.!?]\s*/,'').trim();
   return rest;
 }
+function panelMetaMeals(){
+  const mealCount=(S.meals?.length||0)+(S.extras?.length||0);
+  return mealCount?`${mealCount} vnosov danes`:'Današnji obroki';
+}
+function panelMetaWorkout(){
+  const wt=WKT[S.wt];
+  const name=wt?.l||'Današnji trening';
+  const mins=workoutDurationApprox();
+  return mins?`${name} · ~${mins} min`:name;
+}
+function panelMetaHistory(){
+  return 'Tedenski pregled in pretekli dnevi';
+}
+function renderPanelSwitcher(){
+  const active=S.activePanel||'meals';
+  const metaMeals=document.getElementById('panel-meta-meals');
+  const metaWorkout=document.getElementById('panel-meta-workout');
+  const metaHistory=document.getElementById('panel-meta-history');
+  if(metaMeals)metaMeals.textContent=panelMetaMeals();
+  if(metaWorkout)metaWorkout.textContent=panelMetaWorkout();
+  if(metaHistory)metaHistory.textContent=panelMetaHistory();
+  ['meals','workout','history'].forEach(key=>{
+	const tab=document.getElementById('panel-tab-'+key);
+	const view=document.getElementById('panel-'+key);
+	if(tab){
+	  const stateEl=tab.querySelector('.panel-tab-state');
+	  tab.classList.toggle('active',active===key);
+	  if(stateEl)stateEl.textContent=active===key?'odprto':'odpri';
+	}
+	if(view)view.classList.toggle('active',active===key);
+  });
+}
+function setActivePanel(key){
+  S.activePanel=key||'meals';
+  save();
+  renderPanelSwitcher();
+}
 
 // ─── BP RENDER ──────────────────────────────────────────────
 function renderBp(){
@@ -3483,6 +3571,7 @@ function renderMeals(){
 	</div>`;
   }).join('');
   calcKcal();
+  renderPanelSwitcher();
 }
 
 // ─── CALORIE BURN PER EXERCISE ─────────────────────────────
@@ -3535,6 +3624,7 @@ function renderSteps(){
   else{kcalEl.style.display='none';}
   const chk=document.getElementById('st-chk');
   if(chk){chk.classList.toggle('on',isDone);chk.textContent=isDone?'✓':'○';}
+  renderPanelSwitcher();
 }
 
 function togStepsEdit(){
@@ -4231,6 +4321,7 @@ function renderTracker(){
 
   // Render selected day detail panel
   renderDayDetail(_selectedDay);
+  renderPanelSwitcher();
 }
 
 function selectDay(key){
@@ -5303,6 +5394,7 @@ function renderExtras(){
 		</div>
 	  </div>
 	</div>`).join('');
+  renderPanelSwitcher();
 }
 function togExtra(i){
   if(!Array.isArray(S.extraOpen))S.extraOpen=[];
