@@ -153,7 +153,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .mfood{font-size:18px;color:var(--dk);line-height:1.35;font-weight:500;}
 .mcopy{font-size:13px;color:var(--md);line-height:1.6;margin-top:8px;max-width:72ch;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
 .mkcal{font-size:12px;color:var(--lt);margin-top:2px;}
-.meal-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap;grid-area:actions;padding-top:2px;position:relative;}
+.meal-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap;grid-area:actions;padding-top:2px;}
 .chk{width:24px;height:24px;border-radius:50%;border:.5px solid var(--br);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--lt);transition:all .15s;flex-shrink:0;}
 .chk:hover{border-color:var(--grn);color:var(--grn);}
 .chk.on{background:var(--grn);border-color:var(--grn);color:var(--w);}
@@ -162,19 +162,6 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .sbtn.ex-rm-btn:hover{color:var(--red);border-color:rgba(201,75,42,.3);background:#FDF0EC;}
 .sbtn:hover{color:var(--md);background:var(--bg);}
 .sbtn:disabled{opacity:.3;pointer-events:none;}
-/* "⋯" more-menu trigger button — same visual weight as ↺ for consistency */
-.meal-more-btn{background:none;border:.5px solid var(--br);border-radius:8px;padding:4px 7px;font-size:14px;cursor:pointer;color:var(--lt);line-height:1;font-family:inherit;transition:all .15s;letter-spacing:1px;}
-.meal-more-btn:hover{color:var(--md);background:var(--bg);}
-.meal-more-btn.open{background:var(--bg);color:var(--dk);border-color:var(--md);}
-/* Dropdown menu for the rest of the meal actions. Hidden by default; toggled by .open. */
-.meal-more-menu{position:absolute;right:0;top:calc(100% + 4px);background:var(--w);border:.5px solid var(--br);border-radius:11px;padding:5px;display:none;flex-direction:column;gap:1px;min-width:240px;z-index:50;box-shadow:0 8px 28px rgba(0,0,0,.10),0 1px 3px rgba(0,0,0,.04);}
-.meal-more-menu.open{display:flex;}
-.mmm-item{display:flex;align-items:center;gap:10px;background:none;border:none;padding:9px 11px;border-radius:7px;cursor:pointer;font-family:inherit;font-size:13px;color:var(--md);text-align:left;width:100%;transition:background .12s;}
-.mmm-item:hover{background:var(--bg);color:var(--dk);}
-.mmm-item.mmm-danger{color:var(--lt);}
-.mmm-item.mmm-danger:hover{background:#FDF0EC;color:var(--red);}
-.mmm-icon{font-size:14px;width:20px;text-align:center;flex-shrink:0;}
-.mmm-label{flex:1;}
 /* ── RESPONSIVE ── */
 @media(max-width:500px){
   .app{padding:1.1rem .85rem 3rem;}
@@ -3774,35 +3761,14 @@ function renderMeals(){
 		  <div class="mkcal" id="mkcal${i}">~${m.k||m.kcal} kcal</div>
 		</div>
 		<div class="meal-actions">
-		  <button class="sbtn" onclick="swapMeal(${i})" title="Predlagaj nov obrok glede na preostale kalorije">↺</button>
-		  <button class="meal-more-btn" onclick="event.stopPropagation();togMealMenu(${i})" id="mmb${i}" title="Več možnosti" aria-label="Več možnosti">⋯</button>
-		  <div class="meal-more-menu" id="mmm${i}">
-			<button class="mmm-item" onclick="event.stopPropagation();togPin(${i});closeMealMenu();">
-			  <span class="mmm-icon">📌</span>
-			  <span class="mmm-label">${isPinned?'Odpni — ne uporabi vsak dan':'Pripni — uporabi vsak dan'}</span>
-			</button>
-			<button class="mmm-item" onclick="event.stopPropagation();togIng(${i});closeMealMenu();">
-			  <span class="mmm-icon">📋</span>
-			  <span class="mmm-label">Sestavine</span>
-			</button>
-			<button class="mmm-item" onclick="event.stopPropagation();togEdit(${i});closeMealMenu();">
-			  <span class="mmm-icon">✏</span>
-			  <span class="mmm-label">Vpiši po svoje</span>
-			</button>
-			<button class="mmm-item" onclick="event.stopPropagation();toggleMealPantry(${i});closeMealMenu();">
-			  <span class="mmm-icon">📦</span>
-			  <span class="mmm-label">Predlagaj iz "imam doma"</span>
-			</button>
-			<button class="mmm-item" onclick="event.stopPropagation();toggleMealIdeas(${i});closeMealMenu();">
-			  <span class="mmm-icon">✨</span>
-			  <span class="mmm-label">Pokaži ideje</span>
-			</button>
-			<button class="mmm-item mmm-danger" onclick="event.stopPropagation();deleteMeal(${i});closeMealMenu();">
-			  <span class="mmm-icon">✕</span>
-			  <span class="mmm-label">Izbriši ta obrok</span>
-			</button>
-		  </div>
-		  <button class="chk${done?' on':''}" id="chk${i}" onclick="togMeal(${i})" title="${done?'Označeno kot pojedeno':'Označi kot pojedeno'}">${done?'✓':'○'}</button>
+		  <button class="pin-btn${isPinned?' pinned':''}" onclick="togPin(${i})" title="${isPinned?'Odstrani privzeto':'Nastavi kot privzeto vsak dan'}">📌</button>
+		  <button class="del-btn" onclick="deleteMeal(${i})" title="Izbriši obrok">✕</button>
+		  <button class="ebtn${editOpen?' open':''}" id="eb${i}" onclick="togEdit(${i})" title="Uredi vsebino">✏</button>
+		  <button class="ibtn${open?' open':''}" id="ib${i}" onclick="togIng(${i})">sestavine</button>
+		  <button class="ibtn${pantryOpen?' open':''}" id="pb${i}" onclick="toggleMealPantry(${i})">imam doma</button>
+		  <button class="ibtn${ideasOpen?' open':''}" id="midb${i}" onclick="toggleMealIdeas(${i})">ideje</button>
+		  <button class="sbtn" onclick="swapMeal(${i})" title="Zamenjaj obrok">↺</button>
+		  <button class="chk${done?' on':''}" id="chk${i}" onclick="togMeal(${i})" title="Zaužito">${done?'✓':'○'}</button>
 		</div>
 	  </div>
 	  <div class="edit-panel${editOpen?' open':''}" id="editp${i}">
@@ -4106,40 +4072,6 @@ async function submitCustom(i){
   }catch(e){err('Izračun ni uspel. Poskusi znova.');}
   if(go){go.disabled=false;go.textContent='Izračunaj →';}
 }
-// ─── MEAL "⋯" MORE MENU ────────────────────────────────────
-// Toggles a dropdown of secondary meal actions (pin, edit, ingredients,
-// pantry, ideas, delete). Only one menu can be open at a time — opening
-// another, or clicking anywhere outside, closes the current one.
-function togMealMenu(i){
-  closeMealMenu(i); // close any other open menu first
-  const menu=document.getElementById('mmm'+i);
-  const btn=document.getElementById('mmb'+i);
-  if(!menu||!btn)return;
-  const isOpen=menu.classList.contains('open');
-  if(isOpen){
-	menu.classList.remove('open');
-	btn.classList.remove('open');
-  } else {
-	menu.classList.add('open');
-	btn.classList.add('open');
-  }
-}
-function closeMealMenu(exceptIdx){
-  document.querySelectorAll('.meal-more-menu.open').forEach(el=>{
-	const id=el.id;
-	if(typeof exceptIdx==='number'&&id==='mmm'+exceptIdx)return;
-	el.classList.remove('open');
-	const btn=document.getElementById('mmb'+id.replace('mmm',''));
-	if(btn)btn.classList.remove('open');
-  });
-}
-// Close any open menu when user clicks outside
-document.addEventListener('click',function(e){
-  if(e.target.closest('.meal-more-menu'))return;
-  if(e.target.closest('.meal-more-btn'))return;
-  closeMealMenu();
-});
-
 function togIng(i){
   if(!Array.isArray(S.exp))S.exp=[];
   if(S.md&&S.md[i]){
