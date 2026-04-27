@@ -471,6 +471,8 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .del-btn:hover{color:var(--red);background:#FDF0EC;border-color:rgba(201,75,42,.3);}
 .pinned-badge{font-size:11px;color:#B45309;background:#FFF3E0;padding:2px 6px;border-radius:4px;margin-left:4px;}
 .add-meal-row{display:flex;gap:7px;margin-top:8px;}
+.add-meal-sel{border:.5px solid var(--br);border-radius:8px;padding:8px 11px;font-size:14px;font-family:inherit;background:var(--w);color:var(--dk);outline:none;min-width:176px;}
+.add-meal-sel:focus{border-color:rgba(0,0,0,.2);}
 .add-meal-inp{flex:1;border:.5px solid var(--br);border-radius:8px;padding:8px 11px;font-size:14px;font-family:inherit;background:var(--w);color:var(--dk);outline:none;}
 .add-meal-inp:focus{border-color:rgba(0,0,0,.2);}
 .add-meal-inp::placeholder{color:var(--lt);}
@@ -1307,13 +1309,21 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 		<div style="font-size:13px;color:var(--lt);padding:8px 0;">Generiram predloge...</div>
 	  </div>
 	</div>
-	<div id="mc"></div>
-	<div id="extra-meals"></div>
-	<!-- Add extra meal - always at bottom -->
-	<div class="add-meal-row" style="margin-top:10px;">
-	  <input class="add-meal-inp" id="extra-inp" placeholder="+ Dodaj obrok (sladoled, kava, banana...)" onkeydown="if(event.key==='Enter')addExtraMeal()">
-	  <button class="add-meal-btn" id="extra-btn" onclick="addExtraMeal()">Dodaj</button>
-	</div>
+		<div id="mc"></div>
+		<div id="extra-meals"></div>
+		<!-- Add planned / extra meal -->
+		<div class="add-meal-row" style="margin-top:10px;">
+		  <select class="add-meal-sel" id="meal-type-sel">
+			<option value="Zajtrk">Zajtrk</option>
+			<option value="Dopoldanski prigrizek">Dopoldanski prigrizek</option>
+			<option value="Kosilo">Kosilo</option>
+			<option value="Popoldanski prigrizek">Popoldanski prigrizek</option>
+			<option value="Večerja">Večerja</option>
+		  </select>
+		  <input class="add-meal-inp" id="extra-inp" placeholder="Kaj želiš dodati ali zamenjati? npr. piščanec, tortilja, zelena solata" onkeydown="if(event.key==='Enter')addPlannedMeal()">
+		  <button class="add-meal-btn" id="plan-btn" onclick="addPlannedMeal()">Dodaj v plan</button>
+		  <button class="rbtn" id="extra-btn" onclick="addExtraMeal()">Dodaj extra</button>
+		</div>
   </div>
 
   <div class="sec">
@@ -2804,6 +2814,42 @@ document.addEventListener('click',e=>{const p=document.getElementById('pantry-pa
 const PINNED_KEY='pinned_meals';
 function getPinned(){try{return JSON.parse(localStorage.getItem(lsKey(PINNED_KEY)))||{};}catch(e){return{};}}
 function savePinned(p){try{localStorage.setItem(lsKey(PINNED_KEY),JSON.stringify(p));}catch(e){}}
+function ensureMealStateArrays(){
+  if(!Array.isArray(S.md))S.md=[];
+  if(!Array.isArray(S.exp))S.exp=[];
+  if(!Array.isArray(S.editOpen))S.editOpen=[];
+  if(!Array.isArray(S.mealPantry))S.mealPantry=[];
+  if(!Array.isArray(S.mealPantryOpen))S.mealPantryOpen=[];
+  if(!Array.isArray(S.mealIdeasOpen))S.mealIdeasOpen=[];
+  if(!Array.isArray(S.mealIdeasTab))S.mealIdeasTab=[];
+}
+function mealLabelOrder(label){
+  return LBLS.indexOf(label);
+}
+function findMealIndexByLabel(label){
+  return Array.isArray(S.meals)?S.meals.findIndex(m=>m&&m.label===label):-1;
+}
+function insertMealAt(index, meal){
+  ensureMealStateArrays();
+  S.meals.splice(index,0,meal);
+  S.md.splice(index,0,false);
+  S.exp.splice(index,0,false);
+  S.editOpen.splice(index,0,false);
+  S.mealPantry.splice(index,0,{items:[],mode:'prefer'});
+  S.mealPantryOpen.splice(index,0,false);
+  S.mealIdeasOpen.splice(index,0,false);
+  S.mealIdeasTab.splice(index,0,'fav');
+}
+function insertMealByLabel(meal){
+  const targetOrder=mealLabelOrder(meal.label);
+  let insertAt=S.meals.length;
+  for(let i=0;i<S.meals.length;i++){
+    const ord=mealLabelOrder(S.meals[i]?.label);
+    if(ord===-1)continue;
+    if(ord>targetOrder){insertAt=i;break;}
+  }
+  insertMealAt(insertAt,meal);
+}
 
 function getMealSrc(){return S.easy?(EM[DOW]||EM[1]):(MD[DOW]||MD[1]);}
 function initMeals(){
@@ -3501,6 +3547,10 @@ function deleteMeal(i){
   S.md.splice(i,1);
   if(S.exp)S.exp.splice(i,1);
   if(S.editOpen)S.editOpen.splice(i,1);
+  if(S.mealPantry)S.mealPantry.splice(i,1);
+  if(S.mealPantryOpen)S.mealPantryOpen.splice(i,1);
+  if(S.mealIdeasOpen)S.mealIdeasOpen.splice(i,1);
+  if(S.mealIdeasTab)S.mealIdeasTab.splice(i,1);
   // Unpin if pinned
   const pinned=getPinned();
   if(pinned[i]){delete pinned[i];savePinned(pinned);}
@@ -5045,7 +5095,40 @@ async function addExtraMeal(){
 	inp.value='';
 	save();renderExtras();calcKcal();
   }catch(e){err('Izračun ni uspel.');}
-  btn.disabled=false;btn.textContent='+ Dodaj';
+  btn.disabled=false;btn.textContent='Dodaj extra';
+}
+async function addPlannedMeal(){
+  const inp=document.getElementById('extra-inp');
+  const btn=document.getElementById('plan-btn');
+  const sel=document.getElementById('meal-type-sel');
+  const val=(inp&&inp.value.trim())||'';
+  const label=(sel&&sel.value)||LBLS[0];
+  if(!val)return;
+  btn.disabled=true;btn.textContent='...';
+  try{
+    const txt=await api(
+      'Si prehranjevalni svetovalec. Izračunaj kalorije in sestavi konkreten obrok za izbran tip obroka. Vrni SAMO JSON: {"f":"natančen opis v slovenščini","k":350,"i":[{"n":"sestavina","a":"100 g"}]}',
+      `Pripravi ${label.toLowerCase()} iz tega opisa ali teh sestavin: "${val}".`
+    );
+    const p=JSON.parse(txt);
+    const meal={label,f:p.f,k:parseInt(p.k)||0,i:p.i||[],custom:true};
+    const existingIdx=findMealIndexByLabel(label);
+    if(existingIdx===-1){
+      insertMealByLabel(meal);
+    }else{
+      const replace=confirm(`${label} že obstaja.\n\nŽeliš zamenjati obstoječi ${label.toLowerCase()}?`);
+      if(replace){
+        S.meals[existingIdx]={...S.meals[existingIdx],...meal};
+        S.md[existingIdx]=false;
+      }else{
+        if(!S.extras)S.extras=[];
+        S.extras.push({f:p.f,k:parseInt(p.k)||0,i:p.i||[],done:false});
+      }
+    }
+    inp.value='';
+    save();renderMeals();renderExtras();calcKcal();
+  }catch(e){err('Dodajanje ni uspelo.');}
+  btn.disabled=false;btn.textContent='Dodaj v plan';
 }
 
 // ─── PERSONALIZATION ─────────────────────────────────────────
