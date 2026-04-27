@@ -2631,50 +2631,52 @@ function addExtraWorkout(){
 }
 
 function markWorkoutDone(){
-  // Rule: a workout only counts as done if at least one exercise was checked off.
-  // Without this guard, a user could click "Opravljeno" on an empty workout and
-  // the split would advance — meaning tomorrow shows a different workout even
-  // though nothing was actually trained today.
-  const exDoneCount=Array.isArray(S.exd)?S.exd.filter(Boolean).length:0;
   const isRest=S.wt==='rest';
   const isCardio=S.wt==='cardio';
   const isCrossfit=S.wt==='crossfit';
-  // Rest day, cardio day, and crossfit don't have a per-exercise checklist —
-  // for those, the user's intent IS the completion marker.
-  if(!isRest&&!isCardio&&!isCrossfit&&exDoneCount===0){
-	if(typeof err==='function'){err('Najprej označi vsaj eno opravljeno vajo.');}
-	return;
-  }
-  // Determine what message to show. If user already met weekly quota with this
-  // session, we're done for the week — flag that.
+  const isStrength=!isRest&&!isCardio&&!isCrossfit;
+  const totalExercises=Array.isArray(S.exd)?S.exd.length:0;
+  const exDoneCount=Array.isArray(S.exd)?S.exd.filter(Boolean).length:0;
+
   const sp=ensureWeeklyReset();
   const willMeetQuota=(sp.weeklyDone+1)>=sp.freq;
-  const msg=willMeetQuota
-	? `Označiti vadbo kot opravljeno?\n\nS tem zaključiš tedenski plan (${sp.freq}/${sp.freq}). Do ponedeljka bom predlagal lahek razmig.`
-	: 'Označiti vadbo kot opravljeno?\n\nNaslednji trening v planu se bo prikazal naslednji načrtovan dan.';
+  let msg=willMeetQuota
+    ? `Označiti vadbo kot opravljeno?\n\nS tem zaključiš tedenski plan (${sp.freq}/${sp.freq}). Do ponedeljka bom predlagal lahek razmig.`
+    : 'Označiti vadbo kot opravljeno?\n\nNaslednji trening v planu se bo prikazal naslednji načrtovan dan.';
+
+  if(isStrength&&totalExercises>0&&exDoneCount<totalExercises){
+    msg='Označim vse vaje kot opravljene in dodam porabljene kalorije?\n\n'+msg;
+  }
   if(!confirm(msg))return;
-  // Don't advance the split if this was a "extra" / bonus workout.
-  // Bonus workouts are flagged explicitly by addExtraWorkout() and should NOT
-  // affect the main rotation. They DO count toward weekly done? Per spec,
-  // extras are user-initiated and shouldn't disturb the plan — so we treat
-  // them as completely outside the rotation: no advance, no weeklyDone++.
+
+  // Top-level “Opravljeno” means the workout is complete.
+  // Therefore mark all strength exercises as done too, so earned calories,
+  // dashboard and weekly tracker all update from the same source of truth.
+  if(isStrength&&totalExercises>0){
+    S.exd=S.exd.map(()=>true);
+  }
+
   if(!S.isExtraWorkout){
-	advanceSplit();          // moves position +1, weeklyDone +1
+    advanceSplit();
   }
   S.workoutDone=true;
-  S.wtManual=false;          // back to schedule-driven mode
+  S.wtManual=false;
   S.isExtraWorkout=false;
   save();
-  renderNextUp();
+  calcKcal();
+  if(typeof renderWorkout==='function')renderWorkout();
+  if(typeof renderNextUp==='function')renderNextUp();
+  if(typeof renderTracker==='function')renderTracker();
   // Brief visual confirmation
   const el=document.getElementById('next-up');
   if(el){
-	el.style.transition='background 0.4s';
-	const orig=el.style.background;
-	el.style.background='#EBF4EF';
-	setTimeout(()=>{el.style.background=orig;},900);
+    el.style.transition='background 0.4s';
+    const orig=el.style.background;
+    el.style.background='#EBF4EF';
+    setTimeout(()=>{el.style.background=orig;},900);
   }
 }
+
 
 function resetToPlan(){
   S.wt=nextWorkoutInSplit();initWorkout();save();
@@ -3400,7 +3402,9 @@ function togEx(i){
   const top=document.getElementById('et'+i),chk=document.getElementById('echk'+i);
   if(top)top.classList.toggle('done',S.exd[i]);
   if(chk){chk.classList.toggle('on',S.exd[i]);chk.textContent=S.exd[i]?'✓':'○';}
-  calcKcal();renderTracker();
+  calcKcal();
+  if(typeof renderNextUp==='function')renderNextUp();
+  renderTracker();
 }
 function addCustomEx(){
   const n=document.getElementById('aen').value.trim();
@@ -4210,12 +4214,15 @@ function saveGoals(){
   G.goal=_selGoal;G.act=_selAct;
   saveGoalsState();
   try{localStorage.setItem(lsKey('goals_seen'),'1');}catch(e){}
+
+  // Keep dashboard, macro targets and weekly tracker connected to profile/goal changes.
+  // Goal changes affect kcal budget + macro targets immediately after save.
   closeGoals();
-  calcKcal(); // refresh with new targets
-  // Frequency + training days are saved live by selFreq/togTrainDay, but
-  // re-render the workout overview now since today's wt may have changed.
+  calcKcal();
+  if(typeof renderMacros==='function')renderMacros();
   if(typeof renderNextUp==='function')renderNextUp();
   if(typeof renderTracker==='function')renderTracker();
+  save(); // persist/sync the recalculated day state as well
 }
 
 function selFreq(n){
