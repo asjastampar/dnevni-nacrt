@@ -2206,6 +2206,20 @@ function renderNextUp(){
 }
 
 function markWorkoutDone(){
+  // Rule: a workout only counts as done if at least one exercise was checked off.
+  // Without this guard, a user could click "Opravljeno" on an empty workout and
+  // the split would advance — meaning tomorrow shows a different workout even
+  // though nothing was actually trained today.
+  const exDoneCount=Array.isArray(S.exd)?S.exd.filter(Boolean).length:0;
+  const isRest=S.wt==='rest';
+  const isCardio=S.wt==='cardio';
+  const isCrossfit=S.wt==='crossfit';
+  // Rest day, cardio day, and crossfit don't have a per-exercise checklist —
+  // for those, the user's intent IS the completion marker.
+  if(!isRest&&!isCardio&&!isCrossfit&&exDoneCount===0){
+	if(typeof err==='function'){err('Najprej označi vsaj eno opravljeno vajo.');}
+	return;
+  }
   if(!confirm('Označiti vadbo kot opravljeno?\n\nNaslednji trening v planu se bo prikazal jutri.'))return;
   // Advance the split position so TOMORROW shows the next workout.
   // We DO NOT change today's S.wt — user can still see the workout they did.
@@ -2954,7 +2968,12 @@ function getDayScore(d){
   const mTotal=5,mDone=md.filter(Boolean).length;
   const isRest=d.wt==='rest';
   if(isRest)return mDone/mTotal;
-  const eTotal=ed.length||6,eDone=ed.filter(Boolean).length;
+  // Rule: only include workout in the score if at least one exercise was
+  // actually completed that day. Days without a workout shouldn't be
+  // penalized — meals alone determine the score.
+  const eDone=ed.filter(Boolean).length;
+  if(eDone===0)return mDone/mTotal;
+  const eTotal=ed.length||6;
   return(mDone+eDone)/(mTotal+eTotal);
 }
 
@@ -3141,10 +3160,15 @@ function renderDayDetail(key){
 	?eatenMeals.map(m=>`<div class="hist-meal-row"><div class="hist-meal-name">${m.food}</div><div class="hist-meal-kcal">~${m.kcal} kcal</div></div>`).join('')
 	:'<div class="dd-empty">Ni zabeleženih obrokov ta dan.</div>';
   // Pillsi
+  // Rule 1: Only show actual consumed calories — never targets/remaining.
+  // Rule 2: Only show workout pill if at least one exercise was done that day.
+  //         If no workout completed, omit the workout pill entirely.
   const pills=[];
   pills.push(`<span class="hist-pill${mealsDone===5?' green':mealsDone>0?'':' red'}">${mealsDone}/5 obrokov</span>`);
   if(totalKcal>0)pills.push(`<span class="hist-pill">${totalKcal} kcal</span>`);
-  if(wt!=='rest')pills.push(`<span class="hist-pill${doneEx.length>0?' green':''}">${wtLabel}${exTotal>0?' '+exDone+'/'+exTotal:''}</span>`);
+  if(wt!=='rest'&&doneEx.length>0){
+	pills.push(`<span class="hist-pill green">${wtLabel} ${exDone}/${exTotal}</span>`);
+  }
 
   c.innerHTML=`
 	<div class="day-detail-card">
@@ -3156,8 +3180,7 @@ function renderDayDetail(key){
 	  </div>
 	  <div class="dd-section-lbl">Obroki</div>
 	  ${mealsHtml}
-	  <div class="dd-section-lbl">Vadba — ${wtLabel}</div>
-	  ${workoutHtml}
+	  ${doneEx.length>0||(wt!=='rest'&&isToday)?`<div class="dd-section-lbl">Vadba — ${wtLabel}</div>${workoutHtml}`:''}
 	</div>
   `;
 }
