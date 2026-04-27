@@ -111,8 +111,20 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .meal-card.done .mdot{background:#A8CFBA;}
 .meal-summary-row{display:none;}
 .meal-summary-kcal{color:var(--md);}
-.meal-summary-status{font-size:12px;color:var(--grn);background:#EBF4EF;padding:4px 9px;border-radius:999px;white-space:nowrap;}
+.meal-summary-status{font-size:16px;color:var(--grn);background:#EBF4EF;width:32px;height:32px;border-radius:999px;display:flex;align-items:center;justify-content:center;white-space:nowrap;font-weight:700;}
 .meal-summary-caret{font-size:18px;color:var(--lt);line-height:1;}
+.meal-card.compact-done .meal-top{cursor:pointer;}
+.meal-card.compact-done .meal-summary-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.meal-card.compact-done .meal-summary-main{min-width:0;display:flex;flex-direction:column;gap:4px;}
+.meal-card.compact-done .meal-summary-title{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--lt);}
+.meal-card.compact-done .meal-summary-meta{font-size:15px;color:var(--dk);line-height:1.35;}
+.meal-card.compact-done .mfood,
+.meal-card.compact-done .mkcal,
+.meal-card.compact-done .meal-actions,
+.meal-card.compact-done .ing-panel,
+.meal-card.compact-done .edit-panel,
+.meal-card.compact-done .meal-pantry-panel,
+.meal-card.compact-done .meal-ideas-panel{display:none !important;}
 .meal-top{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;}
 .mdot{width:7px;height:7px;border-radius:50%;background:var(--red);margin-top:7px;flex-shrink:0;transition:background .2s;}
 .mbody{flex:1;min-width:0;}
@@ -162,38 +174,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 	grid-template-areas:"dot body" !important;
 	padding:14px !important;
   }
-  .meal-card.compact-done .meal-summary-row{
-	display:flex;
-	align-items:center;
-	justify-content:space-between;
-	gap:10px;
-  }
-  .meal-card.compact-done .meal-summary-main{
-	min-width:0;
-	display:flex;
-	flex-direction:column;
-	gap:4px;
-  }
-  .meal-card.compact-done .meal-summary-title{
-	font-size:13px;
-	text-transform:uppercase;
-	letter-spacing:.07em;
-	color:var(--lt);
-  }
-  .meal-card.compact-done .meal-summary-meta{
-	font-size:15px;
-	color:var(--dk);
-	line-height:1.35;
-  }
-  .meal-card.compact-done .mfood,
-  .meal-card.compact-done .mkcal,
-  .meal-card.compact-done .meal-actions,
-  .meal-card.compact-done .ing-panel,
-  .meal-card.compact-done .edit-panel,
-  .meal-card.compact-done .meal-pantry-panel,
-  .meal-card.compact-done .meal-ideas-panel{
-	display:none !important;
-  }
+  .meal-card.compact-done .meal-summary-title{font-size:13px;}
 }
 .ibtn{background:none;border:.5px solid var(--br);border-radius:7px;padding:3px 8px;font-size:11px;cursor:pointer;color:var(--lt);font-family:inherit;transition:all .15s;}
 .ibtn:hover{color:var(--md);background:var(--bg);}
@@ -3412,6 +3393,8 @@ function renderMeals(){
 	const isPinned=!!m.pinned||!!pinned[i];
 	const pinnedBadge=isPinned?`<span class="pinned-badge">📌 privzeto</span>`:'';
 	const compactDone=done&&!doneExpanded&&!editOpen&&!pantryOpen&&!ideasOpen;
+	const compactTitle=m.label;
+	const compactMeta=`${parseInt(m.k||m.kcal)||0} kcal`;
 	const pantrySummary=pantryState&&pantryState.items&&pantryState.items.length
 	  ? pantryState.items.map(it=>`<span class="pantry-chip">${it}</span>`).join('')
 	  : '<span style="font-size:12px;color:var(--lt);">Ni izbranih sestavin.</span>';
@@ -3422,11 +3405,11 @@ function renderMeals(){
 		  <div class="mlbl">${m.label}${easyMark}${custom}${pinnedBadge}${pantryBadge}</div>
 		  <div class="meal-summary-row">
 			<div class="meal-summary-main">
-			  <div class="meal-summary-title">${m.label}</div>
-			  <div class="meal-summary-meta">${parseInt(m.k||m.kcal)||0} kcal</div>
+			  <div class="meal-summary-title">${compactTitle}</div>
+			  <div class="meal-summary-meta">${compactMeta}</div>
 			</div>
 			<div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-			  <span class="meal-summary-status">obkljukano</span>
+			  <span class="meal-summary-status">✓</span>
 			  <span class="meal-summary-caret">›</span>
 			</div>
 		  </div>
@@ -5271,12 +5254,23 @@ function renderExtras(){
   const c=document.getElementById('extra-meals');
   if(!c)return;
   if(!S.extras||!S.extras.length){c.innerHTML='';return;}
+  if(!Array.isArray(S.extraOpen))S.extraOpen=[];
   c.innerHTML=S.extras.map((e,i)=>`
-	<div class="meal-card fi${e.done?' done':''}" style="margin-top:0;margin-bottom:7px;" id="xmc${i}">
-	  <div class="meal-top">
+	<div class="meal-card fi${e.done?' done':''}${e.done&&!S.extraOpen[i]?' compact-done':''}" style="margin-top:0;margin-bottom:7px;" id="xmc${i}">
+	  <div class="meal-top" ${e.done&&!S.extraOpen[i]?`onclick="if(!event.target.closest('.meal-actions'))toggleExtraOpen(${i})"`:''}>
 		<div class="mdot" style="background:#8B2B6E"></div>
 		<div class="mbody">
 		  <div class="mlbl" style="color:#8B2B6E;">${e.label||'Dodano'}</div>
+		  <div class="meal-summary-row">
+			<div class="meal-summary-main">
+			  <div class="meal-summary-title">${e.label||'Dodano'}</div>
+			  <div class="meal-summary-meta">${parseInt(e.k)||0} kcal</div>
+			</div>
+			<div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+			  <span class="meal-summary-status">✓</span>
+			  <span class="meal-summary-caret">›</span>
+			</div>
+		  </div>
 		  <div class="mfood">${e.f}</div>
 		  <div class="mkcal">~${e.k} kcal</div>
 		</div>
@@ -5288,11 +5282,20 @@ function renderExtras(){
 	</div>`).join('');
 }
 function togExtra(i){
+  if(!Array.isArray(S.extraOpen))S.extraOpen=[];
   S.extras[i].done=!S.extras[i].done;
+  S.extraOpen[i]=false;
   save();renderExtras();calcKcal();
 }
 function removeExtra(i){
+  if(Array.isArray(S.extraOpen))S.extraOpen.splice(i,1);
   S.extras.splice(i,1);save();renderExtras();calcKcal();
+}
+function toggleExtraOpen(i){
+  if(!Array.isArray(S.extraOpen))S.extraOpen=[];
+  S.extraOpen[i]=!S.extraOpen[i];
+  save();
+  renderExtras();
 }
 async function addExtraMeal(){
   const inp=document.getElementById('extra-inp');
@@ -5309,6 +5312,7 @@ async function addExtraMeal(){
 	const p=JSON.parse(txt);
 	if(!S.extras)S.extras=[];
 	S.extras.push({f:p.f,k:parseInt(p.k)||0,i:p.i||[],done:false});
+	if(Array.isArray(S.extraOpen))S.extraOpen.push(false);
 	inp.value='';
 	save();renderExtras();calcKcal();
   }catch(e){err('Izračun ni uspel.');}
@@ -5331,7 +5335,9 @@ async function addPlannedMeal(){
       );
       const p=JSON.parse(txt);
       if(!S.extras)S.extras=[];
+      if(!Array.isArray(S.extraOpen))S.extraOpen=[];
       S.extras.push({label:'Drugo',f:p.f,k:parseInt(p.k)||0,i:p.i||[],done:false});
+      S.extraOpen.push(false);
       inp.value='';
       save();renderExtras();calcKcal();
       return;
