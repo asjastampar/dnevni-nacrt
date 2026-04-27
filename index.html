@@ -474,7 +474,29 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .diet-note{display:none;align-items:center;gap:5px;font-size:12px;color:var(--red);background:#FDF0EC;padding:3px 9px;border-radius:5px;margin-bottom:9px;flex-wrap:wrap;}
 .diet-note.show{display:flex;}
 .diet-chip{display:inline-flex;align-items:center;background:rgba(255,255,255,.55);border-radius:5px;padding:1px 5px;}
+.pantry-wrap{position:relative;display:inline-flex;}
+.pantry-btn.active{background:#EBF4EF;color:var(--grn);border-color:#B8D9C6;}
+.pantry-panel{position:absolute;left:0;top:34px;z-index:30;width:320px;max-width:calc(100vw - 2rem);background:var(--w);border:.5px solid var(--br);border-radius:16px;box-shadow:0 14px 40px rgba(0,0,0,.12);padding:12px;display:none;}
+.pantry-panel.open{display:block;}
+.pantry-title{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--lt);padding:2px 3px 8px;}
+.pantry-sub{font-size:12px;color:var(--md);line-height:1.45;padding:0 3px 8px;}
+.pantry-input-row{display:flex;gap:8px;align-items:center;margin-bottom:10px;}
+.pantry-inp{flex:1;border:.5px solid var(--br);border-radius:999px;padding:9px 12px;font-size:13px;font-family:inherit;background:var(--w);color:var(--dk);outline:none;}
+.pantry-inp:focus{border-color:rgba(0,0,0,.18);}
+.pantry-chips{display:flex;flex-wrap:wrap;gap:7px;min-height:24px;}
+.pantry-chip{display:inline-flex;align-items:center;gap:6px;background:#F7F3EE;border:.5px solid rgba(0,0,0,.06);border-radius:999px;padding:5px 9px;font-size:12px;color:var(--dk);}
+.pantry-chip button{background:none;border:none;color:var(--lt);cursor:pointer;font-size:13px;line-height:1;padding:0;}
+.pantry-chip button:hover{color:var(--red);}
+.pantry-mode-row{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 8px;}
+.pantry-mode-btn{border:.5px solid var(--br);border-radius:999px;background:none;color:var(--md);padding:6px 10px;font-size:12px;font-family:inherit;cursor:pointer;}
+.pantry-mode-btn.active{background:var(--dk);color:var(--w);border-color:var(--dk);}
+.pantry-actions{display:flex;gap:8px;margin-top:10px;}
+.pantry-note{display:none;align-items:center;gap:6px;font-size:12px;color:var(--md);background:#F7F3EE;padding:9px 11px;border-radius:12px;margin-bottom:10px;flex-wrap:wrap;line-height:1.45;}
+.pantry-note.show{display:flex;}
+.pantry-note b{color:var(--dk);}
+.pantry-note .diet-chip{background:rgba(255,255,255,.85);}
 @media(max-width:500px){.diet-panel{position:fixed;left:.85rem;right:.85rem;top:auto;bottom:1rem;width:auto;}.diet-wrap{position:static;}}
+@media(max-width:500px){.pantry-panel{position:fixed;left:.85rem;right:.85rem;top:auto;bottom:1rem;width:auto;}.pantry-wrap{position:static;}.pantry-input-row{flex-wrap:wrap;}.pantry-input-row .add-meal-btn{width:100%;}}
 
 /* calorie + macro dashboard */
 .kcal-summary{background:var(--w);border:.5px solid var(--br);border-radius:18px;padding:22px 22px 20px;margin-top:12px;box-shadow:0 8px 28px rgba(0,0,0,.025);}
@@ -1232,23 +1254,44 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 		  <div class="tog-track on-grn" id="et"><div class="tog-thumb"></div></div>
 		  <span>Enostavno</span>
 		</label>
-		<div class="diet-wrap">
-		  <button class="diet-btn" id="diet-btn" onclick="toggleDietPanel(event)">Prehrana ▾</button>
-		  <div class="diet-panel" id="diet-panel">
-			<div class="diet-panel-title">Prehranske posebnosti</div>
-			<div id="diet-options"></div>
+			<div class="diet-wrap">
+			  <button class="diet-btn" id="diet-btn" onclick="toggleDietPanel(event)">Prehrana ▾</button>
+			  <div class="diet-panel" id="diet-panel">
+				<div class="diet-panel-title">Prehranske posebnosti</div>
+				<div id="diet-options"></div>
 			<div class="diet-actions">
 			  <button class="diet-mini" onclick="clearDiet(event)">Počisti</button>
-			  <button class="diet-mini primary" onclick="closeDietPanel(event)">Shrani</button>
+				  <button class="diet-mini primary" onclick="closeDietPanel(event)">Shrani</button>
+				</div>
+			  </div>
 			</div>
+			<div class="pantry-wrap">
+			  <button class="rbtn pantry-btn" id="pantry-btn" onclick="togglePantryPanel(event)">Imam doma</button>
+			  <div class="pantry-panel" id="pantry-panel">
+				<div class="pantry-title">Sestavine doma</div>
+				<div class="pantry-sub">Dodaj stvari, ki jih imaš pri roki. Menjave obrokov in nov jedilnik jih bodo upoštevali.</div>
+				<div class="pantry-input-row">
+				  <input class="pantry-inp" id="pantry-inp" placeholder="npr. piščanec, riž, bučke" onkeydown="if(event.key==='Enter')addPantryItem()">
+				  <button class="add-meal-btn" type="button" onclick="addPantryItem()">+ Dodaj</button>
+				</div>
+				<div class="pantry-mode-row">
+				  <button class="pantry-mode-btn" id="pantry-mode-prefer" type="button" onclick="setPantryMode('prefer')">Če paše, uporabi</button>
+				  <button class="pantry-mode-btn" id="pantry-mode-must" type="button" onclick="setPantryMode('must')">Obvezno vključi</button>
+				</div>
+				<div class="pantry-chips" id="pantry-chips"></div>
+				<div class="pantry-actions">
+				  <button class="diet-mini" type="button" onclick="clearPantry(event)">Počisti</button>
+				  <button class="diet-mini primary" type="button" onclick="closePantryPanel(event)">Shrani</button>
+				</div>
+			  </div>
+			</div>
+			<button class="rbtn" id="bam" onclick="refreshMeals()">↺ Zamenjaj vse</button>
+			<button class="pers-btn" id="pers-btn" onclick="togPers()">✦ Ideje</button>
 		  </div>
 		</div>
-		<button class="rbtn" id="bam" onclick="refreshMeals()">↺ Zamenjaj vse</button>
-		<button class="pers-btn" id="pers-btn" onclick="togPers()">✦ Ideje</button>
-	  </div>
-	</div>
-	<div class="diet-note" id="diet-note"></div>
-	<!-- Ideas panel -->
+		<div class="diet-note" id="diet-note"></div>
+		<div class="pantry-note" id="pantry-note"></div>
+		<!-- Ideas panel -->
 	<div class="pers-panel" id="pers-panel">
 	  <div class="pers-title">Predlogi za tebe</div>
 	  <div class="pers-tabs">
@@ -2218,6 +2261,7 @@ async function initApp(){
 
   getDiet();
   renderDietUI();
+  renderPantryUI();
   if(S.easy)document.getElementById('et').classList.add('on-grn');
 
   renderBp();renderMeals();renderWorkout();renderTracker();renderSteps();renderExtras();renderNextUp();
@@ -2417,6 +2461,96 @@ function dietPrompt(){
   if(hasDiet('lowCarb'))rules.push('Low carb: zmanjšaj kruh, riž, testenine, sladkor in večje porcije škroba.');
   return rules.join(' ');
 }
+const PANTRY_KEY='pantry_items_v1';
+const PANTRY_MODE_KEY='pantry_mode_v1';
+function getPantryItems(){
+  try{return JSON.parse(localStorage.getItem(lsKey(PANTRY_KEY)))||[];}catch(e){return[];}
+}
+function savePantryItems(items){
+  try{localStorage.setItem(lsKey(PANTRY_KEY),JSON.stringify(items.slice(0,12)));}catch(e){}
+}
+function getPantryMode(){
+  try{return localStorage.getItem(lsKey(PANTRY_MODE_KEY))||'prefer';}catch(e){return'prefer';}
+}
+function savePantryMode(mode){
+  try{localStorage.setItem(lsKey(PANTRY_MODE_KEY),mode);}catch(e){}
+}
+function pantryPrompt(scope='meal'){
+  const items=getPantryItems();
+  if(!items.length)return '';
+  const mode=getPantryMode();
+  const list=items.join(', ');
+  if(scope==='day'){
+    return mode==='must'
+      ? `POMEMBNO: Pri sestavi dnevnega jedilnika uporabi čim več teh sestavin, kjer so smiselne: ${list}. Vsak nezaključen obrok naj po možnosti vključuje vsaj eno od njih.`
+      : `Če je smiselno, daj prednost jedem, ki porabijo naslednje sestavine od doma: ${list}.`;
+  }
+  return mode==='must'
+    ? `POMEMBNO: Predlagani obrok naj OBVEZNO vsebuje vsaj eno od teh sestavin: ${list}.`
+    : `Če je smiselno, naj predlagani obrok porabi vsaj eno od teh sestavin od doma: ${list}.`;
+}
+function renderPantryUI(){
+  const items=getPantryItems();
+  const mode=getPantryMode();
+  const chips=document.getElementById('pantry-chips');
+  if(chips){
+    chips.innerHTML=items.length
+      ? items.map((it,i)=>`<span class="pantry-chip">${it}<button type="button" onclick="removePantryItem(${i})" aria-label="Odstrani ${it}">✕</button></span>`).join('')
+      : '<span style="font-size:12px;color:var(--lt);padding:2px 2px;">Še nič dodano.</span>';
+  }
+  const btn=document.getElementById('pantry-btn');
+  if(btn){
+    btn.textContent=items.length?`Imam doma (${items.length})`:'Imam doma';
+    btn.classList.toggle('active',items.length>0);
+  }
+  document.getElementById('pantry-mode-prefer')?.classList.toggle('active',mode==='prefer');
+  document.getElementById('pantry-mode-must')?.classList.toggle('active',mode==='must');
+  const note=document.getElementById('pantry-note');
+  if(note){
+    note.classList.toggle('show',items.length>0);
+    note.innerHTML=items.length
+      ? `<b>${mode==='must'?'Obvezno uporabi':'Če paše, uporabi'}:</b> `+items.map(it=>`<span class="diet-chip">${it}</span>`).join(' ')
+      : '';
+  }
+}
+function togglePantryPanel(e){
+  if(e)e.stopPropagation();
+  renderPantryUI();
+  document.getElementById('pantry-panel')?.classList.toggle('open');
+}
+function closePantryPanel(e){
+  if(e)e.stopPropagation();
+  document.getElementById('pantry-panel')?.classList.remove('open');
+  renderPantryUI();
+}
+function addPantryItem(){
+  const inp=document.getElementById('pantry-inp');
+  const raw=(inp?.value||'').trim();
+  if(!raw)return;
+  const items=getPantryItems();
+  const next=raw.toLowerCase();
+  if(!items.some(x=>x.toLowerCase()===next)){
+    items.unshift(raw);
+    savePantryItems(items);
+  }
+  if(inp)inp.value='';
+  renderPantryUI();
+}
+function removePantryItem(i){
+  const items=getPantryItems();
+  items.splice(i,1);
+  savePantryItems(items);
+  renderPantryUI();
+}
+function clearPantry(e){
+  if(e)e.stopPropagation();
+  savePantryItems([]);
+  renderPantryUI();
+}
+function setPantryMode(mode){
+  savePantryMode(mode==='must'?'must':'prefer');
+  renderPantryUI();
+}
 function avoidMealList(){try{return JSON.parse(localStorage.getItem(lsKey('avoided_meals_v1')))||[];}catch(e){return[];}}
 function rememberAvoidedMeal(name){
   if(!name)return;
@@ -2518,6 +2652,7 @@ function toggleDiet(id,e){
   renderMeals();
 }
 document.addEventListener('click',e=>{const p=document.getElementById('diet-panel');if(p&&!e.target.closest('.diet-wrap'))p.classList.remove('open');});
+document.addEventListener('click',e=>{const p=document.getElementById('pantry-panel');if(p&&!e.target.closest('.pantry-wrap'))p.classList.remove('open');});
 
 const PINNED_KEY='pinned_meals';
 function getPinned(){try{return JSON.parse(localStorage.getItem(lsKey(PINNED_KEY)))||{};}catch(e){return{};}}
@@ -2881,6 +3016,7 @@ function selBp(id){
 // ─── RENDER MEALS ───────────────────────────────────────────
 function renderMeals(){
   const pinned=getPinned();
+  const pantryActive=getPantryItems().length>0;
   document.getElementById('mc').innerHTML=S.meals.map((m,i)=>{
 	const ingH=m.i?m.i.map(x=>`<div class="in">${x.n}</div><div class="ia">${x.a}</div>`).join(''):'';
 	const done=S.md[i];const open=S.exp[i];const editOpen=S.editOpen&&S.editOpen[i];
@@ -2901,7 +3037,7 @@ function renderMeals(){
 		  <button class="del-btn" onclick="deleteMeal(${i})" title="Izbriši obrok">✕</button>
 		  <button class="ebtn${editOpen?' open':''}" id="eb${i}" onclick="togEdit(${i})" title="Uredi vsebino">✏</button>
 		  <button class="ibtn${open?' open':''}" id="ib${i}" onclick="togIng(${i})">${open?'skrij':'sestavine'}</button>
-		  <button class="sbtn" onclick="swapMeal(${i})">↺</button>
+		  <button class="sbtn" onclick="swapMeal(${i})" title="${pantryActive?'Zamenjaj in upoštevaj domače sestavine':'Zamenjaj obrok'}">↺</button>
 		  <button class="chk${done?' on':''}" id="chk${i}" onclick="togMeal(${i})" title="Zaužito">${done?'✓':'○'}</button>
 		</div>
 	  </div>
@@ -3780,7 +3916,32 @@ function buildOfflineIngredients(name){
 function buildOfflineMeal(name,kcal){
   return {f:name,k:kcal||estimateOfflineMealKcal(name),i:buildOfflineIngredients(name)};
 }
+function getPantryDrivenMeals(){
+  const items=getPantryItems().map(x=>x.toLowerCase());
+  if(!items.length)return null;
+  const meals=[];
+  if(items.some(x=>/pišč|piscan|chicken/.test(x))){
+    meals.push(buildOfflineMeal('Piščanec, riž in velika solata',470));
+    meals.push(buildOfflineMeal('Tortilja s piščancem in zelenjavo',410));
+    meals.push(buildOfflineMeal('Piščančji bowl z bučkami',430));
+  }
+  if(items.some(x=>/jajc/.test(x))){
+    meals.push(buildOfflineMeal('Omleta z zelenjavo in feta sirom',390));
+  }
+  if(items.some(x=>/riž/.test(x))){
+    meals.push(buildOfflineMeal('Riževa skleda s tuno in zelenjavo',420));
+  }
+  if(items.some(x=>/skyr|jogurt/.test(x))){
+    meals.push(buildOfflineMeal('Skyr z ovsenimi kosmiči in borovnicami',360));
+  }
+  if(items.some(x=>/tuna/.test(x))){
+    meals.push(buildOfflineMeal('Toast s tuno in kumaro',310));
+  }
+  return meals.length?meals:null;
+}
 function getOfflineMealPlan(){
+  const pantryMeals=getPantryDrivenMeals();
+  if(pantryMeals&&pantryMeals.length>=5)return pantryMeals.slice(0,5);
   return [
     buildOfflineMeal('Skyr z ovsenimi kosmiči in borovnicami',360),
     buildOfflineMeal('Proteinski puding in banana',220),
@@ -3850,7 +4011,9 @@ function offlineApi(sys,msg){
     return JSON.stringify(offlinePersItems(/novo/.test(prompt)?'new':'fav'));
   }
   if(/Sestavi dnevni jedilnik|JSON array s 5 elementi/.test(prompt)){
-    return JSON.stringify(getOfflineMealPlan());
+    const plan=getOfflineMealPlan().slice();
+    while(plan.length<5)plan.push(buildOfflineMeal(`Predlog ${plan.length+1}`,320+plan.length*20));
+    return JSON.stringify(plan.slice(0,5));
   }
   if(/Izračunaj kalorije za/.test(prompt)){
     const name=extractFirstQuotedText(msg)||'Obrok po meri';
@@ -3858,7 +4021,7 @@ function offlineApi(sys,msg){
   }
   if(/Zamenjaj obrok/.test(prompt)){
     const current=extractFirstQuotedText(msg)||'obrok';
-    const options=getOfflineMealPlan().map(m=>m.f).filter(f=>f!==current);
+    const options=(getPantryDrivenMeals()||getOfflineMealPlan()).map(m=>m.f).filter(f=>f!==current);
     return JSON.stringify(buildOfflineMeal(options[0]||'Skleda z beljakovinami in zelenjavo'));
   }
   if(/alternativno kardio aktivnost/.test(prompt)){
@@ -4004,10 +4167,11 @@ async function swapMeal(i){
   rememberAvoidedMeal(S.meals[i].f||S.meals[i].food);
   const ez=S.easy?'Recept mora biti hiter in enostaven (konzerve, jajca, pečena kura, whey shake, mikrovalovna). Ni kompleksnega kuhanja.':'';
   const lfc=dietPrompt()+' '+avoidPrompt();
+  const pantry=pantryPrompt('meal');
   const macroHint=getMacroAwareMealSuggestion(i);
   try{
-	const txt=await api(`Si prehranjevalni svetovalec. Zamenjaj obrok. ${ez} ${lfc} ${macroHint.prompt} Kalorična vrednost ±50 kcal. Vrni SAMO JSON: {"f":"opis v slovenščini","k":380,"i":[{"n":"sestavina","a":"100 g"}]}`,
-	  `Zamenjaj ${S.meals[i].label.toLowerCase()}: "${S.meals[i].f||S.meals[i].food}" (~${S.meals[i].k||S.meals[i].kcal} kcal). Upoštevaj prehranske posebnosti: ${dietPrompt()} Drugačna alternativa z gramaturami.`);
+	const txt=await api(`Si prehranjevalni svetovalec. Zamenjaj obrok. ${ez} ${lfc} ${pantry} ${macroHint.prompt} Kalorična vrednost ±50 kcal. Vrni SAMO JSON: {"f":"opis v slovenščini","k":380,"i":[{"n":"sestavina","a":"100 g"}]}`,
+	  `Zamenjaj ${S.meals[i].label.toLowerCase()}: "${S.meals[i].f||S.meals[i].food}" (~${S.meals[i].k||S.meals[i].kcal} kcal). Upoštevaj prehranske posebnosti: ${dietPrompt()} ${pantry} Drugačna alternativa z gramaturami.`);
 	const p=JSON.parse(txt);
 	S.meals[i]={...S.meals[i],...p};save();renderMeals();
   }catch(e){err('Zamenjava ni uspela.');card.classList.remove('loading');btn.disabled=false;btn.innerHTML='↺';}
@@ -4181,9 +4345,10 @@ async function refreshMeals(){
   const btn=document.getElementById('bam');btn.disabled=true;btn.innerHTML='<span class="spin">↺</span> Generiram...';
   const ez=S.easy?'Hiter in enostaven jedilnik (konzerve, jajca, whey shake, pečena kura iz pekarne, mikrovalovna). Brez kompleksnega kuhanja.':'';
   const lfc=dietPrompt()+' '+avoidPrompt();
+  const pantry=pantryPrompt('day');
   const goalKcalTarget=calcGoalKcal()||1600;
   try{
-	const txt=await api(`Si prehranjevalni svetovalec. ${ez} ${lfc} Sestavi dnevni jedilnik ~${goalKcalTarget} kcal za žensko ki želi ${G.goal==='lose'?'shujšati':G.goal==='gain'?'pridobiti mišice':'vzdrževati težo'}. Vrni SAMO veljavni JSON array s 5 elementi. Vsak element mora imeti: "f" = konkretno ime jedi v slovenščini, ne generično "zajtrk", "kosilo", "večerja", "prigrizek"; "k" = kalorije; "i" = seznam sestavin z gramaturami. Format: [{"f":"Skyr z ovsenimi kosmiči, borovnicami in mandlji","k":360,"i":[{"n":"Skyr navadni","a":"170 g"}]}]. Ne uporabljaj generičnih imen obrokov kot naslov jedi.`,
+	const txt=await api(`Si prehranjevalni svetovalec. ${ez} ${lfc} ${pantry} Sestavi dnevni jedilnik ~${goalKcalTarget} kcal za žensko ki želi ${G.goal==='lose'?'shujšati':G.goal==='gain'?'pridobiti mišice':'vzdrževati težo'}. Vrni SAMO veljavni JSON array s 5 elementi. Vsak element mora imeti: "f" = konkretno ime jedi v slovenščini, ne generično "zajtrk", "kosilo", "večerja", "prigrizek"; "k" = kalorije; "i" = seznam sestavin z gramaturami. Format: [{"f":"Skyr z ovsenimi kosmiči, borovnicami in mandlji","k":360,"i":[{"n":"Skyr navadni","a":"170 g"}]}]. Ne uporabljaj generičnih imen obrokov kot naslov jedi.`,
 	  'Svež raznovrsten jedilnik za danes z natančnimi gramaturami.');
 	const p=JSON.parse(txt);
 	const genericTitles=['zajtrk','dopoldanski prigrizek','dopold. prig.','kosilo','popoldanski prigrizek','popold. prig.','večerja'];
