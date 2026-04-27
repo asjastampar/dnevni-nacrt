@@ -1860,6 +1860,8 @@ async function initApp(){
   // unjustifiably. Detect this and roll back so today shows yesterday's planned
   // workout again until the user either trains it or manually changes it.
   // Rest/cardio/crossfit are exempt — they have no per-exercise checklist.
+  let _carryOverApplied=false;
+  let _carryOverWt=null;
   try{
 	const yest=new Date(now);yest.setDate(now.getDate()-1);
 	const yKey=localDateKey(yest);
@@ -1871,18 +1873,26 @@ async function initApp(){
 	const yDone=yEd.filter(Boolean).length;
 	const yWasMarkedDone=!!(yPlan&&yPlan.workoutDone);
 	const isStrength=yWt&&yWt!=='rest'&&yWt!=='cardio'&&yWt!=='crossfit';
-	console.log('[carry-over]',{yKey,yWt,yDone,yWasMarkedDone,isStrength,trackExists:!!yTrack,planExists:!!yPlan});
 	if(isStrength&&yDone===0&&!yWasMarkedDone){
 	  const sp=getSplit();
 	  const yPos=sp.days.indexOf(yWt);
-	  console.log('[carry-over] rollback',{yPos,currentPos:sp.position,days:sp.days});
 	  if(yPos>=0&&sp.position!==yPos){
 		sp.position=yPos;
 		saveSplit(sp);
-		console.log('[carry-over] split.position reset to',yPos);
 	  }
+	  // Carry-over also overrides today's S.wt — the unfinished workout takes
+	  // priority over whatever was loaded from a stale dp_v6 state.
+	  _carryOverApplied=true;
+	  _carryOverWt=yWt;
 	}
-  }catch(e){console.log('[carry-over] error',e);}
+  }catch(e){}
+
+  // Apply carry-over to current S.wt before falling through to split selection
+  if(_carryOverApplied&&_carryOverWt&&S.wt!==_carryOverWt){
+	S.wt=_carryOverWt;
+	S.ex=[];S.exd=[];      // force re-init from WKT for the new wt
+	S.workoutDone=false;
+  }
 
   // Set workout from split if no valid workout type yet (or it's the empty default 'rest')
   const validWt=['upper','lower','full','glute','cardio','crossfit','rest'].includes(S.wt);
