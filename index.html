@@ -5130,6 +5130,41 @@ function getMacroAwareMealSuggestion(mealIdx){
   return {bias:'balanced',prompt:''};
 }
 
+// Compute the kcal target an AI-suggested meal should hit when swapping.
+// Without this, the swap prompt would just ask the AI to keep the OLD meal's
+// calories — meaning if you delete a meal and have 800 kcal left for a single
+// remaining meal, the swap would still suggest a 400 kcal meal. We want the
+// swap to fill the actual gap.
+//
+// Strategy:
+//   remainingBudget = goalKcal + burned - alreadyEaten - sumOfOtherUnEatenMeals
+// Then this single meal should hit `remainingBudget` (clamped to a sane range).
+// Falls back to the old behaviour (current meal kcal) if budget can't be computed.
+function computeSwapKcalTarget(i){
+  try{
+	const goalKcal=calcGoalKcal();
+	if(!goalKcal)return null;
+	// What's already eaten (planned + extras)
+	const eatenPlanned=S.meals.reduce((s,m,idx)=>s+(S.md[idx]?(parseInt(m.k||m.kcal)||0):0),0);
+	const eatenExtras=(S.extras||[]).reduce((s,e)=>s+(e&&e.done?(parseInt(e.k)||0):0),0);
+	// Burned (exercise + steps)
+	const burned=(typeof calcExBurn==='function'?calcExBurn():0)+(typeof stepsKcal==='function'?stepsKcal(ST&&ST.val||0):0);
+	const totalRemaining=goalKcal+burned-eatenPlanned-eatenExtras;
+	// kcal of OTHER planned, not-yet-eaten meals (we're going to keep those)
+	let otherPlanned=0;
+	S.meals.forEach((m,idx)=>{
+	  if(idx===i)return;             // skip the one being swapped
+	  if(S.md[idx])return;           // already eaten — counted above
+	  otherPlanned+=parseInt(m.k||m.kcal)||0;
+	});
+	const target=Math.round(totalRemaining-otherPlanned);
+	// Clamp to sensible range — meals should never be tiny or absurdly huge.
+	if(target<150)return 150;
+	if(target>1200)return 1200;
+	return target;
+  }catch(e){return null;}
+}
+
 async function swapMeal(i,opts={}){
   const card=document.getElementById('mc'+i),btn=card.querySelector('.sbtn');
   btn.disabled=true;btn.innerHTML='<span class="spin">↺</span>';card.classList.add('loading');
@@ -5138,9 +5173,17 @@ async function swapMeal(i,opts={}){
   const lfc=dietPrompt()+' '+avoidPrompt();
   const pantry=mealPantryPrompt(i);
   const macroHint=getMacroAwareMealSuggestion(i);
+  // Target kcal = how much of the daily budget should this single swapped
+  // meal cover. Reflects exercise burn + already-eaten + reserved for other
+  // unfinished planned meals. If budget can't be computed, fall back to old
+  // behaviour (current meal kcal ±50).
+  const targetKcal=computeSwapKcalTarget(i);
+  const fallbackKcal=parseInt(S.meals[i].k||S.meals[i].kcal)||400;
+  const kcalForPrompt=targetKcal||fallbackKcal;
+  const kcalRule=`Kalorična vrednost naj bo ČIM BLIŽJE ${kcalForPrompt} kcal (±70 kcal). NE 400 kcal default — uporabnica ima prav to število proste kalorične luknje za ta obrok.`;
   try{
-	const txt=await api(`Si prehranjevalni svetovalec. Zamenjaj obrok. ${ez} ${lfc} ${pantry} ${macroHint.prompt} Kalorična vrednost ±50 kcal. Vrni SAMO JSON: {"f":"opis v slovenščini","k":380,"i":[{"n":"sestavina","a":"100 g"}]}`,
-	  `Zamenjaj ${S.meals[i].label.toLowerCase()}: "${S.meals[i].f||S.meals[i].food}" (~${S.meals[i].k||S.meals[i].kcal} kcal). Upoštevaj prehranske posebnosti: ${dietPrompt()} ${pantry} Drugačna alternativa z gramaturami.`);
+	const txt=await api(`Si prehranjevalni svetovalec. Zamenjaj obrok. ${ez} ${lfc} ${pantry} ${macroHint.prompt} ${kcalRule} Vrni SAMO JSON: {"f":"opis v slovenščini","k":${kcalForPrompt},"i":[{"n":"sestavina","a":"100 g"}]}`,
+	  `Zamenjaj ${S.meals[i].label.toLowerCase()}: "${S.meals[i].f||S.meals[i].food}" (trenutno ~${fallbackKcal} kcal, ampak nov obrok naj bo ~${kcalForPrompt} kcal). Upoštevaj prehranske posebnosti: ${dietPrompt()} ${pantry} Drugačna alternativa z gramaturami.`);
 	const p=JSON.parse(txt);
 	S.meals[i]={...S.meals[i],...p};save();renderMeals();
   }catch(e){err('Zamenjava ni uspela.');card.classList.remove('loading');btn.disabled=false;btn.innerHTML='↺';}
