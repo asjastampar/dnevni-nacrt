@@ -126,13 +126,14 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .meal-card.compact-done .edit-panel,
 .meal-card.compact-done .meal-pantry-panel,
 .meal-card.compact-done .meal-ideas-panel{display:none !important;}
-.meal-top{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;}
+.meal-top{display:grid;grid-template-columns:12px minmax(0,1fr);grid-template-areas:"dot body" "actions actions";gap:10px 12px;padding:14px 16px;}
 .mdot{width:7px;height:7px;border-radius:50%;background:var(--red);margin-top:7px;flex-shrink:0;transition:background .2s;}
 .mbody{flex:1;min-width:0;}
 .mlbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--lt);margin-bottom:3px;}
-.mfood{font-size:14px;color:var(--dk);line-height:1.5;}
+.mfood{font-size:18px;color:var(--dk);line-height:1.35;font-weight:500;}
+.mcopy{font-size:13px;color:var(--md);line-height:1.6;margin-top:8px;max-width:72ch;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
 .mkcal{font-size:12px;color:var(--lt);margin-top:2px;}
-.meal-actions{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.meal-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap;grid-area:actions;padding-top:2px;}
 .chk{width:24px;height:24px;border-radius:50%;border:.5px solid var(--br);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--lt);transition:all .15s;flex-shrink:0;}
 .chk:hover{border-color:var(--grn);color:var(--grn);}
 .chk.on{background:var(--grn);border-color:var(--grn);color:var(--w);}
@@ -149,13 +150,12 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
   .rbtn,.pers-btn{padding:4px 9px;font-size:11px;}
   .bp-btn{padding:5px 9px;font-size:12px;}
   .bpsel{gap:5px;}
-  /* Mobile meal layout: actions in first row, meal text below full width */
-  .meal-top{display:grid;grid-template-columns:12px 1fr;grid-template-areas:"actions actions" "dot body";gap:9px 10px;align-items:start;padding:12px 14px;}
-  .meal-actions{grid-area:actions;width:100%;justify-content:flex-end;gap:6px;flex-wrap:nowrap;}
-  .meal-actions .pin-btn{display:none;}
+  .meal-top{grid-template-columns:12px 1fr;grid-template-areas:"dot body" "actions actions";gap:10px 10px;padding:13px 14px;}
+  .meal-actions{width:100%;justify-content:flex-start;gap:8px;flex-wrap:wrap;}
   .mdot{grid-area:dot;margin-top:8px;}
   .mbody{grid-area:body;width:100%;min-width:0;}
-  .mfood{font-size:15px;line-height:1.45;}
+  .mfood{font-size:15px;line-height:1.4;}
+  .mcopy{font-size:12px;line-height:1.55;margin-top:7px;}
   .ibtn{padding:5px 10px;font-size:12px;}
   .sbtn,.ebtn,.del-btn{min-width:34px;min-height:34px;padding:6px 8px;}
   .chk{width:34px;height:34px;font-size:14px;}
@@ -170,11 +170,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
   .modal-close-x{display:flex;}
   .steps-val{font-size:18px;}
   .week-row{gap:4px;}
-  .meal-card.compact-done .meal-top{
-	grid-template-columns:12px 1fr !important;
-	grid-template-areas:"dot body" !important;
-	padding:14px !important;
-  }
+  .meal-card.compact-done .meal-top{padding:14px !important;}
   .meal-card.compact-done .meal-summary-title{font-size:13px;}
 }
 .ibtn{background:none;border:.5px solid var(--br);border-radius:7px;padding:3px 8px;font-size:11px;cursor:pointer;color:var(--lt);font-family:inherit;transition:all .15s;}
@@ -506,15 +502,6 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
   .sec-right{width:100%;align-items:center;gap:8px;}
   .tog{font-size:12px;}
   .diet-wrap,.rbtn{max-width:100%;}
-  .meal-top{
-	display:grid !important;
-	grid-template-columns:12px 1fr !important;
-	grid-template-areas:
-	  "dot body"
-	  "actions actions" !important;
-	gap:10px 10px !important;
-	padding:14px 14px 12px !important;
-  }
   .mdot{grid-area:dot;margin-top:8px;}
   .mbody{grid-area:body;}
   .meal-actions{
@@ -525,7 +512,6 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 	gap:8px !important;
 	padding-top:2px;
   }
-  .meal-actions .pin-btn{display:flex;}
   .meal-actions .sbtn,
   .meal-actions .del-btn,
   .meal-actions .chk{
@@ -537,7 +523,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 	padding:7px 12px;
 	font-size:11px;
   }
-  .mfood{font-size:15px;line-height:1.5;}
+  .mfood{font-size:15px;line-height:1.4;}
   .mlbl{line-height:1.45;}
   .meal-pantry-input-row,
   .meal-pantry-actions{
@@ -3359,6 +3345,29 @@ function saveSplitChoice(){
   renderBp();renderWorkout();renderNextUp();renderTracker();
 }
 
+function mealHeadline(text){
+  const raw=String(text||'').replace(/\s+/g,' ').trim();
+  if(!raw)return '';
+  const sentence=raw.split(/(?<=[.!?])\s+/)[0].trim();
+  const cleanSentence=sentence.replace(/[.!?]+$/,'').trim();
+  if(cleanSentence.length&&cleanSentence.length<=78)return cleanSentence;
+  const clause=raw.split(',')[0].trim();
+  if(clause.length&&clause.length<=78)return clause;
+  return raw.length>78?raw.slice(0,78).trim()+'…':raw;
+}
+function mealDescription(text){
+  const raw=String(text||'').replace(/\s+/g,' ').trim();
+  const head=mealHeadline(raw);
+  if(!raw||!head)return '';
+  const normalizedHead=head.replace(/[….!?]+$/,'').trim();
+  let rest=raw;
+  if(rest.toLowerCase().startsWith(normalizedHead.toLowerCase())){
+	rest=rest.slice(normalizedHead.length).trim();
+  }
+  rest=rest.replace(/^[,.!?]\s*/,'').trim();
+  return rest;
+}
+
 // ─── BP RENDER ──────────────────────────────────────────────
 function renderBp(){
   document.getElementById('bpsel').innerHTML=BP.map(b=>{
@@ -3383,6 +3392,9 @@ function renderMeals(){
   const pinned=getPinned();
   document.getElementById('mc').innerHTML=S.meals.map((m,i)=>{
 	const ingH=m.i?m.i.map(x=>`<div class="in">${x.n}</div><div class="ia">${x.a}</div>`).join(''):'';
+	const mealText=m.f||m.food||'';
+	const headline=mealHeadline(mealText);
+	const desc=mealDescription(mealText);
 	const done=S.md[i];const open=S.exp[i];const editOpen=S.editOpen&&S.editOpen[i];
 	const pantryOpen=!!S.mealPantryOpen[i];
 	const ideasOpen=!!(S.mealIdeasOpen&&S.mealIdeasOpen[i]);
@@ -3414,7 +3426,8 @@ function renderMeals(){
 			  <span class="meal-summary-caret">›</span>
 			</div>
 		  </div>
-		  <div class="mfood" id="mfood${i}">${m.f||m.food}</div>
+		  <div class="mfood" id="mfood${i}">${headline}</div>
+		  ${(!compactDone&&desc)?`<div class="mcopy">${desc}</div>`:''}
 		  <div class="mkcal" id="mkcal${i}">~${m.k||m.kcal} kcal</div>
 		</div>
 		<div class="meal-actions">
