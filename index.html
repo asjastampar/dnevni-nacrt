@@ -1866,21 +1866,23 @@ async function initApp(){
 	let yTrack=null,yPlan=null;
 	try{const r=localStorage.getItem(lsKey('track_'+yKey));if(r)yTrack=JSON.parse(r);}catch(e){}
 	try{const r=localStorage.getItem(lsKey('dp_v6_'+yKey));if(r)yPlan=JSON.parse(r);}catch(e){}
-	// We need yesterday's planned workout type. Prefer track.wt, fall back to plan.wt.
 	const yWt=(yTrack&&yTrack.wt)||(yPlan&&yPlan.wt)||null;
 	const yEd=(yTrack&&Array.isArray(yTrack.ed))?yTrack.ed:((yPlan&&Array.isArray(yPlan.exd))?yPlan.exd:[]);
 	const yDone=yEd.filter(Boolean).length;
 	const yWasMarkedDone=!!(yPlan&&yPlan.workoutDone);
 	const isStrength=yWt&&yWt!=='rest'&&yWt!=='cardio'&&yWt!=='crossfit';
+	console.log('[carry-over]',{yKey,yWt,yDone,yWasMarkedDone,isStrength,trackExists:!!yTrack,planExists:!!yPlan});
 	if(isStrength&&yDone===0&&!yWasMarkedDone){
 	  const sp=getSplit();
 	  const yPos=sp.days.indexOf(yWt);
+	  console.log('[carry-over] rollback',{yPos,currentPos:sp.position,days:sp.days});
 	  if(yPos>=0&&sp.position!==yPos){
 		sp.position=yPos;
 		saveSplit(sp);
+		console.log('[carry-over] split.position reset to',yPos);
 	  }
 	}
-  }catch(e){}
+  }catch(e){console.log('[carry-over] error',e);}
 
   // Set workout from split if no valid workout type yet (or it's the empty default 'rest')
   const validWt=['upper','lower','full','glute','cardio','crossfit','rest'].includes(S.wt);
@@ -3640,7 +3642,20 @@ const GOALS_KEY='user_goals';
 let G={age:null,height:null,weight:null,target:null,goal:'lose',act:'light'};
 
 function loadGoals(){
-  try{const s=localStorage.getItem(lsKey(GOALS_KEY));if(s)G={...G,...JSON.parse(s)};}catch(e){}
+  try{
+	let s=localStorage.getItem(lsKey(GOALS_KEY));
+	// Migration: old installs stored user_goals without the user__ prefix.
+	// If namespaced key is missing but legacy global one exists, copy it over
+	// so multi-user setups still see their pre-existing goals (TDEE, target).
+	if(!s){
+	  const legacy=localStorage.getItem(GOALS_KEY);
+	  if(legacy){
+		s=legacy;
+		try{localStorage.setItem(lsKey(GOALS_KEY),legacy);}catch(e){}
+	  }
+	}
+	if(s)G={...G,...JSON.parse(s)};
+  }catch(e){}
 }
 function saveGoalsState(){
   try{localStorage.setItem(lsKey(GOALS_KEY),JSON.stringify(G));}catch(e){}
