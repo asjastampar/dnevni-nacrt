@@ -307,10 +307,16 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .tracker{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:16px;}
 .tracker-head{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--md);margin-bottom:14px;}
 /* Weekly tracker rings + streak */
-.week-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px;}
-.week-row + .week-row{margin-bottom:14px;}
+.week-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:14px;}
+/* Week navigation header */
+.week-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:10px;}
+.week-nav-label{font-size:13px;font-weight:600;color:var(--dk);letter-spacing:-.005em;text-align:center;flex:1;}
+.week-nav-btn{background:none;border:.5px solid var(--br);color:var(--md);width:32px;height:32px;border-radius:50%;font-size:18px;line-height:1;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;padding:0;}
+.week-nav-btn:hover:not(:disabled){background:var(--w);color:var(--dk);border-color:var(--md);}
+.week-nav-btn:disabled,.week-nav-disabled{opacity:.3;cursor:not-allowed;}
 .day-cell{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;padding:6px 2px;cursor:pointer;font-family:inherit;border-radius:10px;transition:background .15s;}
-.day-cell:hover{background:rgba(0,0,0,.03);}
+.day-cell:hover:not(:disabled){background:rgba(0,0,0,.03);}
+.day-cell:disabled{cursor:default;}
 .day-cell.day-future{opacity:.45;cursor:default;}
 .day-cell.day-future:hover{background:none;}
 .day-cell.day-selected{background:rgba(42,97,71,.07);}
@@ -1215,7 +1221,11 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 	  <span class="streak-badge" id="streak-badge" style="display:none;"></span>
 	</div>
 	<div class="tracker">
-	  <div class="week-row" id="week-row-prev"></div>
+	  <div class="week-nav">
+		<button class="week-nav-btn" id="week-prev" onclick="shiftWeek(-1)" type="button" aria-label="Prejšnji teden">‹</button>
+		<div class="week-nav-label" id="week-label">—</div>
+		<button class="week-nav-btn" id="week-next" onclick="shiftWeek(1)" type="button" aria-label="Naslednji teden">›</button>
+	  </div>
 	  <div class="week-row" id="week-row"></div>
 	  <div class="day-detail" id="day-detail"></div>
 	</div>
@@ -1623,7 +1633,7 @@ function saveElog(name,data){const l=loadElog();l[name]=data;try{localStorage.se
 let exExp={};  // UI state: which exercises are expanded
 
 // ─── STATE ──────────────────────────────────────────────────
-let S={meals:[],exp:[false,false,false,false,false],md:[false,false,false,false,false],exd:[],lf:false,diet:[],easy:true,wt:'',ex:[],extras:[]};
+let S={meals:[],exp:[false,false,false,false,false],md:[false,false,false,false,false],exd:[],lf:false,diet:[],easy:false,wt:'',ex:[],extras:[]};
 
 // ─── USER MENU ───────────────────────────────────────────────
 function toggleUserMenu(e){
@@ -2066,8 +2076,27 @@ function initWorkout(){
 function toggleEasy(){
   S.easy=!S.easy;
   document.getElementById('et').className='tog-track'+(S.easy?' on-grn':'');
+  // When user flips this toggle, regenerate meals from the chosen source
+  // (EM = quick easy / MD = full recipes), but ONLY for slots that are:
+  //   - not pinned (user explicitly chose them)
+  //   - not yet eaten (S.md[i] === true means user already logged this meal)
+  // Anything the user touched today stays as-is.
+  if(Array.isArray(S.meals)&&S.meals.length){
+	const src=getMealSrc();
+	const pinned=getPinned();
+	S.meals=S.meals.map((existing,i)=>{
+	  // Pinned slot: keep as pinned object
+	  if(pinned[i])return {label:src[i].l,...pinned[i],pinned:true};
+	  // Already eaten today: keep current meal exactly as is
+	  if(S.md&&S.md[i])return existing;
+	  // Otherwise replace with the source variant (easy or normal)
+	  return mealVariant(src[i],i);
+	});
+  }
   save();
   renderMeals();
+  if(typeof calcKcal==='function')calcKcal();
+  if(typeof renderTracker==='function')renderTracker();
 }
 function toggleLF(){
   toggleDiet('lactoseFree');
@@ -2934,20 +2963,32 @@ function getStreak(){
 }
 
 let _selectedDay=null; // YYYY-MM-DD of currently expanded day, or null
+let _weekOffset=0;     // 0 = current week, -1 = prev, +1 = next, etc.
+
+// Returns Monday at 00:00 of the week with the given offset from current.
+function getWeekStart(offset){
+  const monday=new Date(now);
+  monday.setHours(0,0,0,0);
+  monday.setDate(monday.getDate()-((monday.getDay()+6)%7)+(offset*7));
+  return monday;
+}
+
+function shiftWeek(delta){
+  // Don't allow navigating into the future past the current week.
+  if(_weekOffset+delta>0)return;
+  _weekOffset+=delta;
+  renderTracker();
+}
 
 function renderTracker(){
   const wr=document.getElementById('week-row');
-  const wrPrev=document.getElementById('week-row-prev');
   if(!wr)return;
   const todayKey=now.toISOString().split('T')[0];
   // Default-select today on first render (so the panel shows immediately)
   if(_selectedDay===null)_selectedDay=todayKey;
 
-  // Get Monday of current week
-  const monday=new Date(now);
-  monday.setDate(now.getDate()-((now.getDay()+6)%7));
-  // And Monday of previous week (for top row)
-  const prevMonday=new Date(monday);prevMonday.setDate(monday.getDate()-7);
+  const weekStart=getWeekStart(_weekOffset);
+  const weekEnd=new Date(weekStart);weekEnd.setDate(weekStart.getDate()+6);
 
   function buildCell(d){
 	const isToday=d.toDateString()===now.toDateString();
@@ -2970,7 +3011,7 @@ function renderTracker(){
 		  : (pct>0
 			  ? `<text x="18" y="22" text-anchor="middle" font-size="9" fill="${ringColor}">${pct}%</text>`
 			  : ''));
-	return `<button class="${cls}" onclick="selectDay('${key}')" type="button">
+	return `<button class="${cls}" ${isFuture?'disabled':`onclick="selectDay('${key}')"`} type="button">
 	  <div class="day-name">${WDAYS[d.getDay()]}<span class="day-num">${dateNum}</span></div>
 	  <div class="day-ring">
 		<svg viewBox="0 0 36 36">
@@ -2982,16 +3023,38 @@ function renderTracker(){
 	</button>`;
   }
 
-  // Build previous week + this week
-  let prevHtml='',thisHtml='';
+  // Build the 7 days of the visible week
+  let html='';
   for(let i=0;i<7;i++){
-	const dPrev=new Date(prevMonday);dPrev.setDate(prevMonday.getDate()+i);
-	const dThis=new Date(monday);dThis.setDate(monday.getDate()+i);
-	prevHtml+=buildCell(dPrev);
-	thisHtml+=buildCell(dThis);
+	const d=new Date(weekStart);d.setDate(weekStart.getDate()+i);
+	html+=buildCell(d);
   }
-  if(wrPrev)wrPrev.innerHTML=prevHtml;
-  wr.innerHTML=thisHtml;
+  wr.innerHTML=html;
+
+  // Week label + nav button states
+  const labelEl=document.getElementById('week-label');
+  const nextBtn=document.getElementById('week-next');
+  if(labelEl){
+	if(_weekOffset===0){
+	  labelEl.textContent='Ta teden';
+	} else if(_weekOffset===-1){
+	  labelEl.textContent='Prejšnji teden';
+	} else {
+	  // Format: "13. – 19. apr"
+	  const sm=SLM[weekStart.getMonth()].slice(0,3);
+	  const em=SLM[weekEnd.getMonth()].slice(0,3);
+	  if(weekStart.getMonth()===weekEnd.getMonth()){
+		labelEl.textContent=`${weekStart.getDate()}. – ${weekEnd.getDate()}. ${sm}`;
+	  } else {
+		labelEl.textContent=`${weekStart.getDate()}. ${sm} – ${weekEnd.getDate()}. ${em}`;
+	  }
+	}
+  }
+  // Disable "next" when at current week (no future weeks)
+  if(nextBtn){
+	if(_weekOffset>=0){nextBtn.disabled=true;nextBtn.classList.add('week-nav-disabled');}
+	else{nextBtn.disabled=false;nextBtn.classList.remove('week-nav-disabled');}
+  }
 
   // Streak badge
   const streakEl=document.getElementById('streak-badge');
