@@ -3422,6 +3422,20 @@ function panelMetaMeals(){
   const mealCount=(S.meals?.length||0)+(S.extras?.length||0);
   return mealCount?`${mealCount} vnosov danes`:'Današnji obroki';
 }
+function workoutDurationApprox(){
+  if(S.wt==='rest' || !S.wt)return 0;
+  if(S.wt==='crossfit'){
+	const wod=S.cfWod||(WKT.crossfit?.wods?.[(DOW%((WKT.crossfit?.wods||[]).length||1))]);
+	return parseInt(wod?.time)||20;
+  }
+  if(S.wt==='cardio'){
+	const mins=(S.ex||[]).reduce((sum,e)=>sum+(parseInt(e?.r)||0),0);
+	return mins||30;
+  }
+  const exCount=(S.ex||[]).length;
+  if(!exCount)return 0;
+  return Math.max(30, exCount*8);
+}
 function panelMetaWorkout(){
   const wt=WKT[S.wt];
   const name=wt?.l||'Današnji trening';
