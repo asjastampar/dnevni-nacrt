@@ -2248,6 +2248,70 @@ const DIET_PRESETS={
 	{f:'Krompirjeva ponev s fižolom in zelenjavo',k:455,i:[{n:'Krompir',a:'240 g'},{n:'Beli fižol',a:'130 g'},{n:'Paprika',a:'120 g'},{n:'Olivno olje',a:'12 ml'}]}
   ]
 };
+
+// EASY variants of the diet presets — same dietary rules but no cooking,
+// minimal prep, supermarket-ready (Spar pečena kura, konzervirana tuna,
+// jajca, banane, whey shake, instant ovsena kaša). Used when S.easy is true.
+// Maps preset key → array of 5 fast meals. Falls back to DIET_PRESETS if
+// no easy variant defined.
+const EASY_PRESETS={
+  stableEnergy:[
+	{f:'Skuta s sadjem in ovsenimi kosmiči',k:340,i:[{n:'Skuta',a:'200 g'},{n:'Banana',a:'120 g'},{n:'Ovseni kosmiči',a:'30 g'}]},
+	{f:'Trdo kuhana jajca z banano',k:230,i:[{n:'Jajca',a:'2 kos'},{n:'Banana',a:'120 g'}]},
+	{f:'Pečena kura iz Spara s kruhom in solato',k:520,i:[{n:'Pečena kura (Spar)',a:'200 g'},{n:'Polnozrnati kruh',a:'60 g'},{n:'Mešana solata',a:'150 g'},{n:'Olivno olje',a:'8 ml'}]},
+	{f:'Whey shake z banano',k:220,i:[{n:'Whey protein',a:'30 g'},{n:'Banana',a:'120 g'},{n:'Voda',a:'250 ml'}]},
+	{f:'Konzerva tune, fižol iz konzerve, paradižnik',k:480,i:[{n:'Tuna v lastnem soku',a:'150 g'},{n:'Beli fižol iz konzerve',a:'150 g'},{n:'Paradižnik',a:'150 g'},{n:'Olivno olje',a:'10 ml'}]}
+  ],
+  lactoseFreeStable:[
+	{f:'Trdo kuhana jajca, banana in mandlji',k:340,i:[{n:'Jajca',a:'2 kos'},{n:'Banana',a:'120 g'},{n:'Mandlji',a:'15 g'}]},
+	{f:'Brezlaktozni proteinski jogurt z banano',k:220,i:[{n:'Brezlaktozni proteinski jogurt',a:'200 g'},{n:'Banana',a:'120 g'}]},
+	{f:'Pečena kura iz Spara z riževimi krekerji in solato',k:510,i:[{n:'Pečena kura (Spar)',a:'200 g'},{n:'Riževi krekerji',a:'30 g'},{n:'Mešana solata',a:'150 g'},{n:'Olivno olje',a:'10 ml'}]},
+	{f:'Whey shake z banano (rastlinsko mleko)',k:230,i:[{n:'Whey izolat',a:'30 g'},{n:'Banana',a:'120 g'},{n:'Mandljevo mleko',a:'250 ml'}]},
+	{f:'Konzerva tune s fižolom in paradižnikom',k:470,i:[{n:'Tuna v lastnem soku',a:'150 g'},{n:'Beli fižol iz konzerve',a:'150 g'},{n:'Paradižnik',a:'150 g'},{n:'Olivno olje',a:'10 ml'}]}
+  ],
+  vegan:[
+	{f:'Sojin jogurt z banano in chia semeni',k:280,i:[{n:'Sojin jogurt',a:'200 g'},{n:'Banana',a:'120 g'},{n:'Chia semena',a:'10 g'}]},
+	{f:'Riževi krekerji s humusom',k:200,i:[{n:'Riževi krekerji',a:'30 g'},{n:'Humus',a:'60 g'}]},
+	{f:'Konzervirana čičerika s paradižnikom in olivnim oljem',k:460,i:[{n:'Čičerika iz konzerve',a:'180 g'},{n:'Paradižnik',a:'150 g'},{n:'Riževi krekerji',a:'30 g'},{n:'Olivno olje',a:'12 ml'}]},
+	{f:'Banana in arašidovo maslo',k:230,i:[{n:'Banana',a:'120 g'},{n:'Arašidovo maslo',a:'20 g'}]},
+	{f:'Konzerva fižola, paradižnik in avokado',k:470,i:[{n:'Beli fižol iz konzerve',a:'180 g'},{n:'Paradižnik',a:'120 g'},{n:'Avokado',a:'80 g'},{n:'Olivno olje',a:'10 ml'}]}
+  ],
+  vegetarian:[
+	{f:'Skuta z banano in ovsenimi kosmiči',k:330,i:[{n:'Skuta',a:'200 g'},{n:'Banana',a:'120 g'},{n:'Ovseni kosmiči',a:'25 g'}]},
+	{f:'Trdo kuhana jajca z riževimi krekerji',k:210,i:[{n:'Jajca',a:'2 kos'},{n:'Riževi krekerji',a:'25 g'}]},
+	{f:'Konzerva fižola s feto in paradižnikom',k:480,i:[{n:'Beli fižol iz konzerve',a:'180 g'},{n:'Feta',a:'50 g'},{n:'Paradižnik',a:'150 g'},{n:'Olivno olje',a:'10 ml'}]},
+	{f:'Grški jogurt z medom in banano',k:230,i:[{n:'Grški jogurt',a:'180 g'},{n:'Banana',a:'100 g'},{n:'Med',a:'10 g'}]},
+	{f:'Mocarela, paradižnik in polnozrnati kruh',k:460,i:[{n:'Mocarela',a:'120 g'},{n:'Paradižnik',a:'150 g'},{n:'Polnozrnati kruh',a:'60 g'},{n:'Olivno olje',a:'10 ml'}]}
+  ],
+  glutenFree:[
+	{f:'Trdo kuhana jajca, banana in skuta',k:340,i:[{n:'Jajca',a:'2 kos'},{n:'Banana',a:'120 g'},{n:'Skuta',a:'100 g'}]},
+	{f:'Brezlaktozni jogurt z banano',k:200,i:[{n:'Brezlaktozni jogurt',a:'180 g'},{n:'Banana',a:'120 g'}]},
+	{f:'Pečena kura iz Spara z riževimi krekerji in solato',k:510,i:[{n:'Pečena kura (Spar)',a:'200 g'},{n:'Riževi krekerji',a:'30 g'},{n:'Mešana solata',a:'150 g'},{n:'Olivno olje',a:'10 ml'}]},
+	{f:'Banana in temna čokolada',k:170,i:[{n:'Banana',a:'120 g'},{n:'Temna čokolada 70%',a:'15 g'}]},
+	{f:'Konzerva tune s fižolom in paradižnikom',k:470,i:[{n:'Tuna v lastnem soku',a:'150 g'},{n:'Beli fižol iz konzerve',a:'150 g'},{n:'Paradižnik',a:'150 g'},{n:'Olivno olje',a:'10 ml'}]}
+  ],
+  highProtein:[
+	{f:'Whey shake z banano in arašidovim maslom',k:340,i:[{n:'Whey izolat',a:'30 g'},{n:'Banana',a:'120 g'},{n:'Arašidovo maslo',a:'15 g'},{n:'Voda',a:'250 ml'}]},
+	{f:'Skyr z borovnicami',k:200,i:[{n:'Skyr',a:'200 g'},{n:'Borovnice',a:'70 g'}]},
+	{f:'Pečena kura iz Spara s skuto in paradižnikom',k:520,i:[{n:'Pečena kura (Spar)',a:'200 g'},{n:'Skuta',a:'100 g'},{n:'Paradižnik',a:'150 g'},{n:'Olivno olje',a:'8 ml'}]},
+	{f:'Konzerva tune in trdo kuhano jajce',k:240,i:[{n:'Tuna v lastnem soku',a:'120 g'},{n:'Jajce',a:'1 kos'},{n:'Riževi krekerji',a:'20 g'}]},
+	{f:'Pečena puran iz Spara s polnozrnatim kruhom',k:480,i:[{n:'Pečena puranja prsa',a:'200 g'},{n:'Polnozrnati kruh',a:'60 g'},{n:'Mešana solata',a:'150 g'},{n:'Olivno olje',a:'8 ml'}]}
+  ],
+  lowCarb:[
+	{f:'Trdo kuhana jajca z avokadom',k:380,i:[{n:'Jajca',a:'3 kos'},{n:'Avokado',a:'100 g'},{n:'Olivno olje',a:'5 ml'}]},
+	{f:'Skyr z borovnicami',k:170,i:[{n:'Skyr',a:'170 g'},{n:'Borovnice',a:'70 g'}]},
+	{f:'Pečena kura iz Spara s solato',k:460,i:[{n:'Pečena kura (Spar)',a:'200 g'},{n:'Mešana solata',a:'150 g'},{n:'Olivno olje',a:'15 ml'}]},
+	{f:'Sirni rezki z zelenjavo',k:200,i:[{n:'Trdi sir',a:'50 g'},{n:'Paprika',a:'120 g'},{n:'Kumara',a:'80 g'}]},
+	{f:'Konzerva tune z avokadom in paradižnikom',k:440,i:[{n:'Tuna v lastnem soku',a:'150 g'},{n:'Avokado',a:'100 g'},{n:'Paradižnik',a:'150 g'},{n:'Olivno olje',a:'10 ml'}]}
+  ],
+  safe:[
+	{f:'Sojin jogurt z banano in chia semeni',k:290,i:[{n:'Sojin jogurt',a:'200 g'},{n:'Banana',a:'120 g'},{n:'Chia semena',a:'10 g'}]},
+	{f:'Banana in riževi krekerji',k:180,i:[{n:'Banana',a:'120 g'},{n:'Riževi krekerji',a:'25 g'}]},
+	{f:'Konzerva fižola s paradižnikom in riževimi krekerji',k:460,i:[{n:'Beli fižol iz konzerve',a:'180 g'},{n:'Paradižnik',a:'150 g'},{n:'Riževi krekerji',a:'30 g'},{n:'Olivno olje',a:'10 ml'}]},
+	{f:'Humus s korenjem',k:170,i:[{n:'Humus',a:'60 g'},{n:'Korenje',a:'150 g'}]},
+	{f:'Konzerva čičerike s paradižnikom in avokadom',k:450,i:[{n:'Čičerika iz konzerve',a:'180 g'},{n:'Paradižnik',a:'120 g'},{n:'Avokado',a:'80 g'},{n:'Olivno olje',a:'10 ml'}]}
+  ]
+};
 function getDiet(){
   if(!Array.isArray(S.diet))S.diet=[];
   if(S.lf&&!S.diet.includes('lactoseFree'))S.diet.push('lactoseFree');
@@ -2286,19 +2350,32 @@ function avoidPrompt(){
   const sugar='Ne predlagaj sladkih zajtrkov ali hitrih sladkornih obrokov: palačinke, med, sirup, sladka smetana, sladki kosmiči, sadni smoothie, sladkani jogurt, pecivo, marmelada.';
   return list.length? sugar+' Izogni se tudi nedavno zavrnjenim jedem: '+list.join('; ')+'.':sugar;
 }
+// Picks the diet preset KEY (e.g. 'lactoseFreeStable', 'vegan') based on
+// active dietary flags. mealVariant() then uses that key to look up either
+// the normal-recipe preset (DIET_PRESETS[key]) or the easy-meal preset
+// (EASY_PRESETS[key]) depending on S.easy.
+function pickDietPresetKey(){
+  if(hasDiet('vegan'))return 'vegan';
+  if(hasDiet('vegetarian')&&(hasDiet('lactoseFree')||hasDiet('eggFree')))return 'vegan';
+  if(hasDiet('vegetarian'))return 'vegetarian';
+  if(hasDiet('glutenFree'))return 'glutenFree';
+  if(hasDiet('lowCarb'))return 'lowCarb';
+  if(hasDiet('highProtein'))return 'highProtein';
+  if(hasDiet('lactoseFree'))return 'lactoseFreeStable';
+  if(['nutFree','eggFree','fishFree','noPork','noRedMeat'].some(hasDiet))return 'safe';
+  return 'stableEnergy';
+}
+// Legacy alias — returns the actual preset array (normal). Kept for any old
+// call sites that pre-date pickDietPresetKey.
 function pickDietPreset(){
-  if(hasDiet('vegan'))return DIET_PRESETS.vegan;
-  if(hasDiet('vegetarian')&&(hasDiet('lactoseFree')||hasDiet('eggFree')))return DIET_PRESETS.vegan;
-  if(hasDiet('vegetarian'))return DIET_PRESETS.vegetarian;
-  if(hasDiet('glutenFree'))return DIET_PRESETS.glutenFree;
-  if(hasDiet('lowCarb'))return DIET_PRESETS.lowCarb;
-  if(hasDiet('highProtein'))return DIET_PRESETS.stableEnergy;
-  if(hasDiet('lactoseFree'))return DIET_PRESETS.lactoseFreeStable;
-  if(['nutFree','eggFree','fishFree','noPork','noRedMeat'].some(hasDiet))return DIET_PRESETS.safe;
-  return DIET_PRESETS.stableEnergy;
+  const key=pickDietPresetKey();
+  return DIET_PRESETS[key]||DIET_PRESETS.stableEnergy;
 }
 function mealVariant(m,i){
-  const preset=pickDietPreset();
+  const key=pickDietPresetKey();
+  // When easy mode is on, prefer the EASY_PRESETS variant for that diet.
+  // Falls back to the normal preset if no easy variant is defined.
+  const preset=(S.easy&&EASY_PRESETS[key])||DIET_PRESETS[key];
   if(preset)return {label:m.l,...preset[i%preset.length]};
   return {label:m.l,...(hasDiet('lactoseFree')?m.lf:m.n)};
 }
@@ -4113,6 +4190,16 @@ function saveGoals(){
 
 function selFreq(n){
   const sp=getSplit();
+  // If the user had manually-picked days that don't match the new frequency,
+  // reset to auto so the day-pills reflect the new suggestion. Otherwise the
+  // dots would stay stuck on the old manual selection until the user
+  // re-toggled them by hand.
+  // We keep manual days only if their count exactly matches the new freq —
+  // unlikely but possible if user is fine-tuning.
+  const hadManual=Array.isArray(sp.trainingDays)&&sp.trainingDays.length>0;
+  if(!hadManual||sp.trainingDays.length!==n){
+	sp.trainingDays=null;
+  }
   sp.freq=n;
   // Regenerate the rotation length to match the new frequency. This way a
   // 4×/week plan rotates through 4 distinct sessions per week (instead of
