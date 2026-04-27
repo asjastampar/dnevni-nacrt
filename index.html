@@ -1737,7 +1737,23 @@ function save(){
   cloudSave();
 }
 function saveTrack(){
-  try{localStorage.setItem(lsKey(TTRACK),JSON.stringify({md:S.md,ed:S.exd,wt:S.wt}));}catch(e){}
+  // Compute and persist the day's ACTUAL consumed kcal so the historical
+  // day-detail card can show what was really eaten (incl. extra "Dodaj obrok"
+  // items the user logged on top of the plan), not just the plan's target.
+  let kcalEaten=0;
+  try{
+	if(Array.isArray(S.meals))kcalEaten+=S.meals.reduce((s,m,i)=>s+(S.md&&S.md[i]?(parseInt(m.k||m.kcal)||0):0),0);
+	if(Array.isArray(S.extras))kcalEaten+=S.extras.reduce((s,e)=>s+(e&&e.done?(parseInt(e.k)||0):0),0);
+  }catch(e){}
+  try{
+	localStorage.setItem(lsKey(TTRACK),JSON.stringify({
+	  md:S.md,
+	  ed:S.exd,
+	  wt:S.wt,
+	  kcalEaten,                 // actual consumed kcal for the day
+	  extras:Array.isArray(S.extras)?S.extras.filter(e=>e&&e.done).map(e=>({f:e.f,k:parseInt(e.k)||0})):[]
+	}));
+  }catch(e){}
 }
 
 let _syncTimer=null;
@@ -1835,6 +1851,42 @@ async function initApp(){
   }
   // Common init — runs whether data came from cloud or local
   if(!S.meals||!S.meals.length){initMeals();}
+
+  // ─── WORKOUT CARRY-OVER ─────────────────────────────────────
+  // If yesterday had a planned strength workout that the user did NOT actually
+  // do (no exercise was checked off), the split position may have been
+  // advanced by a stale state or a previous bug. Roll it back so today shows
+  // the same workout again — until the user either does it or chooses to skip.
+  // Rest, cardio and crossfit are skipped from this check since they don't
+  // have a per-exercise checklist.
+  try{
+	const yest=new Date(now);yest.setDate(now.getDate()-1);
+	const yKey=localDateKey(yest);
+	const yTrackRaw=localStorage.getItem(lsKey('track_'+yKey));
+	const yPlanRaw=localStorage.getItem(lsKey('dp_v6_'+yKey));
+	if(yTrackRaw&&yPlanRaw){
+	  const yTrack=JSON.parse(yTrackRaw);
+	  const yPlan=JSON.parse(yPlanRaw);
+	  const yWt=yTrack.wt;
+	  const yEd=Array.isArray(yTrack.ed)?yTrack.ed:[];
+	  const yDone=yEd.filter(Boolean).length;
+	  const isStrength=yWt&&yWt!=='rest'&&yWt!=='cardio'&&yWt!=='crossfit';
+	  // Mark "not done" only if: strength day, exists in plan, no exercise checked,
+	  // AND yesterday's saved S did NOT mark workoutDone explicitly.
+	  const yWasMarkedDone=!!(yPlan&&yPlan.workoutDone);
+	  if(isStrength&&yDone===0&&!yWasMarkedDone){
+		// Find yWt's position in the split. If the current split position is
+		// past it (i.e. yesterday's workout was skipped over), reset to it.
+		const sp=getSplit();
+		const yPos=sp.days.indexOf(yWt);
+		if(yPos>=0&&sp.position!==yPos){
+		  sp.position=yPos;
+		  saveSplit(sp);
+		}
+	  }
+	}
+  }catch(e){}
+
   // Set workout from split if no valid workout type yet (or it's the empty default 'rest')
   const validWt=['upper','lower','full','glute','cardio','crossfit','rest'].includes(S.wt);
   if(!validWt||!S.wt){S.wt=nextWorkoutInSplit();}
@@ -3141,7 +3193,23 @@ function renderDayDetail(key){
   const exDone=ed.filter(Boolean).length;
   const exTotal=ed.length||0;
   const eatenMeals=plan&&plan.meals?plan.meals.filter((_,i)=>md[i]).map(m=>({food:m.f||m.food||'',kcal:parseInt(m.k||m.kcal)||0})):[];
-  const totalKcal=eatenMeals.reduce((s,m)=>s+m.kcal,0);
+  // If we're looking at TODAY, recompute live from S so changes since the last
+  // save are reflected. For past days, prefer the persisted kcalEaten (which
+  // includes "Dodaj obrok" extras), and fall back to the plan-based sum for
+  // legacy track records that didn't store kcalEaten.
+  let totalKcal;
+  if(isToday){
+	const planEaten=eatenMeals.reduce((s,m)=>s+m.kcal,0);
+	const extrasEaten=(S.extras||[]).reduce((s,e)=>s+(e&&e.done?(parseInt(e.k)||0):0),0);
+	totalKcal=planEaten+extrasEaten;
+  } else {
+	totalKcal=(typeof track.kcalEaten==='number')?track.kcalEaten:eatenMeals.reduce((s,m)=>s+m.kcal,0);
+  }
+  // Combine plan meals + logged extras for the meal listing in past-day cards.
+  const extrasList=isToday
+	?(S.extras||[]).filter(e=>e&&e.done).map(e=>({food:e.f||'',kcal:parseInt(e.k)||0,extra:true}))
+	:(Array.isArray(track.extras)?track.extras.map(e=>({food:e.f||'',kcal:parseInt(e.k)||0,extra:true})):[]);
+  const allMeals=[...eatenMeals,...extrasList];
   const doneEx=plan&&plan.ex?plan.ex.filter((_,i)=>ed[i]).map(e=>({n:e.n,log:exlog[e.n]||null})):[];
   const wtLabel=(WKT_LABELS&&WKT_LABELS[wt])||wt;
   // Workout detail
@@ -3156,8 +3224,8 @@ function renderDayDetail(key){
 	}).join('');
   } else workoutHtml='<div class="dd-empty">Vadba ni bila zabeležena.</div>';
   // Meals detail
-  const mealsHtml=eatenMeals.length
-	?eatenMeals.map(m=>`<div class="hist-meal-row"><div class="hist-meal-name">${m.food}</div><div class="hist-meal-kcal">~${m.kcal} kcal</div></div>`).join('')
+  const mealsHtml=allMeals.length
+	?allMeals.map(m=>`<div class="hist-meal-row"><div class="hist-meal-name">${m.food}${m.extra?' <span style="font-size:10.5px;color:var(--lt);">(dodano)</span>':''}</div><div class="hist-meal-kcal">~${m.kcal} kcal</div></div>`).join('')
 	:'<div class="dd-empty">Ni zabeleženih obrokov ta dan.</div>';
   // Pillsi
   // Rule 1: Only show actual consumed calories — never targets/remaining.
