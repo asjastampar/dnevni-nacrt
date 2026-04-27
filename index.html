@@ -1320,9 +1320,8 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 			<option value="Popoldanski prigrizek">Popoldanski prigrizek</option>
 			<option value="Večerja">Večerja</option>
 		  </select>
-		  <input class="add-meal-inp" id="extra-inp" placeholder="Kaj želiš dodati ali zamenjati? npr. piščanec, tortilja, zelena solata" onkeydown="if(event.key==='Enter')addPlannedMeal()">
+		  <input class="add-meal-inp" id="extra-inp" placeholder="Kaj želiš dodati? Če pustiš prazno, predlagam obrok sama." onkeydown="if(event.key==='Enter')addPlannedMeal()">
 		  <button class="add-meal-btn" id="plan-btn" onclick="addPlannedMeal()">Dodaj v plan</button>
-		  <button class="rbtn" id="extra-btn" onclick="addExtraMeal()">Dodaj extra</button>
 		</div>
   </div>
 
@@ -2823,11 +2822,23 @@ function ensureMealStateArrays(){
   if(!Array.isArray(S.mealIdeasOpen))S.mealIdeasOpen=[];
   if(!Array.isArray(S.mealIdeasTab))S.mealIdeasTab=[];
 }
+function baseMealLabel(label){
+  return String(label||'').replace(/\s+\d+$/,'').trim();
+}
 function mealLabelOrder(label){
-  return LBLS.indexOf(label);
+  return LBLS.indexOf(baseMealLabel(label));
 }
 function findMealIndexByLabel(label){
   return Array.isArray(S.meals)?S.meals.findIndex(m=>m&&m.label===label):-1;
+}
+function countMealsByBaseLabel(label){
+  const base=baseMealLabel(label);
+  return Array.isArray(S.meals)?S.meals.filter(m=>baseMealLabel(m?.label)===base).length:0;
+}
+function nextMealLabel(label){
+  const base=baseMealLabel(label);
+  const count=countMealsByBaseLabel(base);
+  return count===0?base:`${base} ${count+1}`;
 }
 function insertMealAt(index, meal){
   ensureMealStateArrays();
@@ -2847,6 +2858,9 @@ function insertMealByLabel(meal){
     const ord=mealLabelOrder(S.meals[i]?.label);
     if(ord===-1)continue;
     if(ord>targetOrder){insertAt=i;break;}
+  }
+  for(let i=0;i<S.meals.length;i++){
+    if(mealLabelOrder(S.meals[i]?.label)===targetOrder)insertAt=i+1;
   }
   insertMealAt(insertAt,meal);
 }
@@ -5081,6 +5095,7 @@ function removeExtra(i){
 async function addExtraMeal(){
   const inp=document.getElementById('extra-inp');
   const btn=document.getElementById('extra-btn');
+  if(!btn)return;
   const val=(inp&&inp.value.trim())||'';
   if(!val)return;
   btn.disabled=true;btn.textContent='...';
@@ -5103,30 +5118,19 @@ async function addPlannedMeal(){
   const sel=document.getElementById('meal-type-sel');
   const val=(inp&&inp.value.trim())||'';
   const label=(sel&&sel.value)||LBLS[0];
-  if(!val)return;
   btn.disabled=true;btn.textContent='...';
   try{
     const txt=await api(
       'Si prehranjevalni svetovalec. Izračunaj kalorije in sestavi konkreten obrok za izbran tip obroka. Vrni SAMO JSON: {"f":"natančen opis v slovenščini","k":350,"i":[{"n":"sestavina","a":"100 g"}]}',
-      `Pripravi ${label.toLowerCase()} iz tega opisa ali teh sestavin: "${val}".`
+      val
+        ? `Pripravi ${label.toLowerCase()} iz tega opisa ali teh sestavin: "${val}".`
+        : `Predlagaj primeren ${label.toLowerCase()} za danes.`
     );
     const p=JSON.parse(txt);
-    const meal={label,f:p.f,k:parseInt(p.k)||0,i:p.i||[],custom:true};
-    const existingIdx=findMealIndexByLabel(label);
-    if(existingIdx===-1){
-      insertMealByLabel(meal);
-    }else{
-      const replace=confirm(`${label} že obstaja.\n\nŽeliš zamenjati obstoječi ${label.toLowerCase()}?`);
-      if(replace){
-        S.meals[existingIdx]={...S.meals[existingIdx],...meal};
-        S.md[existingIdx]=false;
-      }else{
-        if(!S.extras)S.extras=[];
-        S.extras.push({f:p.f,k:parseInt(p.k)||0,i:p.i||[],done:false});
-      }
-    }
+    const meal={label:nextMealLabel(label),f:p.f,k:parseInt(p.k)||0,i:p.i||[],custom:true};
+    insertMealByLabel(meal);
     inp.value='';
-    save();renderMeals();renderExtras();calcKcal();
+    save();renderMeals();calcKcal();
   }catch(e){err('Dodajanje ni uspelo.');}
   btn.disabled=false;btn.textContent='Dodaj v plan';
 }
