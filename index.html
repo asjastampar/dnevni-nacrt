@@ -2983,7 +2983,7 @@ function calcExBurn(){
 }
 
 function calcKcal(){
-  loadGoals();
+  if(!_goalsPreviewMode)loadGoals();
   const eaten=S.meals.reduce((s,m,i)=>s+(S.md[i]?(parseInt(m.k||m.kcal)||0):0),0);
   const extraEaten=(S.extras||[]).reduce((s,e)=>s+(e.done?(parseInt(e.k)||0):0),0);
   const totalEaten=eaten+extraEaten;
@@ -4112,15 +4112,41 @@ function calcMacroTargets(){
 }
 
 let _selGoal='lose',_selAct='light';
+let _goalsOriginal=null,_goalsSaved=false,_goalsPreviewMode=false;
+
+function readGoalsDraft(){
+  return {
+    age:parseInt(document.getElementById('g-age')?.value)||null,
+    height:parseInt(document.getElementById('g-height')?.value)||null,
+    weight:parseFloat(document.getElementById('g-weight')?.value)||null,
+    target:parseFloat(document.getElementById('g-target')?.value)||null,
+    goal:_selGoal,
+    act:_selAct
+  };
+}
+function refreshGoalConnectedUI(){
+  calcKcal();
+  if(typeof renderMacros==='function')renderMacros();
+  if(typeof renderTracker==='function')renderTracker();
+}
+function applyGoalsLivePreview(){
+  // Live preview only: update in-memory goal state so the dashboard behind the modal
+  // immediately shows what would be saved. Nothing is persisted until saveGoals().
+  G={...G,...readGoalsDraft()};
+  _goalsPreviewMode=true;
+  refreshGoalConnectedUI();
+}
 function selGoal(g){
   _selGoal=g;
   ['lose','maintain','gain'].forEach(x=>document.getElementById('go-'+x)?.classList.toggle('active',x===g));
   updateGoalsCalc();
+  applyGoalsLivePreview();
 }
 function selAct(a){
   _selAct=a;
   ['sed','light','mod','high'].forEach(x=>document.getElementById('ga-'+x)?.classList.toggle('active',x===a));
   updateGoalsCalc();
+  applyGoalsLivePreview();
 }
 function updateGoalsCalc(){
   const age=parseInt(document.getElementById('g-age')?.value)||null;
@@ -4168,6 +4194,9 @@ function updateGoalsCalc(){
 }
 function openGoals(mode='profile'){
   loadGoals();
+  _goalsOriginal={...G};
+  _goalsSaved=false;
+  _goalsPreviewMode=false;
   document.getElementById('g-age').value=G.age||'';
   document.getElementById('g-height').value=G.height||'';
   document.getElementById('g-weight').value=G.weight||'';
@@ -4205,23 +4234,26 @@ function openGoals(mode='profile'){
   refreshTrainDaysUI();
   document.getElementById('goals-overlay').classList.remove('hide');
 }
-function closeGoals(){document.getElementById('goals-overlay').classList.add('hide');}
+function closeGoals(){
+  // If user previewed changes but did not save, restore the last saved goal state.
+  if(_goalsPreviewMode&&!_goalsSaved&&_goalsOriginal){
+    G={...G,..._goalsOriginal};
+    _goalsPreviewMode=false;
+    refreshGoalConnectedUI();
+  }
+  document.getElementById('goals-overlay').classList.add('hide');
+}
 function saveGoals(){
-  G.age=parseInt(document.getElementById('g-age')?.value)||null;
-  G.height=parseInt(document.getElementById('g-height')?.value)||null;
-  G.weight=parseFloat(document.getElementById('g-weight')?.value)||null;
-  G.target=parseFloat(document.getElementById('g-target')?.value)||null;
-  G.goal=_selGoal;G.act=_selAct;
+  G={...G,...readGoalsDraft()};
+  _goalsSaved=true;
+  _goalsPreviewMode=false;
   saveGoalsState();
   try{localStorage.setItem(lsKey('goals_seen'),'1');}catch(e){}
 
-  // Keep dashboard, macro targets and weekly tracker connected to profile/goal changes.
-  // Goal changes affect kcal budget + macro targets immediately after save.
+  // Commit preview: dashboard, macro targets and weekly tracker stay connected to the saved goal.
   closeGoals();
-  calcKcal();
-  if(typeof renderMacros==='function')renderMacros();
+  refreshGoalConnectedUI();
   if(typeof renderNextUp==='function')renderNextUp();
-  if(typeof renderTracker==='function')renderTracker();
   save(); // persist/sync the recalculated day state as well
 }
 
@@ -4284,7 +4316,7 @@ function refreshTrainDaysUI(){
 // Add event listeners to recalculate on input change
 function bindGoalsInputs(){
   ['g-age','g-height','g-weight','g-target'].forEach(id=>{
-	document.getElementById(id)?.addEventListener('input',updateGoalsCalc);
+	document.getElementById(id)?.addEventListener('input',()=>{updateGoalsCalc();applyGoalsLivePreview();});
   });
 }
 
@@ -4307,7 +4339,7 @@ function estimateMacros(mealName, kcal){
 }
 
 function renderMacros(){
-  loadGoals();
+  if(!_goalsPreviewMode)loadGoals();
   const targets=calcMacroTargets();
   let totP=0,totC=0,totF=0;
   S.meals.forEach((m,i)=>{
