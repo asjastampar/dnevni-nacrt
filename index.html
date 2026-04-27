@@ -1239,8 +1239,20 @@ const SLD=['Nedelja','Ponedeljek','Torek','Sreda','Četrtek','Petek','Sobota'];
 const SLM=['januar','februar','marec','april','maj','junij','julij','avgust','september','oktober','november','december'];
 const LBLS=['Zajtrk','Dopoldanski prigrizek','Kosilo','Popoldanski prigrizek','Večerja'];
 const now=new Date(),DOW=now.getDay();
-const TK='dp_v6_'+now.toISOString().split('T')[0];
-const TTRACK='track_'+now.toISOString().split('T')[0];
+// IMPORTANT: All date keys (dp_v6_*, track_*, exlog_*, wodlog_*, steps_*) use the
+// LOCAL calendar date — not UTC. Using toISOString().split('T')[0] returns the UTC
+// date, which can differ from the user's local date by ±1 day around midnight.
+// That mismatch caused yesterday's data to be stored under today's key (or vice
+// versa) for users in non-UTC timezones (Slovenia is UTC+2 in summer).
+function localDateKey(d){
+  d=d||new Date();
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+const TK='dp_v6_'+localDateKey(now);
+const TTRACK='track_'+localDateKey(now);
 document.getElementById('ds').textContent=SLD[DOW]+', '+now.getDate()+'. '+SLM[now.getMonth()]+' '+now.getFullYear();
 
 // ─── MEAL DATA ─────────────────────────────────────────────
@@ -1503,7 +1515,7 @@ function ensureFitStart(){
       s=legacy;
       try{localStorage.setItem(k,s);}catch(e){}
     } else {
-      s=now.toISOString().split('T')[0];
+      s=localDateKey(now);
       try{localStorage.setItem(k,s);}catch(e){}
     }
   }
@@ -1527,7 +1539,7 @@ function getExerciseHistory(name){
   const history=[];
   for(let i=0;i<=30;i++){
 	const d=new Date(now);d.setDate(now.getDate()-i);
-	const key=d.toISOString().split('T')[0];
+	const key=localDateKey(d);
 	try{
 	  const s=localStorage.getItem(lsKey('exlog_'+key));
 	  if(!s)continue;
@@ -1626,7 +1638,7 @@ function getRepRange(exName,wt){
 }
 
 // exercise log: store per day, per exercise name
-const ELKEY='exlog_'+now.toISOString().split('T')[0];
+const ELKEY='exlog_'+localDateKey(now);
 function loadElog(){try{return JSON.parse(localStorage.getItem(lsKey(ELKEY)))||{};}catch(e){return{};}}
 function saveElog(name,data){const l=loadElog();l[name]=data;try{localStorage.setItem(lsKey(ELKEY),JSON.stringify(l));}catch(e){}}
 
@@ -1734,7 +1746,7 @@ function cloudSave(){
   clearTimeout(_syncTimer);
   _syncTimer=setTimeout(async()=>{
 	if(!AUTH)return;
-	const today=now.toISOString().split('T')[0];
+	const today=localDateKey(now);
 	const payload={
 	  main:S,
 	  track:{md:S.md,ed:S.exd,wt:S.wt},
@@ -1797,7 +1809,7 @@ async function initApp(){
 
   // Try load from cloud first, fall back to localStorage
   setSyncStatus('↺ nalagam...');
-  const today=now.toISOString().split('T')[0];
+  const today=localDateKey(now);
   const cloudData=await cloudLoad(today);
   // Always read local storage first (user-namespaced now that AUTH is set).
   // Cloud overrides on top — if cloudData has fresher values they win.
@@ -2382,7 +2394,7 @@ const BURN={
 const BURN_DEFAULT=14; // kcal/serijo za neznane vaje
 const CARDIO_BURN_PER_MIN=7; // kcal/min zmerne intenzivnosti
 
-const STEPS_KEY='steps_'+now.toISOString().split('T')[0];
+const STEPS_KEY='steps_'+localDateKey(now);
 let ST={goal:10000,done:false,val:0};
 function loadSteps(){try{const s=localStorage.getItem(lsKey(STEPS_KEY));if(s)ST=JSON.parse(s);}catch(e){}}
 function saveStepsState(){
@@ -2650,7 +2662,7 @@ function renderWorkout(){
 	const wod=S.cfWod;
 	const typeClass=wod.type==='AMRAP'?'amrap':wod.type==='EMOM'?'emom':'';
 	const timeLabel=wod.type==='AMRAP'?`${wod.time} min`:wod.type==='EMOM'?`${wod.time} min`:wod.rounds?`${wod.rounds} krogov`:'';
-	const savedResult=localStorage.getItem(lsKey('wodlog_'+now.toISOString().split('T')[0]))||'';
+	const savedResult=localStorage.getItem(lsKey('wodlog_'+localDateKey(now)))||'';
 	const exRows=wod.ex.map((e,i)=>{
 	  const info=getExInfo(e.n)||{};
 	  const descHtml=info.desc?`<div class="wod-desc-panel" id="wdp${i}"><div class="ex-desc" style="margin-bottom:6px;">${info.desc}</div><div class="ex-tip">💡 ${info.tip}</div><a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent((info.yt||e.n))}" target="_blank">▶ Video</a></div>`:'';
@@ -2847,7 +2859,7 @@ function togWodDesc(i){
 function saveWodResult(){
   const val=document.getElementById('wod-res')?.value;
   if(!val)return;
-  localStorage.setItem(lsKey('wodlog_'+now.toISOString().split('T')[0]),val);
+  localStorage.setItem(lsKey('wodlog_'+localDateKey(now)),val);
   const ok=document.getElementById('wod-ok');
   if(ok){ok.textContent='✓ shranjeno';ok.classList.add('show');setTimeout(()=>ok.classList.remove('show'),2500);}
 }
@@ -2952,7 +2964,7 @@ function getStreak(){
   let streak=0;
   for(let i=0;i<=60;i++){
 	const d=new Date(now);d.setDate(now.getDate()-i);
-	const key=d.toISOString().split('T')[0];
+	const key=localDateKey(d);
 	const td=i===0?{md:S.md,ed:S.exd,wt:S.wt}:getTrackData(key);
 	if(!td)break;
 	const score=getDayScore(td);
@@ -2965,7 +2977,8 @@ function getStreak(){
 let _selectedDay=null; // YYYY-MM-DD of currently expanded day, or null
 let _weekOffset=0;     // 0 = current week, -1 = prev, +1 = next, etc.
 
-// Returns Monday at 00:00 of the week with the given offset from current.
+// Returns Monday at 00:00 (LOCAL time) of the week with the given offset from now.
+// Offset 0 = current week, -1 = previous, +1 = next, etc.
 function getWeekStart(offset){
   const monday=new Date(now);
   monday.setHours(0,0,0,0);
@@ -2983,7 +2996,7 @@ function shiftWeek(delta){
 function renderTracker(){
   const wr=document.getElementById('week-row');
   if(!wr)return;
-  const todayKey=now.toISOString().split('T')[0];
+  const todayKey=localDateKey(now);
   // Default-select today on first render (so the panel shows immediately)
   if(_selectedDay===null)_selectedDay=todayKey;
 
@@ -2993,7 +3006,7 @@ function renderTracker(){
   function buildCell(d){
 	const isToday=d.toDateString()===now.toDateString();
 	const isFuture=d>now&&!isToday;
-	const key=d.toISOString().split('T')[0];
+	const key=localDateKey(d);
 	const td=isToday?{md:S.md,ed:S.exd,wt:S.wt}:getTrackData(key);
 	const score=isFuture?null:getDayScore(td);
 	const pct=score===null?0:Math.round(score*100);
@@ -3083,7 +3096,7 @@ function renderDayDetail(key){
   const c=document.getElementById('day-detail');
   if(!c)return;
   if(!key){c.innerHTML='';return;}
-  const todayKey=now.toISOString().split('T')[0];
+  const todayKey=localDateKey(now);
   const isToday=key===todayKey;
   const d=new Date(key+'T12:00:00');
   const dayName=SLD[d.getDay()];
@@ -3778,7 +3791,7 @@ function getHistoryFoods(){
   const foods=[];
   for(let i=1;i<=14;i++){
 	const d=new Date(now);d.setDate(now.getDate()-i);
-	const key=d.toISOString().split('T')[0];
+	const key=localDateKey(d);
 	try{
 	  const s=localStorage.getItem(lsKey('dp_v6_'+key));
 	  if(!s)continue;
