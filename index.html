@@ -2989,6 +2989,7 @@ function savePinned(p){try{localStorage.setItem(lsKey(PINNED_KEY),JSON.stringify
 function ensureMealStateArrays(){
   if(!Array.isArray(S.md))S.md=[];
   if(!Array.isArray(S.exp))S.exp=[];
+  if(!Array.isArray(S.doneOpen))S.doneOpen=[];
   if(!Array.isArray(S.editOpen))S.editOpen=[];
   if(!Array.isArray(S.mealPantry))S.mealPantry=[];
   if(!Array.isArray(S.mealPantryOpen))S.mealPantryOpen=[];
@@ -3018,6 +3019,7 @@ function insertMealAt(index, meal){
   S.meals.splice(index,0,meal);
   S.md.splice(index,0,false);
   S.exp.splice(index,0,false);
+  S.doneOpen.splice(index,0,false);
   S.editOpen.splice(index,0,false);
   S.mealPantry.splice(index,0,{items:[],mode:'prefer'});
   S.mealPantryOpen.splice(index,0,false);
@@ -3395,26 +3397,26 @@ function selBp(id){
 
 // ─── RENDER MEALS ───────────────────────────────────────────
 function renderMeals(){
+  ensureMealStateArrays();
   const pinned=getPinned();
-  if(!Array.isArray(S.mealPantry))S.mealPantry=[];
-  if(!Array.isArray(S.mealPantryOpen))S.mealPantryOpen=[];
   document.getElementById('mc').innerHTML=S.meals.map((m,i)=>{
 	const ingH=m.i?m.i.map(x=>`<div class="in">${x.n}</div><div class="ia">${x.a}</div>`).join(''):'';
 	const done=S.md[i];const open=S.exp[i];const editOpen=S.editOpen&&S.editOpen[i];
 	const pantryOpen=!!S.mealPantryOpen[i];
 	const ideasOpen=!!(S.mealIdeasOpen&&S.mealIdeasOpen[i]);
+	const doneExpanded=!!S.doneOpen[i];
 	const pantryState=S.mealPantry[i]||null;
 	const pantryBadge=pantryState&&Array.isArray(pantryState.items)&&pantryState.items.length?`<span class="meal-pantry-badge">imam doma</span>`:'';
 	const easyMark=S.easy&&!m.pinned?`<span class="easy-badge">hitro</span>`:'';
 	const custom=m.custom?`<span style="font-size:11px;color:var(--red);margin-left:4px;">ročni vnos</span>`:'';
 	const isPinned=!!m.pinned||!!pinned[i];
 	const pinnedBadge=isPinned?`<span class="pinned-badge">📌 privzeto</span>`:'';
-	const compactDone=done&&!open&&!editOpen&&!pantryOpen&&!ideasOpen;
+	const compactDone=done&&!doneExpanded&&!editOpen&&!pantryOpen&&!ideasOpen;
 	const pantrySummary=pantryState&&pantryState.items&&pantryState.items.length
 	  ? pantryState.items.map(it=>`<span class="pantry-chip">${it}</span>`).join('')
 	  : '<span style="font-size:12px;color:var(--lt);">Ni izbranih sestavin.</span>';
 	return `<div class="meal-card fi${done?' done':''}${compactDone?' compact-done':''}" id="mc${i}">
-	  <div class="meal-top" onclick="if(!event.target.closest('.meal-actions'))togIng(${i})">
+	  <div class="meal-top" onclick="if(!event.target.closest('.meal-actions'))${compactDone?`toggleDoneMeal(${i})`:`togIng(${i})`}">
 		<div class="mdot"></div>
 		<div class="mbody">
 		  <div class="mlbl">${m.label}${easyMark}${custom}${pinnedBadge}${pantryBadge}</div>
@@ -3688,13 +3690,23 @@ function calcKcal(){
 
 function togMeal(i){
   S.md[i]=!S.md[i];
+  if(!Array.isArray(S.doneOpen))S.doneOpen=[];
   if(S.md[i]){
 	if(!Array.isArray(S.exp))S.exp=[];
 	S.exp[i]=false;
+	S.doneOpen[i]=false;
+  }else{
+	S.doneOpen[i]=false;
   }
   save();
   calcKcal();
   renderTracker();
+  renderMeals();
+}
+function toggleDoneMeal(i){
+  if(!Array.isArray(S.doneOpen))S.doneOpen=[];
+  S.doneOpen[i]=!S.doneOpen[i];
+  save();
   renderMeals();
 }
 function togEdit(i){
@@ -3749,6 +3761,7 @@ function deleteMeal(i){
   S.meals.splice(i,1);
   S.md.splice(i,1);
   if(S.exp)S.exp.splice(i,1);
+  if(S.doneOpen)S.doneOpen.splice(i,1);
   if(S.editOpen)S.editOpen.splice(i,1);
   if(S.mealPantry)S.mealPantry.splice(i,1);
   if(S.mealPantryOpen)S.mealPantryOpen.splice(i,1);
