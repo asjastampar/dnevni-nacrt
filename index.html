@@ -526,6 +526,25 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .goal-opt{padding:9px 5px;border:.5px solid var(--br);border-radius:9px;background:none;font-size:13px;color:var(--md);cursor:pointer;font-family:inherit;transition:all .15s;text-align:center;line-height:1.4;}
 .goal-opt:hover{border-color:rgba(0,0,0,.2);color:var(--dk);}
 .goal-opt.active{background:var(--dk);color:var(--w);border-color:var(--dk);}
+.goals-plan-shell{display:flex;flex-direction:column;gap:14px;}
+.goals-plan-note{font-size:13px;color:var(--md);line-height:1.55;margin-top:-2px;}
+.goals-plan-card{background:linear-gradient(180deg,#F7F3EE 0%,#F4EFE8 100%);border:.5px solid rgba(0,0,0,.05);border-radius:18px;padding:16px 16px 15px;}
+.goals-plan-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px;}
+.goals-plan-kicker{font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.goals-plan-title{font-size:22px;color:var(--dk);font-weight:600;line-height:1.1;}
+.goals-plan-meta{font-size:13px;color:var(--md);line-height:1.45;}
+.goals-plan-link{background:rgba(255,255,255,.72);color:var(--md);border:.5px solid var(--br);border-radius:999px;padding:9px 13px;font-size:12px;cursor:pointer;font-family:inherit;flex-shrink:0;transition:all .15s;}
+.goals-plan-link:hover{background:var(--w);color:var(--dk);}
+.goals-plan-section{display:flex;flex-direction:column;gap:8px;}
+.goals-plan-label{font-size:11px;color:var(--md);text-transform:uppercase;letter-spacing:.08em;}
+.goals-plan-hint{font-size:12px;color:var(--lt);line-height:1.45;}
+.goals-plan-summary{background:#F7F3EE;border:.5px solid rgba(0,0,0,.05);border-radius:16px;padding:12px 14px;font-size:13px;color:var(--md);line-height:1.5;}
+.goals-plan-summary b{color:var(--dk);}
+.goals-plan-actions{display:flex;gap:10px;margin-top:4px;}
+.goals-plan-cancel{flex:0 0 auto;background:none;color:var(--md);border:.5px solid var(--br);border-radius:14px;padding:12px 18px;font-size:14px;cursor:pointer;font-family:inherit;transition:all .15s;}
+.goals-plan-cancel:hover{background:var(--bg);color:var(--dk);}
+.goals-plan-save{flex:1;margin-top:0 !important;border-radius:16px !important;padding:14px 18px;}
+.goal-opt.day-pick{font-size:14px;padding:12px 4px;}
 .goals-calc{background:var(--bg);border-radius:9px;padding:10px 12px;margin-bottom:14px;font-size:13px;color:var(--md);line-height:1.7;display:none;}
 .goals-calc.show{display:block;}
 /* Prevent layout shift when inputs open the calc box */
@@ -1005,46 +1024,49 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 	  <div class="goals-calc" id="goals-calc"></div>
 	</div>
 
-	<div id="goals-plan-section">
-	  <div style="background:var(--bg);border-radius:13px;padding:13px 15px;margin-bottom:12px;font-size:13px;color:var(--md);line-height:1.55;">
-		Trening se premakne naprej šele, ko ga označiš kot opravljen.<br>
-		Če izpustiš dan, te isti trening počaka.
-	  </div>
-	  <div style="background:var(--bg);border-radius:9px;padding:11px 13px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
-		<div>
-		  <div style="font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">Razdelitev vadb</div>
-		  <div style="font-size:13px;color:var(--md);" id="profile-split-summary">—</div>
+		<div id="goals-plan-section">
+		  <div class="goals-plan-shell">
+			<div class="goals-plan-note">Trening se premakne naprej šele, ko ga označiš kot opravljen. Če izpustiš dan, te isti trening počaka.</div>
+			<div class="goals-plan-card">
+			  <div class="goals-plan-card-head">
+				<div>
+				  <div class="goals-plan-kicker">Izbran split</div>
+				  <div class="goals-plan-title" id="profile-split-name">—</div>
+				</div>
+				<button class="goals-plan-link" onclick="closeGoals();openSplitPicker();">Uredi split</button>
+			  </div>
+			  <div class="goals-plan-meta" id="profile-split-summary">—</div>
+			</div>
+			<div class="goals-plan-section">
+			  <div class="goals-plan-label">Kolikokrat treniraš?</div>
+			  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;">
+				<button class="goal-opt" id="freq-2" onclick="selFreq(2)">2×</button>
+				<button class="goal-opt" id="freq-3" onclick="selFreq(3)">3×</button>
+				<button class="goal-opt" id="freq-4" onclick="selFreq(4)">4×</button>
+				<button class="goal-opt" id="freq-5" onclick="selFreq(5)">5×</button>
+			  </div>
+			</div>
+			<div class="goals-plan-section">
+			  <div class="goals-plan-label">Kateri dnevi ti ustrezajo?</div>
+			  <div class="goals-plan-hint">Če jih ne izbereš sama, predlagamo optimalen razpored.</div>
+			  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;">
+				<button class="goal-opt day-pick" data-day="1" onclick="togTrainDay(1)">Po</button>
+				<button class="goal-opt day-pick" data-day="2" onclick="togTrainDay(2)">To</button>
+				<button class="goal-opt day-pick" data-day="3" onclick="togTrainDay(3)">Sr</button>
+				<button class="goal-opt day-pick" data-day="4" onclick="togTrainDay(4)">Če</button>
+				<button class="goal-opt day-pick" data-day="5" onclick="togTrainDay(5)">Pe</button>
+				<button class="goal-opt day-pick" data-day="6" onclick="togTrainDay(6)">So</button>
+				<button class="goal-opt day-pick" data-day="0" onclick="togTrainDay(0)">Ne</button>
+			  </div>
+			</div>
+			<div class="goals-plan-summary" id="train-days-summary">—</div>
+		  </div>
 		</div>
-		<button onclick="closeGoals();openSplitPicker();" style="background:var(--w);color:var(--md);border:.5px solid var(--br);border-radius:999px;padding:8px 12px;font-size:12px;cursor:pointer;font-family:inherit;flex-shrink:0;">⚙ Uredi split</button>
-	  </div>
-	  <div class="modal-field">
-		<label>Frekvenca vadb / teden</label>
-		<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:8px;">
-		  <button class="goal-opt" id="freq-2" onclick="selFreq(2)">2×</button>
-		  <button class="goal-opt" id="freq-3" onclick="selFreq(3)">3×</button>
-		  <button class="goal-opt" id="freq-4" onclick="selFreq(4)">4×</button>
-		  <button class="goal-opt" id="freq-5" onclick="selFreq(5)">5×</button>
-		</div>
-	  </div>
-	  <div class="modal-field">
-		<label>Dnevi treningov <span style="font-weight:400;color:var(--lt);font-size:11px;">Če ne izbereš, predlagamo optimalne dneve.</span></label>
-		<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;">
-		  <button class="goal-opt day-pick" data-day="1" onclick="togTrainDay(1)">P</button>
-		  <button class="goal-opt day-pick" data-day="2" onclick="togTrainDay(2)">T</button>
-		  <button class="goal-opt day-pick" data-day="3" onclick="togTrainDay(3)">S</button>
-		  <button class="goal-opt day-pick" data-day="4" onclick="togTrainDay(4)">Č</button>
-		  <button class="goal-opt day-pick" data-day="5" onclick="togTrainDay(5)">P</button>
-		  <button class="goal-opt day-pick" data-day="6" onclick="togTrainDay(6)">S</button>
-		  <button class="goal-opt day-pick" data-day="0" onclick="togTrainDay(0)">N</button>
-		</div>
-		<div id="train-days-summary" style="font-size:11.5px;color:var(--lt);margin-top:6px;">—</div>
-	  </div>
-	</div>
 
-	<div style="display:flex;gap:8px;margin-top:4px;">
-	  <button onclick="closeGoals()" style="flex:0 0 auto;background:var(--bg);color:var(--md);border:.5px solid var(--br);border-radius:9px;padding:12px 18px;font-size:14px;cursor:pointer;font-family:inherit;">Zapri</button>
-	  <button class="modal-btn" id="goals-save-btn" style="flex:1;margin-top:0;" onclick="saveGoals()">Shrani →</button>
-	</div>
+		<div class="goals-plan-actions">
+		  <button class="goals-plan-cancel" onclick="closeGoals()">Zapri</button>
+		  <button class="modal-btn goals-plan-save" id="goals-save-btn" onclick="saveGoals()">Shrani →</button>
+		</div>
   </div>
 </div>
 
@@ -4223,12 +4245,14 @@ function openGoals(mode='profile'){
   show('goals-target-section',mode==='goal');
   show('goals-plan-section',mode==='plan');
 
+  const splitNameEl=document.getElementById('profile-split-name');
   const sumEl=document.getElementById('profile-split-summary');
-  if(sumEl){
+  if(splitNameEl||sumEl){
 	const sp=getSplit();
 	const splitName=SPLITS[sp.id]?.name||'Po meri';
 	const days=sp.days.map(d=>WT_LBL[d]||d).join(' · ');
-	sumEl.innerHTML=`<b style="color:var(--dk);">${splitName}</b><br><span style="font-size:11px;">${days}</span>`;
+	if(splitNameEl)splitNameEl.textContent=splitName;
+	if(sumEl)sumEl.textContent=days;
   }
   refreshFreqUI();
   refreshTrainDaysUI();
@@ -4309,7 +4333,10 @@ function refreshTrainDaysUI(){
   if(summary){
 	const labelsLong=['ned','pon','tor','sre','čet','pet','sob'];
 	const txt=days.slice().sort((a,b)=>((a+6)%7)-((b+6)%7)).map(d=>labelsLong[d]).join(', ');
-	summary.textContent=isAuto?`Predlagano: ${txt}`:`Izbrani: ${txt}`;
+	const spName=SPLITS[sp.id]?.name||'Po meri';
+	summary.innerHTML=isAuto
+	  ? `<b>${spName}</b> · ${sp.freq}x tedensko · predlagano: ${txt}`
+	  : `<b>${spName}</b> · ${sp.freq}x tedensko · izbrano: ${txt}`;
   }
 }
 
