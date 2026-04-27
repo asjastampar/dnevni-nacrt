@@ -338,9 +338,15 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .day-detail-empty{padding:22px 18px;text-align:center;color:var(--lt);font-size:13px;background:var(--w);border:.5px dashed var(--br);border-radius:14px;}
 .dde-day{font-size:14px;font-weight:600;color:var(--dk);margin-bottom:4px;}
 .dde-msg{font-size:12.5px;color:var(--lt);}
-.dd-head{margin-bottom:14px;}
+.dd-head{margin-bottom:14px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
 .dd-day{font-size:15px;font-weight:600;color:var(--dk);margin-bottom:6px;}
 .dd-pills{display:flex;flex-wrap:wrap;gap:6px;}
+.dd-edit-btn{background:none;border:.5px solid var(--br);color:var(--md);border-radius:999px;padding:6px 11px;font-size:11.5px;font-family:inherit;cursor:pointer;flex-shrink:0;transition:all .15s;}
+.dd-edit-btn:hover{background:var(--bg);color:var(--dk);border-color:var(--md);}
+/* Past day edit modal rows */
+.past-row{display:flex;align-items:flex-start;gap:9px;padding:8px 10px;background:var(--bg);border-radius:9px;cursor:pointer;font-size:13px;color:var(--dk);line-height:1.4;}
+.past-row input[type="checkbox"]{margin-top:3px;flex-shrink:0;width:16px;height:16px;cursor:pointer;accent-color:var(--grn);}
+.past-row span{flex:1;}
 .dd-section-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--lt);margin-top:14px;margin-bottom:8px;font-weight:500;}
 .dd-section-lbl:first-of-type{margin-top:8px;}
 .dd-empty{font-size:13px;color:var(--lt);padding:4px 0;}
@@ -992,16 +998,64 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 	  </div>
 	</div>
 	<div class="goals-calc" id="goals-calc"></div>
-	<div style="background:var(--bg);border-radius:9px;padding:11px 13px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+	<div style="background:var(--bg);border-radius:9px;padding:11px 13px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
 	  <div>
 		<div style="font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">Plan vadb</div>
 		<div style="font-size:13px;color:var(--md);" id="profile-split-summary">—</div>
 	  </div>
 	  <button onclick="closeGoals();openSplitPicker();" style="background:var(--w);color:var(--md);border:.5px solid var(--br);border-radius:9px;padding:8px 12px;font-size:12px;cursor:pointer;font-family:inherit;flex-shrink:0;">⚙ Uredi</button>
 	</div>
+
+	<div class="modal-field">
+	  <label>Frekvenca vadb / teden</label>
+	  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:8px;">
+		<button class="goal-opt" id="freq-2" onclick="selFreq(2)">2×</button>
+		<button class="goal-opt" id="freq-3" onclick="selFreq(3)">3×</button>
+		<button class="goal-opt" id="freq-4" onclick="selFreq(4)">4×</button>
+		<button class="goal-opt" id="freq-5" onclick="selFreq(5)">5×</button>
+	  </div>
+	</div>
+	<div class="modal-field">
+	  <label>Dnevi treningov <span style="font-weight:400;color:var(--lt);font-size:11px;">(neoznačeno = aplikacija predlaga)</span></label>
+	  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;">
+		<button class="goal-opt day-pick" data-day="1" onclick="togTrainDay(1)">P</button>
+		<button class="goal-opt day-pick" data-day="2" onclick="togTrainDay(2)">T</button>
+		<button class="goal-opt day-pick" data-day="3" onclick="togTrainDay(3)">S</button>
+		<button class="goal-opt day-pick" data-day="4" onclick="togTrainDay(4)">Č</button>
+		<button class="goal-opt day-pick" data-day="5" onclick="togTrainDay(5)">P</button>
+		<button class="goal-opt day-pick" data-day="6" onclick="togTrainDay(6)">S</button>
+		<button class="goal-opt day-pick" data-day="0" onclick="togTrainDay(0)">N</button>
+	  </div>
+	  <div id="train-days-summary" style="font-size:11.5px;color:var(--lt);margin-top:6px;">—</div>
+	</div>
+
 	<div style="display:flex;gap:8px;margin-top:4px;">
 	  <button onclick="closeGoals()" style="flex:0 0 auto;background:var(--bg);color:var(--md);border:.5px solid var(--br);border-radius:9px;padding:12px 18px;font-size:14px;cursor:pointer;font-family:inherit;">Zapri</button>
 	  <button class="modal-btn" style="flex:1;margin-top:0;" onclick="saveGoals()">Shrani profil →</button>
+	</div>
+  </div>
+</div>
+
+<!-- PAST DAY EDIT MODAL -->
+<div class="modal-overlay hide" id="past-day-overlay">
+  <div class="modal" style="max-width:480px;">
+	<button class="modal-close-x" onclick="closePastDayEdit()" aria-label="Zapri">✕</button>
+	<div class="modal-logo">Uredi <em>za nazaj</em></div>
+	<div class="modal-sub" id="past-day-sub">—</div>
+	<div style="background:var(--bg);border-radius:9px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--md);line-height:1.45;">
+	  Označi obroke in vaje, ki si jih dejansko naredila ta dan, čeprav jih takrat nisi vnesla. Brez panike — popravljanje za nazaj je normalno.
+	</div>
+	<div class="modal-field">
+	  <label>Obroki</label>
+	  <div id="past-day-meals" style="display:flex;flex-direction:column;gap:6px;"></div>
+	</div>
+	<div class="modal-field" id="past-day-ex-field">
+	  <label>Vaje</label>
+	  <div id="past-day-ex" style="display:flex;flex-direction:column;gap:6px;"></div>
+	</div>
+	<div style="display:flex;gap:8px;margin-top:4px;">
+	  <button onclick="closePastDayEdit()" style="flex:0 0 auto;background:var(--bg);color:var(--md);border:.5px solid var(--br);border-radius:9px;padding:12px 18px;font-size:14px;cursor:pointer;font-family:inherit;">Zapri</button>
+	  <button class="modal-btn" style="flex:1;margin-top:0;" onclick="savePastDayEdit()">Shrani spremembe →</button>
 	</div>
   </div>
 </div>
@@ -1396,23 +1450,123 @@ const SPLITS={
 };
 
 const SPLIT_KEY='workout_split';
+// Auto-suggested training days for each frequency (0=Sun, 1=Mon, ..., 6=Sat).
+// Designed to spread workouts across the week so we don't pile them up.
+const AUTO_TRAINING_DAYS={
+  2:[2,5],          // Tue, Fri
+  3:[1,3,5],        // Mon, Wed, Fri
+  4:[1,2,4,5],      // Mon, Tue, Thu, Fri
+  5:[1,2,3,4,5]     // Mon-Fri (5 in a row is intentional — that's what user picked)
+};
+// Returns the local YYYY-MM-DD of the Monday of the week containing `d`.
+function isoWeekMonday(d){
+  const m=new Date(d);m.setHours(0,0,0,0);
+  // JS: Sun=0, Mon=1; we want Monday-based week
+  const offset=(m.getDay()+6)%7;
+  m.setDate(m.getDate()-offset);
+  return localDateKey(m);
+}
 function getSplit(){
+  let sp=null;
   try{
 	const s=localStorage.getItem(lsKey(SPLIT_KEY));
-	if(s)return JSON.parse(s);
+	if(s)sp=JSON.parse(s);
   }catch(e){}
-  return {id:'glute_focus',days:SPLITS.glute_focus.days,position:0};
+  if(!sp)sp={id:'glute_focus',days:SPLITS.glute_focus.days,position:0};
+  // Backfill new fields for users who upgraded from the old model
+  if(typeof sp.freq!=='number')sp.freq=3;
+  if(!Array.isArray(sp.trainingDays))sp.trainingDays=null; // null = auto
+  if(typeof sp.weeklyDone!=='number')sp.weeklyDone=0;
+  if(!sp.weekStart)sp.weekStart=isoWeekMonday(now);
+  return sp;
 }
 function saveSplit(sp){
   try{localStorage.setItem(lsKey(SPLIT_KEY),JSON.stringify(sp));}catch(e){}
 }
-function nextWorkoutInSplit(){
-  const sp=getSplit();
-  return sp.days[sp.position%sp.days.length];
+// Resolve which days of the week are training days (returns array of 0..6).
+function getTrainingDays(sp){
+  sp=sp||getSplit();
+  if(Array.isArray(sp.trainingDays)&&sp.trainingDays.length)return sp.trainingDays.slice();
+  return (AUTO_TRAINING_DAYS[sp.freq]||AUTO_TRAINING_DAYS[3]).slice();
 }
+// Reset the weekly counter when crossing into a new ISO week.
+function ensureWeeklyReset(sp){
+  sp=sp||getSplit();
+  const thisWeek=isoWeekMonday(now);
+  if(sp.weekStart!==thisWeek){
+	sp.weekStart=thisWeek;
+	sp.weeklyDone=0;
+	saveSplit(sp);
+  }
+  return sp;
+}
+// Decide what workout to show today. Returns an object {wt, isMakeup}:
+//   wt = workout key ('upper','lower','full','glute','cardio','crossfit','rest')
+//   isMakeup = true if showing a missed workout from a previous planned day
+//
+// Rules:
+//  1) If today IS a planned training day and weekly quota not met → next in rotation
+//  2) If today is NOT a planned day BUT a recent planned day was missed (no
+//     workout done that day, within last 3 days) AND weekly quota not met
+//     → offer the missed workout as a makeup. The user can do it today
+//     instead of waiting for the next planned slot.
+//  3) Otherwise → 'rest'
+//
+// Note: position only advances inside markWorkoutDone(), so a missed planned
+// day naturally keeps the same workout queued up.
+function wasWorkoutDoneOnDay(dateStr){
+  // Returns true if user actually trained on the given date (any exercise
+  // checked OR explicit workoutDone flag).
+  try{
+	const t=localStorage.getItem(lsKey('track_'+dateStr));
+	if(t){
+	  const td=JSON.parse(t);
+	  if(Array.isArray(td.ed)&&td.ed.filter(Boolean).length>0)return true;
+	}
+	const p=localStorage.getItem(lsKey('dp_v6_'+dateStr));
+	if(p){
+	  const pd=JSON.parse(p);
+	  if(pd.workoutDone)return true;
+	}
+  }catch(e){}
+  return false;
+}
+function getTodaysWorkoutInfo(){
+  const sp=ensureWeeklyReset();
+  const dow=now.getDay();
+  const trainingDays=getTrainingDays(sp);
+  const isTrainingDay=trainingDays.includes(dow);
+  const quotaMet=sp.weeklyDone>=sp.freq;
+
+  if(quotaMet){
+	return {wt:'rest',isMakeup:false,quotaMet:true};
+  }
+  if(isTrainingDay){
+	return {wt:sp.days[sp.position%sp.days.length],isMakeup:false,quotaMet:false};
+  }
+  // Today not planned: check if a recent planned day was missed.
+  // Look back up to 3 days for a planned-but-untrained day.
+  // Stop scanning once we hit the start of the current week (Monday) — we
+  // don't carry workouts from last week into this week.
+  const weekStart=isoWeekMonday(now);
+  for(let i=1;i<=3;i++){
+	const d=new Date(now);d.setDate(now.getDate()-i);
+	const dKey=localDateKey(d);
+	if(dKey<weekStart)break; // crossed into previous week, stop
+	if(!trainingDays.includes(d.getDay()))continue; // wasn't a planned day
+	if(wasWorkoutDoneOnDay(dKey))continue; // they did train that day
+	// Found a missed planned day — offer the queued workout
+	return {wt:sp.days[sp.position%sp.days.length],isMakeup:true,quotaMet:false};
+  }
+  return {wt:'rest',isMakeup:false,quotaMet:false};
+}
+function getTodaysWorkout(){return getTodaysWorkoutInfo().wt;}
+// Legacy alias — kept so any older call site still works.
+function nextWorkoutInSplit(){return getTodaysWorkout();}
 function advanceSplit(){
-  const sp=getSplit();
+  const sp=ensureWeeklyReset();
   sp.position=(sp.position+1)%sp.days.length;
+  sp.weeklyDone=(sp.weeklyDone||0)+1;
   saveSplit(sp);
 }
 
@@ -1852,51 +2006,31 @@ async function initApp(){
   // Common init — runs whether data came from cloud or local
   if(!S.meals||!S.meals.length){initMeals();}
 
-  // ─── WORKOUT CARRY-OVER ─────────────────────────────────────
-  // The split position only ever advances inside markWorkoutDone(). If yesterday's
-  // saved state shows the position WAS advanced but the corresponding workout
-  // wasn't actually trained (no exercise checked, no explicit workoutDone flag),
-  // a previous bug or a stale Opravljeno-click rolled the rotation forward
-  // unjustifiably. Detect this and roll back so today shows yesterday's planned
-  // workout again until the user either trains it or manually changes it.
-  // Rest/cardio/crossfit are exempt — they have no per-exercise checklist.
-  let _carryOverApplied=false;
-  let _carryOverWt=null;
-  try{
-	const yest=new Date(now);yest.setDate(now.getDate()-1);
-	const yKey=localDateKey(yest);
-	let yTrack=null,yPlan=null;
-	try{const r=localStorage.getItem(lsKey('track_'+yKey));if(r)yTrack=JSON.parse(r);}catch(e){}
-	try{const r=localStorage.getItem(lsKey('dp_v6_'+yKey));if(r)yPlan=JSON.parse(r);}catch(e){}
-	const yWt=(yTrack&&yTrack.wt)||(yPlan&&yPlan.wt)||null;
-	const yEd=(yTrack&&Array.isArray(yTrack.ed))?yTrack.ed:((yPlan&&Array.isArray(yPlan.exd))?yPlan.exd:[]);
-	const yDone=yEd.filter(Boolean).length;
-	const yWasMarkedDone=!!(yPlan&&yPlan.workoutDone);
-	const isStrength=yWt&&yWt!=='rest'&&yWt!=='cardio'&&yWt!=='crossfit';
-	if(isStrength&&yDone===0&&!yWasMarkedDone){
-	  const sp=getSplit();
-	  const yPos=sp.days.indexOf(yWt);
-	  if(yPos>=0&&sp.position!==yPos){
-		sp.position=yPos;
-		saveSplit(sp);
-	  }
-	  // Carry-over also overrides today's S.wt — the unfinished workout takes
-	  // priority over whatever was loaded from a stale dp_v6 state.
-	  _carryOverApplied=true;
-	  _carryOverWt=yWt;
-	}
-  }catch(e){}
+  // ─── WORKOUT SCHEDULING + CARRY-OVER ─────────────────────────
+  // Resolve today's workout from the split + weekly schedule:
+  //   - On non-training days: 'rest' (recovery)
+  //   - When weekly quota already met: 'rest' (active rest)
+  //   - Otherwise: the next strength workout in the rotation
+  // Plus a carry-over rule: if yesterday WAS a planned training day and the
+  // user did NOT actually do the workout (no exercises checked, no explicit
+  // markWorkoutDone), the rotation does NOT advance — same workout reappears
+  // on the next planned day. This is enforced by simply not advancing inside
+  // markWorkoutDone() unless the user calls it themselves.
+  ensureWeeklyReset();
+  const todaysSchedule=getTodaysWorkout(); // 'rest' or strength type or cardio etc.
 
-  // Apply carry-over to current S.wt before falling through to split selection
-  if(_carryOverApplied&&_carryOverWt&&S.wt!==_carryOverWt){
-	S.wt=_carryOverWt;
-	S.ex=[];S.exd=[];      // force re-init from WKT for the new wt
+  // We override S.wt only when stale — otherwise respect a manual choice the
+  // user made earlier in the session (e.g. "Spremeni" picker).
+  const validWtList=['upper','lower','full','glute','cardio','crossfit','rest'];
+  const hasValidWt=validWtList.includes(S.wt);
+  // If it's a fresh day (no S.wt yet) OR the loaded S.wt doesn't match what
+  // the schedule says today should be AND the user hasn't manually flagged it,
+  // adopt the schedule's recommendation.
+  if(!hasValidWt||!S.wt||(!S.wtManual&&S.wt!==todaysSchedule)){
+	S.wt=todaysSchedule;
+	S.ex=[];S.exd=[];
 	S.workoutDone=false;
   }
-
-  // Set workout from split if no valid workout type yet (or it's the empty default 'rest')
-  const validWt=['upper','lower','full','glute','cardio','crossfit','rest'].includes(S.wt);
-  if(!validWt||!S.wt){S.wt=nextWorkoutInSplit();}
   if(!S.ex||(!S.ex.length&&S.wt!=='crossfit'&&S.wt!=='cardio'&&S.wt!=='rest')){initWorkout();}
 
   // Date display
@@ -2182,7 +2316,9 @@ let _customDays=null; // tracks edits while modal is open
 
 function renderNextUp(){
   const sp=getSplit();
-  const next=nextWorkoutInSplit();
+  const todayInfo=getTodaysWorkoutInfo();
+  const next=todayInfo.wt;
+  const isMakeup=todayInfo.isMakeup;
   const nextNext=sp.days[(sp.position+1)%sp.days.length];
   const el=document.getElementById('next-up');
   if(!el)return;
@@ -2200,12 +2336,36 @@ function renderNextUp(){
   const exDone=Array.isArray(S.exd)?S.exd.filter(Boolean).length:0;
 
   // ── Focus banner content depends on context ──
+  // Recovery suggestions used when a rest day appears (rotated by day-of-week
+  // so the message feels fresh).
+  const RECOVERY_TIPS=[
+	'Sprehod v naravi (30–45 min) odlično pomaga regeneraciji.',
+	'Lahka vožnja s kolesom ali plavanje — brez napora.',
+	'10 min mobilnosti / raztezanja — boki, hrbet, ramena.',
+	'Lahek joga ali pilates — fokus na dihanju.',
+	'Sprehod po hribu ali stopnicah — nizka intenzivnost.',
+	'Foam roller + raztezanje — telo ti bo hvaležno.',
+	'Aktivni počitek: 8000 korakov skozi dan zadošča.'
+  ];
+  function pickRecoveryTip(){
+	return RECOVERY_TIPS[now.getDay()%RECOVERY_TIPS.length];
+  }
   function getFocusBanner(){
 	if(isDone){
 	  return {cls:'fb-good',icon:'✓',title:'Trening opravljen',sub:'Odlično! Telo se zdaj regenerira.'};
 	}
 	if(showing==='rest'){
-	  return {cls:'fb-rest',icon:'😌',title:'Danes je počitek',sub:'Posveti čas regeneraciji. Lahka hoja ali raztezanje sta vedno dobrodošla.'};
+	  // Distinguish "weekly quota already met" from "this is a planned rest day"
+	  const sp=getSplit();
+	  const quotaMet=(sp.weeklyDone||0)>=sp.freq;
+	  if(quotaMet){
+		return {cls:'fb-good',icon:'🎉',title:`Tedenski plan opravljen (${sp.weeklyDone}/${sp.freq})`,sub:pickRecoveryTip()};
+	  }
+	  return {cls:'fb-rest',icon:'😌',title:'Danes je počitek',sub:pickRecoveryTip()};
+	}
+	// Makeup workout: today isn't a planned day but we're offering a missed one
+	if(isMakeup&&isOnPlan){
+	  return {cls:'fb-go',icon:'↺',title:'Nadomestni trening',sub:'Včerajšnja vadba ni bila opravljena. Lahko jo dohitiš danes — ali pa počakaš na naslednji načrtovan dan.'};
 	}
 	// Active strength/cardio/crossfit
 	if(exDone===0){
@@ -2250,6 +2410,7 @@ function renderNextUp(){
 		</div>
 		<div class="wo-overview-actions">
 		  <button class="next-up-btn" onclick="togBpManual()" title="Izberi drugo vadbo za danes">Spremeni</button>
+		  ${restMode?`<button class="next-up-btn" onclick="addExtraWorkout()" title="Dodaj bonus trening (ne moti tedenskega plana)">+ Bonus trening</button>`:''}
 		  ${showOpravljeno?`<button class="next-up-btn primary" onclick="markWorkoutDone()" title="Označi kot opravljeno in pojdi na naslednjo">✓ Opravljeno</button>`:''}
 		</div>
 	  </div>
@@ -2262,6 +2423,17 @@ function renderNextUp(){
 	  </div>
 	</div>
   `;
+}
+
+// Bonus / extra workout — user-initiated session that does NOT advance the
+// main split rotation and does NOT count toward the weekly quota. Useful when
+// the user wants to do something on a scheduled rest day or after meeting
+// quota. Marked with isExtraWorkout so markWorkoutDone() knows not to advance.
+function addExtraWorkout(){
+  // Open the body part picker; once the user selects, it'll be marked extra.
+  S.isExtraWorkout=true;
+  S.wtManual=true;
+  togBpManual();
 }
 
 function markWorkoutDone(){
@@ -2279,13 +2451,27 @@ function markWorkoutDone(){
 	if(typeof err==='function'){err('Najprej označi vsaj eno opravljeno vajo.');}
 	return;
   }
-  if(!confirm('Označiti vadbo kot opravljeno?\n\nNaslednji trening v planu se bo prikazal jutri.'))return;
-  // Advance the split position so TOMORROW shows the next workout.
-  // We DO NOT change today's S.wt — user can still see the workout they did.
-  advanceSplit();
-  // Mark today as completed (used by carry-over check across days)
-  S.workoutDone=true;save();
-  renderNextUp(); // update "Nato:" label
+  // Determine what message to show. If user already met weekly quota with this
+  // session, we're done for the week — flag that.
+  const sp=ensureWeeklyReset();
+  const willMeetQuota=(sp.weeklyDone+1)>=sp.freq;
+  const msg=willMeetQuota
+	? `Označiti vadbo kot opravljeno?\n\nS tem zaključiš tedenski plan (${sp.freq}/${sp.freq}). Do ponedeljka bom predlagal lahek razmig.`
+	: 'Označiti vadbo kot opravljeno?\n\nNaslednji trening v planu se bo prikazal naslednji načrtovan dan.';
+  if(!confirm(msg))return;
+  // Don't advance the split if this was a "extra" / bonus workout.
+  // Bonus workouts are flagged explicitly by addExtraWorkout() and should NOT
+  // affect the main rotation. They DO count toward weekly done? Per spec,
+  // extras are user-initiated and shouldn't disturb the plan — so we treat
+  // them as completely outside the rotation: no advance, no weeklyDone++.
+  if(!S.isExtraWorkout){
+	advanceSplit();          // moves position +1, weeklyDone +1
+  }
+  S.workoutDone=true;
+  S.wtManual=false;          // back to schedule-driven mode
+  S.isExtraWorkout=false;
+  save();
+  renderNextUp();
   // Brief visual confirmation
   const el=document.getElementById('next-up');
   if(el){
@@ -2407,7 +2593,13 @@ function renderBp(){
 	return `<button class="${cls}" onclick="selBp('${b.id}')">${b.l}</button>`;
   }).join('');
 }
-function selBp(id){S.wt=id;initWorkout();save();renderBp();renderWorkout();renderNextUp();renderTracker();}
+function selBp(id){
+  S.wt=id;
+  S.wtManual=true;          // user-picked → don't let schedule override on reload
+  S.workoutDone=false;
+  initWorkout();save();
+  renderBp();renderWorkout();renderNextUp();renderTracker();
+}
 
 // ─── RENDER MEALS ───────────────────────────────────────────
 function renderMeals(){
@@ -3258,10 +3450,11 @@ function renderDayDetail(key){
   c.innerHTML=`
 	<div class="day-detail-card">
 	  <div class="dd-head">
-		<div>
+		<div style="flex:1;">
 		  <div class="dd-day">${isToday?'Danes':dayName}, ${dateStr}</div>
 		  <div class="dd-pills">${pills.join('')}</div>
 		</div>
+		${!isToday?`<button class="dd-edit-btn" onclick="openPastDayEdit('${key}')" title="Označi za nazaj">✏ Uredi</button>`:''}
 	  </div>
 	  <div class="dd-section-lbl">Obroki</div>
 	  ${mealsHtml}
@@ -3768,6 +3961,9 @@ function openGoals(){
 	const days=sp.days.map(d=>WT_LBL[d]||d).join(' · ');
 	sumEl.innerHTML=`<b style="color:var(--dk);">${splitName}</b><br><span style="font-size:11px;">${days}</span>`;
   }
+  // Populate frequency + training day pickers
+  refreshFreqUI();
+  refreshTrainDaysUI();
   document.getElementById('goals-overlay').classList.remove('hide');
 }
 function closeGoals(){document.getElementById('goals-overlay').classList.add('hide');}
@@ -3781,6 +3977,50 @@ function saveGoals(){
   try{localStorage.setItem(lsKey('goals_seen'),'1');}catch(e){}
   closeGoals();
   calcKcal(); // refresh with new targets
+  // Frequency + training days are saved live by selFreq/togTrainDay, but
+  // re-render the workout overview now since today's wt may have changed.
+  if(typeof renderNextUp==='function')renderNextUp();
+  if(typeof renderTracker==='function')renderTracker();
+}
+
+function selFreq(n){
+  const sp=getSplit();
+  sp.freq=n;
+  saveSplit(sp);
+  refreshFreqUI();
+  refreshTrainDaysUI();
+}
+function togTrainDay(d){
+  const sp=getSplit();
+  // Initialize manual selection from current effective days if none yet
+  let cur=Array.isArray(sp.trainingDays)?sp.trainingDays.slice():getTrainingDays(sp).slice();
+  if(cur.includes(d)){cur=cur.filter(x=>x!==d);}else{cur.push(d);}
+  cur.sort((a,b)=>a-b);
+  sp.trainingDays=cur.length?cur:null; // empty selection → revert to auto
+  saveSplit(sp);
+  refreshTrainDaysUI();
+}
+function refreshFreqUI(){
+  const sp=getSplit();
+  [2,3,4,5].forEach(n=>{
+	const el=document.getElementById('freq-'+n);
+	if(el)el.classList.toggle('active',sp.freq===n);
+  });
+}
+function refreshTrainDaysUI(){
+  const sp=getSplit();
+  const days=getTrainingDays(sp);
+  const isAuto=!Array.isArray(sp.trainingDays)||!sp.trainingDays.length;
+  document.querySelectorAll('.day-pick').forEach(el=>{
+	const d=parseInt(el.dataset.day);
+	el.classList.toggle('active',days.includes(d));
+  });
+  const summary=document.getElementById('train-days-summary');
+  if(summary){
+	const labelsLong=['ned','pon','tor','sre','čet','pet','sob'];
+	const txt=days.slice().sort((a,b)=>((a+6)%7)-((b+6)%7)).map(d=>labelsLong[d]).join(', ');
+	summary.textContent=isAuto?`Predlagano: ${txt}`:`Izbrani: ${txt}`;
+  }
 }
 
 // Add event listeners to recalculate on input change
@@ -4013,6 +4253,95 @@ function togHist(key){
 // replaced by the click-to-expand day detail panel inside the weekly tracker.
 // Kept as a no-op stub in case any code path still calls it.
 function renderHistory(){}
+
+// ─── PAST DAY EDIT (mark items retroactively) ─────────────────
+let _pastDayKey=null;
+let _pastDayPlan=null;
+let _pastDayTrack=null;
+
+function openPastDayEdit(key){
+  _pastDayKey=key;
+  // Load plan + track for the day
+  let plan=null,track=null;
+  try{const s=localStorage.getItem(lsKey('dp_v6_'+key));if(s)plan=JSON.parse(s);}catch(e){}
+  try{const s=localStorage.getItem(lsKey('track_'+key));if(s)track=JSON.parse(s);}catch(e){}
+  _pastDayPlan=plan;
+  _pastDayTrack=track||{md:[false,false,false,false,false],ed:[],wt:plan?plan.wt:'rest'};
+
+  // Header
+  const d=new Date(key+'T12:00:00');
+  const dayName=SLD[d.getDay()];
+  const dateStr=d.getDate()+'. '+SLM[d.getMonth()];
+  document.getElementById('past-day-sub').textContent=`${dayName}, ${dateStr}`;
+
+  // Meals: render from plan, allow toggling md
+  const mealsEl=document.getElementById('past-day-meals');
+  if(plan&&Array.isArray(plan.meals)&&plan.meals.length){
+	const md=Array.isArray(_pastDayTrack.md)?_pastDayTrack.md:[];
+	mealsEl.innerHTML=plan.meals.map((m,i)=>{
+	  const checked=md[i]?'checked':'';
+	  const lbl=(m.f||m.food||'').replace(/"/g,'&quot;');
+	  const k=parseInt(m.k||m.kcal)||0;
+	  return `<label class="past-row"><input type="checkbox" data-mi="${i}" ${checked}><span><b>${m.label||LBLS[i]||'Obrok'}</b><br><span style="font-size:11.5px;color:var(--lt);">${lbl} — ~${k} kcal</span></span></label>`;
+	}).join('');
+  } else {
+	mealsEl.innerHTML='<div style="font-size:13px;color:var(--lt);">Za ta dan ni shranjenega jedilnika.</div>';
+  }
+
+  // Exercises: render from plan, allow toggling ed
+  const exEl=document.getElementById('past-day-ex');
+  const exField=document.getElementById('past-day-ex-field');
+  const wt=_pastDayTrack.wt||(plan&&plan.wt)||'rest';
+  if(wt==='rest'||!plan||!Array.isArray(plan.ex)||!plan.ex.length){
+	exField.style.display='none';
+  } else {
+	exField.style.display='block';
+	const ed=Array.isArray(_pastDayTrack.ed)?_pastDayTrack.ed:[];
+	exEl.innerHTML=plan.ex.map((e,i)=>{
+	  const checked=ed[i]?'checked':'';
+	  return `<label class="past-row"><input type="checkbox" data-ei="${i}" ${checked}><span>${e.n||e.name||'Vaja'}</span></label>`;
+	}).join('');
+  }
+  document.getElementById('past-day-overlay').classList.remove('hide');
+}
+
+function closePastDayEdit(){
+  document.getElementById('past-day-overlay').classList.add('hide');
+  _pastDayKey=null;_pastDayPlan=null;_pastDayTrack=null;
+}
+
+function savePastDayEdit(){
+  if(!_pastDayKey)return;
+  // Read all checkboxes
+  const md=Array.isArray(_pastDayTrack.md)?_pastDayTrack.md.slice():[false,false,false,false,false];
+  document.querySelectorAll('#past-day-meals input[type="checkbox"]').forEach(cb=>{
+	const i=parseInt(cb.dataset.mi);
+	md[i]=cb.checked;
+  });
+  const ed=Array.isArray(_pastDayTrack.ed)?_pastDayTrack.ed.slice():[];
+  document.querySelectorAll('#past-day-ex input[type="checkbox"]').forEach(cb=>{
+	const i=parseInt(cb.dataset.ei);
+	ed[i]=cb.checked;
+  });
+  // Recompute kcalEaten from updated md + plan meals + plan extras
+  let kcalEaten=0;
+  if(_pastDayPlan&&Array.isArray(_pastDayPlan.meals)){
+	kcalEaten+=_pastDayPlan.meals.reduce((s,m,i)=>s+(md[i]?(parseInt(m.k||m.kcal)||0):0),0);
+  }
+  if(_pastDayPlan&&Array.isArray(_pastDayPlan.extras)){
+	kcalEaten+=_pastDayPlan.extras.reduce((s,e)=>s+(e&&e.done?(parseInt(e.k)||0):0),0);
+  }
+  // Build updated track
+  const wt=_pastDayTrack.wt||'rest';
+  const updatedTrack={
+	md,ed,wt,kcalEaten,
+	extras:Array.isArray(_pastDayPlan&&_pastDayPlan.extras)?_pastDayPlan.extras.filter(e=>e&&e.done).map(e=>({f:e.f,k:parseInt(e.k)||0})):[]
+  };
+  try{localStorage.setItem(lsKey('track_'+_pastDayKey),JSON.stringify(updatedTrack));}catch(e){}
+  closePastDayEdit();
+  // Re-render the day detail card + tracker rings
+  if(typeof renderTracker==='function')renderTracker();
+}
 
 // ─── INIT called from initApp() above ────────────────────────
 </script>
