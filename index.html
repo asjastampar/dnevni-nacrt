@@ -1853,36 +1853,31 @@ async function initApp(){
   if(!S.meals||!S.meals.length){initMeals();}
 
   // ─── WORKOUT CARRY-OVER ─────────────────────────────────────
-  // If yesterday had a planned strength workout that the user did NOT actually
-  // do (no exercise was checked off), the split position may have been
-  // advanced by a stale state or a previous bug. Roll it back so today shows
-  // the same workout again — until the user either does it or chooses to skip.
-  // Rest, cardio and crossfit are skipped from this check since they don't
-  // have a per-exercise checklist.
+  // The split position only ever advances inside markWorkoutDone(). If yesterday's
+  // saved state shows the position WAS advanced but the corresponding workout
+  // wasn't actually trained (no exercise checked, no explicit workoutDone flag),
+  // a previous bug or a stale Opravljeno-click rolled the rotation forward
+  // unjustifiably. Detect this and roll back so today shows yesterday's planned
+  // workout again until the user either trains it or manually changes it.
+  // Rest/cardio/crossfit are exempt — they have no per-exercise checklist.
   try{
 	const yest=new Date(now);yest.setDate(now.getDate()-1);
 	const yKey=localDateKey(yest);
-	const yTrackRaw=localStorage.getItem(lsKey('track_'+yKey));
-	const yPlanRaw=localStorage.getItem(lsKey('dp_v6_'+yKey));
-	if(yTrackRaw&&yPlanRaw){
-	  const yTrack=JSON.parse(yTrackRaw);
-	  const yPlan=JSON.parse(yPlanRaw);
-	  const yWt=yTrack.wt;
-	  const yEd=Array.isArray(yTrack.ed)?yTrack.ed:[];
-	  const yDone=yEd.filter(Boolean).length;
-	  const isStrength=yWt&&yWt!=='rest'&&yWt!=='cardio'&&yWt!=='crossfit';
-	  // Mark "not done" only if: strength day, exists in plan, no exercise checked,
-	  // AND yesterday's saved S did NOT mark workoutDone explicitly.
-	  const yWasMarkedDone=!!(yPlan&&yPlan.workoutDone);
-	  if(isStrength&&yDone===0&&!yWasMarkedDone){
-		// Find yWt's position in the split. If the current split position is
-		// past it (i.e. yesterday's workout was skipped over), reset to it.
-		const sp=getSplit();
-		const yPos=sp.days.indexOf(yWt);
-		if(yPos>=0&&sp.position!==yPos){
-		  sp.position=yPos;
-		  saveSplit(sp);
-		}
+	let yTrack=null,yPlan=null;
+	try{const r=localStorage.getItem(lsKey('track_'+yKey));if(r)yTrack=JSON.parse(r);}catch(e){}
+	try{const r=localStorage.getItem(lsKey('dp_v6_'+yKey));if(r)yPlan=JSON.parse(r);}catch(e){}
+	// We need yesterday's planned workout type. Prefer track.wt, fall back to plan.wt.
+	const yWt=(yTrack&&yTrack.wt)||(yPlan&&yPlan.wt)||null;
+	const yEd=(yTrack&&Array.isArray(yTrack.ed))?yTrack.ed:((yPlan&&Array.isArray(yPlan.exd))?yPlan.exd:[]);
+	const yDone=yEd.filter(Boolean).length;
+	const yWasMarkedDone=!!(yPlan&&yPlan.workoutDone);
+	const isStrength=yWt&&yWt!=='rest'&&yWt!=='cardio'&&yWt!=='crossfit';
+	if(isStrength&&yDone===0&&!yWasMarkedDone){
+	  const sp=getSplit();
+	  const yPos=sp.days.indexOf(yWt);
+	  if(yPos>=0&&sp.position!==yPos){
+		sp.position=yPos;
+		saveSplit(sp);
 	  }
 	}
   }catch(e){}
@@ -3195,20 +3190,30 @@ function renderDayDetail(key){
   const eatenMeals=plan&&plan.meals?plan.meals.filter((_,i)=>md[i]).map(m=>({food:m.f||m.food||'',kcal:parseInt(m.k||m.kcal)||0})):[];
   // If we're looking at TODAY, recompute live from S so changes since the last
   // save are reflected. For past days, prefer the persisted kcalEaten (which
-  // includes "Dodaj obrok" extras), and fall back to the plan-based sum for
+  // includes "Dodaj obrok" extras), and fall back to plan + plan.extras for
   // legacy track records that didn't store kcalEaten.
+  // (plan.extras = the full S.extras array saved that day inside dp_v6_DATE.)
+  const planExtras=Array.isArray(plan&&plan.extras)?plan.extras.filter(e=>e&&e.done).map(e=>({f:e.f||'',k:parseInt(e.k)||0})):[];
   let totalKcal;
   if(isToday){
 	const planEaten=eatenMeals.reduce((s,m)=>s+m.kcal,0);
 	const extrasEaten=(S.extras||[]).reduce((s,e)=>s+(e&&e.done?(parseInt(e.k)||0):0),0);
 	totalKcal=planEaten+extrasEaten;
+  } else if(typeof track.kcalEaten==='number'){
+	totalKcal=track.kcalEaten;
   } else {
-	totalKcal=(typeof track.kcalEaten==='number')?track.kcalEaten:eatenMeals.reduce((s,m)=>s+m.kcal,0);
+	// Legacy day: rebuild from plan meals + plan.extras
+	const planEaten=eatenMeals.reduce((s,m)=>s+m.kcal,0);
+	const xtra=planExtras.reduce((s,e)=>s+e.k,0);
+	totalKcal=planEaten+xtra;
   }
   // Combine plan meals + logged extras for the meal listing in past-day cards.
+  // Source of extras: today=live S.extras; past=track.extras (new) or plan.extras (legacy).
   const extrasList=isToday
 	?(S.extras||[]).filter(e=>e&&e.done).map(e=>({food:e.f||'',kcal:parseInt(e.k)||0,extra:true}))
-	:(Array.isArray(track.extras)?track.extras.map(e=>({food:e.f||'',kcal:parseInt(e.k)||0,extra:true})):[]);
+	:(Array.isArray(track.extras)&&track.extras.length
+	  ?track.extras.map(e=>({food:e.f||'',kcal:parseInt(e.k)||0,extra:true}))
+	  :planExtras.map(e=>({food:e.f||'',kcal:e.k,extra:true})));
   const allMeals=[...eatenMeals,...extrasList];
   const doneEx=plan&&plan.ex?plan.ex.filter((_,i)=>ed[i]).map(e=>({n:e.n,log:exlog[e.n]||null})):[];
   const wtLabel=(WKT_LABELS&&WKT_LABELS[wt])||wt;
@@ -3988,4 +3993,3 @@ function renderHistory(){}
 </script>
 </body>
 </html>
-
