@@ -4983,6 +4983,17 @@ function offlineApi(sys,msg){
     while(plan.length<5)plan.push(buildOfflineMeal(`Predlog ${plan.length+1}`,320+plan.length*20));
     return JSON.stringify(plan.slice(0,5));
   }
+  if(/Sestavi SAMO preostale obroke/i.test(prompt)){
+    const labelsMatch=(prompt.match(/Natančni sloti in želene kalorije:\s*([^.]*)\./i)||[])[1]||'';
+    const pairs=labelsMatch.split(';').map(x=>x.trim()).filter(Boolean);
+    const items=pairs.map((pair,idx)=>{
+      const label=((pair.match(/^([^:]+):/)||[])[1]||LBLS[idx]||'Obrok').trim();
+      const kcal=parseInt((pair.match(/~(\d+)\s*kcal/i)||[])[1])||320+(idx*40);
+      const idea=buildOfflineMeal(`${label}: ${getOfflineMealPlan()[idx%getOfflineMealPlan().length].f}`,kcal);
+      return {f:idea.f.replace(/^.*?:\s*/,''),k:kcal,i:idea.i};
+    });
+    return JSON.stringify(items);
+  }
   if(/Izračunaj kalorije za/.test(prompt)){
     const name=extractFirstQuotedText(msg)||'Obrok po meri';
     return JSON.stringify(buildOfflineMeal(name));
@@ -5045,6 +5056,156 @@ async function api(sys,msg){
     clearTimeout(timer);
   }
 }
+
+function getRemainingKcalBudget(){
+  const goalKcal=calcGoalKcal();
+  if(!goalKcal)return null;
+  const eatenPlanned=S.meals.reduce((s,m,idx)=>s+(S.md[idx]?(parseInt(m.k||m.kcal)||0):0),0);
+  const eatenExtras=(S.extras||[]).reduce((s,e)=>s+(e&&e.done?(parseInt(e.k)||0):0),0);
+  const burned=(typeof calcExBurn==='function'?calcExBurn():0)+(typeof stepsKcal==='function'?stepsKcal(ST&&ST.val||0):0);
+  return Math.round(goalKcal+burned-eatenPlanned-eatenExtras);
+}
+
+function getUnfinishedMealIndices(){
+  return (S.meals||[]).map((m,i)=>S.md[i]?null:i).filter(i=>i!==null);
+}
+
+function mealLabelWeight(label){
+  const base=baseMealLabel(label||'');
+  if(base==='Zajtrk')return 0.24;
+  if(base==='Dopoldanski prigrizek')return 0.12;
+  if(base==='Kosilo')return 0.30;
+  if(base==='Popoldanski prigrizek')return 0.12;
+  if(base==='Večerja')return 0.22;
+  return 0.18;
+}
+
+function normalizeAmountString(amount){
+  return String(amount||'')
+    .replace(/½/g,'0.5')
+    .replace(/¼/g,'0.25')
+    .replace(/¾/g,'0.75')
+    .replace(/,/g,'.');
+}
+
+function pickIngredientProfile(name){
+  const n=String(name||'').toLowerCase();
+  const profiles=[
+    {re:/whey|protein/i,p:80,c:10,f:7,unitG:30},
+    {re:/piščan|piscan|puran/i,p:23,c:0,f:2.5,unitG:140},
+    {re:/tuna|tunina/i,p:24,c:0,f:7,unitG:120},
+    {re:/losos|salmon/i,p:22,c:0,f:13,unitG:150},
+    {re:/riba|lignj/i,p:20,c:1,f:5,unitG:150},
+    {re:/jajc|beljak|rumenjak/i,p:13,c:1,f:11,unitG:55},
+    {re:/skyr/i,p:11,c:4,f:0.3,unitG:170},
+    {re:/gršk|grski jogurt|jogurt|kefir/i,p:8,c:5,f:3,unitG:170},
+    {re:/skuta|cottage/i,p:12,c:3,f:4,unitG:150},
+    {re:/sir|gouda|brie|parmezan|feta/i,p:24,c:2,f:28,unitG:30},
+    {re:/tofu/i,p:15,c:3,f:9,unitG:150},
+    {re:/riž|riz|rizi-bizi/i,p:7,c:78,f:1,unitG:70},
+    {re:/testenin|penne|špaget|spaget/i,p:13,c:75,f:2,unitG:80},
+    {re:/ovseni|kosmiči|kosmici|kaša|kasa/i,p:13,c:60,f:7,unitG:60},
+    {re:/kruh|toast|tortil|kreker|rižev toast|rizev toast/i,p:9,c:52,f:5,unitG:50},
+    {re:/krompir|polenta/i,p:2,c:18,f:0.2,unitG:180},
+    {re:/ajda|quinoa/i,p:13,c:64,f:6,unitG:70},
+    {re:/fižol|fizol|čičer|cicer|leč|lec/i,p:8,c:20,f:2,unitG:150},
+    {re:/banana|jabol|hrušk|bresk|jagod|borovnic|malin|sadje|mango|pomaran/i,p:1,c:14,f:0.3,unitG:120},
+    {re:/avokado/i,p:2,c:9,f:15,unitG:70},
+    {re:/oreh|orešč|oresc|mandlj/i,p:18,c:14,f:55,unitG:25},
+    {re:/olivno olje|olje|maslo/i,p:0,c:0,f:100,unitG:10},
+    {re:/mleko|mandljevo mleko/i,p:3.4,c:5,f:1.5,unitG:200},
+    {re:/hummus/i,p:8,c:14,f:10,unitG:40},
+    {re:/zelenjav|solat|kumar|paradiž|paradiz|paprik|brokol|bučk|buck|špina|spinac|rukol|rukola|blitv|gob/i,p:1.8,c:5,f:0.3,unitG:120}
+  ];
+  return profiles.find(p=>p.re.test(n))||null;
+}
+
+function parseAmountToGrams(amount,name){
+  const txt=normalizeAmountString(amount);
+  const profile=pickIngredientProfile(name)||{};
+  const paren=(txt.match(/\(([\d.]+)\s*g\)/i)||[])[1];
+  if(paren)return parseFloat(paren);
+  const g=(txt.match(/([\d.]+)\s*g\b/i)||[])[1];
+  if(g)return parseFloat(g);
+  const kg=(txt.match(/([\d.]+)\s*kg\b/i)||[])[1];
+  if(kg)return parseFloat(kg)*1000;
+  const ml=(txt.match(/([\d.]+)\s*ml\b/i)||[])[1];
+  if(ml)return parseFloat(ml);
+  const spoon=(txt.match(/([\d.]+)\s*(?:žlica|zlica)/i)||[])[1];
+  if(spoon)return parseFloat(spoon)*15;
+  const tsp=(txt.match(/([\d.]+)\s*(?:žlička|zlicka)/i)||[])[1];
+  if(tsp)return parseFloat(tsp)*5;
+  const slice=(txt.match(/([\d.]+)\s*(?:rezini|rezina)/i)||[])[1];
+  if(slice)return parseFloat(slice)*(profile.unitG||25);
+  const piece=(txt.match(/([\d.]+)\s*(?:kos|kosa|kom)/i)||[])[1];
+  if(piece)return parseFloat(piece)*(profile.unitG||60);
+  const clove=(txt.match(/([\d.]+)\s*(?:strok|stroka)/i)||[])[1];
+  if(clove)return parseFloat(clove)*5;
+  return profile.unitG||100;
+}
+
+function estimateMacrosFromMeal(mealOrName,kcalMaybe,ingredientsMaybe){
+  const meal=(typeof mealOrName==='object'&&mealOrName)?mealOrName:{f:mealOrName,k:kcalMaybe,i:ingredientsMaybe};
+  const declaredKcal=parseInt(meal.k||meal.kcal)||0;
+  const ingredients=Array.isArray(meal.i)?meal.i:[];
+  if(ingredients.length){
+    let p=0,c=0,f=0;
+    ingredients.forEach(it=>{
+      const prof=pickIngredientProfile(it.n);
+      if(!prof)return;
+      const grams=parseAmountToGrams(it.a,it.n);
+      const factor=(grams||0)/100;
+      p+=prof.p*factor;
+      c+=prof.c*factor;
+      f+=prof.f*factor;
+    });
+    const rawKcal=p*4+c*4+f*9;
+    if(rawKcal>0&&declaredKcal>0){
+      const scale=Math.max(0.6,Math.min(1.6,declaredKcal/rawKcal));
+      p*=scale;c*=scale;f*=scale;
+    }
+    if((p+c+f)>0)return {p:Math.round(p),c:Math.round(c),f:Math.round(f)};
+  }
+  return estimateMacros(meal.f||meal.food||'',declaredKcal||kcalMaybe||0);
+}
+
+function computePerMealMacroTargets(i){
+  const rem=getRemainingMacros(i);
+  if(!rem)return null;
+  let otherP=0,otherC=0,otherF=0;
+  S.meals.forEach((m,idx)=>{
+    if(idx===i)return;
+    if(S.md[idx])return;
+    const est=estimateMacrosFromMeal(m);
+    otherP+=est.p;otherC+=est.c;otherF+=est.f;
+  });
+  return {
+    p:Math.max(0,Math.round(rem.p-otherP)),
+    c:Math.max(0,Math.round(rem.c-otherC)),
+    f:Math.max(0,Math.round(rem.f-otherF))
+  };
+}
+
+function distributeRemainingKcalAcrossMeals(indices){
+  const totalRemaining=getRemainingKcalBudget();
+  if(totalRemaining===null||!Array.isArray(indices)||!indices.length)return [];
+  let weights=indices.map(i=>parseInt(S.meals[i]?.k||S.meals[i]?.kcal)||0);
+  let weightSum=weights.reduce((s,v)=>s+Math.max(0,v),0);
+  if(weightSum<=0){
+    weights=indices.map(i=>mealLabelWeight(S.meals[i]?.label||LBLS[i]));
+    weightSum=weights.reduce((s,v)=>s+v,0);
+  }
+  return indices.map((mealIdx,pos)=>{
+    const share=weightSum>0?weights[pos]/weightSum:1/indices.length;
+    const raw=Math.round(totalRemaining*share);
+    return {
+      idx:mealIdx,
+      label:S.meals[mealIdx]?.label||LBLS[mealIdx]||'Obrok',
+      kcal:Math.max(150,Math.min(1200,raw))
+    };
+  });
+}
+
 // ─── MACRO-AWARE MEAL REFRESH ────────────────────────────────
 // Calculate remaining macros for today (target - eaten + extras eaten)
 // Excludes the meal at index `excludeIdx` so we know what's left WITHOUT counting
@@ -5056,14 +5217,12 @@ function getRemainingMacros(excludeIdx){
   S.meals.forEach((m,i)=>{
 	if(i===excludeIdx)return; // skip the meal being replaced
 	if(!S.md[i])return;       // only count eaten meals
-	const kcal=parseInt(m.k||m.kcal)||0;
-	const est=estimateMacros(m.f||m.food||'',kcal);
+	const est=estimateMacrosFromMeal(m);
 	eatenP+=est.p;eatenC+=est.c;eatenF+=est.f;
   });
   (S.extras||[]).forEach(e=>{
 	if(!e.done)return;
-	const kcal=parseInt(e.k)||0;
-	const est=estimateMacros(e.f||'',kcal);
+	const est=estimateMacrosFromMeal(e);
 	eatenP+=est.p;eatenC+=est.c;eatenF+=est.f;
   });
   return {
@@ -5081,6 +5240,7 @@ function getRemainingMacros(excludeIdx){
 function getMacroAwareMealSuggestion(mealIdx){
   const rem=getRemainingMacros(mealIdx);
   if(!rem)return {bias:'balanced',prompt:''};
+  const perMeal=computePerMealMacroTargets(mealIdx);
 
   // How many unfinished planned meals are left including this one?
   const remainingMealCount=S.meals.filter((m,i)=>i===mealIdx||!S.md[i]).length;
@@ -5096,7 +5256,7 @@ function getMacroAwareMealSuggestion(mealIdx){
   if(isLastUnfinished&&pPct<0.7){
 	return {
 	  bias:'last_meal_protein',
-	  prompt:`POMEMBNO: To je zadnji obrok za danes. Uporabnica še potrebuje ~${Math.max(0,Math.round(rem.p))}g beljakovin do dnevnega cilja (${targets.p}g). Predlagaj jed z visoko vsebnostjo beljakovin (vsaj 25-35g). Izogni se jedem brez mesa/skute/jajc/whey-a.`
+	  prompt:`POMEMBNO: To je zadnji obrok za danes. Uporabnica še potrebuje približno ${Math.max(0,Math.round(rem.p))}g beljakovin, ${Math.max(0,Math.round(rem.c))}g OH in ${Math.max(0,Math.round(rem.f))}g maščob do dnevnega cilja. Predlagaj jed z visoko vsebnostjo beljakovin (vsaj 25-35g). Izogni se jedem brez mesa/skute/jajc/whey-a.`
 	};
   }
 
@@ -5122,12 +5282,21 @@ function getMacroAwareMealSuggestion(mealIdx){
   if(pPct<0.5&&rem.p>20){
 	return {
 	  bias:'protein',
-	  prompt:`POMEMBNO: Uporabnica je v deficitu beljakovin (zaužila ${rem.eaten.p}g od ${targets.p}g cilja). Predlagaj jed z visoko vsebnostjo beljakovin (piščanec, tuna, skuta, jajca, whey, losos, skyr).`
+	  prompt:`POMEMBNO: Uporabnica je v deficitu beljakovin (zaužila ${rem.eaten.p}g od ${targets.p}g cilja). Predlagaj jed z visoko vsebnostjo beljakovin (piščanec, tuna, skuta, jajca, whey, losos, skyr). Cilj za ta obrok naj bo približno ${Math.max(20,Math.round(perMeal?.p||0))}g beljakovin.`
 	};
   }
 
   // Default — balanced
-  return {bias:'balanced',prompt:''};
+  const targetBits=[];
+  if(perMeal){
+    if(perMeal.p>0)targetBits.push(`${perMeal.p}g beljakovin`);
+    if(perMeal.c>0)targetBits.push(`${perMeal.c}g OH`);
+    if(perMeal.f>0)targetBits.push(`${perMeal.f}g maščob`);
+  }
+  return {
+    bias:'balanced',
+    prompt:targetBits.length?`Makro cilj za ta obrok naj bo približno: ${targetBits.join(', ')}. Ni treba zadeti popolno, naj pa gre obrok v to smer.`:''
+  };
 }
 
 // Compute the kcal target an AI-suggested meal should hit when swapping.
@@ -5173,6 +5342,7 @@ async function swapMeal(i,opts={}){
   const lfc=dietPrompt()+' '+avoidPrompt();
   const pantry=mealPantryPrompt(i);
   const macroHint=getMacroAwareMealSuggestion(i);
+  const macroTargets=computePerMealMacroTargets(i);
   // Target kcal = how much of the daily budget should this single swapped
   // meal cover. Reflects exercise burn + already-eaten + reserved for other
   // unfinished planned meals. If budget can't be computed, fall back to old
@@ -5181,8 +5351,9 @@ async function swapMeal(i,opts={}){
   const fallbackKcal=parseInt(S.meals[i].k||S.meals[i].kcal)||400;
   const kcalForPrompt=targetKcal||fallbackKcal;
   const kcalRule=`Kalorična vrednost naj bo ČIM BLIŽJE ${kcalForPrompt} kcal (±70 kcal). NE 400 kcal default — uporabnica ima prav to število proste kalorične luknje za ta obrok.`;
+  const macroRule=macroTargets?`Makro cilj za ta obrok: približno ${macroTargets.p}g beljakovin, ${macroTargets.c}g OH in ${macroTargets.f}g maščob. To uporabi kot smer, ne kot absolutno pravilo.`:'';
   try{
-	const txt=await api(`Si prehranjevalni svetovalec. Zamenjaj obrok. ${ez} ${lfc} ${pantry} ${macroHint.prompt} ${kcalRule} Vrni SAMO JSON: {"f":"opis v slovenščini","k":${kcalForPrompt},"i":[{"n":"sestavina","a":"100 g"}]}`,
+	const txt=await api(`Si prehranjevalni svetovalec. Zamenjaj obrok. ${ez} ${lfc} ${pantry} ${macroHint.prompt} ${macroRule} ${kcalRule} Vrni SAMO JSON: {"f":"opis v slovenščini","k":${kcalForPrompt},"i":[{"n":"sestavina","a":"100 g"}]}`,
 	  `Zamenjaj ${S.meals[i].label.toLowerCase()}: "${S.meals[i].f||S.meals[i].food}" (trenutno ~${fallbackKcal} kcal, ampak nov obrok naj bo ~${kcalForPrompt} kcal). Upoštevaj prehranske posebnosti: ${dietPrompt()} ${pantry} Drugačna alternativa z gramaturami.`);
 	const p=JSON.parse(txt);
 	S.meals[i]={...S.meals[i],...p};save();renderMeals();
@@ -5357,28 +5528,41 @@ async function refreshMeals(){
   const btn=document.getElementById('bam');btn.disabled=true;btn.innerHTML='<span class="spin">↺</span> Generiram...';
   const ez=S.easy?'Hiter in enostaven jedilnik (konzerve, jajca, whey shake, pečena kura iz pekarne, mikrovalovna). Brez kompleksnega kuhanja.':'';
   const lfc=dietPrompt()+' '+avoidPrompt();
-  const goalKcalTarget=calcGoalKcal()||1600;
+  const unfinished=getUnfinishedMealIndices();
+  if(!unfinished.length){
+    btn.disabled=false;btn.innerHTML='↺ Zamenjaj vse';
+    return;
+  }
+  const remainingKcal=Math.max(0,getRemainingKcalBudget()||0);
+  const macroLeft=getRemainingMacros();
+  const mealTargets=distributeRemainingKcalAcrossMeals(unfinished);
+  const slotGuide=mealTargets.map(x=>`${x.label}: ~${x.kcal} kcal`).join('; ');
+  const totalMacroGuide=macroLeft
+    ? `Za preostanek dneva uporabnica še potrebuje približno ${Math.max(0,Math.round(macroLeft.p))}g beljakovin, ${Math.max(0,Math.round(macroLeft.c))}g OH in ${Math.max(0,Math.round(macroLeft.f))}g maščob. To razporedi smiselno čez vse preostale obroke.`
+    : '';
   try{
-	const txt=await api(`Si prehranjevalni svetovalec. ${ez} ${lfc} Sestavi dnevni jedilnik ~${goalKcalTarget} kcal za žensko ki želi ${G.goal==='lose'?'shujšati':G.goal==='gain'?'pridobiti mišice':'vzdrževati težo'}. Vrni SAMO veljavni JSON array s 5 elementi. Vsak element mora imeti: "f" = konkretno ime jedi v slovenščini, ne generično "zajtrk", "kosilo", "večerja", "prigrizek"; "k" = kalorije; "i" = seznam sestavin z gramaturami. Format: [{"f":"Skyr z ovsenimi kosmiči, borovnicami in mandlji","k":360,"i":[{"n":"Skyr navadni","a":"170 g"}]}]. Ne uporabljaj generičnih imen obrokov kot naslov jedi.`,
-	  'Svež raznovrsten jedilnik za danes z natančnimi gramaturami.');
+	const txt=await api(`Si prehranjevalni svetovalec. ${ez} ${lfc} Sestavi SAMO preostale obroke za današnji plan. Ne sestavljaj novega celega dneva. Upoštevaj, da so nekateri obroki že pojedeni in jih ne spreminjamo. Za preostale obroke je na voljo približno ${remainingKcal} kcal skupaj. ${totalMacroGuide} Natančni sloti in želene kalorije: ${slotGuide}. Vrni SAMO veljavni JSON array s ${unfinished.length} elementi v ISTEM vrstnem redu kot sloti. Vsak element mora imeti: "f" = konkretno ime jedi v slovenščini, ne generično "zajtrk", "kosilo", "večerja", "prigrizek"; "k" = kalorije; "i" = seznam sestavin z gramaturami. Format: [{"f":"Skyr z ovsenimi kosmiči, borovnicami in mandlji","k":360,"i":[{"n":"Skyr navadni","a":"170 g"}]}]. Ne uporabljaj generičnih imen obrokov kot naslov jedi.`,
+	  `Osveži samo preostale obroke za danes. Sloti po vrsti: ${slotGuide}. Že pojedeni obroki ostanejo nedotaknjeni.`);
 	const p=JSON.parse(txt);
 	const genericTitles=['zajtrk','dopoldanski prigrizek','dopold. prig.','kosilo','popoldanski prigrizek','popold. prig.','večerja'];
 	const cleaned=Array.isArray(p)?p.map((m,i)=>{
 	  const title=(m.f||'').trim().toLowerCase();
 	  if(genericTitles.includes(title)){
 		const ing=(m.i||[]).map(x=>x.n).filter(Boolean).join(', ');
-		return {...m,f:ing?ing:LBLS[i]};
+		const mealIdx=unfinished[i];
+		const label=(mealIdx!==undefined?(S.meals[mealIdx]?.label||LBLS[mealIdx]):LBLS[i]);
+		return {...m,f:ing?ing:label};
 	  }
 	  return m;
 	}):p;
-	if(Array.isArray(cleaned)&&cleaned.length===5){
-  S.meals = S.meals.map((oldMeal,i)=>{
-	if(S.md[i]) return oldMeal; // obkljukane obroke pusti pri miru
-	return {label:LBLS[i], ...cleaned[i]};
-  });
-  save();
-  renderMeals();
-}
+	if(Array.isArray(cleaned)&&cleaned.length===unfinished.length){
+	  unfinished.forEach((mealIdx,pos)=>{
+		const oldMeal=S.meals[mealIdx];
+		S.meals[mealIdx]={...oldMeal,...cleaned[pos],label:oldMeal?.label||LBLS[mealIdx]};
+	  });
+	  save();
+	  renderMeals();
+	}
   }catch(e){err('Generiranje ni uspelo.');}
   btn.disabled=false;btn.innerHTML='↺ Zamenjaj vse';
 }
@@ -5733,14 +5917,12 @@ function renderMacros(){
   let totP=0,totC=0,totF=0;
   S.meals.forEach((m,i)=>{
 	if(!S.md[i])return;
-	const kcal=parseInt(m.k||m.kcal)||0;
-	const est=estimateMacros(m.f||m.food||'',kcal);
+	const est=estimateMacrosFromMeal(m);
 	totP+=est.p;totC+=est.c;totF+=est.f;
   });
   (S.extras||[]).forEach(e=>{
 	if(!e.done)return;
-	const kcal=parseInt(e.k)||0;
-	const est=estimateMacros(e.f||'',kcal);
+	const est=estimateMacrosFromMeal(e);
 	totP+=est.p;totC+=est.c;totF+=est.f;
   });
   const bar=document.getElementById('macro-bar');
