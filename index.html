@@ -116,6 +116,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .meal-card.compact-done .meal-top{cursor:pointer;}
 .meal-card.compact-done .meal-summary-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
 .meal-card.compact-done .meal-summary-main{min-width:0;display:flex;flex-direction:column;gap:4px;}
+.meal-card.compact-done .mlbl{display:none !important;}
 .meal-card.compact-done .meal-summary-title{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--lt);}
 .meal-card.compact-done .meal-summary-meta{font-size:15px;color:var(--dk);line-height:1.35;}
 .meal-card.compact-done .mfood,
@@ -3399,7 +3400,7 @@ function renderMeals(){
 	  ? pantryState.items.map(it=>`<span class="pantry-chip">${it}</span>`).join('')
 	  : '<span style="font-size:12px;color:var(--lt);">Ni izbranih sestavin.</span>';
 	return `<div class="meal-card fi${done?' done':''}${compactDone?' compact-done':''}" id="mc${i}">
-	  <div class="meal-top" onclick="if(!event.target.closest('.meal-actions'))${compactDone?`toggleDoneMeal(${i})`:`togIng(${i})`}">
+	  <div class="meal-top" onclick="if(!event.target.closest('.meal-actions'))${done?`toggleDoneMeal(${i})`:`togIng(${i})`}">
 		<div class="mdot"></div>
 		<div class="mbody">
 		  <div class="mlbl">${m.label}${easyMark}${custom}${pinnedBadge}${pantryBadge}</div>
@@ -3420,6 +3421,7 @@ function renderMeals(){
 		  <button class="pin-btn${isPinned?' pinned':''}" onclick="togPin(${i})" title="${isPinned?'Odstrani privzeto':'Nastavi kot privzeto vsak dan'}">📌</button>
 		  <button class="del-btn" onclick="deleteMeal(${i})" title="Izbriši obrok">✕</button>
 		  <button class="ebtn${editOpen?' open':''}" id="eb${i}" onclick="togEdit(${i})" title="Uredi vsebino">✏</button>
+		  <button class="ibtn${open?' open':''}" id="ib${i}" onclick="togIng(${i})">sestavine</button>
 		  <button class="ibtn${pantryOpen?' open':''}" id="pb${i}" onclick="toggleMealPantry(${i})">imam doma</button>
 		  <button class="ibtn${ideasOpen?' open':''}" id="midb${i}" onclick="toggleMealIdeas(${i})">ideje</button>
 		  <button class="sbtn" onclick="swapMeal(${i})" title="Zamenjaj obrok">↺</button>
@@ -3688,7 +3690,11 @@ function togMeal(i){
 }
 function toggleDoneMeal(i){
   if(!Array.isArray(S.doneOpen))S.doneOpen=[];
+  if(!Array.isArray(S.exp))S.exp=[];
   S.doneOpen[i]=!S.doneOpen[i];
+  if(!S.doneOpen[i]){
+	S.exp[i]=false;
+  }
   save();
   renderMeals();
 }
@@ -3722,10 +3728,14 @@ async function submitCustom(i){
   if(go){go.disabled=false;go.textContent='Izračunaj →';}
 }
 function togIng(i){
-  S.exp[i]=!S.exp[i];save();
-  const p=document.getElementById('ip'+i),b=document.getElementById('ib'+i);
-  if(p)p.classList.toggle('open',S.exp[i]);
-  if(b){b.classList.toggle('open',S.exp[i]);b.textContent=S.exp[i]?'skrij':'sestavine';}
+  if(!Array.isArray(S.exp))S.exp=[];
+  if(S.md&&S.md[i]){
+	if(!Array.isArray(S.doneOpen))S.doneOpen=[];
+	S.doneOpen[i]=true;
+  }
+  S.exp[i]=!S.exp[i];
+  save();
+  renderMeals();
 }
 function togPin(i){
   const pinned=getPinned();
