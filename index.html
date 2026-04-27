@@ -958,80 +958,92 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 
 <!-- GOALS MODAL -->
 <div class="modal-overlay hide" id="goals-overlay">
-  <div class="modal" style="max-width:420px;">
+  <div class="modal" style="max-width:460px;">
 	<button class="modal-close-x" onclick="closeGoals()" aria-label="Zapri">✕</button>
-	<div class="modal-logo">Moj <em>profil</em></div>
-	<div class="modal-sub">Nastavi svoje podatke za natančen izračun</div>
-	<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-	  <div class="modal-field" style="margin-bottom:0;">
-		<label>Starost</label>
-		<input type="number" id="g-age" placeholder="npr. 30" min="15" max="80" style="text-align:center;">
+	<div class="modal-logo" id="goals-modal-title">Moj <em>profil</em></div>
+	<div class="modal-sub" id="goals-modal-sub">Osnovni podatki za natančen izračun.</div>
+
+	<div id="goals-profile-section">
+	  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+		<div class="modal-field" style="margin-bottom:0;">
+		  <label>Starost</label>
+		  <input type="number" id="g-age" placeholder="npr. 30" min="15" max="80" style="text-align:center;">
+		</div>
+		<div class="modal-field" style="margin-bottom:0;">
+		  <label>Višina (cm)</label>
+		  <input type="number" id="g-height" placeholder="npr. 168" min="140" max="220" style="text-align:center;">
+		</div>
+		<div class="modal-field" style="margin-bottom:0;">
+		  <label>Teža (kg)</label>
+		  <input type="number" id="g-weight" placeholder="npr. 68" min="40" max="200" step="0.1" style="text-align:center;">
+		</div>
+		<div class="modal-field" style="margin-bottom:0;">
+		  <label>Ciljna teža (kg)</label>
+		  <input type="number" id="g-target" placeholder="npr. 63" min="40" max="200" step="0.1" style="text-align:center;">
+		</div>
 	  </div>
-	  <div class="modal-field" style="margin-bottom:0;">
-		<label>Višina (cm)</label>
-		<input type="number" id="g-height" placeholder="npr. 168" min="140" max="220" style="text-align:center;">
+	  <div class="modal-field">
+		<label>Aktivnost</label>
+		<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+		  <button class="goal-opt" id="ga-sed" onclick="selAct('sed')">🪑 Pretežno sedem</button>
+		  <button class="goal-opt" id="ga-light" onclick="selAct('light')">🚶 Malo gibanja</button>
+		  <button class="goal-opt" id="ga-mod" onclick="selAct('mod')">🏃 Zmerno aktiven</button>
+		  <button class="goal-opt" id="ga-high" onclick="selAct('high')">💪 Zelo aktiven</button>
+		</div>
 	  </div>
-	  <div class="modal-field" style="margin-bottom:0;">
-		<label>Teža (kg)</label>
-		<input type="number" id="g-weight" placeholder="npr. 68" min="40" max="200" step="0.1" style="text-align:center;">
-	  </div>
-	  <div class="modal-field" style="margin-bottom:0;">
-		<label>Ciljna teža (kg)</label>
-		<input type="number" id="g-target" placeholder="npr. 63" min="40" max="200" step="0.1" style="text-align:center;">
-	  </div>
-	</div>
-	<div class="modal-field">
-	  <label>Cilj</label>
-	  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;">
-		<button class="goal-opt" id="go-lose" onclick="selGoal('lose')">📉<br>Hujšanje</button>
-		<button class="goal-opt" id="go-maintain" onclick="selGoal('maintain')">⚖️<br>Vzdrževanje</button>
-		<button class="goal-opt" id="go-gain" onclick="selGoal('gain')">📈<br>Pridobivanje</button>
-	  </div>
-	</div>
-	<div class="modal-field">
-	  <label>Aktivnost</label>
-	  <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
-		<button class="goal-opt" id="ga-sed" onclick="selAct('sed')">🪑 Pretežno sedem</button>
-		<button class="goal-opt" id="ga-light" onclick="selAct('light')">🚶 Malo gibanja</button>
-		<button class="goal-opt" id="ga-mod" onclick="selAct('mod')">🏃 Zmerno aktiven</button>
-		<button class="goal-opt" id="ga-high" onclick="selAct('high')">💪 Zelo aktiven</button>
-	  </div>
-	</div>
-	<div class="goals-calc" id="goals-calc"></div>
-	<div style="background:var(--bg);border-radius:9px;padding:11px 13px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
-	  <div>
-		<div style="font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">Plan vadb</div>
-		<div style="font-size:13px;color:var(--md);" id="profile-split-summary">—</div>
-	  </div>
-	  <button onclick="closeGoals();openSplitPicker();" style="background:var(--w);color:var(--md);border:.5px solid var(--br);border-radius:9px;padding:8px 12px;font-size:12px;cursor:pointer;font-family:inherit;flex-shrink:0;">⚙ Uredi</button>
 	</div>
 
-	<div class="modal-field">
-	  <label>Frekvenca vadb / teden</label>
-	  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:8px;">
-		<button class="goal-opt" id="freq-2" onclick="selFreq(2)">2×</button>
-		<button class="goal-opt" id="freq-3" onclick="selFreq(3)">3×</button>
-		<button class="goal-opt" id="freq-4" onclick="selFreq(4)">4×</button>
-		<button class="goal-opt" id="freq-5" onclick="selFreq(5)">5×</button>
+	<div id="goals-target-section">
+	  <div class="modal-field">
+		<label>Cilj</label>
+		<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;">
+		  <button class="goal-opt" id="go-lose" onclick="selGoal('lose')">📉<br>Hujšanje</button>
+		  <button class="goal-opt" id="go-maintain" onclick="selGoal('maintain')">⚖️<br>Vzdrževanje</button>
+		  <button class="goal-opt" id="go-gain" onclick="selGoal('gain')">📈<br>Pridobivanje</button>
+		</div>
 	  </div>
+	  <div class="goals-calc" id="goals-calc"></div>
 	</div>
-	<div class="modal-field">
-	  <label>Dnevi treningov <span style="font-weight:400;color:var(--lt);font-size:11px;">(neoznačeno = aplikacija predlaga)</span></label>
-	  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;">
-		<button class="goal-opt day-pick" data-day="1" onclick="togTrainDay(1)">P</button>
-		<button class="goal-opt day-pick" data-day="2" onclick="togTrainDay(2)">T</button>
-		<button class="goal-opt day-pick" data-day="3" onclick="togTrainDay(3)">S</button>
-		<button class="goal-opt day-pick" data-day="4" onclick="togTrainDay(4)">Č</button>
-		<button class="goal-opt day-pick" data-day="5" onclick="togTrainDay(5)">P</button>
-		<button class="goal-opt day-pick" data-day="6" onclick="togTrainDay(6)">S</button>
-		<button class="goal-opt day-pick" data-day="0" onclick="togTrainDay(0)">N</button>
+
+	<div id="goals-plan-section">
+	  <div style="background:var(--bg);border-radius:13px;padding:13px 15px;margin-bottom:12px;font-size:13px;color:var(--md);line-height:1.55;">
+		Trening se premakne naprej šele, ko ga označiš kot opravljen.<br>
+		Če izpustiš dan, te isti trening počaka.
 	  </div>
-	  <div id="train-days-summary" style="font-size:11.5px;color:var(--lt);margin-top:6px;">—</div>
+	  <div style="background:var(--bg);border-radius:9px;padding:11px 13px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+		<div>
+		  <div style="font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">Razdelitev vadb</div>
+		  <div style="font-size:13px;color:var(--md);" id="profile-split-summary">—</div>
+		</div>
+		<button onclick="closeGoals();openSplitPicker();" style="background:var(--w);color:var(--md);border:.5px solid var(--br);border-radius:999px;padding:8px 12px;font-size:12px;cursor:pointer;font-family:inherit;flex-shrink:0;">⚙ Uredi split</button>
+	  </div>
+	  <div class="modal-field">
+		<label>Frekvenca vadb / teden</label>
+		<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:8px;">
+		  <button class="goal-opt" id="freq-2" onclick="selFreq(2)">2×</button>
+		  <button class="goal-opt" id="freq-3" onclick="selFreq(3)">3×</button>
+		  <button class="goal-opt" id="freq-4" onclick="selFreq(4)">4×</button>
+		  <button class="goal-opt" id="freq-5" onclick="selFreq(5)">5×</button>
+		</div>
+	  </div>
+	  <div class="modal-field">
+		<label>Dnevi treningov <span style="font-weight:400;color:var(--lt);font-size:11px;">Če ne izbereš, predlagamo optimalne dneve.</span></label>
+		<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;">
+		  <button class="goal-opt day-pick" data-day="1" onclick="togTrainDay(1)">P</button>
+		  <button class="goal-opt day-pick" data-day="2" onclick="togTrainDay(2)">T</button>
+		  <button class="goal-opt day-pick" data-day="3" onclick="togTrainDay(3)">S</button>
+		  <button class="goal-opt day-pick" data-day="4" onclick="togTrainDay(4)">Č</button>
+		  <button class="goal-opt day-pick" data-day="5" onclick="togTrainDay(5)">P</button>
+		  <button class="goal-opt day-pick" data-day="6" onclick="togTrainDay(6)">S</button>
+		  <button class="goal-opt day-pick" data-day="0" onclick="togTrainDay(0)">N</button>
+		</div>
+		<div id="train-days-summary" style="font-size:11.5px;color:var(--lt);margin-top:6px;">—</div>
+	  </div>
 	</div>
 
 	<div style="display:flex;gap:8px;margin-top:4px;">
 	  <button onclick="closeGoals()" style="flex:0 0 auto;background:var(--bg);color:var(--md);border:.5px solid var(--br);border-radius:9px;padding:12px 18px;font-size:14px;cursor:pointer;font-family:inherit;">Zapri</button>
-	  <button class="modal-btn" style="flex:1;margin-top:0;" onclick="saveGoals()">Shrani profil →</button>
+	  <button class="modal-btn" id="goals-save-btn" style="flex:1;margin-top:0;" onclick="saveGoals()">Shrani →</button>
 	</div>
   </div>
 </div>
@@ -1105,13 +1117,13 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 			<div class="user-menu-sub">Tvoj dnevni načrt</div>
 		  </div>
 		</div>
-		<button class="user-menu-item" onclick="closeUserMenu();openGoals();">
+		<button class="user-menu-item" onclick="closeUserMenu();openGoals('profile');">
 		  <span class="umi-ico">◎</span><span>Moj profil</span>
 		</button>
-		<button class="user-menu-item" onclick="closeUserMenu();openGoals();">
+		<button class="user-menu-item" onclick="closeUserMenu();openGoals('goal');">
 		  <span class="umi-ico">◌</span><span>Moj cilj</span>
 		</button>
-		<button class="user-menu-item" onclick="closeUserMenu();openSplitPicker();">
+		<button class="user-menu-item" onclick="closeUserMenu();openGoals('plan');">
 		  <span class="umi-ico">⚙</span><span>Plan vadb</span>
 		</button>
 		<div class="user-menu-sep"></div>
@@ -4150,7 +4162,7 @@ function updateGoalsCalc(){
 	  Vadba v appu se doda k cilju ("zaslužene" kalorije).
 	</div>`;
 }
-function openGoals(){
+function openGoals(mode='profile'){
   loadGoals();
   document.getElementById('g-age').value=G.age||'';
   document.getElementById('g-height').value=G.height||'';
@@ -4158,7 +4170,26 @@ function openGoals(){
   document.getElementById('g-target').value=G.target||'';
   _selGoal=G.goal||'lose';_selAct=G.act||'light';
   selGoal(_selGoal);selAct(_selAct);
-  // Populate split summary
+
+  const titles={
+    profile:['Moj <em>profil</em>','Osnovni podatki za natančen izračun.','Shrani profil →'],
+    goal:['Moj <em>cilj</em>','Kalorijski cilj, makri in smer napredka.','Shrani cilj →'],
+    plan:['Tvoj <em>plan</em> vadb','Ritem treningov, dnevi in razdelitev vadbe.','Shrani plan →']
+  };
+  if(!titles[mode])mode='profile';
+  const t=titles[mode];
+  const titleEl=document.getElementById('goals-modal-title');
+  const subEl=document.getElementById('goals-modal-sub');
+  const saveEl=document.getElementById('goals-save-btn');
+  if(titleEl)titleEl.innerHTML=t[0];
+  if(subEl)subEl.textContent=t[1];
+  if(saveEl)saveEl.textContent=t[2];
+
+  const show=(id,on)=>{const el=document.getElementById(id); if(el)el.style.display=on?'block':'none';};
+  show('goals-profile-section',mode==='profile');
+  show('goals-target-section',mode==='goal');
+  show('goals-plan-section',mode==='plan');
+
   const sumEl=document.getElementById('profile-split-summary');
   if(sumEl){
 	const sp=getSplit();
@@ -4166,7 +4197,6 @@ function openGoals(){
 	const days=sp.days.map(d=>WT_LBL[d]||d).join(' · ');
 	sumEl.innerHTML=`<b style="color:var(--dk);">${splitName}</b><br><span style="font-size:11px;">${days}</span>`;
   }
-  // Populate frequency + training day pickers
   refreshFreqUI();
   refreshTrainDaysUI();
   document.getElementById('goals-overlay').classList.remove('hide');
