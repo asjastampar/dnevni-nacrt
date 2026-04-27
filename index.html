@@ -71,6 +71,9 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
   .wo-icon{width:46px;height:46px;font-size:21px;}
   .wo-overview-name{font-size:19px;}
   .wo-overview-actions .next-up-btn{font-size:11px;padding:6px 9px;}
+  .history-insights{grid-template-columns:1fr 1fr;gap:8px;}
+  .history-stat{padding:12px;}
+  .history-stat-value{font-size:21px;}
 }
 /* Subtle action row below next-up */
 .workout-actions-row{display:flex;gap:6px;justify-content:flex-end;margin-bottom:12px;}
@@ -341,6 +344,18 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .lf-note{display:none;align-items:center;gap:5px;font-size:12px;color:var(--red);background:#FDF0EC;padding:3px 9px;border-radius:5px;margin-bottom:9px;}
 /* weekly tracker */
 .tracker{background:var(--w);border:.5px solid var(--br);border-radius:var(--r);padding:16px;}
+.history-insights{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px;}
+.history-stat{background:#F8F5EE;border:.5px solid rgba(23,23,19,.06);border-radius:16px;padding:13px 14px;}
+.history-stat-kicker{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--lt);margin-bottom:6px;}
+.history-stat-value{font-size:24px;line-height:1.05;color:var(--dk);font-weight:600;margin-bottom:4px;}
+.history-stat-note{font-size:12px;color:var(--md);line-height:1.45;}
+.history-trend{background:#FCFBF8;border:.5px solid rgba(23,23,19,.06);border-radius:16px;padding:14px 15px;margin-bottom:14px;}
+.history-trend-title{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--lt);margin-bottom:8px;}
+.history-trend-item{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:8px 0;border-top:.5px solid rgba(23,23,19,.06);}
+.history-trend-item:first-child{border-top:none;padding-top:0;}
+.history-trend-name{font-size:14px;color:var(--dk);font-weight:500;}
+.history-trend-meta{font-size:12px;color:var(--md);line-height:1.45;}
+.history-trend-delta{font-size:12px;color:var(--grn);background:#EBF4EF;border-radius:999px;padding:4px 9px;white-space:nowrap;}
 .tracker-head{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--md);margin-bottom:14px;}
 /* Weekly tracker rings + streak */
 .week-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:14px;}
@@ -1530,6 +1545,8 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 	  <span class="sec-lbl">Tedenski pregled</span>
 	  <span class="streak-badge" id="streak-badge" style="display:none;"></span>
 	</div>
+	<div class="history-insights" id="history-insights"></div>
+	<div class="history-trend" id="history-trend"></div>
 	<div class="tracker">
 	  <div class="week-nav">
 		<button class="week-nav-btn" id="week-prev" onclick="shiftWeek(-1)" type="button" aria-label="Prejšnji teden">‹</button>
@@ -4245,6 +4262,121 @@ function shiftWeek(delta){
   renderTracker();
 }
 
+function getHistoryDaySnapshot(key){
+  const todayKey=localDateKey(now);
+  if(key===todayKey){
+	return {
+	  track:{md:S.md||[],ed:S.exd||[],wt:S.wt||'rest',kcalEaten:(S.meals||[]).reduce((s,m,i)=>s+((S.md&&S.md[i])?(parseInt(m.k||m.kcal)||0):0),0)+(S.extras||[]).reduce((s,e)=>s+(e&&e.done?(parseInt(e.k)||0):0),0)},
+	  plan:{meals:S.meals||[],ex:S.ex||[],extras:S.extras||[],wt:S.wt||'rest'}
+	};
+  }
+  let track=null,plan=null;
+  try{const s=localStorage.getItem(lsKey('track_'+key));if(s)track=JSON.parse(s);}catch(e){}
+  try{const s=localStorage.getItem(lsKey('dp_v6_'+key));if(s)plan=JSON.parse(s);}catch(e){}
+  return {track,plan};
+}
+function getRecentHistoryStats(days=28){
+  let trackedDays=0, workoutDays=0, totalMealsDone=0, totalMealSlots=0, kcalDays=0, kcalTotal=0;
+  for(let i=0;i<days;i++){
+	const d=new Date(now);d.setDate(now.getDate()-i);
+	const key=localDateKey(d);
+	const snap=getHistoryDaySnapshot(key);
+	if(!snap.track && !snap.plan)continue;
+	trackedDays++;
+	const md=(snap.track&&snap.track.md)||[];
+	const ed=(snap.track&&snap.track.ed)||[];
+	totalMealsDone+=md.filter(Boolean).length;
+	const mealSlots=(snap.plan&&Array.isArray(snap.plan.meals)&&snap.plan.meals.length)?snap.plan.meals.length:5;
+	totalMealSlots+=mealSlots;
+	const exerciseCount=ed.filter(Boolean).length + (((snap.track&&snap.track.customEx)||[]).length);
+	if((snap.track&&snap.track.wt&&snap.track.wt!=='rest'&&exerciseCount>0) || ((snap.track&&snap.track.wt)==='cardio') || ((snap.track&&snap.track.wt)==='crossfit' && localStorage.getItem(lsKey('wodlog_'+key)))){
+	  workoutDays++;
+	}
+	const kcal=(snap.track&&typeof snap.track.kcalEaten==='number')
+	  ? snap.track.kcalEaten
+	  : (((snap.plan&&Array.isArray(snap.plan.meals))?snap.plan.meals.reduce((s,m,idx)=>s+(md[idx]?(parseInt(m.k||m.kcal)||0):0),0):0)
+		  + ((snap.plan&&Array.isArray(snap.plan.extras))?snap.plan.extras.reduce((s,e)=>s+(e&&e.done?(parseInt(e.k)||0):0),0):0));
+	if(kcal>0){kcalDays++;kcalTotal+=kcal;}
+  }
+  return {
+	trackedDays,
+	workoutDays,
+	mealRate:totalMealSlots?Math.round((totalMealsDone/totalMealSlots)*100):0,
+	avgKcal:kcalDays?Math.round(kcalTotal/kcalDays):0
+  };
+}
+function getProgressiveOverloadStats(limit=3){
+  const elogKeys=[];
+  for(let i=0;i<=42;i++){
+	const d=new Date(now);d.setDate(now.getDate()-i);
+	elogKeys.push(localDateKey(d));
+  }
+  const exerciseMap={};
+  elogKeys.forEach(key=>{
+	try{
+	  const raw=localStorage.getItem(lsKey('exlog_'+key));
+	  if(!raw)return;
+	  const log=JSON.parse(raw);
+	  Object.entries(log||{}).forEach(([name,val])=>{
+		const kg=parseFloat(val.kg)||0;
+		const reps=parseInt(val.r)||0;
+		const sets=parseInt(val.s)||0;
+		if(!exerciseMap[name])exerciseMap[name]=[];
+		exerciseMap[name].push({key,kg,reps,sets,volume:kg*Math.max(1,reps)*Math.max(1,sets)});
+	  });
+	}catch(e){}
+  });
+  return Object.entries(exerciseMap).map(([name,entries])=>{
+	const ordered=entries.sort((a,b)=>a.key.localeCompare(b.key));
+	const first=ordered[0], last=ordered[ordered.length-1];
+	const kgDelta=(last.kg||0)-(first.kg||0);
+	const volDelta=(last.volume||0)-(first.volume||0);
+	return {name,sessions:ordered.length,kgDelta,volDelta,first,last};
+  }).filter(x=>x.sessions>=2 && (x.kgDelta>0 || x.volDelta>0))
+	.sort((a,b)=>(b.kgDelta*1000+b.volDelta)-(a.kgDelta*1000+a.volDelta))
+	.slice(0,limit);
+}
+function renderHistoryInsights(){
+  const statsEl=document.getElementById('history-insights');
+  const trendEl=document.getElementById('history-trend');
+  if(!statsEl||!trendEl)return;
+  const stats=getRecentHistoryStats(28);
+  statsEl.innerHTML=`
+	<div class="history-stat">
+	  <div class="history-stat-kicker">Zabeleženi dnevi</div>
+	  <div class="history-stat-value">${stats.trackedDays}</div>
+	  <div class="history-stat-note">v zadnjih 28 dneh</div>
+	</div>
+	<div class="history-stat">
+	  <div class="history-stat-kicker">Meal consistency</div>
+	  <div class="history-stat-value">${stats.mealRate}%</div>
+	  <div class="history-stat-note">odkljukanih planiranih obrokov</div>
+	</div>
+	<div class="history-stat">
+	  <div class="history-stat-kicker">Trening dnevi</div>
+	  <div class="history-stat-value">${stats.workoutDays}</div>
+	  <div class="history-stat-note">aktivnih dni v 4 tednih</div>
+	</div>
+	<div class="history-stat">
+	  <div class="history-stat-kicker">Povp. kcal</div>
+	  <div class="history-stat-value">${stats.avgKcal||'—'}</div>
+	  <div class="history-stat-note">na dneh z vnosom hrane</div>
+	</div>`;
+  const trends=getProgressiveOverloadStats(3);
+  if(!trends.length){
+	trendEl.innerHTML=`<div class="history-trend-title">Napredek v progresive overload</div><div class="history-stat-note">Ko boš za iste vaje skozi tedne shranjevala kg/serije/ponovitve, se bodo tukaj pokazali konkretni premiki.</div>`;
+	return;
+  }
+  trendEl.innerHTML=`<div class="history-trend-title">Napredek v progresive overload</div>`+trends.map(t=>`
+	<div class="history-trend-item">
+	  <div>
+		<div class="history-trend-name">${t.name}</div>
+		<div class="history-trend-meta">${t.first.kg||0} kg → ${t.last.kg||0} kg · ${t.sessions} beleženj</div>
+	  </div>
+	  <div class="history-trend-delta">${t.kgDelta>0?`+${t.kgDelta} kg`:`+${Math.round(t.volDelta)} vol`}</div>
+	</div>`).join('');
+}
+
 function renderTracker(){
   const wr=document.getElementById('week-row');
   if(!wr)return;
@@ -4333,6 +4465,7 @@ function renderTracker(){
 	}
   }
 
+  renderHistoryInsights();
   // Render selected day detail panel
   renderDayDetail(_selectedDay);
   renderPanelSwitcher();
@@ -4367,7 +4500,16 @@ function renderDayDetail(key){
 	try{wodRes=localStorage.getItem(lsKey('wodlog_'+key))||'';}catch(e){}
   }
   if(!track){
-	c.innerHTML=`<div class="day-detail-empty"><div class="dde-day">${dayName}, ${dateStr}</div><div class="dde-msg">Za ta dan ni zabeleženih podatkov.</div></div>`;
+	c.innerHTML=`<div class="day-detail-card">
+	  <div class="dd-head">
+		<div style="flex:1;">
+		  <div class="dd-day">${dayName}, ${dateStr}</div>
+		  <div class="dde-msg">Za ta dan še ni zabeleženih podatkov.</div>
+		</div>
+		${!isToday?`<button class="dd-edit-btn" onclick="openPastDayEdit('${key}')">✏ Uredi dan</button>`:''}
+	  </div>
+	  <div class="dd-empty">Dodaj lahko obroke, dodatke ali vadbo za nazaj, tudi če je bil dan prej prazen.</div>
+	</div>`;
 	return;
   }
   const md=track.md||[];const ed=track.ed||[];const wt=track.wt||'rest';
@@ -5651,7 +5793,8 @@ function renderPastPlannedMeals(){
 	  return `<label class="past-row"><input type="checkbox" data-mi="${i}" ${checked}><span><b>${m.label||LBLS[i]||'Obrok'}</b><br><span style="font-size:11.5px;color:var(--lt);">${lbl} — ~${k} kcal</span></span></label>`;
 	}).join('');
   } else {
-	field.style.display='none';
+	field.style.display='block';
+	mealsEl.innerHTML='<div style="font-size:12px;color:var(--lt);padding:4px 2px;">Za ta dan ni bilo shranjenega plana. Spodaj lahko vseeno dodaš, kar si jedla, in označiš vadbo.</div>';
   }
 }
 
