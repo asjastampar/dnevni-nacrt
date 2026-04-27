@@ -1038,21 +1038,50 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 
 <!-- PAST DAY EDIT MODAL -->
 <div class="modal-overlay hide" id="past-day-overlay">
-  <div class="modal" style="max-width:480px;">
+  <div class="modal" style="max-width:480px;max-height:90vh;overflow-y:auto;">
 	<button class="modal-close-x" onclick="closePastDayEdit()" aria-label="Zapri">✕</button>
 	<div class="modal-logo">Uredi <em>za nazaj</em></div>
 	<div class="modal-sub" id="past-day-sub">—</div>
 	<div style="background:var(--bg);border-radius:9px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--md);line-height:1.45;">
-	  Označi obroke in vaje, ki si jih dejansko naredila ta dan, čeprav jih takrat nisi vnesla. Brez panike — popravljanje za nazaj je normalno.
+	  Označi ali dodaj kar si dejansko jedla in trenirala ta dan. Lahko dodaš tudi obroke ali vaje, ki niso bile v planu.
 	</div>
-	<div class="modal-field">
-	  <label>Obroki</label>
+
+	<!-- Planned meals (from saved plan) -->
+	<div class="modal-field" id="past-day-planned-field">
+	  <label>Iz plana</label>
 	  <div id="past-day-meals" style="display:flex;flex-direction:column;gap:6px;"></div>
 	</div>
-	<div class="modal-field" id="past-day-ex-field">
-	  <label>Vaje</label>
-	  <div id="past-day-ex" style="display:flex;flex-direction:column;gap:6px;"></div>
+
+	<!-- Custom meals user adds for that past day -->
+	<div class="modal-field">
+	  <label>Dodatni obroki <span style="font-weight:400;color:var(--lt);font-size:11px;">(za nazaj)</span></label>
+	  <div id="past-day-extras" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
+	  <div style="display:flex;gap:6px;">
+		<input id="past-extra-name" type="text" placeholder="npr. sladoled, kava, banana..." style="flex:1;padding:9px 11px;border:.5px solid var(--br);border-radius:9px;font-size:13px;font-family:inherit;background:var(--w);">
+		<input id="past-extra-kcal" type="number" placeholder="kcal" min="0" max="3000" style="width:75px;padding:9px 11px;border:.5px solid var(--br);border-radius:9px;font-size:13px;font-family:inherit;background:var(--w);">
+		<button onclick="addPastExtra()" style="background:var(--dk);color:var(--w);border:none;border-radius:9px;padding:9px 14px;font-size:13px;cursor:pointer;font-family:inherit;flex-shrink:0;">+ Dodaj</button>
+	  </div>
 	</div>
+
+	<!-- Workout type for that day -->
+	<div class="modal-field">
+	  <label>Vadba</label>
+	  <div id="past-day-wt-picker" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px;">
+		<button class="goal-opt past-wt-opt" data-wt="rest" onclick="selPastWt('rest')">😌 Počitek</button>
+		<button class="goal-opt past-wt-opt" data-wt="upper" onclick="selPastWt('upper')">💪 Zgornji</button>
+		<button class="goal-opt past-wt-opt" data-wt="lower" onclick="selPastWt('lower')">🦵 Spodnji</button>
+		<button class="goal-opt past-wt-opt" data-wt="glute" onclick="selPastWt('glute')">🍑 Glute</button>
+		<button class="goal-opt past-wt-opt" data-wt="full" onclick="selPastWt('full')">🔥 Celo telo</button>
+		<button class="goal-opt past-wt-opt" data-wt="cardio" onclick="selPastWt('cardio')">🏃 Kardio</button>
+		<button class="goal-opt past-wt-opt" data-wt="crossfit" onclick="selPastWt('crossfit')">⚡ CrossFit</button>
+	  </div>
+	  <div id="past-day-ex" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
+	  <div id="past-day-add-ex-row" style="display:none;gap:6px;">
+		<input id="past-ex-name" type="text" placeholder="ime vaje (npr. Hip thrust)" style="flex:1;padding:9px 11px;border:.5px solid var(--br);border-radius:9px;font-size:13px;font-family:inherit;background:var(--w);">
+		<button onclick="addPastEx()" style="background:var(--dk);color:var(--w);border:none;border-radius:9px;padding:9px 14px;font-size:13px;cursor:pointer;font-family:inherit;flex-shrink:0;">+ Vaja</button>
+	  </div>
+	</div>
+
 	<div style="display:flex;gap:8px;margin-top:4px;">
 	  <button onclick="closePastDayEdit()" style="flex:0 0 auto;background:var(--bg);color:var(--md);border:.5px solid var(--br);border-radius:9px;padding:12px 18px;font-size:14px;cursor:pointer;font-family:inherit;">Zapri</button>
 	  <button class="modal-btn" style="flex:1;margin-top:0;" onclick="savePastDayEdit()">Shrani spremembe →</button>
@@ -1478,6 +1507,15 @@ function getSplit(){
   if(!Array.isArray(sp.trainingDays))sp.trainingDays=null; // null = auto
   if(typeof sp.weeklyDone!=='number')sp.weeklyDone=0;
   if(!sp.weekStart)sp.weekStart=isoWeekMonday(now);
+  // One-time migration: pre-freq versions of the app could leave position
+  // advanced past the start of the rotation while weeklyDone is 0 (because
+  // weeklyDone didn't exist). On a clean week with no completions yet, reset
+  // position to 0 so the user starts at the beginning of the rotation.
+  if((sp.weeklyDone||0)===0&&(sp.position||0)>0&&!sp._migrated){
+	sp.position=0;
+	sp._migrated=true;
+	try{localStorage.setItem(lsKey(SPLIT_KEY),JSON.stringify(sp));}catch(e){}
+  }
   return sp;
 }
 function saveSplit(sp){
@@ -2389,7 +2427,13 @@ function renderNextUp(){
 
   // Pillsi (under name)
   const pills=[];
-  if(splitLen>1&&showing!=='rest')pills.push(`<span class="wo-pill">Trening ${splitPos}/${splitLen}</span>`);
+  if(showing!=='rest'){
+	// Weekly progress pill — much clearer than the old "rotation N/N" indicator,
+	// which users read as "X of X done" when it actually meant rotation slot.
+	const weekDone=sp.weeklyDone||0;
+	const weekTarget=sp.freq||3;
+	pills.push(`<span class="wo-pill">Ta teden ${weekDone}/${weekTarget}</span>`);
+  }
   if(estMin)pills.push(`<span class="wo-pill"><span class="wo-pill-icon">⏱</span> ~${estMin} min</span>`);
   if(estKcal)pills.push(`<span class="wo-pill"><span class="wo-pill-icon">🔥</span> ~${estKcal} kcal</span>`);
 
@@ -3216,15 +3260,20 @@ function getTrackData(d){
 function getDayScore(d){
   if(!d)return null;
   const md=d.md||[];const ed=d.ed||[];
+  const cx=Array.isArray(d.customEx)?d.customEx:[];
   const mTotal=5,mDone=md.filter(Boolean).length;
   const isRest=d.wt==='rest';
-  if(isRest)return mDone/mTotal;
-  // Rule: only include workout in the score if at least one exercise was
-  // actually completed that day. Days without a workout shouldn't be
-  // penalized — meals alone determine the score.
-  const eDone=ed.filter(Boolean).length;
+  // For rest days, meals + retroactive custom exercises (if any) count.
+  // Custom exercises on a rest day still mean the user moved their body.
+  if(isRest){
+	if(cx.length>0)return Math.min(1,(mDone+cx.length)/(mTotal+cx.length));
+	return mDone/mTotal;
+  }
+  // Strength/cardio: only include workout in the score if at least one
+  // exercise was actually completed (planned ed[] OR customEx).
+  const eDone=ed.filter(Boolean).length+cx.length;
   if(eDone===0)return mDone/mTotal;
-  const eTotal=ed.length||6;
+  const eTotal=(ed.length||6)+cx.length;
   return(mDone+eDone)/(mTotal+eTotal);
 }
 
@@ -3420,16 +3469,19 @@ function renderDayDetail(key){
 	  :planExtras.map(e=>({food:e.f||'',kcal:e.k,extra:true})));
   const allMeals=[...eatenMeals,...extrasList];
   const doneEx=plan&&plan.ex?plan.ex.filter((_,i)=>ed[i]).map(e=>({n:e.n,log:exlog[e.n]||null})):[];
+  // Custom exercises added retroactively via "Uredi za nazaj"
+  const customExArr=(!isToday&&Array.isArray(track.customEx))?track.customEx.map(e=>({n:e.n,log:null,custom:true})):[];
+  const allDoneEx=[...doneEx,...customExArr];
   const wtLabel=(WKT_LABELS&&WKT_LABELS[wt])||wt;
   // Workout detail
   let workoutHtml='';
   if(wt==='rest')workoutHtml='<div class="dd-empty">Dan počitka.</div>';
   else if(wt==='cardio')workoutHtml='<div class="dd-empty">Kardio trening.</div>';
   else if(wt==='crossfit')workoutHtml=`<div class="dd-empty">CrossFit WOD${wodRes?' — Rezultat: <b>'+wodRes+'</b>':''}.</div>`;
-  else if(doneEx.length){
-	workoutHtml=doneEx.map(e=>{
+  else if(allDoneEx.length){
+	workoutHtml=allDoneEx.map(e=>{
 	  const l=e.log;const logStr=l&&l.kg?`${l.s||'?'}×${l.r||'?'} · ${l.kg} kg`:'';
-	  return `<div class="hist-ex-row"><div class="hist-ex-name">${e.n}</div><div class="hist-ex-log${logStr?'':' empty'}">${logStr||'opravljeno'}</div></div>`;
+	  return `<div class="hist-ex-row"><div class="hist-ex-name">${e.n}${e.custom?' <span style="font-size:10.5px;color:var(--lt);">(dodano)</span>':''}</div><div class="hist-ex-log${logStr?'':' empty'}">${logStr||'opravljeno'}</div></div>`;
 	}).join('');
   } else workoutHtml='<div class="dd-empty">Vadba ni bila zabeležena.</div>';
   // Meals detail
@@ -3443,9 +3495,12 @@ function renderDayDetail(key){
   const pills=[];
   pills.push(`<span class="hist-pill${mealsDone===5?' green':mealsDone>0?'':' red'}">${mealsDone}/5 obrokov</span>`);
   if(totalKcal>0)pills.push(`<span class="hist-pill">${totalKcal} kcal</span>`);
-  if(wt!=='rest'&&doneEx.length>0){
-	pills.push(`<span class="hist-pill green">${wtLabel} ${exDone}/${exTotal}</span>`);
+  if(wt!=='rest'&&allDoneEx.length>0){
+	const totalLabel=exTotal>0?(exDone+customExArr.length)+'/'+(exTotal+customExArr.length):''+allDoneEx.length+' vaj';
+	pills.push(`<span class="hist-pill green">${wtLabel} ${totalLabel}</span>`);
   }
+
+  // Update workout-rendered guard at bottom too — allDoneEx instead of doneEx
 
   c.innerHTML=`
 	<div class="day-detail-card">
@@ -3458,7 +3513,7 @@ function renderDayDetail(key){
 	  </div>
 	  <div class="dd-section-lbl">Obroki</div>
 	  ${mealsHtml}
-	  ${doneEx.length>0||(wt!=='rest'&&isToday)?`<div class="dd-section-lbl">Vadba — ${wtLabel}</div>${workoutHtml}`:''}
+	  ${allDoneEx.length>0||(wt!=='rest'&&isToday)?`<div class="dd-section-lbl">Vadba — ${wtLabel}</div>${workoutHtml}`:''}
 	</div>
   `;
 }
@@ -4258,15 +4313,19 @@ function renderHistory(){}
 let _pastDayKey=null;
 let _pastDayPlan=null;
 let _pastDayTrack=null;
+// Working state we mutate as user interacts with the modal:
+let _pastExtras=[];          // [{f,k,done:true}]
+let _pastCustomEx=[];        // [{n,done:true}] — custom exercises added retroactively
 
 function openPastDayEdit(key){
   _pastDayKey=key;
-  // Load plan + track for the day
   let plan=null,track=null;
   try{const s=localStorage.getItem(lsKey('dp_v6_'+key));if(s)plan=JSON.parse(s);}catch(e){}
   try{const s=localStorage.getItem(lsKey('track_'+key));if(s)track=JSON.parse(s);}catch(e){}
   _pastDayPlan=plan;
   _pastDayTrack=track||{md:[false,false,false,false,false],ed:[],wt:plan?plan.wt:'rest'};
+  _pastExtras=Array.isArray(_pastDayTrack.extras)?_pastDayTrack.extras.map(e=>({f:e.f,k:parseInt(e.k)||0,done:true})):[];
+  _pastCustomEx=Array.isArray(_pastDayTrack.customEx)?_pastDayTrack.customEx.map(e=>({n:e.n,done:true})):[];
 
   // Header
   const d=new Date(key+'T12:00:00');
@@ -4274,9 +4333,22 @@ function openPastDayEdit(key){
   const dateStr=d.getDate()+'. '+SLM[d.getMonth()];
   document.getElementById('past-day-sub').textContent=`${dayName}, ${dateStr}`;
 
-  // Meals: render from plan, allow toggling md
+  // Planned meals (from saved plan)
+  renderPastPlannedMeals();
+  // Custom extras (user-added retroactively)
+  renderPastExtras();
+  // Workout type picker + exercise list
+  renderPastWtPicker();
+  renderPastExercises();
+  document.getElementById('past-day-overlay').classList.remove('hide');
+}
+
+function renderPastPlannedMeals(){
   const mealsEl=document.getElementById('past-day-meals');
+  const field=document.getElementById('past-day-planned-field');
+  const plan=_pastDayPlan;
   if(plan&&Array.isArray(plan.meals)&&plan.meals.length){
+	field.style.display='block';
 	const md=Array.isArray(_pastDayTrack.md)?_pastDayTrack.md:[];
 	mealsEl.innerHTML=plan.meals.map((m,i)=>{
 	  const checked=md[i]?'checked':'';
@@ -4285,61 +4357,163 @@ function openPastDayEdit(key){
 	  return `<label class="past-row"><input type="checkbox" data-mi="${i}" ${checked}><span><b>${m.label||LBLS[i]||'Obrok'}</b><br><span style="font-size:11.5px;color:var(--lt);">${lbl} — ~${k} kcal</span></span></label>`;
 	}).join('');
   } else {
-	mealsEl.innerHTML='<div style="font-size:13px;color:var(--lt);">Za ta dan ni shranjenega jedilnika.</div>';
+	field.style.display='none';
   }
+}
 
-  // Exercises: render from plan, allow toggling ed
-  const exEl=document.getElementById('past-day-ex');
-  const exField=document.getElementById('past-day-ex-field');
-  const wt=_pastDayTrack.wt||(plan&&plan.wt)||'rest';
-  if(wt==='rest'||!plan||!Array.isArray(plan.ex)||!plan.ex.length){
-	exField.style.display='none';
+function renderPastExtras(){
+  const el=document.getElementById('past-day-extras');
+  if(!_pastExtras.length){el.innerHTML='<div style="font-size:12px;color:var(--lt);padding:4px 2px;">Dodaj kar si dejansko jedla zunaj plana.</div>';return;}
+  el.innerHTML=_pastExtras.map((e,i)=>`
+	<div class="past-row" style="justify-content:space-between;cursor:default;">
+	  <span><b>${e.f}</b> <span style="color:var(--lt);">— ${e.k} kcal</span></span>
+	  <button onclick="removePastExtra(${i})" style="background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;padding:0 6px;line-height:1;">×</button>
+	</div>`).join('');
+}
+
+function addPastExtra(){
+  const nameEl=document.getElementById('past-extra-name');
+  const kcalEl=document.getElementById('past-extra-kcal');
+  const f=(nameEl.value||'').trim();
+  const k=parseInt(kcalEl.value)||0;
+  if(!f){nameEl.focus();return;}
+  if(k<=0){kcalEl.focus();return;}
+  _pastExtras.push({f,k,done:true});
+  nameEl.value='';kcalEl.value='';
+  renderPastExtras();
+  nameEl.focus();
+}
+
+function removePastExtra(i){
+  _pastExtras.splice(i,1);
+  renderPastExtras();
+}
+
+function selPastWt(wt){
+  _pastDayTrack.wt=wt;
+  // If we're switching workout type, reset ed since the exercise list changes.
+  // But if user previously had ed for this same wt, preserve.
+  if(_pastDayPlan&&_pastDayPlan.wt===wt){
+	// keep existing ed
   } else {
-	exField.style.display='block';
+	_pastDayTrack.ed=[];
+  }
+  renderPastWtPicker();
+  renderPastExercises();
+}
+
+function renderPastWtPicker(){
+  const wt=_pastDayTrack.wt||'rest';
+  document.querySelectorAll('.past-wt-opt').forEach(el=>{
+	el.classList.toggle('active',el.dataset.wt===wt);
+  });
+}
+
+function renderPastExercises(){
+  const exEl=document.getElementById('past-day-ex');
+  const addRow=document.getElementById('past-day-add-ex-row');
+  const wt=_pastDayTrack.wt||'rest';
+  if(wt==='rest'){
+	exEl.innerHTML='';
+	addRow.style.display='none';
+	return;
+  }
+  if(wt==='cardio'||wt==='crossfit'){
+	exEl.innerHTML=`<div style="font-size:13px;color:var(--md);padding:4px 2px;">${wt==='cardio'?'Kardio':'CrossFit'} trening — ne potrebuje vaj na seznamu.</div>`;
+	addRow.style.display='none';
+	return;
+  }
+  // Strength: list planned ex (if plan.wt matches), else allow custom-only
+  let html='';
+  if(_pastDayPlan&&_pastDayPlan.wt===wt&&Array.isArray(_pastDayPlan.ex)&&_pastDayPlan.ex.length){
 	const ed=Array.isArray(_pastDayTrack.ed)?_pastDayTrack.ed:[];
-	exEl.innerHTML=plan.ex.map((e,i)=>{
+	html+=_pastDayPlan.ex.map((e,i)=>{
 	  const checked=ed[i]?'checked':'';
 	  return `<label class="past-row"><input type="checkbox" data-ei="${i}" ${checked}><span>${e.n||e.name||'Vaja'}</span></label>`;
 	}).join('');
+  } else {
+	// No matching plan — start from default WKT skeleton so user has a head start
+	const defaultEx=(WKT[wt]&&Array.isArray(WKT[wt].ex))?WKT[wt].ex:[];
+	if(defaultEx.length){
+	  html+='<div style="font-size:11.5px;color:var(--lt);margin-bottom:4px;">Predlagane vaje za '+(WT_LBL[wt]||wt)+':</div>';
+	  html+=defaultEx.map((e,i)=>{
+		// Stored under a separate "default ex" channel — when saving we'll
+		// translate them into customEx if checked.
+		const checked='';
+		return `<label class="past-row"><input type="checkbox" data-default-ei="${i}" data-default-name="${(e.n||e.name||'').replace(/"/g,'&quot;')}" ${checked}><span>${e.n||e.name||'Vaja'}</span></label>`;
+	  }).join('');
+	}
   }
-  document.getElementById('past-day-overlay').classList.remove('hide');
+  // Custom exercises user added retroactively
+  if(_pastCustomEx.length){
+	html+='<div style="font-size:11.5px;color:var(--lt);margin-top:6px;margin-bottom:4px;">Dodane vaje:</div>';
+	html+=_pastCustomEx.map((e,i)=>`
+	  <div class="past-row" style="justify-content:space-between;cursor:default;">
+		<span>✓ ${e.n}</span>
+		<button onclick="removePastCustomEx(${i})" style="background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;padding:0 6px;line-height:1;">×</button>
+	  </div>`).join('');
+  }
+  exEl.innerHTML=html;
+  addRow.style.display='flex';
+}
+
+function addPastEx(){
+  const el=document.getElementById('past-ex-name');
+  const n=(el.value||'').trim();
+  if(!n){el.focus();return;}
+  _pastCustomEx.push({n,done:true});
+  el.value='';
+  renderPastExercises();
+  el.focus();
+}
+
+function removePastCustomEx(i){
+  _pastCustomEx.splice(i,1);
+  renderPastExercises();
 }
 
 function closePastDayEdit(){
   document.getElementById('past-day-overlay').classList.add('hide');
   _pastDayKey=null;_pastDayPlan=null;_pastDayTrack=null;
+  _pastExtras=[];_pastCustomEx=[];
 }
 
 function savePastDayEdit(){
   if(!_pastDayKey)return;
-  // Read all checkboxes
+  // Read planned-meal checkboxes
   const md=Array.isArray(_pastDayTrack.md)?_pastDayTrack.md.slice():[false,false,false,false,false];
   document.querySelectorAll('#past-day-meals input[type="checkbox"]').forEach(cb=>{
 	const i=parseInt(cb.dataset.mi);
 	md[i]=cb.checked;
   });
+  // Read planned-exercise checkboxes (if plan matched)
   const ed=Array.isArray(_pastDayTrack.ed)?_pastDayTrack.ed.slice():[];
-  document.querySelectorAll('#past-day-ex input[type="checkbox"]').forEach(cb=>{
+  document.querySelectorAll('#past-day-ex input[data-ei]').forEach(cb=>{
 	const i=parseInt(cb.dataset.ei);
 	ed[i]=cb.checked;
   });
-  // Recompute kcalEaten from updated md + plan meals + plan extras
+  // Default-skeleton exercises become custom if checked (when no plan was matched)
+  const defaultsChecked=[];
+  document.querySelectorAll('#past-day-ex input[data-default-ei]').forEach(cb=>{
+	if(cb.checked)defaultsChecked.push({n:cb.dataset.defaultName,done:true});
+  });
+  const customEx=[..._pastCustomEx,...defaultsChecked];
+
+  // Recompute kcalEaten
   let kcalEaten=0;
   if(_pastDayPlan&&Array.isArray(_pastDayPlan.meals)){
 	kcalEaten+=_pastDayPlan.meals.reduce((s,m,i)=>s+(md[i]?(parseInt(m.k||m.kcal)||0):0),0);
   }
-  if(_pastDayPlan&&Array.isArray(_pastDayPlan.extras)){
-	kcalEaten+=_pastDayPlan.extras.reduce((s,e)=>s+(e&&e.done?(parseInt(e.k)||0):0),0);
-  }
-  // Build updated track
+  kcalEaten+=_pastExtras.reduce((s,e)=>s+(parseInt(e.k)||0),0);
+
   const wt=_pastDayTrack.wt||'rest';
   const updatedTrack={
 	md,ed,wt,kcalEaten,
-	extras:Array.isArray(_pastDayPlan&&_pastDayPlan.extras)?_pastDayPlan.extras.filter(e=>e&&e.done).map(e=>({f:e.f,k:parseInt(e.k)||0})):[]
+	extras:_pastExtras.map(e=>({f:e.f,k:e.k})),
+	customEx:customEx.map(e=>({n:e.n}))
   };
   try{localStorage.setItem(lsKey('track_'+_pastDayKey),JSON.stringify(updatedTrack));}catch(e){}
   closePastDayEdit();
-  // Re-render the day detail card + tracker rings
   if(typeof renderTracker==='function')renderTracker();
 }
 
