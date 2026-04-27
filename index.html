@@ -5281,7 +5281,10 @@ async function addPlannedMeal(){
     inp.value='';
     save();renderMeals();calcKcal();
   }catch(e){err('Dodajanje ni uspelo.');}
-  btn.disabled=false;btn.textContent='Dodaj v plan';
+  finally{
+    btn.disabled=false;
+    btn.textContent='Dodaj v plan';
+  }
 }
 
 // ─── PERSONALIZATION ─────────────────────────────────────────
