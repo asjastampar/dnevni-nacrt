@@ -1951,6 +1951,8 @@ document.addEventListener('click',function(e){
 
 // ─── AUTH ────────────────────────────────────────────────────
 let AUTH = null; // {username, pin, displayName}
+const IS_LOCAL_FILE = typeof window!=='undefined' && window.location && window.location.protocol==='file:';
+const LOCAL_PROFILES_KEY='fit_local_profiles_v1';
 
 function getAuth(){
   try{ return JSON.parse(localStorage.getItem('fit_auth'))||null; }catch(e){return null;}
@@ -1982,6 +1984,29 @@ function logout(){
   document.getElementById('auth-name').value='';
   document.getElementById('auth-pin').value='';
 }
+function loadLocalProfiles(){
+  try{return JSON.parse(localStorage.getItem(LOCAL_PROFILES_KEY))||{};}catch(e){return{};}
+}
+function saveLocalProfiles(profiles){
+  try{localStorage.setItem(LOCAL_PROFILES_KEY,JSON.stringify(profiles));}catch(e){}
+}
+async function localAuth(action, username, pin){
+  const profiles=loadLocalProfiles();
+  const key=(username||'').trim().toLowerCase();
+  if(!key)throw new Error('Vnesi ime.');
+  if(pin.length<4)throw new Error('PIN naj ima vsaj 4 znake.');
+  if(action==='register'){
+    if(profiles[key])throw new Error('Ta profil že obstaja.');
+    const created={username:key,pin,displayName:username.trim()};
+    profiles[key]=created;
+    saveLocalProfiles(profiles);
+    return created;
+  }
+  const existing=profiles[key];
+  if(!existing)throw new Error('Profil ne obstaja. Uporabi registracijo.');
+  if(existing.pin!==pin)throw new Error('Napačen PIN.');
+  return existing;
+}
 
 function switchTab(tab){
   const isLogin=tab==='login';
@@ -2001,6 +2026,22 @@ async function submitAuth(){
   errEl.classList.remove('show');
   if(!name||!pin){errEl.textContent='Vnesi ime in PIN.';errEl.classList.add('show');return;}
   btn.disabled=true;btn.textContent='...';
+  if(IS_LOCAL_FILE){
+    try{
+      const d=await localAuth(switchTab._mode||'login',name,pin);
+      setAuth({username:d.username,pin,displayName:d.displayName});
+      await initApp();
+      btn.disabled=false;
+      btn.textContent=switchTab._mode==='login'?'Prijava →':'Ustvari profil →';
+      return;
+    }catch(e){
+      errEl.textContent=e.message||'Napaka pri prijavi.';
+      errEl.classList.add('show');
+      btn.disabled=false;
+      btn.textContent=switchTab._mode==='login'?'Prijava →':'Ustvari profil →';
+      return;
+    }
+  }
   try{
 	const r=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},
 	  body:JSON.stringify({action:switchTab._mode||'login',username:name,pin})});
@@ -2045,6 +2086,10 @@ function saveTrack(){
 
 let _syncTimer=null;
 function cloudSave(){
+  if(IS_LOCAL_FILE){
+    setSyncStatus('✓ lokalno');
+    return;
+  }
   // Debounce — sync 2s after last change
   clearTimeout(_syncTimer);
   _syncTimer=setTimeout(async()=>{
@@ -2066,6 +2111,7 @@ function cloudSave(){
 }
 
 async function cloudLoad(date){
+  if(IS_LOCAL_FILE)return null;
   if(!AUTH)return null;
   try{
 	const r=await fetch(`/api/data?action=load&username=${AUTH.username}&pin=${AUTH.pin}&date=${date}`);
@@ -2075,6 +2121,7 @@ async function cloudLoad(date){
 }
 
 async function cloudHistory(){
+  if(IS_LOCAL_FILE)return null;
   if(!AUTH)return null;
   try{
 	const r=await fetch(`/api/data?action=history&username=${AUTH.username}&pin=${AUTH.pin}`);
@@ -3707,7 +3754,142 @@ function renderDayDetail(key){
 }
 
 // ─── API CALLS ──────────────────────────────────────────────
+function cloneJson(v){return JSON.parse(JSON.stringify(v));}
+function extractFirstQuotedText(txt){
+  const m=(txt||'').match(/"([^"]+)"/);
+  return m?m[1].trim():'';
+}
+function estimateOfflineMealKcal(name){
+  const n=(name||'').toLowerCase();
+  if(/whey|skyr|jogurt|skuta/.test(n))return 240;
+  if(/jajc|omlet/.test(n))return 320;
+  if(/pišč|tuna|losos|riž|krompir|solat/.test(n))return 430;
+  if(/toast|sendvi|tortil|wrap/.test(n))return 390;
+  if(/ovs|kaša|granola/.test(n))return 360;
+  if(/banana|sadje|orešč|mandelj/.test(n))return 260;
+  return 350;
+}
+function buildOfflineIngredients(name){
+  const n=(name||'').toLowerCase();
+  if(/skyr|jogurt/.test(n))return [{n:'Skyr ali jogurt',a:'180 g'},{n:'Sadje',a:'100 g'},{n:'Kosmiči ali semena',a:'25 g'}];
+  if(/jajc|omlet/.test(n))return [{n:'Jajca',a:'3 kos'},{n:'Zelenjava',a:'120 g'},{n:'Kruh ali krekerji',a:'40 g'}];
+  if(/pišč|tuna|losos/.test(n))return [{n:'Beljakovinski vir',a:'140 g'},{n:'Priloga',a:'150 g'},{n:'Zelenjava',a:'150 g'}];
+  if(/toast|sendvi|wrap/.test(n))return [{n:'Kruh ali tortilla',a:'1 kos'},{n:'Beljakovinski vir',a:'100 g'},{n:'Zelenjava',a:'80 g'}];
+  return [{n:'Glavna sestavina',a:'1 porcija'},{n:'Priloga',a:'po okusu'}];
+}
+function buildOfflineMeal(name,kcal){
+  return {f:name,k:kcal||estimateOfflineMealKcal(name),i:buildOfflineIngredients(name)};
+}
+function getOfflineMealPlan(){
+  return [
+    buildOfflineMeal('Skyr z ovsenimi kosmiči in borovnicami',360),
+    buildOfflineMeal('Proteinski puding in banana',220),
+    buildOfflineMeal('Piščanec, riž in velika solata',470),
+    buildOfflineMeal('Toast s tuno in kumaro',310),
+    buildOfflineMeal('Omleta z zelenjavo in feta sirom',390)
+  ];
+}
+function offlineExerciseDescription(name){
+  const info=getExInfo(name)||{};
+  return {
+    desc:info.desc||`${name} naredi mirno in nadzorovano. Gib naj bo čist, brez hitenja in brez bolečine.`,
+    tip:info.tip||'Začni lažje in dodaj obremenitev šele, ko je tehnika stabilna.',
+    kg:info.kg||0,
+    yt:info.yt||`${name} tutorial`
+  };
+}
+function extractAlternativesFromSys(sys){
+  const m=(sys||'').match(/(?:Izberi eno izmed|OBVEZNO izberi eno od teh alternativ)[^:]*:\s*([^.]*)\./i);
+  if(!m)return [];
+  return m[1].split(',').map(x=>x.trim()).filter(Boolean);
+}
+function pickDifferentExercise(currentName, fallbackList){
+  const alts=(fallbackList||[]).filter(x=>x&&x.toLowerCase()!==String(currentName||'').toLowerCase());
+  return alts[0]||currentName||'Vaja';
+}
+function offlineWorkoutForType(type){
+  const base=WKT[type];
+  if(!base||!Array.isArray(base.ex))return [];
+  const ex=cloneJson(base.ex);
+  if(ex.length>1){
+    const rotated=ex.slice(1).concat(ex[0]);
+    return rotated.slice(0,6);
+  }
+  return ex.slice(0,6);
+}
+function offlineCrossfitWod(){
+  return {
+    type:'AMRAP',
+    time:14,
+    name:'Offline AMRAP',
+    ex:[
+      {n:'Air squat',r:'14'},
+      {n:'Push-up (na kolenih ali polni)',r:'8'},
+      {n:'Sit-up',r:'16'}
+    ],
+    note:'Naredi čim več kakovostnih krogov v 14 minutah.'
+  };
+}
+function offlinePersItems(mode){
+  const isNew=mode==='new';
+  const items=[
+    {f:'Skyr bowl z malinami',k:280,why:'lahka beljakovinska izbira za hitro sitost',tag:isNew?'novo':'fav'},
+    {f:'Tuna wrap s solato',k:340,why:'visok protein in malo priprave',tag:isNew?'novo':'fav'},
+    {f:'Omleta z bučkami in sirom',k:360,why:'toplejši obrok z dobrim razmerjem makrov',tag:isNew?'novo':'fav'},
+    {f:'Proteinski jogurt in banana',k:230,why:'enostaven prigrizek pred ali po vadbi',tag:isNew?'novo':'fav'},
+    {f:'Piščančja solata s krompirjem',k:420,why:'nasiten obrok za kosilo ali večerjo',tag:isNew?'novo':'fav'}
+  ];
+  return items;
+}
+function offlineApi(sys,msg){
+  const prompt=(sys||'')+' '+(msg||'');
+  if(/Opiši vajo/.test(prompt)){
+    return JSON.stringify(offlineExerciseDescription(extractFirstQuotedText(msg)));
+  }
+  if(/JSON array s 5 predlogi/.test(prompt)){
+    return JSON.stringify(offlinePersItems(/novo/.test(prompt)?'new':'fav'));
+  }
+  if(/Sestavi dnevni jedilnik|JSON array s 5 elementi/.test(prompt)){
+    return JSON.stringify(getOfflineMealPlan());
+  }
+  if(/Izračunaj kalorije za/.test(prompt)){
+    const name=extractFirstQuotedText(msg)||'Obrok po meri';
+    return JSON.stringify(buildOfflineMeal(name));
+  }
+  if(/Zamenjaj obrok/.test(prompt)){
+    const current=extractFirstQuotedText(msg)||'obrok';
+    const options=getOfflineMealPlan().map(m=>m.f).filter(f=>f!==current);
+    return JSON.stringify(buildOfflineMeal(options[0]||'Skleda z beljakovinami in zelenjavo'));
+  }
+  if(/alternativno kardio aktivnost/.test(prompt)){
+    const alts=extractAlternativesFromSys(sys);
+    const n=pickDifferentExercise(extractFirstQuotedText(msg),alts.length?alts:WKT.cardio.ex.map(e=>e.n));
+    return JSON.stringify({n,s:'1',r:'30 min',kcal:200});
+  }
+  if(/telovadnico\. .*JSON:\s*\{\"n\":\"ime vaje/.test(prompt) || /telovadnico\. .*Vrni SAMO JSON:\s*\{\"n\":\"ime vaje/.test(prompt)){
+    const current=extractFirstQuotedText(msg);
+    const alts=extractAlternativesFromSys(sys);
+    const n=pickDifferentExercise(current,alts);
+    return JSON.stringify({n,s:'3',r:'10-12'});
+  }
+  if(/Zamenjaj eno vajo v WODu/.test(prompt)){
+    const pool=['Air squat','Sit-up','Box step-up (z ročkama 4 kg)','Kettlebell swing (12 kg)','Dumbbell push press'];
+    const n=pickDifferentExercise(extractFirstQuotedText(msg),pool);
+    return JSON.stringify({n,r:'10'});
+  }
+  if(/Sestavi WOD/.test(prompt)){
+    return JSON.stringify(offlineCrossfitWod());
+  }
+  if(/Predlagaj 7 različnih kardio aktivnosti/.test(prompt)){
+    return JSON.stringify(cloneJson(WKT.cardio.ex));
+  }
+  if(/SAMO JSON array 6 vaj/.test(prompt)){
+    return JSON.stringify(offlineWorkoutForType(S.wt||'full'));
+  }
+  return JSON.stringify({ok:true});
+}
 async function api(sys,msg){
+  if(IS_LOCAL_FILE)return offlineApi(sys,msg);
   // 30s timeout — prevents the UI from hanging if the AI server stalls or is unreachable.
   const controller=new AbortController();
   const timer=setTimeout(()=>controller.abort(),30000);
@@ -3725,6 +3907,7 @@ async function api(sys,msg){
     if(e&&e.name==='AbortError'){
       throw new Error('Časovna omejitev — strežnik se ni odzval pravočasno.');
     }
+    if(IS_LOCAL_FILE)return offlineApi(sys,msg);
     throw e;
   }finally{
     clearTimeout(timer);
@@ -4341,10 +4524,13 @@ function refreshTrainDaysUI(){
 }
 
 // Add event listeners to recalculate on input change
+let _goalsInputsBound=false;
 function bindGoalsInputs(){
+  if(_goalsInputsBound)return;
   ['g-age','g-height','g-weight','g-target'].forEach(id=>{
 	document.getElementById(id)?.addEventListener('input',()=>{updateGoalsCalc();applyGoalsLivePreview();});
   });
+  _goalsInputsBound=true;
 }
 
 // ─── MACRO ESTIMATION ────────────────────────────────────────
