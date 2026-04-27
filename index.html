@@ -479,6 +479,83 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .add-meal-btn{background:var(--dk);color:var(--w);border:none;border-radius:8px;padding:8px 13px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:opacity .15s;}
 .add-meal-btn:hover{opacity:.8;}
 .add-meal-btn:disabled{opacity:.4;pointer-events:none;}
+@media(max-width:500px){
+  .sec-right{width:100%;align-items:center;gap:8px;}
+  .tog{font-size:12px;}
+  .diet-wrap,.rbtn{max-width:100%;}
+  .meal-top{
+	display:grid !important;
+	grid-template-columns:12px 1fr !important;
+	grid-template-areas:
+	  "dot body"
+	  "actions actions" !important;
+	gap:10px 10px !important;
+	padding:14px 14px 12px !important;
+  }
+  .mdot{grid-area:dot;margin-top:8px;}
+  .mbody{grid-area:body;}
+  .meal-actions{
+	grid-area:actions;
+	width:100%;
+	justify-content:flex-start !important;
+	flex-wrap:wrap !important;
+	gap:8px !important;
+	padding-top:2px;
+  }
+  .meal-actions .pin-btn{display:flex;}
+  .meal-actions .sbtn,
+  .meal-actions .del-btn,
+  .meal-actions .chk{
+	min-width:40px;
+	min-height:40px;
+  }
+  .meal-actions .ibtn{
+	min-height:40px;
+	padding:7px 12px;
+	font-size:11px;
+  }
+  .mfood{font-size:15px;line-height:1.5;}
+  .mlbl{line-height:1.45;}
+  .meal-pantry-input-row,
+  .meal-pantry-actions{
+	flex-wrap:wrap;
+  }
+  .meal-pantry-input-row .add-meal-btn,
+  .meal-pantry-actions .diet-mini,
+  .meal-pantry-actions .edit-go{
+	width:100%;
+  }
+  .meal-ideas-tabs > *{
+	flex:1 1 calc(50% - 6px);
+	text-align:center;
+  }
+  .add-meal-row{
+	display:grid;
+	grid-template-columns:1fr;
+	gap:10px;
+  }
+  .add-meal-sel,
+  .add-meal-inp,
+  .add-meal-btn{
+	width:100%;
+	min-width:0;
+  }
+  .add-meal-sel,
+  .add-meal-inp{
+	font-size:16px;
+	padding:11px 13px;
+  }
+  .add-meal-btn{
+	padding:12px 16px;
+	font-size:15px;
+  }
+  .steps-card{
+	align-items:flex-start;
+  }
+  .steps-actions{
+	align-self:center;
+  }
+}
 /* personalize panel */
 .pers-btn{display:flex;align-items:center;gap:5px;font-size:12px;color:#8B2B6E;background:#FBE8F5;border:.5px solid #E4ABCF;border-radius:20px;padding:5px 11px;cursor:pointer;font-family:inherit;transition:all .15s;}
 .pers-btn:hover{background:#f5d5ed;}
@@ -1319,6 +1396,7 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 			<option value="Kosilo">Kosilo</option>
 			<option value="Popoldanski prigrizek">Popoldanski prigrizek</option>
 			<option value="Večerja">Večerja</option>
+			<option value="Drugo">Drugo</option>
 		  </select>
 		  <input class="add-meal-inp" id="extra-inp" placeholder="Kaj želiš dodati? Če pustiš prazno, predlagam obrok sama." onkeydown="if(event.key==='Enter')addPlannedMeal()">
 		  <button class="add-meal-btn" id="plan-btn" onclick="addPlannedMeal()">Dodaj v plan</button>
@@ -5128,7 +5206,7 @@ function renderExtras(){
 	  <div class="meal-top">
 		<div class="mdot" style="background:#8B2B6E"></div>
 		<div class="mbody">
-		  <div class="mlbl" style="color:#8B2B6E;">Dodano</div>
+		  <div class="mlbl" style="color:#8B2B6E;">${e.label||'Dodano'}</div>
 		  <div class="mfood">${e.f}</div>
 		  <div class="mkcal">~${e.k} kcal</div>
 		</div>
@@ -5174,6 +5252,20 @@ async function addPlannedMeal(){
   const label=(sel&&sel.value)||LBLS[0];
   btn.disabled=true;btn.textContent='...';
   try{
+    if(label==='Drugo'){
+      const txt=await api(
+        'Si prehranjevalni svetovalec. Izračunaj kalorije za vneseno hrano ali manjši dodatek. Vrni SAMO JSON: {"f":"natančen opis v slovenščini","k":180,"i":[{"n":"sestavina","a":"100 g"}]}',
+        val
+          ? `Izračunaj kalorije za ta dodatek ali manjši obrok: "${val}".`
+          : 'Predlagaj manjši dodatek za čez dan, npr. kava z mlekom, kepica sladoleda, sadje ali proteinski puding.'
+      );
+      const p=JSON.parse(txt);
+      if(!S.extras)S.extras=[];
+      S.extras.push({label:'Drugo',f:p.f,k:parseInt(p.k)||0,i:p.i||[],done:false});
+      inp.value='';
+      save();renderExtras();calcKcal();
+      return;
+    }
     const easyHint=S.easy
       ? ' Predlagaj zelo enostaven, zdrav obrok z minimum effort. Daj prednost idejam kot so tuna in fižolova solata, pečena kura iz trgovine in solata, wrap brez kuhanja, skuta in sadje, testenine s pestom.'
       : '';
