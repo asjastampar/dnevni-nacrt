@@ -1279,7 +1279,7 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 	  <span class="sec-lbl">Jedilnik</span>
 	  <div class="sec-right">
 		<label class="tog" onclick="toggleEasy()">
-		  <div class="tog-track on-grn" id="et"><div class="tog-thumb"></div></div>
+		  <div class="tog-track" id="et"><div class="tog-thumb"></div></div>
 		  <span>Enostavno</span>
 		</label>
 			<div class="diet-wrap">
@@ -2450,6 +2450,54 @@ const EASY_PRESETS={
 	{f:'Konzerva čičerike s paradižnikom in avokadom',k:450,i:[{n:'Čičerika iz konzerve',a:'180 g'},{n:'Paradižnik',a:'120 g'},{n:'Avokado',a:'80 g'},{n:'Olivno olje',a:'10 ml'}]}
   ]
 };
+const EASY_MEAL_POOLS={
+  'Zajtrk':[
+	{f:'Skuta in sadje z ovsenimi kosmiči',k:330,i:[{n:'Skuta',a:'200 g'},{n:'Jagodičevje ali banana',a:'120 g'},{n:'Ovseni kosmiči',a:'30 g'}]},
+	{f:'Skyr z banano in orehi',k:320,i:[{n:'Skyr',a:'200 g'},{n:'Banana',a:'120 g'},{n:'Orehi',a:'15 g'}]},
+	{f:'Proteinski jogurt in sadje',k:250,i:[{n:'Proteinski jogurt',a:'200 g'},{n:'Sadje po izbiri',a:'150 g'}]},
+	{f:'Toast s skuto in puranjimi prsmi',k:340,i:[{n:'Polnozrnat toast',a:'2 rezini'},{n:'Skuta',a:'80 g'},{n:'Puranje prsi',a:'60 g'},{n:'Paradižnik',a:'100 g'}]},
+	{f:'Jajca, toast in paradižnik',k:360,i:[{n:'Jajca',a:'2 kos'},{n:'Polnozrnat toast',a:'2 rezini'},{n:'Paradižnik',a:'120 g'}]}
+  ],
+  'Dopoldanski prigrizek':[
+	{f:'Skyr in borovnice',k:190,i:[{n:'Skyr',a:'170 g'},{n:'Borovnice',a:'80 g'}]},
+	{f:'Banana in pest mandljev',k:210,i:[{n:'Banana',a:'120 g'},{n:'Mandlji',a:'20 g'}]},
+	{f:'Skuta in jabolko',k:220,i:[{n:'Skuta',a:'150 g'},{n:'Jabolko',a:'150 g'}]},
+	{f:'Riževi krekerji s humusom',k:200,i:[{n:'Riževi krekerji',a:'30 g'},{n:'Humus',a:'60 g'}]},
+	{f:'Proteinski puding',k:180,i:[{n:'Proteinski puding',a:'1 lonček'}]}
+  ],
+  'Kosilo':[
+	{f:'Tuna in fižolova solata',k:460,i:[{n:'Tuna v lastnem soku',a:'150 g'},{n:'Beli fižol iz konzerve',a:'150 g'},{n:'Paradižnik',a:'150 g'},{n:'Olivno olje',a:'10 ml'}]},
+	{f:'Pečena kura iz Spara in velika solata',k:520,i:[{n:'Pečena kura iz Spara',a:'200 g'},{n:'Mešana solata',a:'180 g'},{n:'Kruh ali bombeta',a:'60 g'}]},
+	{f:'Wrap brez kuhanja s piščancem',k:490,i:[{n:'Polnozrnata tortilja',a:'1 velika'},{n:'Pečen piščanec',a:'120 g'},{n:'Skuta ali humus',a:'50 g'},{n:'Solata',a:'80 g'},{n:'Paradižnik',a:'80 g'}]},
+	{f:'Testenine s pestom in tuno',k:540,i:[{n:'Testenine',a:'80 g'},{n:'Pesto',a:'25 g'},{n:'Tuna v lastnem soku',a:'120 g'},{n:'Češnjev paradižnik',a:'120 g'}]},
+	{f:'Piščančja skleda z rižem in zelenjavo',k:510,i:[{n:'Pečen piščanec',a:'140 g'},{n:'Kuhan riž',a:'160 g'},{n:'Mešana zelenjava',a:'180 g'}]}
+  ],
+  'Popoldanski prigrizek':[
+	{f:'Skuta in sadje',k:210,i:[{n:'Skuta',a:'150 g'},{n:'Sadje po izbiri',a:'150 g'}]},
+	{f:'Proteinski jogurt',k:170,i:[{n:'Proteinski jogurt',a:'200 g'}]},
+	{f:'Korenje in humus',k:180,i:[{n:'Korenje',a:'150 g'},{n:'Humus',a:'60 g'}]},
+	{f:'Jabolko in arašidovo maslo',k:220,i:[{n:'Jabolko',a:'150 g'},{n:'Arašidovo maslo',a:'20 g'}]},
+	{f:'Riževi krekerji s puranjimi prsmi',k:190,i:[{n:'Riževi krekerji',a:'30 g'},{n:'Puranje prsi',a:'60 g'}]}
+  ],
+  'Večerja':[
+	{f:'Pečena kura iz Spara in solata',k:470,i:[{n:'Pečena kura iz Spara',a:'180 g'},{n:'Zelena ali mešana solata',a:'180 g'},{n:'Olivno olje',a:'10 ml'}]},
+	{f:'Tuna in fižolova solata',k:440,i:[{n:'Tuna v lastnem soku',a:'140 g'},{n:'Beli fižol iz konzerve',a:'130 g'},{n:'Paradižnik',a:'150 g'},{n:'Olivno olje',a:'10 ml'}]},
+	{f:'Wrap brez kuhanja s piščancem in solato',k:460,i:[{n:'Polnozrnata tortilja',a:'1 velika'},{n:'Pečen piščanec',a:'110 g'},{n:'Skuta ali humus',a:'50 g'},{n:'Solata',a:'80 g'}]},
+	{f:'Skuta, zelenjava in kruh',k:350,i:[{n:'Skuta',a:'180 g'},{n:'Kumara in paradižnik',a:'200 g'},{n:'Polnozrnat kruh',a:'60 g'}]},
+	{f:'Testenine s pestom in paradižnikom',k:430,i:[{n:'Testenine',a:'70 g'},{n:'Pesto',a:'20 g'},{n:'Češnjev paradižnik',a:'150 g'},{n:'Parmezan',a:'10 g'}]}
+  ]
+};
+function shouldUseGenericEasyMeals(){
+  return !['vegan','vegetarian','glutenFree','lactoseFree','lowCarb','nutFree','eggFree','fishFree','noPork','noRedMeat'].some(hasDiet);
+}
+function easyMealFromPool(label){
+  const base=baseMealLabel(label);
+  const pool=EASY_MEAL_POOLS[base];
+  if(!pool||!pool.length)return null;
+  const match=String(label||'').match(/\s+(\d+)$/);
+  const occurrence=match?Math.max(0,parseInt(match[1],10)-1):0;
+  return {...pool[occurrence%pool.length]};
+}
 function getDiet(){
   if(!Array.isArray(S.diet))S.diet=[];
   if(S.lf&&!S.diet.includes('lactoseFree'))S.diet.push('lactoseFree');
@@ -2742,13 +2790,19 @@ function pickDietPreset(){
   const key=pickDietPresetKey();
   return DIET_PRESETS[key]||DIET_PRESETS.stableEnergy;
 }
-function mealVariant(m,i){
+function mealVariant(m,i,labelOverride){
+  const label=labelOverride||m?.l||m?.label||LBLS[i%LBLS.length];
   const key=pickDietPresetKey();
+  if(S.easy&&shouldUseGenericEasyMeals()){
+	const simple=easyMealFromPool(label);
+	if(simple)return {label,...simple};
+  }
   // When easy mode is on, prefer the EASY_PRESETS variant for that diet.
   // Falls back to the normal preset if no easy variant is defined.
-  const preset=(S.easy&&EASY_PRESETS[key])||DIET_PRESETS[key];
-  if(preset)return {label:m.l,...preset[i%preset.length]};
-  return {label:m.l,...(hasDiet('lactoseFree')?m.lf:m.n)};
+  const preset=(S.easy&&EASY_PRESETS[key])||DIET_PRESETS[key]||DIET_PRESETS.stableEnergy;
+  const baseIndex=LBLS.indexOf(baseMealLabel(label));
+  const presetIndex=baseIndex>-1?baseIndex:i%preset.length;
+  return {label,...preset[presetIndex%preset.length]};
 }
 function renderDietUI(){
   getDiet();
@@ -2890,11 +2944,11 @@ function toggleEasy(){
 	const pinned=getPinned();
 	S.meals=S.meals.map((existing,i)=>{
 	  // Pinned slot: keep as pinned object
-	  if(pinned[i])return {label:src[i].l,...pinned[i],pinned:true};
+	  if(pinned[i])return {label:existing.label,...pinned[i],pinned:true};
 	  // Already eaten today: keep current meal exactly as is
 	  if(S.md&&S.md[i])return existing;
-	  // Otherwise replace with the source variant (easy or normal)
-	  return mealVariant(src[i],i);
+	  // Otherwise replace the content, but keep the original meal label/slot.
+	  return mealVariant(src[i]||existing,i,existing.label);
 	});
   }
   save();
@@ -5120,11 +5174,14 @@ async function addPlannedMeal(){
   const label=(sel&&sel.value)||LBLS[0];
   btn.disabled=true;btn.textContent='...';
   try{
+    const easyHint=S.easy
+      ? ' Predlagaj zelo enostaven, zdrav obrok z minimum effort. Daj prednost idejam kot so tuna in fižolova solata, pečena kura iz trgovine in solata, wrap brez kuhanja, skuta in sadje, testenine s pestom.'
+      : '';
     const txt=await api(
       'Si prehranjevalni svetovalec. Izračunaj kalorije in sestavi konkreten obrok za izbran tip obroka. Vrni SAMO JSON: {"f":"natančen opis v slovenščini","k":350,"i":[{"n":"sestavina","a":"100 g"}]}',
       val
-        ? `Pripravi ${label.toLowerCase()} iz tega opisa ali teh sestavin: "${val}".`
-        : `Predlagaj primeren ${label.toLowerCase()} za danes.`
+        ? `Pripravi ${label.toLowerCase()} iz tega opisa ali teh sestavin: "${val}".${easyHint}`
+        : `Predlagaj primeren ${label.toLowerCase()} za danes.${easyHint}`
     );
     const p=JSON.parse(txt);
     const meal={label:nextMealLabel(label),f:p.f,k:parseInt(p.k)||0,i:p.i||[],custom:true};
