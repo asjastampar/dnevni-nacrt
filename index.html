@@ -344,6 +344,38 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .epills{display:flex;gap:5px;flex-shrink:0;}
 .ep{background:#EBF4EF;color:var(--grn);font-size:12px;padding:2px 7px;border-radius:5px;white-space:nowrap;}
 .ep.pk{background:#FBE8F5;color:#8B2B6E;}
+.workout-block{display:flex;flex-direction:column;gap:10px;}
+.workout-subhead{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--lt);margin:2px 2px 0;}
+.wu-card{background:var(--w);border:.5px solid var(--br);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:12px;}
+.wu-card.done{background:#F8FBF8;}
+.wu-dot{width:8px;height:8px;border-radius:50%;background:var(--grn);flex-shrink:0;opacity:.7;}
+.wu-body{flex:1;}
+.wu-title{font-size:15px;color:var(--dk);}
+.wu-meta{font-size:12px;color:var(--lt);margin-top:2px;}
+.logged-chip{font-size:12px;color:var(--md);background:var(--bg);padding:4px 9px;border-radius:999px;white-space:nowrap;}
+.cue-box{background:#F4F8F5;border:.5px solid #D5E5DA;border-radius:14px;padding:12px 13px;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.cue-row{font-size:13px;line-height:1.5;color:var(--md);}
+.cue-row b{color:var(--dk);font-weight:600;}
+.setlog-sec{margin-top:10px;}
+.setlog-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--lt);margin-bottom:7px;}
+.setlog-help{font-size:12px;color:var(--md);line-height:1.45;margin-bottom:8px;}
+.setlog-area{width:100%;min-height:92px;border:.5px solid var(--br);border-radius:12px;padding:10px 12px;font-size:14px;font-family:inherit;background:var(--w);color:var(--dk);outline:none;resize:vertical;line-height:1.45;}
+.setlog-area:focus{border-color:rgba(0,0,0,.2);}
+.setlog-area::placeholder{color:var(--lt);}
+.exercise-manual-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;}
+.exercise-manual-row .edit-input{min-width:220px;}
+.exercise-note{font-size:12px;color:var(--md);background:#F8F5EE;border-radius:10px;padding:8px 10px;line-height:1.45;margin-bottom:10px;}
+.ex-summary-line{font-size:12px;color:var(--md);margin-top:4px;line-height:1.45;}
+.ex-top-logged{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.ex-top-main{flex:1;min-width:0;}
+.ex-detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.ex-detail-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--lt);}
+.add-ex-row{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap;}
+.add-ex-row input{border:.5px solid var(--br);border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit;background:var(--w);color:var(--dk);outline:none;}
+.add-ex-row input:focus{border-color:rgba(0,0,0,.2);}
+.add-ex-row input::placeholder{color:var(--lt);}
+.add-ex-name{flex:1;min-width:120px;}
+.add-ex-btn{background:var(--grn);color:var(--w);border:none;border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;}
 /* badge / info */
 .badge{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border-radius:20px;font-size:13px;font-weight:500;margin-bottom:11px;}
 .badge.gym{background:#EBF4EF;color:var(--grn);}
@@ -482,14 +514,6 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .ebtn{background:none;border:.5px solid var(--br);border-radius:7px;padding:3px 7px;font-size:13px;cursor:pointer;color:var(--lt);font-family:inherit;transition:all .15s;line-height:1;}
 .ebtn:hover{color:var(--md);background:var(--bg);}
 .ebtn.open{color:var(--red);border-color:#F0B8A8;background:#FDF0EC;}
-/* custom exercise */
-.add-ex-row{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap;}
-.add-ex-row input{border:.5px solid var(--br);border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit;background:var(--w);color:var(--dk);outline:none;}
-.add-ex-row input:focus{border-color:rgba(0,0,0,.2);}
-.add-ex-row input::placeholder{color:var(--lt);}
-.add-ex-name{flex:1;min-width:120px;}
-.add-ex-sm{width:52px;}
-.add-ex-btn{background:var(--grn);color:var(--w);border:none;border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;}
 /* kcal display */
 .kcal-split{display:flex;gap:6px;align-items:center;}
 .kcal-eaten{font-size:18px;font-weight:500;color:var(--dk);}
@@ -1598,8 +1622,6 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 	<div id="wc"></div>
 	<div class="add-ex-row" id="add-ex-row" style="display:none">
 	  <input class="add-ex-name" id="aen" placeholder="Ime vaje (npr. hip thrust)...">
-	  <input class="add-ex-sm" id="aes" placeholder="serije" value="3">
-	  <input class="add-ex-sm" id="aer" placeholder="ponovitve" value="12">
 	  <button class="add-ex-btn" onclick="addCustomEx()">+ Dodaj</button>
 	</div>
   </div>
@@ -2234,7 +2256,7 @@ function saveElog(name,data){const l=loadElog();l[name]=data;try{localStorage.se
 let exExp={};  // UI state: which exercises are expanded
 
 // ─── STATE ──────────────────────────────────────────────────
-let S={meals:[],exp:[false,false,false,false,false],md:[false,false,false,false,false],exd:[],lf:false,diet:[],easy:false,wt:'',ex:[],extras:[],activePanel:'meals',mealMoreOpen:[],extraOpen:[],extraEditOpen:[],mealEntryMode:'plan',manualOpen:[]};
+let S={meals:[],exp:[false,false,false,false,false],md:[false,false,false,false,false],exd:[],wuDone:[],lf:false,diet:[],easy:false,wt:'',ex:[],extras:[],activePanel:'meals',mealMoreOpen:[],extraOpen:[],extraEditOpen:[],mealEntryMode:'plan',manualOpen:[]};
 
 // ─── USER MENU ───────────────────────────────────────────────
 function toggleUserMenu(e){
@@ -3178,8 +3200,8 @@ function initMeals(){
 }
 function initWorkout(){
   const w=WKT[S.wt];
-  if(S.wt==='crossfit'){S.ex=[];S.exd=[];S.cfWod=null;}
-  else{S.ex=w.ex?w.ex.map(e=>({...e})):[];S.exd=S.ex.map(()=>false);}
+  if(S.wt==='crossfit'){S.ex=[];S.exd=[];S.wuDone=[];S.cfWod=null;}
+  else{S.ex=w.ex?w.ex.map(e=>({...e})):[];S.exd=S.ex.map(()=>false);S.wuDone=(getWorkoutPrimer(S.wt)?.warmup||[]).map(()=>false);}
 }
 
 // ─── TOGGLES ────────────────────────────────────────────────
@@ -3758,6 +3780,117 @@ function renderWorkoutPrimer(wt){
   </div>`;
 }
 
+function ensureWarmupState(){
+  const steps=(getWorkoutPrimer(S.wt)?.warmup)||[];
+  if(!Array.isArray(S.wuDone))S.wuDone=[];
+  if(S.wuDone.length!==steps.length){
+    S.wuDone=steps.map((_,i)=>!!S.wuDone[i]);
+  }
+  return steps;
+}
+function toggleWarmup(i){
+  ensureWarmupState();
+  S.wuDone[i]=!S.wuDone[i];
+  save();
+  renderWorkout();
+}
+function getExerciseFeelCue(name){
+  const n=String(name||'').toLowerCase();
+  if(/hip thrust|glute bridge|frog pump|abduktor|kickback|donkey/i.test(n))return{
+    feel:'zadnjico, ob strani tudi glute medius',
+    fix:'če čutiš predvsem križ ali sprednje stegne, znižaj težo, rebra zapri, brado rahlo proti prsnemu košu in na vrhu zavestno stisni zadnjico'
+  };
+  if(/deadlift|mrtv|rdl|pull.?through|good morning/i.test(n))return{
+    feel:'zadnjo ložo in zadnjico',
+    fix:'če čutiš predvsem križ, pelji boke bolj nazaj, zmehčaj kolena in drži utež bližje nogam'
+  };
+  if(/squat|počep|leg press|hack|split squat|lunge|izpad|step.?up/i.test(n))return{
+    feel:'zadnjico in stegna',
+    fix:'če čutiš samo kolena ali križ, skrajšaj gib, preveri smer kolen in upočasni spust'
+  };
+  if(/row|veslan|lat pull|pulldown|pull.?up|trx/i.test(n))return{
+    feel:'srednji del hrbta in latse pod pazduho',
+    fix:'če delajo samo bicepsi, spusti ramena dol, najprej povleci komolce nazaj in znižaj težo'
+  };
+  if(/press|potisk|push.?up|shoulder/i.test(n))return{
+    feel:'prsni koš, rame ali triceps glede na vajo',
+    fix:'če čutiš samo vrat ali križ, stisni jedro, spusti ramena in znižaj težo'
+  };
+  if(/biceps|curl/i.test(n))return{
+    feel:'biceps spredaj na nadlakti',
+    fix:'če ni občutka, ne gugaj s trupom in obrni dlan povsem navzgor'
+  };
+  if(/triceps|pushdown|dip|skull/i.test(n))return{
+    feel:'triceps na zadnji strani roke',
+    fix:'če čutiš rame, drži komolce bolj pri telesu in znižaj težo'
+  };
+  if(/plank|sit.?up|crunch|dead bug|bird dog|core|trebu/i.test(n))return{
+    feel:'trebuh in stabilnost trupa',
+    fix:'če čutiš križ, stisni rebra dol, skrajšaj gib in dihaj počasneje'
+  };
+  return{
+    feel:'ciljno mišico v kontroliranem gibu',
+    fix:'če občutka ni, znižaj težo, upočasni tempo in naredi eno lažjo testno serijo'
+  };
+}
+function parseSetLines(text){
+  return String(text||'').split('\n').map(line=>line.trim()).filter(Boolean).map(line=>{
+    const m=line.match(/([0-9]+(?:[.,][0-9]+)?)?\s*(?:kg)?\s*[x×]\s*([0-9]+)/i);
+    if(!m)return null;
+    const kg=m[1]?parseFloat(String(m[1]).replace(',','.')):0;
+    const reps=parseInt(m[2])||0;
+    return reps?{kg,reps}:null;
+  }).filter(Boolean);
+}
+function formatSetLinesFromLog(log,e){
+  if(!log)return'';
+  if(log.setsText)return String(log.setsText).trim();
+  if(Array.isArray(log.setsDetail)&&log.setsDetail.length){
+    return log.setsDetail.map(s=>`${(s.kg||0)>0?s.kg:''} x ${s.reps}`).join('\n');
+  }
+  const sets=parseInt(log.s)||parseInt(e?.s)||0;
+  const reps=parseInt(log.r)||parseInt(e?.r)||0;
+  const kg=parseFloat(log.kg)||0;
+  if(sets&&reps){
+    return Array.from({length:sets},()=>`${kg>0?kg:''} x ${reps}`).join('\n');
+  }
+  return '';
+}
+function summarizeSetLog(log){
+  if(!log)return'';
+  if(Array.isArray(log.setsDetail)&&log.setsDetail.length){
+    const arr=log.setsDetail;
+    const same=arr.every(s=>String(s.kg||0)===String(arr[0].kg||0)&&String(s.reps||0)===String(arr[0].reps||0));
+    if(same){
+      const first=arr[0]||{};
+      return `${arr.length}×${first.reps}${(first.kg||0)>0?` · ${first.kg} kg`:''}`;
+    }
+    return arr.map(s=>`${(s.kg||0)>0?`${s.kg}kg×`:'×'}${s.reps}`).join(' · ');
+  }
+  if(log.kg||log.s||log.r){
+    return `${log.s||'?'}×${log.r||'?'}${parseFloat(log.kg||0)>0?` · ${log.kg} kg`:''}`;
+  }
+  return '';
+}
+function renameExercise(i){
+  const inp=document.getElementById('renex'+i);
+  const next=String(inp?.value||'').trim();
+  const cur=S.ex[i];
+  if(!cur||!next)return;
+  const old=cur.n;
+  if(next===old)return;
+  const elog=loadElog();
+  if(elog[old]&&!elog[next]){
+    elog[next]=elog[old];
+    delete elog[old];
+    try{localStorage.setItem(lsKey(ELKEY),JSON.stringify(elog));}catch(e){}
+  }
+  S.ex[i]={...cur,n:next,custom:true};
+  save();
+  renderWorkout();
+  calcKcal();
+}
+
 // ─── BP RENDER ──────────────────────────────────────────────
 function renderBp(){
   document.getElementById('bpsel').innerHTML=BP.map(b=>{
@@ -4015,7 +4148,7 @@ function calcExBurn(){
   return S.ex.reduce((sum,ex,i)=>{
 	if(!S.exd[i])return sum;
 	const logged=loadElog()[ex.n]||{};
-	const sets=parseInt(logged.s)||parseInt(ex.s)||3;
+	const sets=(Array.isArray(logged.setsDetail)&&logged.setsDetail.length)?logged.setsDetail.length:(parseInt(logged.s)||parseInt(ex.s)||3);
 	const kcalPerSet=BURN[ex.n]||BURN_DEFAULT;
 	return sum+sets*kcalPerSet;
   },0);
@@ -4323,7 +4456,19 @@ function deleteMeal(i){
 // ─── RENDER WORKOUT ─────────────────────────────────────────
 function renderWorkout(){
   const c=document.getElementById('wc'),baw=document.getElementById('baw'),w=WKT[S.wt];
-  const primerHtml=renderWorkoutPrimer(S.wt);
+  const warmupSteps=ensureWarmupState();
+  const warmupHtml=warmupSteps.length?`<div class="workout-block">
+    <div class="workout-subhead">Ogrevanje</div>
+    ${warmupSteps.map((step,i)=>`
+      <div class="wu-card${S.wuDone[i]?' done':''}">
+        <div class="wu-dot"></div>
+        <div class="wu-body">
+          <div class="wu-title">${step}</div>
+          <div class="wu-meta">odkljukaj, ko narediš</div>
+        </div>
+        <button class="chk${S.wuDone[i]?' on':''}" onclick="toggleWarmup(${i})">${S.wuDone[i]?'✓':'○'}</button>
+      </div>`).join('')}
+  </div>`:'';
   // Defensive helper — set disabled/innerHTML safely
   const setBaw=(disabled,html)=>{
 	if(!baw)return;
@@ -4354,7 +4499,7 @@ function renderWorkout(){
 		${descHtml}
 	  </div>`;
 	}).join('');
-	c.innerHTML=primerHtml+`<div class="wod-card" id="wod-card">
+	c.innerHTML=warmupHtml+`<div class="wod-card" id="wod-card">
 	  <div class="wod-head">
 		<span class="wod-type ${typeClass}">${wod.type}</span>
 		<span class="wod-title">${wod.name}</span>
@@ -4372,9 +4517,9 @@ function renderWorkout(){
 	<div style="margin-top:8px;font-size:12px;color:var(--lt);">Klikni ↺ pri posamezni vaji za zamenjavo, ali "Nov WOD" za cel nov trening.</div>`;
 	return;
   }
-  if(S.wt==='cardio'){
+	if(S.wt==='cardio'){
 	setBaw(false);document.getElementById('add-ex-row').style.display='none';
-	c.innerHTML=primerHtml+`<div style="font-size:12px;color:var(--lt);margin-bottom:10px;">Izberi kaj boš naredila, nastavi čas in odkljukaj ob koncu.</div>`+
+	c.innerHTML=warmupHtml+`<div style="font-size:12px;color:var(--lt);margin-bottom:10px;">Izberi kaj boš naredila, nastavi čas in odkljukaj ob koncu.</div>`+
 	  S.ex.map((e,i)=>{
 		const done=S.exd[i];const open=!!exExp[i];
 		const info=getExInfo(e.n)||{};
@@ -4415,20 +4560,15 @@ function renderWorkout(){
 	  }).join('');
 	return;
   }
-  else if(S.wt==='rest'){setBaw(true);c.innerHTML=primerHtml+`<div class="info-box" style="text-align:center;">😌 <b>Danes je počitek</b><br><br>Telo se regenerira in mišice rastejo.<br>Lahka hoja ali raztezanje sta vedno dobrodošla.</div>`;document.getElementById('add-ex-row').style.display='none';}
+  else if(S.wt==='rest'){setBaw(true);c.innerHTML=`<div class="info-box" style="text-align:center;">😌 <b>Danes je počitek</b><br><br>Telo se regenerira in mišice rastejo.<br>Lahka hoja ali raztezanje sta vedno dobrodošla.</div>`;document.getElementById('add-ex-row').style.display='none';}
   else{
 	setBaw(false,'↺ Zamenjaj vaje');document.getElementById('add-ex-row').style.display='flex';
-	const bc=S.wt==='glute'?'glute':'gym';
 	const elog=loadElog();
-	// Workout summary stats
-	const totalSets=S.ex.reduce((sum,e)=>{
-	  const [rl,rh]=getRepRange(e.n,S.wt);
-	  const sg=suggestProgression(e.n,rl,rh,(getExInfo(e.n)||{}).kg||0);
-	  return sum+sg.sets;
-	},0);
-	const estMin=Math.round(totalSets*2.5);  // ~2.5 min per set incl. rest
-	c.innerHTML=primerHtml+`<div class="workout-summary">
+	const totalSets=S.ex.reduce((sum,e)=>sum+(parseInt(e.s)||3),0);
+	const estMin=Math.max(35,Math.round(totalSets*2.5));
+	c.innerHTML=warmupHtml+`<div class="workout-summary">
 	  <div class="ws-stats">
+		<span class="ws-stat"><b>${warmupSteps.length}</b> ogrevanje</span>
 		<span class="ws-stat"><b>${S.ex.length}</b> vaj</span>
 		<span class="ws-stat"><b>${totalSets}</b> serij</span>
 		<span class="ws-stat">~<b>${estMin}</b> min</span>
@@ -4436,83 +4576,59 @@ function renderWorkout(){
 	  <button class="ws-overview-btn" onclick="togAllExercises()" id="ws-toggle-all">Razširi vse ▾</button>
 	</div>`+
 	  S.ex.map((e,i)=>{
-		const done=S.exd[i];const pk=S.wt==='glute';const open=!!exExp[i];
+		const done=S.exd[i];const open=!!exExp[i];
 		const info=getExInfo(e.n)||{};const logged=elog[e.n]||{};
-		const startKg=info.kg||0;
-		// Double progression suggestion
-		const [repLow,repHigh]=getRepRange(e.n,S.wt);
-		const sugg=suggestProgression(e.n,repLow,repHigh,startKg);
 		const hist=getExerciseHistory(e.n);
-		const targetS=String(sugg.sets);const targetR=repLow+'-'+repHigh;
-		// History display (last 3 sessions)
+		const cue=getExerciseFeelCue(e.n);
+		const loggedSummary=summarizeSetLog(logged);
+		const setText=formatSetLinesFromLog(logged,e);
+		const firstTip=info.tip?`Začni približno pri: ${info.tip}`:'Če ne veš, začni lažje in prvo serijo naredi testno.';
 		const histHtml=hist.length>0?`
 		  <div class="ex-hist">
 			<div class="ex-hist-title">Zgodovina</div>
-			${hist.slice(0,3).map(h=>`<div class="ex-hist-row"><span class="ex-hist-date">${h.daysAgo===0?'danes':h.daysAgo+'d nazaj'}</span><span class="ex-hist-val">${h.kg||'—'}kg × ${h.s||'?'} × ${h.r||'?'}</span></div>`).join('')}
+			${hist.slice(0,3).map(h=>`<div class="ex-hist-row"><span class="ex-hist-date">${h.daysAgo===0?'danes':h.daysAgo+'d nazaj'}</span><span class="ex-hist-val">${summarizeSetLog(h)||`${h.kg||'—'}kg × ${h.s||'?'} × ${h.r||'?'}`}</span></div>`).join('')}
 		  </div>`:'';
-		// Progression hint badge
-		const sugClassMap={first:'first',deload:'deload',consolidate:'hold',rep_push:'push',increase:'inc'};
-		const sugClass=sugClassMap[sugg.type]||'';
-		const ingHtml=info.desc?`
-		  <div class="ex-desc">${info.desc}</div>
-		  <div class="ex-tip">💡 ${info.tip||''}</div>
-		  <a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent((info.yt||e.n)+' tutorial')}" target="_blank">▶ Poglej video navodila</a>
-		  <div class="prog-card prog-${sugClass}">
-			<div class="prog-head">
-			  <span class="prog-lbl">Cilj danes</span>
-			  <span class="prog-target">${sugg.sets} × ${sugg.reps} pon. · <b>${sugg.kg||'—'} kg</b></span>
-			</div>
-			<div class="prog-note">${sugg.note}</div>
-		  </div>
-		  ${histHtml}
-		  <div class="log-sec">
-			<div class="log-title">Danes sem naredila</div>
-			<div class="log-row">
-			  <span class="log-lbl">Teža</span>
-			  <input class="log-inp w" id="lkg${i}" type="number" min="0" step="0.5" placeholder="${sugg.kg||'kg'}" value="${logged.kg||''}"> <span class="log-lbl">kg</span>
-			  <span class="log-lbl" style="margin-left:4px;">Serije</span>
-			  <input class="log-inp n" id="ls${i}" type="number" min="0" max="10" placeholder="${sugg.sets}" value="${logged.s||''}">
-			  <span class="log-lbl">×</span>
-			  <input class="log-inp n" id="lr${i}" type="number" min="0" max="50" placeholder="${sugg.reps}" value="${logged.r||''}">
-			  <span class="log-lbl">pon.</span>
-			  <button class="log-save" onclick="logEx(${i},'${e.n.replace(/'/g,'&#39;')}')">Shrani</button>
-			  <span class="log-ok" id="lok${i}">${logged.kg?'✓ shranjeno':''}</span>
-			</div>
-		  </div>`:`
-		  <div class="no-desc" style="margin-bottom:9px;"></div>
-		  <div class="prog-card prog-${sugClass}">
-			<div class="prog-head">
-			  <span class="prog-lbl">Cilj danes</span>
-			  <span class="prog-target">${sugg.sets} × ${sugg.reps} pon. · <b>${sugg.kg||'—'} kg</b></span>
-			</div>
-			<div class="prog-note">${sugg.note}</div>
-		  </div>
-		  ${histHtml}
-		  <div class="log-sec">
-			<div class="log-title">Danes sem naredila</div>
-			<div class="log-row">
-			  <span class="log-lbl">Teža</span>
-			  <input class="log-inp w" id="lkg${i}" type="number" min="0" step="0.5" placeholder="${sugg.kg||'kg'}" value="${logged.kg||''}"> <span class="log-lbl">kg</span>
-			  <span class="log-lbl" style="margin-left:4px;">Serije</span>
-			  <input class="log-inp n" id="ls${i}" type="number" min="0" max="10" placeholder="${sugg.sets}" value="${logged.s||''}">
-			  <span class="log-lbl">×</span>
-			  <input class="log-inp n" id="lr${i}" type="number" min="0" max="50" placeholder="${sugg.reps}" value="${logged.r||''}">
-			  <span class="log-lbl">pon.</span>
-			  <button class="log-save" onclick="logEx(${i},'${e.n.replace(/'/g,'&#39;')}')">Shrani</button>
-			  <span class="log-ok" id="lok${i}">${logged.kg?'✓ shranjeno':''}</span>
-			</div>
-		  </div>`;
+		const descHtml=info.desc?`<div class="ex-desc">${info.desc}</div>`:`<div class="no-desc" style="margin-bottom:8px;"></div>`;
 		return `<div class="ex-wrap" id="ew${i}">
 		  <div class="ex-top${done?' done':''}" id="et${i}">
 			<div class="edot"></div>
-			<div class="ename">${e.n}${e.custom?` <span style="font-size:11px;color:var(--red);">ročno</span>`:''}${logged.kg?` <span style="font-size:11px;color:var(--grn);">${logged.s||'?'}×${logged.r||'?'} · ${logged.kg}kg</span>`:''}</div>
-			<div class="epills"><span class="ep${pk?' pk':''}" title="${sugg.note}">${sugg.kg||'—'}kg</span><span class="ep${pk?' pk':''}">${sugg.sets}×${sugg.reps}</span></div>
+			<div class="ex-top-main">
+			  <div class="ename">${e.n}</div>
+			</div>
+			${loggedSummary?`<span class="logged-chip">${loggedSummary}</span>`:''}
 			<button class="chk${done?' on':''}" id="echk${i}" onclick="togEx(${i})">${done?'✓':'○'}</button>
-			<button class="ex-xbtn${open?' open':''}" id="exb${i}" onclick="togExInfo(${i})" title="Navodila in log">▾</button>
+			<button class="ex-xbtn${open?' open':''}" id="exb${i}" onclick="togExInfo(${i})" title="Odpri vajo">▾</button>
 		  </div>
-		  <div class="ex-detail${open?' open':''}" id="exd${i}">${ingHtml}
+		  <div class="ex-detail${open?' open':''}" id="exd${i}">
+			<div class="ex-detail-head">
+			  <div class="ex-detail-title">Vnos za to vajo</div>
+			  <span class="log-ok" id="lok${i}">${loggedSummary?'✓ shranjeno':''}</span>
+			</div>
+			${descHtml}
+			<div class="cue-box">
+			  <div class="cue-row"><b>Čutiti moraš:</b> ${cue.feel}</div>
+			  <div class="cue-row"><b>Če ne čutiš:</b> ${cue.fix}</div>
+			</div>
+			<div class="exercise-note">${firstTip}</div>
+			<div class="setlog-sec">
+			  <div class="setlog-label">Danes sem naredila</div>
+			  <div class="setlog-help">Vsaka vrstica je ena serija. Primer: <b>20 x 10</b>, nato v novo vrstico <b>25 x 8</b>, nato <b>30 x 6</b>.</div>
+			  <textarea class="setlog-area" id="lsets${i}" placeholder="20 x 10&#10;25 x 8&#10;30 x 6">${setText}</textarea>
+			  <div class="exercise-manual-row">
+				<button class="log-save" onclick="logEx(${i},'${e.n.replace(/'/g,'&#39;')}')">Shrani</button>
+			  </div>
+			</div>
+			<div class="setlog-sec">
+			  <div class="setlog-label">Ročno zamenjaj vajo</div>
+			  <div class="setlog-help">Če delaš drugo varianto, tukaj prepiši ime vaje. To je ločeno od vpisane teže.</div>
+			  <div class="exercise-manual-row">
+				<input class="edit-input" id="renex${i}" value="${e.n.replace(/"/g,'&quot;')}" placeholder="npr. mrtvi dvig s palico">
+				<button class="edit-go" onclick="renameExercise(${i})">Shrani vajo</button>
+			  </div>
+			</div>
+			${histHtml}
 			<div class="ex-actions">
-			  <button class="ex-action-btn" onclick="swapEx(${i})" title="Zamenjaj s podobno vajo">↺ Zamenjaj</button>
+			  <button class="ex-action-btn" onclick="swapEx(${i})" title="Zamenjaj s podobno vajo">↺ Zamenjaj vajo</button>
 			  <button class="ex-action-btn ex-rm" onclick="removeEx(${i})" title="Odstrani vajo">✕ Odstrani</button>
 			</div>
 		  </div>
@@ -4591,16 +4707,21 @@ function togExInfo(i){
   }
 }
 function logEx(i,name){
-  const kg=document.getElementById('lkg'+i)?.value;
-  const s=document.getElementById('ls'+i)?.value;
-  const r=document.getElementById('lr'+i)?.value;
-  saveElog(name,{kg,s,r});
+  const text=String(document.getElementById('lsets'+i)?.value||'').trim();
+  const setsDetail=parseSetLines(text);
+  let kg='',s='',r='';
+  if(setsDetail.length){
+    const topKg=Math.max(...setsDetail.map(x=>parseFloat(x.kg)||0),0);
+    const last=setsDetail[setsDetail.length-1]||{};
+    kg=topKg||'';
+    s=setsDetail.length;
+    r=last.reps||'';
+  }
+  saveElog(name,{kg,s,r,setsDetail,setsText:text});
   calcKcal();
   const ok=document.getElementById('lok'+i);
   if(ok){ok.textContent='✓ shranjeno';ok.classList.add('show');setTimeout(()=>ok.classList.remove('show'),2500);}
-  // update the inline summary in ename without full re-render
-  const et=document.getElementById('et'+i);
-  if(et){const nm=et.querySelector('.ename');if(nm&&kg){const existing=nm.querySelector('span:last-child');const tag=document.createElement('span');tag.style.cssText='font-size:11px;color:var(--grn);';tag.textContent=` ${s||'?'}×${r||'?'} · ${kg}kg`;if(existing&&existing.style.color.includes('rgb(42'))existing.replaceWith(tag);else nm.appendChild(tag);}}
+  renderWorkout();
 }
 function togEx(i){
   S.exd[i]=!S.exd[i];save();
@@ -4613,11 +4734,10 @@ function togEx(i){
 }
 function addCustomEx(){
   const n=document.getElementById('aen').value.trim();
-  const s=document.getElementById('aes').value.trim()||'3';
-  const r=document.getElementById('aer').value.trim()||'12';
   if(!n)return;
-  S.ex.push({n,s,r,custom:true});S.exd.push(false);
+  S.ex.push({n,custom:true});S.exd.push(false);
   document.getElementById('aen').value='';
+  exExp[S.ex.length-1]=true;
   save();renderWorkout();
 }
 
@@ -5682,9 +5802,11 @@ async function swapEx(i){
 
   // Movement pattern + curated alternatives
   const mv=getMovementAlternatives(cur.n);
-  // Also avoid other exercises currently in the workout
+  // Avoid exercises already in current workout OR already logged today
   const otherInWorkout=S.ex.filter((_,idx)=>idx!==i).map(e=>e.n.toLowerCase());
-  const candidates=mv.alternatives.filter(a=>!otherInWorkout.includes(a.toLowerCase()));
+  const loggedToday=Object.keys(loadElog()).map(n=>String(n).toLowerCase());
+  const blocked=new Set([...otherInWorkout,...loggedToday]);
+  const candidates=mv.alternatives.filter(a=>!blocked.has(a.toLowerCase()));
 
   const restoreBtn=()=>{card.classList.remove('loading');btn.disabled=false;btn.innerHTML=origLabel;};
 
