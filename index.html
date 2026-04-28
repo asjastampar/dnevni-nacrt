@@ -362,6 +362,28 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .setlog-area{width:100%;min-height:92px;border:.5px solid var(--br);border-radius:12px;padding:10px 12px;font-size:14px;font-family:inherit;background:var(--w);color:var(--dk);outline:none;resize:vertical;line-height:1.45;}
 .setlog-area:focus{border-color:rgba(0,0,0,.2);}
 .setlog-area::placeholder{color:var(--lt);}
+/* Structured-set entry: one row per set with kg + reps + remove */
+.set-rows{display:flex;flex-direction:column;gap:6px;}
+.set-row{display:grid;grid-template-columns:32px 1fr 18px 1fr 22px;align-items:center;gap:8px;padding:7px 9px;background:var(--bg);border-radius:9px;}
+.set-row-num{font-size:11.5px;color:var(--lt);font-weight:600;text-align:center;}
+.set-row-input{background:var(--w);border:.5px solid var(--br);border-radius:7px;padding:7px 9px;font-size:14px;font-family:inherit;color:var(--dk);outline:none;text-align:center;width:100%;min-width:0;-moz-appearance:textfield;}
+.set-row-input::-webkit-outer-spin-button,.set-row-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.set-row-input:focus{border-color:rgba(0,0,0,.25);}
+.set-row-x{font-size:11.5px;color:var(--lt);text-align:center;font-weight:600;}
+.set-row-rm{background:none;border:none;color:var(--lt);font-size:16px;cursor:pointer;padding:2px 4px;line-height:1;border-radius:5px;transition:all .12s;font-family:inherit;}
+.set-row-rm:hover{color:var(--red);background:#FDF0EC;}
+.set-add-btn{background:none;border:.5px dashed var(--br);border-radius:9px;padding:8px 12px;font-size:12.5px;color:var(--md);cursor:pointer;font-family:inherit;width:100%;margin-top:6px;transition:all .15s;}
+.set-add-btn:hover{border-color:var(--md);color:var(--dk);background:var(--bg);}
+.set-row-input.kg-input::after{content:'kg';color:var(--lt);}
+/* Time/duration entry — single line */
+.set-time{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.set-time-field{display:flex;flex-direction:column;gap:4px;}
+.set-time-field label{font-size:10.5px;color:var(--lt);text-transform:uppercase;letter-spacing:.05em;}
+.set-time-input{background:var(--w);border:.5px solid var(--br);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;color:var(--dk);outline:none;}
+.set-time-input:focus{border-color:rgba(0,0,0,.25);}
+/* Progressive overload hint chip */
+.po-hint{display:inline-block;background:#F0F7F2;color:#386f4d;font-size:11.5px;padding:4px 9px;border-radius:999px;margin-bottom:8px;font-weight:500;}
+.po-hint.first-time{background:#FEF7E8;color:#7a5c00;}
 .exercise-manual-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;}
 .exercise-manual-row .edit-input{min-width:220px;}
 .exercise-note{font-size:12px;color:var(--md);background:#F8F5EE;border-radius:10px;padding:8px 10px;line-height:1.45;margin-bottom:10px;}
@@ -4488,6 +4510,244 @@ function parseSetLines(text){
     return reps?{kg,reps}:null;
   }).filter(Boolean);
 }
+
+// Determines what kind of inputs a given exercise needs:
+//   'weighted' = kg + reps (free weights, machines)
+//   'bodyweight' = reps only (push-ups, pull-ups, planks)
+//   'time' = duration only (planks, isometric holds)
+//   'run' = distance + duration (running, walking)
+//   'cardio_machine' = duration + optional distance/watts (bike, elliptical, rower)
+function getInputMode(ex){
+  if(!ex)return 'weighted';
+  // Cardio workout type — by exercise name
+  if(S.wt==='cardio'){
+	const n=(ex.n||'').toLowerCase();
+	if(/tek|run|hoja|walk|tek\b/.test(n))return 'run';
+	return 'cardio_machine';
+  }
+  // Look up id in EX_DB for movement-aware decision
+  if(ex.id&&typeof EX_DB!=='undefined'&&EX_DB[ex.id]){
+	const e=EX_DB[ex.id];
+	// Isometric holds → time
+	if(e.movement==='core_iso'&&/plank|hold/i.test(e.n))return 'time';
+	// Pure bodyweight exercises (no kg field needed) — when neither home_eq
+	// nor gym is in locations, OR when the name strongly implies BW
+	const bwOnly=e.locations.every(l=>l==='home_basic'||l==='outdoor');
+	if(bwOnly)return 'bodyweight';
+	// Push-ups/dips/pull-ups are bodyweight even though they appear in gym
+	if(/push.?up|pull.?up|dip|bridge|raise/i.test(e.n)&&e.movement!=='hip_extension'&&e.movement!=='calf')return 'bodyweight';
+	return 'weighted';
+  }
+  // Legacy / custom exercises — guess from name
+  const n=(ex.n||'').toLowerCase();
+  if(/plank|hold|sit|deadbug|bird dog|hollow/.test(n))return 'time';
+  if(/push.?up|pull.?up|squat$|izpad|bridge|crunch|dvig|burpee/.test(n))return 'bodyweight';
+  return 'weighted';
+}
+
+// Returns the user's previous best for a given exercise — used to anchor
+// progressive overload suggestions. Looks back up to 60 days, prefers the
+// most recent entry with the highest kg or reps.
+function getExerciseBaseline(name){
+  if(!name)return null;
+  let best=null;
+  for(let i=1;i<=60;i++){
+	const d=new Date(now);d.setDate(now.getDate()-i);
+	const k=localDateKey(d);
+	try{
+	  const raw=localStorage.getItem(lsKey('exlog_'+k));
+	  if(!raw)continue;
+	  const log=JSON.parse(raw);
+	  const e=log[name];
+	  if(!e)continue;
+	  if(Array.isArray(e.setsDetail)&&e.setsDetail.length){
+		const topKg=Math.max(...e.setsDetail.map(s=>parseFloat(s.kg)||0),0);
+		const topReps=Math.max(...e.setsDetail.map(s=>parseInt(s.reps)||0),0);
+		if(!best||topKg>best.kg||(topKg===best.kg&&topReps>best.reps)){
+		  best={daysAgo:i,kg:topKg,reps:topReps,sets:e.setsDetail.length,date:k};
+		}
+	  } else if(e.kg||e.r){
+		const kg=parseFloat(e.kg)||0;
+		const reps=parseInt(e.r)||0;
+		if(!best||kg>best.kg||(kg===best.kg&&reps>best.reps)){
+		  best={daysAgo:i,kg,reps,sets:parseInt(e.s)||0,date:k};
+		}
+	  }
+	}catch(err){}
+  }
+  return best;
+}
+
+// Parse "8-12" or "30s" from the exercise's r field. Returns {lo, hi}.
+function parseRepRange(ex){
+  const r=String(ex.r||ex.scheme||'').trim();
+  const m=r.match(/(\d+)\s*[-–]\s*(\d+)/);
+  if(m)return {lo:parseInt(m[1]),hi:parseInt(m[2])};
+  const single=r.match(/^(\d+)/);
+  if(single){const n=parseInt(single[1]);return {lo:Math.max(1,n-2),hi:n+2};}
+  return null;
+}
+
+// Suggest the next workout target using simple double progression.
+function suggestProgression(ex){
+  const name=ex.n;
+  const base=getExerciseBaseline(name);
+  if(!base)return {type:'first_time',hint:'Prvič vnašaš to vajo. Začni lažje od pričakovanega — tako boš lahko progresno napredovala.'};
+  const repRange=parseRepRange(ex);
+  const repHi=repRange?repRange.hi:12;
+  const isUpper=ex.id&&typeof EX_DB!=='undefined'&&EX_DB[ex.id]&&['horizontal_push','vertical_push','horizontal_pull','vertical_pull','biceps_isolation','triceps_isolation','rear_delt'].includes(EX_DB[ex.id].movement);
+  if(base.reps>=repHi&&base.kg>0){
+	const inc=isUpper?2.5:5;
+	return {
+	  type:'add_weight',
+	  prevKg:base.kg,prevReps:base.reps,
+	  targetKg:base.kg+inc,targetReps:repRange?repRange.lo:8,
+	  hint:`Prejšnji put: <b>${base.kg} kg × ${base.reps}</b>. Dodaj ${inc} kg → cilj <b>${base.kg+inc} kg × ${repRange?repRange.lo:8}</b>.`
+	};
+  }
+  if(base.kg>0){
+	return {
+	  type:'add_reps',
+	  prevKg:base.kg,prevReps:base.reps,
+	  targetKg:base.kg,targetReps:base.reps+1,
+	  hint:`Prejšnji put: <b>${base.kg} kg × ${base.reps}</b>. Cilj danes: <b>${base.kg} kg × ${base.reps+1}</b>.`
+	};
+  }
+  return {
+	type:'add_reps',
+	prevKg:0,prevReps:base.reps,
+	targetKg:0,targetReps:base.reps+1,
+	hint:`Prejšnji put: <b>${base.reps} ponovitev</b>. Cilj danes: <b>${base.reps+1}</b>.`
+  };
+}
+
+// Build the structured set rows for an exercise.
+function renderSetRows(i,e,log){
+  const mode=getInputMode(e);
+  let sets=[];
+  if(Array.isArray(log&&log.setsDetail)&&log.setsDetail.length){
+	sets=log.setsDetail.map(s=>({kg:s.kg||0,reps:s.reps||0,sec:s.sec||0,km:s.km||0}));
+  }
+  if(!sets.length){
+	const targetSets=parseInt(e.s)||3;
+	const targetReps=parseInt(e.r)||10;
+	for(let k=0;k<targetSets;k++)sets.push({kg:0,reps:targetReps,sec:0,km:0});
+  }
+  if(mode==='time'){
+	const sec=sets[0]?.sec||parseInt(e.r)||30;
+	return `<div class="set-time">
+	  <div class="set-time-field">
+		<label>Čas (sek)</label>
+		<input class="set-time-input" type="number" inputmode="numeric" id="ti${i}-sec" value="${sec||''}" placeholder="30">
+	  </div>
+	  <div class="set-time-field">
+		<label>Serije</label>
+		<input class="set-time-input" type="number" inputmode="numeric" id="ti${i}-sets" value="${sets.length||3}" placeholder="3">
+	  </div>
+	</div>`;
+  }
+  if(mode==='run'){
+	const km=sets[0]?.km||0;
+	const minMatch=String(e.r||'').match(/(\d+)/);
+	const min=sets[0]?.reps||(minMatch?parseInt(minMatch[1]):30);
+	return `<div class="set-time">
+	  <div class="set-time-field">
+		<label>Razdalja (km)</label>
+		<input class="set-time-input" type="number" inputmode="decimal" id="ti${i}-km" value="${km||''}" placeholder="5">
+	  </div>
+	  <div class="set-time-field">
+		<label>Čas (min)</label>
+		<input class="set-time-input" type="number" inputmode="numeric" id="ti${i}-min" value="${min||''}" placeholder="30">
+	  </div>
+	</div>`;
+  }
+  if(mode==='cardio_machine'){
+	const km=sets[0]?.km||0;
+	const minMatch=String(e.r||'').match(/(\d+)/);
+	const min=sets[0]?.reps||(minMatch?parseInt(minMatch[1]):30);
+	return `<div class="set-time">
+	  <div class="set-time-field">
+		<label>Čas (min)</label>
+		<input class="set-time-input" type="number" inputmode="numeric" id="ti${i}-min" value="${min||''}" placeholder="30">
+	  </div>
+	  <div class="set-time-field">
+		<label>Razdalja (km, neobvezno)</label>
+		<input class="set-time-input" type="number" inputmode="decimal" id="ti${i}-km" value="${km||''}" placeholder="—">
+	  </div>
+	</div>`;
+  }
+  // weighted or bodyweight: row per set
+  const showKg=mode==='weighted';
+  const rowsHtml=sets.map((s,k)=>`
+	<div class="set-row" data-set-idx="${k}">
+	  <div class="set-row-num">${k+1}.</div>
+	  ${showKg
+		?`<input class="set-row-input kg-input" type="number" inputmode="decimal" placeholder="kg" data-ex="${i}" data-k="${k}" data-field="kg" value="${s.kg||''}">`
+		:`<div></div>`}
+	  <div class="set-row-x">${showKg?'×':''}</div>
+	  <input class="set-row-input rep-input" type="number" inputmode="numeric" placeholder="ponov." data-ex="${i}" data-k="${k}" data-field="reps" value="${s.reps||''}">
+	  <button class="set-row-rm" onclick="removeSetRow(${i},${k})" title="Odstrani serijo" aria-label="Odstrani serijo">×</button>
+	</div>
+  `).join('');
+  return `<div class="set-rows" id="srs${i}">${rowsHtml}</div>
+	<button class="set-add-btn" onclick="addSetRow(${i})">+ Dodaj sklop</button>`;
+}
+
+// Add an empty set row to a given exercise's input grid.
+function addSetRow(i){
+  const sets=readSetRowsFromDOM(i);
+  const last=sets[sets.length-1]||{};
+  sets.push({kg:last.kg||0,reps:last.reps||0});
+  const container=document.getElementById('srs'+i);
+  if(!container)return;
+  const k=sets.length-1;
+  const showKg=getInputMode(S.ex[i])==='weighted';
+  const html=`<div class="set-row" data-set-idx="${k}">
+	<div class="set-row-num">${k+1}.</div>
+	${showKg?`<input class="set-row-input kg-input" type="number" inputmode="decimal" placeholder="kg" data-ex="${i}" data-k="${k}" data-field="kg" value="${sets[k].kg||''}">`:`<div></div>`}
+	<div class="set-row-x">${showKg?'×':''}</div>
+	<input class="set-row-input rep-input" type="number" inputmode="numeric" placeholder="ponov." data-ex="${i}" data-k="${k}" data-field="reps" value="${sets[k].reps||''}">
+	<button class="set-row-rm" onclick="removeSetRow(${i},${k})" title="Odstrani serijo" aria-label="Odstrani serijo">×</button>
+  </div>`;
+  container.insertAdjacentHTML('beforeend',html);
+  const focusField=showKg?'kg':'reps';
+  const focusEl=container.querySelector(`[data-ex="${i}"][data-k="${k}"][data-field="${focusField}"]`);
+  if(focusEl)focusEl.focus();
+}
+
+// Remove a set row and re-number.
+function removeSetRow(i,k){
+  const container=document.getElementById('srs'+i);
+  if(!container)return;
+  const rows=container.querySelectorAll('.set-row');
+  if(rows.length<=1)return;
+  const target=container.querySelector(`.set-row[data-set-idx="${k}"]`);
+  if(target)target.remove();
+  container.querySelectorAll('.set-row').forEach((row,idx)=>{
+	row.dataset.setIdx=idx;
+	const num=row.querySelector('.set-row-num');
+	if(num)num.textContent=(idx+1)+'.';
+	row.querySelectorAll('.set-row-input').forEach(inp=>{inp.dataset.k=idx;});
+	const rm=row.querySelector('.set-row-rm');
+	if(rm)rm.setAttribute('onclick',`removeSetRow(${i},${idx})`);
+  });
+}
+
+// Read the current state of the structured input grid for exercise i.
+function readSetRowsFromDOM(i){
+  const container=document.getElementById('srs'+i);
+  if(!container)return [];
+  const rows=container.querySelectorAll('.set-row');
+  const out=[];
+  rows.forEach(row=>{
+	const kgInput=row.querySelector('[data-field="kg"]');
+	const repInput=row.querySelector('[data-field="reps"]');
+	const kg=kgInput?(parseFloat(kgInput.value.replace(',','.'))||0):0;
+	const reps=repInput?(parseInt(repInput.value)||0):0;
+	out.push({kg,reps});
+  });
+  return out;
+}
 function formatSetLinesFromLog(log,e){
   if(!log)return'';
   if(log.setsText)return String(log.setsText).trim();
@@ -5263,8 +5523,14 @@ function renderWorkout(){
 			<div class="exercise-note">${firstTip}</div>
 			<div class="setlog-sec">
 			  <div class="setlog-label">Danes sem naredila</div>
-			  <div class="setlog-help">Vsaka vrstica je ena serija. Primer: <b>20 x 10</b>, nato v novo vrstico <b>25 x 8</b>, nato <b>30 x 6</b>.</div>
-			  <textarea class="setlog-area" id="lsets${i}" placeholder="20 x 10&#10;25 x 8&#10;30 x 6">${setText}</textarea>
+			  ${(function(){
+				const prog=suggestProgression(e);
+				if(prog.type==='first_time'){
+				  return `<div class="po-hint first-time">★ ${prog.hint}</div>`;
+				}
+				return `<div class="po-hint">${prog.hint}</div>`;
+			  })()}
+			  ${renderSetRows(i,e,logged)}
 			  <div class="exercise-manual-row">
 				<button class="log-save" onclick="logEx(${i},'${e.n.replace(/'/g,'&#39;')}')">Shrani</button>
 			  </div>
@@ -5358,17 +5624,38 @@ function togExInfo(i){
   }
 }
 function logEx(i,name){
-  const text=String(document.getElementById('lsets'+i)?.value||'').trim();
-  const setsDetail=parseSetLines(text);
+  const ex=S.ex[i];
+  const mode=getInputMode(ex);
+  let setsDetail=[];
   let kg='',s='',r='';
-  if(setsDetail.length){
-    const topKg=Math.max(...setsDetail.map(x=>parseFloat(x.kg)||0),0);
-    const last=setsDetail[setsDetail.length-1]||{};
-    kg=topKg||'';
-    s=setsDetail.length;
-    r=last.reps||'';
+
+  if(mode==='time'){
+	const sec=parseInt(document.getElementById('ti'+i+'-sec')?.value)||0;
+	const sets=parseInt(document.getElementById('ti'+i+'-sets')?.value)||1;
+	if(sec>0){
+	  for(let k=0;k<sets;k++)setsDetail.push({sec,reps:0,kg:0});
+	  s=sets;r=sec+'s';
+	}
+  } else if(mode==='run'||mode==='cardio_machine'){
+	const min=parseInt(document.getElementById('ti'+i+'-min')?.value)||0;
+	const km=parseFloat(String(document.getElementById('ti'+i+'-km')?.value||'').replace(',','.'))||0;
+	if(min>0){
+	  setsDetail.push({sec:min*60,km,reps:min,kg:0});
+	  s=1;r=min+' min';
+	}
+  } else {
+	// weighted or bodyweight: read from set rows
+	const rows=readSetRowsFromDOM(i);
+	setsDetail=rows.filter(rw=>rw.reps>0).map(rw=>({kg:rw.kg||0,reps:rw.reps||0}));
+	if(setsDetail.length){
+	  const topKg=Math.max(...setsDetail.map(x=>parseFloat(x.kg)||0),0);
+	  const last=setsDetail[setsDetail.length-1]||{};
+	  kg=topKg||'';
+	  s=setsDetail.length;
+	  r=last.reps||'';
+	}
   }
-  saveElog(name,{kg,s,r,setsDetail,setsText:text});
+  saveElog(name,{kg,s,r,setsDetail});
   calcKcal();
   const ok=document.getElementById('lok'+i);
   if(ok){ok.textContent='✓ shranjeno';ok.classList.add('show');setTimeout(()=>ok.classList.remove('show'),2500);}
