@@ -583,6 +583,10 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .meal-main-btn.primary:hover{background:#25563f;color:#fff;}
 .meal-main-btn.subtle{background:#FDFCF9;}
 .meal-main-btn.active{background:#EBF4EF;border-color:#B8D9C6;color:var(--grn);}
+.meal-status-btn{margin-left:auto;width:44px;min-width:44px;height:44px;border-radius:50%;padding:0;font-size:26px;line-height:1;border:1px solid rgba(0,0,0,.08);background:#F4F1EB;color:#A7A39A;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.meal-status-btn:hover{background:#ECE8E0;color:#6B6A63;}
+.meal-status-btn.active{background:var(--grn);border-color:var(--grn);color:#fff;}
+.meal-status-btn.active:hover{background:#25563f;color:#fff;}
 .meal-more-panel{border-top:.5px solid var(--br);padding:12px 14px;display:none;background:#FDFCF9;}
 .meal-more-panel.open{display:block;}
 .meal-more-grid{display:flex;flex-wrap:wrap;gap:8px;}
@@ -592,6 +596,10 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .meal-more-btn.warn{color:var(--red);}
 .meal-more-btn.warn:hover{background:#FDF0EC;border-color:rgba(201,75,42,.2);color:var(--red);}
 .meal-edit-note{font-size:12px;color:var(--md);line-height:1.45;margin-bottom:8px;}
+.manual-panel{border-top:.5px solid var(--br);padding:12px 14px;display:none;background:#FDFCF9;}
+.manual-panel.open{display:block;}
+.manual-input-row{display:flex;gap:10px;align-items:flex-start;}
+.manual-input-row .edit-input{flex:1;}
 @media(max-width:500px){
   .sec-right{width:100%;align-items:center;gap:8px;}
   .tog{font-size:12px;}
@@ -605,6 +613,9 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 	flex-wrap:wrap !important;
 	gap:8px !important;
 	padding-top:2px;
+  }
+  .meal-status-btn{
+	margin-left:0;
   }
   .meal-actions .sbtn,
   .meal-actions .del-btn,
@@ -638,6 +649,12 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
   .entry-card{
 	padding:13px;
 	border-radius:18px;
+  }
+  .manual-input-row{
+	flex-direction:column;
+  }
+  .manual-input-row .edit-go{
+	width:100%;
   }
   .add-meal-row{
 	display:grid;
@@ -2218,7 +2235,7 @@ function saveElog(name,data){const l=loadElog();l[name]=data;try{localStorage.se
 let exExp={};  // UI state: which exercises are expanded
 
 // ─── STATE ──────────────────────────────────────────────────
-let S={meals:[],exp:[false,false,false,false,false],md:[false,false,false,false,false],exd:[],lf:false,diet:[],easy:false,wt:'',ex:[],extras:[],activePanel:'meals',mealMoreOpen:[],extraOpen:[],extraEditOpen:[],mealEntryMode:'plan'};
+let S={meals:[],exp:[false,false,false,false,false],md:[false,false,false,false,false],exd:[],lf:false,diet:[],easy:false,wt:'',ex:[],extras:[],activePanel:'meals',mealMoreOpen:[],extraOpen:[],extraEditOpen:[],mealEntryMode:'plan',manualOpen:[]};
 
 // ─── USER MENU ───────────────────────────────────────────────
 function toggleUserMenu(e){
@@ -2798,8 +2815,6 @@ function parseMealPantryInput(val){
 }
 function toggleMealPantry(i){
   if(!Array.isArray(S.mealPantryOpen))S.mealPantryOpen=[];
-  if(!Array.isArray(S.mealMoreOpen))S.mealMoreOpen=[];
-  S.mealMoreOpen[i]=false;
   S.mealPantryOpen[i]=!S.mealPantryOpen[i];
   renderMeals();
   if(S.mealPantryOpen[i]){
@@ -2850,8 +2865,6 @@ function mealTypeHint(label){
 }
 async function toggleMealIdeas(i){
   if(!Array.isArray(S.mealIdeasOpen))S.mealIdeasOpen=[];
-  if(!Array.isArray(S.mealMoreOpen))S.mealMoreOpen=[];
-  S.mealMoreOpen[i]=false;
   S.mealIdeasOpen[i]=!S.mealIdeasOpen[i];
   renderMeals();
   if(S.mealIdeasOpen[i])await loadMealIdeas(i,false);
@@ -3106,6 +3119,7 @@ function ensureMealStateArrays(){
   if(!Array.isArray(S.exp))S.exp=[];
   if(!Array.isArray(S.doneOpen))S.doneOpen=[];
   if(!Array.isArray(S.editOpen))S.editOpen=[];
+  if(!Array.isArray(S.manualOpen))S.manualOpen=[];
   if(!Array.isArray(S.mealMoreOpen))S.mealMoreOpen=[];
   if(!Array.isArray(S.mealPantry))S.mealPantry=[];
   if(!Array.isArray(S.mealPantryOpen))S.mealPantryOpen=[];
@@ -3137,6 +3151,7 @@ function insertMealAt(index, meal){
   S.exp.splice(index,0,false);
   S.doneOpen.splice(index,0,false);
   S.editOpen.splice(index,0,false);
+  S.manualOpen.splice(index,0,false);
   S.mealMoreOpen.splice(index,0,false);
   S.mealPantry.splice(index,0,{items:[],mode:'prefer'});
   S.mealPantryOpen.splice(index,0,false);
@@ -3772,6 +3787,7 @@ function renderMeals(){
 	const headline=mealHeadline(mealText);
 	const desc=mealDescription(mealText);
 	const done=S.md[i];const open=S.exp[i];const editOpen=S.editOpen&&S.editOpen[i];
+	const manualOpen=!!S.manualOpen[i];
 	const pantryOpen=!!S.mealPantryOpen[i];
 	const ideasOpen=!!(S.mealIdeasOpen&&S.mealIdeasOpen[i]);
 	const doneExpanded=!!S.doneOpen[i];
@@ -3782,13 +3798,13 @@ function renderMeals(){
 	const custom=m.custom?`<span style="font-size:11px;color:var(--red);margin-left:4px;">ročni vnos</span>`:'';
 	const isPinned=!!m.pinned||!!pinned[i];
 	const pinnedBadge=isPinned?`<span class="pinned-badge">📌 privzeto</span>`:'';
-	const compactDone=done&&!doneExpanded&&!editOpen&&!pantryOpen&&!ideasOpen&&!moreOpen&&!open;
+	const compactDone=done&&!doneExpanded&&!manualOpen&&!editOpen&&!pantryOpen&&!ideasOpen&&!moreOpen&&!open;
 	const compactTitle=m.label;
 	const compactMeta=`${parseInt(m.k||m.kcal)||0} kcal`;
 	const pantrySummary=pantryState&&pantryState.items&&pantryState.items.length
 	  ? pantryState.items.map(it=>`<span class="pantry-chip">${it}</span>`).join('')
 	  : '<span style="font-size:12px;color:var(--lt);">Ni izbranih sestavin.</span>';
-	const topClick=done?` onclick="if(!event.target.closest('.meal-actions')&&!event.target.closest('.meal-more-panel')&&!event.target.closest('.edit-panel')&&!event.target.closest('.meal-pantry-panel')&&!event.target.closest('.meal-ideas-panel')&&!event.target.closest('.ing-panel'))toggleDoneMeal(${i})"`:'';
+	const topClick=done?` onclick="if(!event.target.closest('.meal-actions')&&!event.target.closest('.meal-more-panel')&&!event.target.closest('.manual-panel')&&!event.target.closest('.edit-panel')&&!event.target.closest('.meal-pantry-panel')&&!event.target.closest('.meal-ideas-panel')&&!event.target.closest('.ing-panel'))toggleDoneMeal(${i})"`:'';
 	return `<div class="meal-card fi${done?' done':''}${compactDone?' compact-done':''}" id="mc${i}">
 	  <div class="meal-top"${topClick}>
 		<div class="mdot"></div>
@@ -3809,10 +3825,17 @@ function renderMeals(){
 		  <div class="mkcal" id="mkcal${i}">~${m.k||m.kcal} kcal</div>
 		</div>
 		<div class="meal-actions">
-		  <button class="meal-main-btn primary ${done?'active':''}" id="chk${i}" onclick="togMeal(${i})">${done?'Zaužito ✓':'Zaužito'}</button>
-		  <button class="meal-main-btn ${editOpen?'active':''}" id="eb${i}" onclick="togEdit(${i})">Uredi</button>
+		  <button class="meal-main-btn ${manualOpen?'active':''}" id="mb${i}" onclick="toggleManualInput(${i})">Ročni vnos</button>
 		  <button class="meal-main-btn meal-swap-btn" onclick="swapMeal(${i})" title="Zamenjaj obrok">Zamenjaj</button>
 		  <button class="meal-main-btn subtle ${moreOpen?'active':''}" onclick="toggleMealMore(${i})">Več</button>
+		  <button class="meal-main-btn meal-status-btn ${done?'active':''}" id="chk${i}" onclick="togMeal(${i})" title="${done?'Označeno kot zaužito':'Označi kot zaužito'}">${done?'✓':'+'}</button>
+		</div>
+	  </div>
+	  <div class="manual-panel${manualOpen?' open':''}" id="manp${i}">
+		<div class="meal-edit-note">Sem vpiši obrok po domače, npr. <i>ovseni kosmiči 36 g, whey 25 g, borovnice 63 g</i>. App ga pretvori v strukturiran obrok.</div>
+		<div class="manual-input-row">
+		  <input class="edit-input" id="mi${i}" placeholder="Kaj si dejansko jedel?" onkeydown="if(event.key==='Enter')submitManualMeal(${i})">
+		  <button class="edit-go" id="mgo${i}" onclick="submitManualMeal(${i})">Shrani v obrok</button>
 		</div>
 	  </div>
 	  <div class="meal-more-panel${moreOpen?' open':''}" id="mmp${i}">
@@ -3820,13 +3843,13 @@ function renderMeals(){
 		  <button class="meal-more-btn ${open?'active':''}" id="ib${i}" onclick="togIng(${i})">Sestavine</button>
 		  <button class="meal-more-btn ${pantryOpen?'active':''}" id="pb${i}" onclick="toggleMealPantry(${i})">Imam doma</button>
 		  <button class="meal-more-btn ${ideasOpen?'active':''}" id="midb${i}" onclick="toggleMealIdeas(${i})">Ideje</button>
+		  <button class="meal-more-btn ${editOpen?'active':''}" id="eb${i}" onclick="togEdit(${i})">Uredi</button>
 		  <button class="meal-more-btn ${isPinned?'active':''}" onclick="togPin(${i})">${isPinned?'Privzeto ✓':'Shrani kot privzeto'}</button>
 		  <button class="meal-more-btn warn" onclick="deleteMeal(${i})">Izbriši obrok</button>
 		</div>
 	  </div>
 	  <div class="edit-panel${editOpen?' open':''}" id="editp${i}">
-		<div class="meal-edit-note">Popravi količino ali opis. Primer: <i>1 toast namesto 2</i>, <i>manj olja</i> ali <i>skyr z borovnicami</i>.</div>
-		<input class="edit-input" id="ei${i}" placeholder="Opis obroka ali popravek količine" onkeydown="if(event.key==='Enter')submitCustom(${i})">
+		<div class="meal-edit-note">Tukaj urejaš samo sestavine in količine. Kar vpišeš spodaj, v celoti nadomesti stari seznam sestavin.</div>
 		<textarea class="edit-area" id="eia${i}" placeholder="Sestavine in količine, vsaka v novo vrstico. Primer:&#10;Skyr — 170 g&#10;Borovnice — 80 g&#10;Ovseni kosmiči — 30 g"></textarea>
 		<button class="edit-go" id="ego${i}" onclick="submitCustom(${i})">Shrani spremembo</button>
 	  </div>
@@ -4152,9 +4175,11 @@ function toggleMealMore(i){
   if(!Array.isArray(S.mealMoreOpen))S.mealMoreOpen=[];
   if(!Array.isArray(S.exp))S.exp=[];
   if(!Array.isArray(S.editOpen))S.editOpen=[];
+  if(!Array.isArray(S.manualOpen))S.manualOpen=[];
   if(!Array.isArray(S.mealPantryOpen))S.mealPantryOpen=[];
   if(!Array.isArray(S.mealIdeasOpen))S.mealIdeasOpen=[];
   S.exp[i]=false;
+  S.manualOpen[i]=false;
   S.editOpen[i]=false;
   S.mealPantryOpen[i]=false;
   S.mealIdeasOpen[i]=false;
@@ -4162,60 +4187,108 @@ function toggleMealMore(i){
   save();
   renderMeals();
 }
-function togEdit(i){
-  if(!S.editOpen)S.editOpen=Array(5).fill(false);
-  if(!Array.isArray(S.mealMoreOpen))S.mealMoreOpen=[];
-  S.mealMoreOpen[i]=false;
-  S.editOpen[i]=!S.editOpen[i];
-  const panel=document.getElementById('editp'+i),btn=document.getElementById('eb'+i);
-  if(panel)panel.classList.toggle('open',S.editOpen[i]);
-  if(btn)btn.classList.toggle('active',S.editOpen[i]);
-  if(S.editOpen[i])setTimeout(()=>{
-	const inp=document.getElementById('ei'+i);
-	const area=document.getElementById('eia'+i);
+function toggleManualInput(i){
+  if(!Array.isArray(S.manualOpen))S.manualOpen=[];
+  if(!Array.isArray(S.editOpen))S.editOpen=[];
+  if(!Array.isArray(S.exp))S.exp=[];
+  if(!Array.isArray(S.mealPantryOpen))S.mealPantryOpen=[];
+  if(!Array.isArray(S.mealIdeasOpen))S.mealIdeasOpen=[];
+  S.editOpen[i]=false;
+  S.exp[i]=false;
+  S.mealPantryOpen[i]=false;
+  S.mealIdeasOpen[i]=false;
+  S.manualOpen[i]=!S.manualOpen[i];
+  save();
+  renderMeals();
+  if(S.manualOpen[i])setTimeout(()=>{
+	const inp=document.getElementById('mi'+i);
 	if(inp){
 	  inp.value=S.meals[i]?.f||S.meals[i]?.food||'';
 	  inp.focus();
 	  inp.select();
 	}
-	if(area)area.value=formatIngredientLines(S.meals[i]?.i||[]);
+  },40);
+}
+function togEdit(i){
+  if(!S.editOpen)S.editOpen=Array(5).fill(false);
+  if(!Array.isArray(S.manualOpen))S.manualOpen=[];
+  S.manualOpen[i]=false;
+  S.editOpen[i]=!S.editOpen[i];
+  const panel=document.getElementById('editp'+i),btn=document.getElementById('eb'+i);
+  if(panel)panel.classList.toggle('open',S.editOpen[i]);
+  if(btn)btn.classList.toggle('active',S.editOpen[i]);
+  if(S.editOpen[i])setTimeout(()=>{
+	const area=document.getElementById('eia'+i);
+	if(area){
+	  area.value=formatIngredientLines(S.meals[i]?.i||[]);
+	  area.focus();
+	  area.select();
+	}
   },50);
   save();
   renderMeals();
 }
+function summarizeIngredientLines(items,fallback){
+  if(!Array.isArray(items)||!items.length)return fallback||'Ročni vnos';
+  const names=items.map(it=>it.n).filter(Boolean).slice(0,3);
+  if(!names.length)return fallback||'Ročni vnos';
+  return names.join(', ');
+}
 async function submitCustom(i){
-  const inp=document.getElementById('ei'+i);
   const area=document.getElementById('eia'+i);
   const go=document.getElementById('ego'+i);
-  const val=(inp&&inp.value.trim())||'';
   const ingText=(area&&area.value.trim())||'';
   const directItems=parseIngredientLines(ingText);
-  if(!val&&!ingText)return;
+  if(!ingText)return;
   go.disabled=true;go.textContent='...';
   try{
 	const txt=await api(
-	  'Si prehranjevalni svetovalec. Uporabnica popravlja količine, gramature in opis že obstoječega obroka. Ohrani pomen njenih količin in jih ne prepisuj v generične. Izračunaj kalorije in vrni SAMO veljavni JSON: {"f":"opis hrane v slovenščini","k":450,"i":[{"n":"sestavina","a":"100 g"}]}',
-	  `Popravi obrok. Opis: "${val||S.meals[i]?.f||S.meals[i]?.food||''}". Sestavine in količine: "${ingText||'brez dodatnega seznama'}". Če so količine podane, jih upoštevaj dobesedno.`
+	  'Si prehranjevalni svetovalec. Uporabnica ureja seznam sestavin in količin. To je edini vir resnice. Upoštevaj količine dobesedno in jih ne združuj s starimi. Izračunaj kalorije in vrni SAMO veljavni JSON: {"f":"kratek naraven opis obroka v slovenščini","k":450,"i":[{"n":"sestavina","a":"100 g"}]}',
+	  `Na podlagi tega seznama sestavin in količin ustvari posodobljen obrok: "${ingText}". Vse, kar je tu zapisano, v celoti nadomesti stare sestavine.`
 	);
 	const p=JSON.parse(txt);
-	S.meals[i]={...S.meals[i],f:p.f||val||S.meals[i].f,k:parseInt(p.k)||S.meals[i].k,i:(p.i&&p.i.length?p.i:directItems.length?directItems:S.meals[i].i),custom:true};
+	const nextItems=(p.i&&p.i.length?p.i:directItems);
+	S.meals[i]={...S.meals[i],f:p.f||summarizeIngredientLines(nextItems,S.meals[i].f),k:parseInt(p.k)||S.meals[i].k,i:nextItems,custom:true};
 	// If meal was pinned, update the pin too
 	const pinned=getPinned();
-	if(pinned[i]){pinned[i]={f:p.f||val,k:parseInt(p.k)||0,i:(p.i&&p.i.length?p.i:directItems)};savePinned(pinned);}
+	if(pinned[i]){pinned[i]={f:p.f||summarizeIngredientLines(nextItems,S.meals[i].f),k:parseInt(p.k)||0,i:nextItems};savePinned(pinned);}
 	if(S.editOpen)S.editOpen[i]=false;
 	save();renderMeals();calcKcal();
   }catch(e){
-	S.meals[i]={...S.meals[i],f:val||S.meals[i].f||S.meals[i].food,i:directItems.length?directItems:S.meals[i].i,custom:true};
+	S.meals[i]={...S.meals[i],f:summarizeIngredientLines(directItems,S.meals[i].f||S.meals[i].food),i:directItems,custom:true};
 	if(S.editOpen)S.editOpen[i]=false;
 	save();renderMeals();calcKcal();
 	err('Shranjeno brez novega preračuna kalorij.');
   }
   if(go){go.disabled=false;go.textContent='Shrani spremembo';}
 }
+async function submitManualMeal(i){
+  const inp=document.getElementById('mi'+i);
+  const btn=document.getElementById('mgo'+i);
+  const val=(inp&&inp.value.trim())||'';
+  if(!val)return;
+  btn.disabled=true;btn.textContent='...';
+  try{
+	const txt=await api(
+	  'Si prehranjevalni svetovalec. Uporabnica vnaša obrok v naravnem jeziku. Iz besedila razberi sestavine, količine in kalorije. Vrni SAMO veljavni JSON: {"f":"kratek naraven opis obroka v slovenščini","k":350,"i":[{"n":"sestavina","a":"100 g"}]}',
+	  `Pretvori ta ročni vnos v strukturiran obrok: "${val}". Če so količine podane, jih upoštevaj dobesedno.`
+	);
+	const p=JSON.parse(txt);
+	S.meals[i]={...S.meals[i],f:p.f||val,k:parseInt(p.k)||S.meals[i].k,i:p.i||S.meals[i].i,custom:true};
+	if(S.manualOpen)S.manualOpen[i]=false;
+	save();renderMeals();calcKcal();
+  }catch(e){
+	S.meals[i]={...S.meals[i],f:val,custom:true};
+	if(S.manualOpen)S.manualOpen[i]=false;
+	save();renderMeals();calcKcal();
+	err('Vnos je shranjen, preračun pa ni uspel.');
+  }
+  if(btn){btn.disabled=false;btn.textContent='Shrani v obrok';}
+}
 function togIng(i){
   if(!Array.isArray(S.exp))S.exp=[];
-  if(!Array.isArray(S.mealMoreOpen))S.mealMoreOpen=[];
-  S.mealMoreOpen[i]=false;
+  if(!Array.isArray(S.manualOpen))S.manualOpen=[];
+  S.manualOpen[i]=false;
   if(S.md&&S.md[i]){
 	if(!Array.isArray(S.doneOpen))S.doneOpen=[];
 	S.doneOpen[i]=true;
@@ -4243,6 +4316,7 @@ function deleteMeal(i){
   if(S.exp)S.exp.splice(i,1);
   if(S.doneOpen)S.doneOpen.splice(i,1);
   if(S.editOpen)S.editOpen.splice(i,1);
+  if(S.manualOpen)S.manualOpen.splice(i,1);
   if(S.mealMoreOpen)S.mealMoreOpen.splice(i,1);
   if(S.mealPantry)S.mealPantry.splice(i,1);
   if(S.mealPantryOpen)S.mealPantryOpen.splice(i,1);
@@ -6137,9 +6211,9 @@ function renderExtras(){
 		  <div class="mkcal">~${e.k} kcal</div>
 		</div>
 		<div class="meal-actions">
-		  <button class="meal-main-btn primary ${e.done?'active':''}" id="xchk${i}" onclick="togExtra(${i})">${e.done?'Zaužito ✓':'Zaužito'}</button>
 		  <button class="meal-main-btn ${S.extraEditOpen[i]?'active':''}" onclick="toggleExtraEdit(${i})">Uredi</button>
 		  <button class="meal-main-btn subtle" onclick="removeExtra(${i})">Izbriši</button>
+		  <button class="meal-main-btn meal-status-btn ${e.done?'active':''}" id="xchk${i}" onclick="togExtra(${i})" title="${e.done?'Označeno kot zaužito':'Označi kot zaužito'}">${e.done?'✓':'+'}</button>
 		</div>
 	  </div>
 	  <div class="edit-panel${S.extraEditOpen[i]?' open':''}" id="xeditp${i}">
