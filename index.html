@@ -365,13 +365,14 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 /* Structured-set entry: one row per set with kg + reps + remove */
 .set-rows{display:flex;flex-direction:column;gap:6px;}
 /* Compact mode: kg + reps + sets in one row, default for same-weight users */
-.set-compact{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:6px;}
+.set-compact{display:grid;gap:8px;margin-bottom:6px;}
+.set-compact.cols-3{grid-template-columns:1fr 1fr 1fr;}
+.set-compact.cols-2{grid-template-columns:1fr 1fr;}
 .set-compact-field{display:flex;flex-direction:column;gap:4px;position:relative;}
 .set-compact-field label{font-size:10.5px;color:var(--lt);text-transform:uppercase;letter-spacing:.05em;}
 .set-compact-input{background:var(--w);border:.5px solid var(--br);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;color:var(--dk);outline:none;text-align:center;-moz-appearance:textfield;}
 .set-compact-input::-webkit-outer-spin-button,.set-compact-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .set-compact-input:focus{border-color:rgba(0,0,0,.25);}
-.set-compact-unit{position:absolute;right:11px;top:31px;font-size:11px;color:var(--lt);pointer-events:none;}
 .set-row{display:grid;grid-template-columns:32px 1fr 18px 1fr 22px;align-items:center;gap:8px;padding:7px 9px;background:var(--bg);border-radius:9px;}
 .set-row-num{font-size:11.5px;color:var(--lt);font-weight:600;text-align:center;}
 .set-row-input{background:var(--w);border:.5px solid var(--br);border-radius:7px;padding:7px 9px;font-size:14px;font-family:inherit;color:var(--dk);outline:none;text-align:center;width:100%;min-width:0;-moz-appearance:textfield;}
@@ -3058,12 +3059,18 @@ function cloudSave(){
   _syncTimer=setTimeout(async()=>{
 	if(!AUTH)return;
 	const today=localDateKey(now);
+	let splitState=null;
+	try{const s=localStorage.getItem(lsKey(SPLIT_KEY));if(s)splitState=JSON.parse(s);}catch(e){}
+	let goalsState=null;
+	try{const s=localStorage.getItem(lsKey(GOALS_KEY));if(s)goalsState=JSON.parse(s);}catch(e){}
 	const payload={
 	  main:S,
 	  track:{md:S.md,ed:S.exd,wt:S.wt},
 	  elog:loadElog(),
 	  wod:localStorage.getItem(lsKey('wodlog_'+today))||'',
-	  steps:ST
+	  steps:ST,
+	  split:splitState,    // workout_split — frequency, position, weeklyDone, training days
+	  goals:goalsState     // user_goals — age, height, weight, target, location
 	};
 	try{
 	  await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},
@@ -3142,6 +3149,16 @@ async function initApp(){
 	}
 	if(cloudData.elog)try{localStorage.setItem(lsKey(ELKEY),JSON.stringify(cloudData.elog));}catch(e){}
 	if(cloudData.wod)try{localStorage.setItem(lsKey('wodlog_'+today),cloudData.wod);}catch(e){}
+	// Restore split (frequency, weeklyDone, position, training days) so weekly
+	// quota and rotation state stay in sync across devices.
+	if(cloudData.split){
+	  try{localStorage.setItem(lsKey(SPLIT_KEY),JSON.stringify(cloudData.split));}catch(e){}
+	}
+	// Restore goals (age, weight, target, location) so profile syncs across devices.
+	if(cloudData.goals){
+	  try{localStorage.setItem(lsKey(GOALS_KEY),JSON.stringify(cloudData.goals));}catch(e){}
+	  loadGoals();
+	}
 	setSyncStatus('✓ naloženo');
   } else {
 	setSyncStatus('');
@@ -4531,10 +4548,17 @@ function parseSetLines(text){
 //   'cardio_machine' = duration + optional distance/watts (bike, elliptical, rower)
 function getInputMode(ex){
   if(!ex)return 'weighted';
+  const nLower=(ex.n||'').toLowerCase();
   // Cardio workout type — by exercise name
   if(S.wt==='cardio'){
-	const n=(ex.n||'').toLowerCase();
-	if(/tek|run|hoja|walk|tek\b/.test(n))return 'run';
+	if(/tek|run|hoja|walk/.test(nLower))return 'run';
+	return 'cardio_machine';
+  }
+  // Cardio-equipment exercises added as custom into a strength workout — still
+  // treat them as cardio_machine so the user gets time/distance fields, not kg/reps.
+  // Recognized: tek, ski erg, kolo, veslanje (rowing), eliptika, stair, assault bike, treadmill.
+  if(/\btek\b|\brun\b|\bhoja\b|\bwalk\b|ski.?erg|\bkolo\b|veslanj|rowing|rower|eliptik|elliptic|stair|stairmaster|assault|airbike|\bbike\b|treadmill|tekal/.test(nLower)){
+	if(/\btek\b|\brun\b|\bhoja\b|\bwalk\b/.test(nLower))return 'run';
 	return 'cardio_machine';
   }
   // Look up id in EX_DB for movement-aware decision
@@ -4551,9 +4575,8 @@ function getInputMode(ex){
 	return 'weighted';
   }
   // Legacy / custom exercises — guess from name
-  const n=(ex.n||'').toLowerCase();
-  if(/plank|hold|sit|deadbug|bird dog|hollow/.test(n))return 'time';
-  if(/push.?up|pull.?up|squat$|izpad|bridge|crunch|dvig|burpee/.test(n))return 'bodyweight';
+  if(/plank|hold|sit|deadbug|bird dog|hollow/.test(nLower))return 'time';
+  if(/push.?up|pull.?up|squat$|izpad|bridge|crunch|dvig|burpee/.test(nLower))return 'bodyweight';
   return 'weighted';
 }
 
@@ -4704,18 +4727,18 @@ function renderSetRows(i,e,log){
   if(!expanded){
 	// COMPACT: single set of inputs that applies to all `setsCount` sets.
 	const setsCount=sets.length||3;
-	return `<div class="set-compact" id="srs${i}" data-mode="compact">
+	const colCount=showKg?3:2;
+	return `<div class="set-compact ${showKg?'cols-3':'cols-2'}" id="srs${i}" data-mode="compact">
 	  ${showKg?`<div class="set-compact-field">
-		<label>Teža</label>
-		<input class="set-compact-input" type="number" inputmode="decimal" placeholder="kg" id="sc${i}-kg" value="${firstKg||''}">
-		<span class="set-compact-unit">kg</span>
+		<label>Teža (kg)</label>
+		<input class="set-compact-input" type="number" inputmode="decimal" placeholder="0" id="sc${i}-kg" value="${firstKg||''}">
 	  </div>`:''}
 	  <div class="set-compact-field">
 		<label>Ponovitev</label>
-		<input class="set-compact-input" type="number" inputmode="numeric" placeholder="reps" id="sc${i}-reps" value="${firstReps||''}">
+		<input class="set-compact-input" type="number" inputmode="numeric" placeholder="10" id="sc${i}-reps" value="${firstReps||''}">
 	  </div>
 	  <div class="set-compact-field">
-		<label>Serij</label>
+		<label>Število serij</label>
 		<input class="set-compact-input" type="number" inputmode="numeric" placeholder="3" id="sc${i}-sets" value="${setsCount}">
 	  </div>
 	</div>
@@ -5598,7 +5621,6 @@ function renderWorkout(){
 		  ${info.tip?`<div class="ex-tip">💡 ${info.tip}</div>`:''}
 		  <a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent((info.yt||e.n))}" target="_blank">▶ Video navodila</a>
 		`:`<a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent(e.n+' form')}" target="_blank">▶ Video navodila</a>`;
-		const renameOpen=!!(S.exRenameOpen&&S.exRenameOpen[i]);
 		return `<div class="ex-wrap" id="ew${i}">
 		  <div class="ex-top${done?' done':''}" id="et${i}">
 			<div class="edot"></div>
@@ -5634,18 +5656,9 @@ function renderWorkout(){
 				<button class="log-save" onclick="logEx(${i},'${e.n.replace(/'/g,'&#39;')}')">Shrani</button>
 			  </div>
 			</div>
-			${renameOpen?`<div class="setlog-sec">
-			  <div class="setlog-label">Preimenuj vajo</div>
-			  <div class="setlog-help">Če delaš drugo varianto, tukaj prepiši ime. Vpisana teža ostane.</div>
-			  <div class="exercise-manual-row">
-				<input class="edit-input" id="renex${i}" value="${e.n.replace(/"/g,'&quot;')}" placeholder="npr. mrtvi dvig s palico">
-				<button class="edit-go" onclick="renameExercise(${i})">Shrani novo ime</button>
-			  </div>
-			</div>`:''}
 			${histHtml}
 			<div class="ex-actions">
 			  <button class="ex-action-btn" onclick="swapEx(${i})" title="Zamenjaj s podobno vajo">↺ Zamenjaj vajo</button>
-			  <button class="ex-action-btn" onclick="togExRename(${i})" title="Preimenuj vajo">✏ Preimenuj</button>
 			  <button class="ex-action-btn ex-rm" onclick="removeEx(${i})" title="Odstrani vajo">✕ Odstrani</button>
 			</div>
 		  </div>
