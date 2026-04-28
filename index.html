@@ -1343,6 +1343,17 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 				<button class="goal-opt day-pick" data-day="0" onclick="togTrainDay(0)">Ne</button>
 			  </div>
 			</div>
+			<div class="goals-plan-section">
+			  <div class="goals-plan-label">Kje treniraš?</div>
+			  <div class="goals-plan-hint">Vaje prilagodimo opremi, ki jo imaš na voljo.</div>
+			  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:7px;">
+				<button class="goal-opt" id="gl-gym_full" onclick="selLoc('gym_full')">🏋️ Fitnes (vse)</button>
+				<button class="goal-opt" id="gl-gym_weights" onclick="selLoc('gym_weights')">💪 Fitnes (uteži)</button>
+				<button class="goal-opt" id="gl-home_eq" onclick="selLoc('home_eq')">🏠 Doma (oprema)</button>
+				<button class="goal-opt" id="gl-home_basic" onclick="selLoc('home_basic')">🤸 Doma (telo)</button>
+				<button class="goal-opt" id="gl-outdoor" onclick="selLoc('outdoor')" style="grid-column:span 2;">🌲 Zunaj / teren</button>
+			  </div>
+			</div>
 			<div class="goals-plan-summary" id="train-days-summary">—</div>
 		  </div>
 		</div>
@@ -1779,6 +1790,579 @@ const EM={
 };
 
 // ─── WORKOUT DATA ───────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// EXERCISE DATABASE (EX_DB)
+// ─────────────────────────────────────────────────────────────
+// Single source of truth for every exercise the planner can show. WKT
+// definitions reference these by id so an exercise edited here updates
+// everywhere. Designed to be premium-coach quality:
+//   - movement = abstract pattern (used to find equivalent alternatives)
+//   - locations = where this exercise can be done (gym_full, gym_weights,
+//     home_eq, home_basic, outdoor)
+//   - primary/secondary = main and assisting muscle groups
+//   - cue = what the user should FEEL during the rep — the difference
+//     between a junk rep and a quality rep
+//   - desc = brief technique note (3 cues, not a wall of text)
+//   - alts = ordered list of substitute exercise ids that train the same
+//     pattern — used for swap suggestions
+//   - scheme = recommended starting sets×reps for someone with no history
+//   - level = beginner|intermediate|advanced (filter for new users)
+//   - video = YouTube search query (rendered as a search link, never a
+//     hardcoded video — search returns current top form videos)
+//
+// Naming convention for ids: <pattern>_<implement>_<variant>.
+// Eg. hipthrust_barbell, squat_bw_jump, row_db_one.
+const EX_DB={
+  // ── HIP-DOMINANT (glute, hamstring, posterior chain) ───────
+  hipthrust_barbell:{n:'Hip thrust s palico',movement:'hip_extension',primary:['glutes'],secondary:['hamstrings'],locations:['gym_full','gym_weights'],level:'intermediate',scheme:'4×8-12',
+	desc:'Zgornji del hrbta na klop, palica čez kolke, stopala ravno pred sebe.',
+	cue:'Na vrhu giba SILNO stisni zadnjico za 1 sekundo — občutek pečenja v zadnjici.',
+	video:'hip thrust barbell form glute focus',
+	alts:['hipthrust_db','gluteridge_bb','gluteridge_bw','gluteridge_band']},
+  hipthrust_db:{n:'Hip thrust z ročko',movement:'hip_extension',primary:['glutes'],secondary:['hamstrings'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-15',
+	desc:'Hrbet na klop, ročka na medenici, dvig do ravne linije ramen-koleni.',
+	cue:'Stisk zadnjice na vrhu — ne dvigaj križa.',
+	video:'dumbbell hip thrust home form',
+	alts:['hipthrust_barbell','gluteridge_db','gluteridge_bw']},
+  gluteridge_bb:{n:'Glute bridge s palico',movement:'hip_extension',primary:['glutes'],secondary:['hamstrings'],locations:['gym_full','gym_weights'],level:'beginner',scheme:'3×12-15',
+	desc:'Leže na tleh, palica čez kolke, dvig medenice.',
+	cue:'Občutek krčenja zadnjice mora biti močnejši od bolečine v križu.',
+	video:'barbell glute bridge form',
+	alts:['hipthrust_barbell','gluteridge_db','gluteridge_bw']},
+  gluteridge_db:{n:'Glute bridge z ročko',movement:'hip_extension',primary:['glutes'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×12-15',
+	desc:'Leže na tleh, ročka na kolkih, dvig medenice.',
+	cue:'Stopala bližje zadnjici = več glute, dlje = več hamstring.',
+	video:'dumbbell glute bridge',
+	alts:['gluteridge_bw','gluteridge_band','hipthrust_db']},
+  gluteridge_bw:{n:'Glute bridge — telesna teža',movement:'hip_extension',primary:['glutes'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×15-20',
+	desc:'Leže na tleh, kolena pokrčena, dvig medenice.',
+	cue:'2 sekundi zadrži na vrhu — kvaliteta pred številom.',
+	video:'glute bridge bodyweight form',
+	alts:['gluteridge_band','singleleg_bridge','hipthrust_db']},
+  gluteridge_band:{n:'Glute bridge z elastiko',movement:'hip_extension',primary:['glutes'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×15-20',
+	desc:'Elastika nad koleni, leže, dvig medenice — kolena potiskaj navzven.',
+	cue:'Občutek peče v zadnjici IN na zunanji strani stegen.',
+	video:'banded glute bridge home',
+	alts:['gluteridge_bw','singleleg_bridge','hipthrust_db']},
+  singleleg_bridge:{n:'Enonožni glute bridge',movement:'hip_extension',primary:['glutes'],secondary:['hamstrings','core'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'intermediate',scheme:'3×10/nogo',
+	desc:'Bridge z eno nogo iztegnjeno, druga drži.',
+	cue:'Boki ostanejo ravni — ne pusti, da medenica pade na eno stran.',
+	video:'single leg glute bridge form',
+	alts:['gluteridge_bw','gluteridge_band','rdl_db_oneleg']},
+  rdl_bb:{n:'Romunski mrtvi dvig (palica)',movement:'hip_hinge',primary:['hamstrings','glutes'],secondary:['low_back'],locations:['gym_full','gym_weights'],level:'intermediate',scheme:'3-4×8-10',
+	desc:'Stoja, palica blizu telesa, kolena rahlo pokrčena, kolki nazaj.',
+	cue:'Občutek raztega zadnjega dela stegen je signal — ne ukrivljaj križa.',
+	video:'romanian deadlift form barbell',
+	alts:['rdl_db','goodmorning_bb','rdl_db_oneleg']},
+  rdl_db:{n:'Romunski mrtvi dvig (ročke)',movement:'hip_hinge',primary:['hamstrings','glutes'],secondary:['low_back'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
+	desc:'Ročke pred stegni, kolena rahlo pokrčena, kolki nazaj.',
+	cue:'Peče te zadnji del stegen, ne križ.',
+	video:'dumbbell romanian deadlift form',
+	alts:['rdl_bb','goodmorning_bw','rdl_db_oneleg']},
+  rdl_db_oneleg:{n:'Enonožni RDL z ročko',movement:'hip_hinge',primary:['glutes','hamstrings'],secondary:['core','balance'],locations:['gym_full','gym_weights','home_eq','home_basic'],level:'intermediate',scheme:'3×8-10/nogo',
+	desc:'Stoja na eni nogi, druga gre nazaj, ročka v nasprotni roki.',
+	cue:'Trebuh napet — če se zazibaš, zmanjšaj utež.',
+	video:'single leg romanian deadlift form',
+	alts:['rdl_db','rdl_bb','singleleg_bridge']},
+  goodmorning_bb:{n:'Good morning s palico',movement:'hip_hinge',primary:['hamstrings','glutes'],secondary:['low_back'],locations:['gym_full','gym_weights'],level:'advanced',scheme:'3×8-10',
+	desc:'Palica na zgornjem delu hrbta, kolki nazaj, hrbet raven.',
+	cue:'Zelo lahka utež za začetek — tehnika je vse.',
+	video:'good morning exercise form',
+	alts:['rdl_bb','rdl_db','goodmorning_bw']},
+  goodmorning_bw:{n:'Good morning brez uteži',movement:'hip_hinge',primary:['hamstrings','glutes'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×12-15',
+	desc:'Roke na ramenih, kolki nazaj, raven hrbet.',
+	cue:'Ne ukrivljaj križa — če kolena hočejo trepetati, ne hodi tako globoko.',
+	video:'bodyweight good morning form',
+	alts:['rdl_db','rdl_db_oneleg','singleleg_bridge']},
+  cablepull_through:{n:'Cable pull-through',movement:'hip_hinge',primary:['glutes','hamstrings'],locations:['gym_full'],level:'beginner',scheme:'3×12-15',
+	desc:'Stoja s hrbtom proti kablu, ročaj med nogami, kolki naprej.',
+	cue:'Eksplozivno potisni kolke naprej — močan stisk zadnjice.',
+	video:'cable pull through form',
+	alts:['rdl_db','kettlebell_swing','rdl_bb']},
+  kettlebell_swing:{n:'Kettlebell swing',movement:'hip_hinge',primary:['glutes','hamstrings'],secondary:['core','shoulders'],locations:['gym_full','gym_weights','home_eq'],level:'intermediate',scheme:'3×15-20',
+	desc:'Eksplozivno zamahni utež od med nog do ravnine ramen.',
+	cue:'Moč prihaja iz kolkov, ne iz rok — roke samo vodijo.',
+	video:'kettlebell swing russian form',
+	alts:['cablepull_through','rdl_db','goodmorning_bw']},
+  donkey_kick_cable:{n:'Donkey kicks pri kablu',movement:'hip_extension_isolation',primary:['glutes'],locations:['gym_full'],level:'beginner',scheme:'3×12-15/nogo',
+	desc:'Manšeta na gleženj, na vseh štirih, brca nogo nazaj.',
+	cue:'Na vrhu zadrži 1 sek — krčenje samo zadnjice.',
+	video:'cable donkey kick form',
+	alts:['donkey_kick_band','donkey_kick_bw','frog_pump']},
+  donkey_kick_band:{n:'Donkey kicks z elastiko',movement:'hip_extension_isolation',primary:['glutes'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×15/nogo',
+	desc:'Elastika v komolcih in stopalu, brca nogo nazaj.',
+	cue:'Ne dvigaj križa, da bi šla noga višje — kvaliteta.',
+	video:'banded donkey kick form',
+	alts:['donkey_kick_bw','frog_pump','singleleg_bridge']},
+  donkey_kick_bw:{n:'Donkey kicks',movement:'hip_extension_isolation',primary:['glutes'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×15/nogo',
+	desc:'Na vseh štirih, brca nogo navzgor.',
+	cue:'Pet potiska v strop — ne dvigaj križa.',
+	video:'donkey kick exercise form',
+	alts:['donkey_kick_band','frog_pump','firehydrant']},
+  frog_pump:{n:'Frog pumps',movement:'hip_extension_isolation',primary:['glutes'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×20',
+	desc:'Leže, stopala skupaj, kolena ven (žaba), dvig medenice.',
+	cue:'Hitra, eksplozivna kontrakcija na vrhu.',
+	video:'frog pump glute exercise',
+	alts:['gluteridge_band','gluteridge_bw','donkey_kick_bw']},
+  firehydrant:{n:'Fire hydrants',movement:'hip_abduction',primary:['glutes_med'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×15/nogo',
+	desc:'Na vseh štirih, dvig pokrčene noge v stran.',
+	cue:'Drži boke ravne — ne pusti, da telo zaniha.',
+	video:'fire hydrant exercise',
+	alts:['clamshells','sidestep_band','hip_abductor_machine']},
+  clamshells:{n:'Clamshells z elastiko',movement:'hip_abduction',primary:['glutes_med'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×15/nogo',
+	desc:'Bočno leže, elastika nad koleni, koleno gor.',
+	cue:'Občutek peče na zunanji strani zadnjice.',
+	video:'clamshell exercise form',
+	alts:['firehydrant','sidestep_band','hip_abductor_machine']},
+  sidestep_band:{n:'Stranski koraki z elastiko',movement:'hip_abduction',primary:['glutes_med'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×12/smer',
+	desc:'Elastika okoli kolen ali gležnjev, polčep, stranski koraki.',
+	cue:'Stalno napeti — elastika ne sme oslabeti.',
+	video:'lateral band walk form',
+	alts:['firehydrant','clamshells','hip_abductor_machine']},
+  hip_abductor_machine:{n:'Abduktor stroj (odmik nog)',movement:'hip_abduction',primary:['glutes_med'],locations:['gym_full'],level:'beginner',scheme:'3×15-20',
+	desc:'Sedi na stroju, blazinice ob zunanjem delu kolen, razpre noge.',
+	cue:'Lahno se nakloni naprej za boljši poudarek na glute.',
+	video:'hip abductor machine form',
+	alts:['sidestep_band','clamshells','firehydrant']},
+  // ── KNEE-DOMINANT (squat / leg press) ──────────────────────
+  squat_bb:{n:'Počep s palico',movement:'squat',primary:['quads','glutes'],secondary:['hamstrings','core'],locations:['gym_full','gym_weights'],level:'intermediate',scheme:'3-4×6-10',
+	desc:'Palica na zgornjem hrbtu, počep do paralele ali nižje.',
+	cue:'Kolena gredo z prsti — ne kolapsirajo navznoter.',
+	video:'barbell back squat form',
+	alts:['squat_goblet','legpress','squat_db']},
+  squat_goblet:{n:'Goblet počep',movement:'squat',primary:['quads','glutes'],secondary:['core'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
+	desc:'Ročka pred prsmi, počep — komolci na kolenih spodaj.',
+	cue:'Drži pokončno trupa — ročka ostane pred prsmi.',
+	video:'goblet squat form',
+	alts:['squat_bb','squat_bw','legpress']},
+  squat_db:{n:'Počep z ročkami',movement:'squat',primary:['quads','glutes'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
+	desc:'Ročke ob telesu, počep do paralele.',
+	cue:'Pete na tleh skozi ves gib.',
+	video:'dumbbell squat form',
+	alts:['squat_goblet','squat_bw','split_squat']},
+  squat_bw:{n:'Air počep',movement:'squat',primary:['quads','glutes'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×15-20',
+	desc:'Brez uteži, roke pred sabo, počep do paralele.',
+	cue:'Počasi navzdol (3 sek), eksplozivno gor.',
+	video:'air squat bodyweight form',
+	alts:['squat_db','squat_jump','split_squat']},
+  squat_sumo_db:{n:'Sumo počep z ročko',movement:'squat',primary:['glutes','adductors'],secondary:['quads'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
+	desc:'Široka stoja, prsti narazen, ročka držana med nogami, počep.',
+	cue:'Občutek raztega na notranji strani stegen + glute.',
+	video:'sumo squat dumbbell form',
+	alts:['squat_goblet','squat_db','squat_bb']},
+  legpress:{n:'Leg press',movement:'squat',primary:['quads','glutes'],locations:['gym_full'],level:'beginner',scheme:'3×12-15',
+	desc:'Sedi v stroj, stopala v sredini ploščadi, počep.',
+	cue:'Visoka in široka stopala = več glutes; nizka in ozka = več quads.',
+	video:'leg press form glute focus',
+	alts:['squat_goblet','squat_bb','squat_db']},
+  bulgarian_split:{n:'Bolgarski počep',movement:'lunge_split',primary:['quads','glutes'],secondary:['hamstrings','balance'],locations:['gym_full','gym_weights','home_eq','home_basic','outdoor'],level:'intermediate',scheme:'3×8-10/nogo',
+	desc:'Ena noga zadaj na klopi/stolu, počep s sprednjo nogo.',
+	cue:'Težo na peti sprednje noge — peče te quad in glute.',
+	video:'bulgarian split squat form',
+	alts:['split_squat','lunge_db','step_up']},
+  split_squat:{n:'Split počep',movement:'lunge_split',primary:['quads','glutes'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×10/nogo',
+	desc:'Ena noga zadaj na tleh, počep s sprednjo.',
+	cue:'Sprednje koleno NE gre čez prste, zadnje koleno se približa tlom.',
+	video:'split squat form',
+	alts:['lunge_db','bulgarian_split','step_up']},
+  lunge_db:{n:'Izpadni koraki z ročkami',movement:'lunge_walk',primary:['quads','glutes'],locations:['gym_full','gym_weights','home_eq','outdoor'],level:'beginner',scheme:'3×10/nogo',
+	desc:'Ročke ob telesu, korak naprej, oba kolena 90°.',
+	cue:'Trupa drži pokončno, ne se naprej nagiba.',
+	video:'walking lunge dumbbell form',
+	alts:['lunge_bw','split_squat','step_up']},
+  lunge_bw:{n:'Izpadni koraki',movement:'lunge_walk',primary:['quads','glutes'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×12/nogo',
+	desc:'Brez uteži, korak naprej, oba kolena 90°.',
+	cue:'Stopa peta, koleno 90° — kontrolirano gor.',
+	video:'bodyweight lunge form',
+	alts:['split_squat','reverse_lunge','step_up']},
+  reverse_lunge:{n:'Obratni izpad',movement:'lunge_walk',primary:['quads','glutes'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×10/nogo',
+	desc:'Korak nazaj, oba kolena 90°, vrnitev.',
+	cue:'Lažji za kolena kot navadni izpad — primerno za začetnice.',
+	video:'reverse lunge form',
+	alts:['lunge_db','lunge_bw','step_up']},
+  step_up:{n:'Step-up na klop',movement:'lunge_split',primary:['glutes','quads'],locations:['gym_full','gym_weights','home_eq','home_basic','outdoor'],level:'beginner',scheme:'3×10/nogo',
+	desc:'Stopalo na klop/stol, dvig na klop s eno nogo.',
+	cue:'Potisnite z dvigajočo peto, ne odrivajte se s tlom.',
+	video:'dumbbell step up form',
+	alts:['bulgarian_split','split_squat','lunge_db']},
+  squat_jump:{n:'Squat jump',movement:'squat_explosive',primary:['quads','glutes','calves'],locations:['home_basic','home_eq','outdoor'],level:'intermediate',scheme:'3×10',
+	desc:'Počep, eksplozivni skok navzgor, mehki pristanek v počepu.',
+	cue:'Pristanek MEHKO — tihi koleni, ne s ploskanjem.',
+	video:'squat jump form',
+	alts:['squat_bw','split_squat','reverse_lunge']},
+  // ── PUSH (chest/shoulders/triceps) ─────────────────────────
+  bench_bb:{n:'Bench press s palico',movement:'horizontal_push',primary:['chest','triceps'],secondary:['shoulders'],locations:['gym_full','gym_weights'],level:'intermediate',scheme:'3-4×6-10',
+	desc:'Leže na klop, palica do prsi, eksplozivno gor.',
+	cue:'Lopatice v klop, ne dvigaj jih.',
+	video:'barbell bench press form',
+	alts:['bench_db','pushup','chest_press_machine']},
+  bench_db:{n:'Potisk z ročkami leže',movement:'horizontal_push',primary:['chest','triceps'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
+	desc:'Leže na klop, ročke do prsi, gor.',
+	cue:'Ročke se srečajo nad prsmi (ne nad obrazom).',
+	video:'dumbbell bench press form',
+	alts:['bench_bb','pushup','chest_press_machine']},
+  chest_press_machine:{n:'Prsni stroj (chest press)',movement:'horizontal_push',primary:['chest','triceps'],locations:['gym_full'],level:'beginner',scheme:'3×10-12',
+	desc:'Sedi v stroj, ročaji v višini prsi, potisk naprej.',
+	cue:'Lopatice v naslon — ne pusti jih naprej.',
+	video:'chest press machine form',
+	alts:['bench_db','pushup','bench_bb']},
+  pushup:{n:'Push-up',movement:'horizontal_push',primary:['chest','triceps','shoulders'],secondary:['core'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×8-15',
+	desc:'Plank pozicija, prsi do tal, gor.',
+	cue:'Telo ravna kot palica — ne pusti, da boki padejo.',
+	video:'push up proper form',
+	alts:['pushup_incline','bench_db','chest_press_machine']},
+  pushup_incline:{n:'Push-up na vzpetini',movement:'horizontal_push',primary:['chest','triceps'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×10-15',
+	desc:'Roke na klop/stol, push-up. Lažje od navadnega.',
+	cue:'Višja vzpetina = lažje. Začni visoko in zniže s časom.',
+	video:'incline push up form',
+	alts:['pushup','bench_db','chest_press_machine']},
+  ohp_bb:{n:'Vzdolžni potisk nad glavo (palica)',movement:'vertical_push',primary:['shoulders','triceps'],secondary:['core'],locations:['gym_full','gym_weights'],level:'intermediate',scheme:'3×6-10',
+	desc:'Stoja, palica iz ramen, potisk nad glavo.',
+	cue:'Trebuh napet — ne se naslanjati nazaj.',
+	video:'overhead press barbell form',
+	alts:['ohp_db','pikepushup','shoulder_press_machine']},
+  ohp_db:{n:'Vzdolžni potisk nad glavo (ročke)',movement:'vertical_push',primary:['shoulders','triceps'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
+	desc:'Stoja ali sed, ročke iz ramen, potisk nad glavo.',
+	cue:'Ročke gredo malo naprej, ne narazen.',
+	video:'dumbbell shoulder press form',
+	alts:['ohp_bb','pikepushup','shoulder_press_machine']},
+  shoulder_press_machine:{n:'Stroj za rame (shoulder press)',movement:'vertical_push',primary:['shoulders','triceps'],locations:['gym_full'],level:'beginner',scheme:'3×10-12',
+	desc:'Sedi v stroj, ročaji v višini ramen, potisk gor.',
+	cue:'Ne zaklepaj komolce na vrhu.',
+	video:'shoulder press machine form',
+	alts:['ohp_db','ohp_bb','pikepushup']},
+  pikepushup:{n:'Pike push-up',movement:'vertical_push',primary:['shoulders','triceps'],locations:['home_basic','outdoor'],level:'intermediate',scheme:'3×8-10',
+	desc:'V obrnjenem V (boki visoko), spušča glavo proti tlom.',
+	cue:'Težnost se mora čutiti v ramenih, ne v prsih.',
+	video:'pike push up form',
+	alts:['ohp_db','pushup','ohp_bb']},
+  triceps_pushdown:{n:'Triceps potisk pri kablu',movement:'triceps_isolation',primary:['triceps'],locations:['gym_full'],level:'beginner',scheme:'3×12-15',
+	desc:'Stoja, ročaj na visokem kablu, potisk navzdol.',
+	cue:'Komolci ostanejo ob telesu — premikajo se samo podlakti.',
+	video:'cable triceps pushdown form',
+	alts:['triceps_dip_bench','overhead_triceps_db','close_grip_pushup']},
+  triceps_dip_bench:{n:'Triceps dip na klopi',movement:'triceps_isolation',primary:['triceps'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×10-12',
+	desc:'Roke na klop za hrbtom, noge naprej, spustiš telo.',
+	cue:'Komolci nazaj, ne ven.',
+	video:'tricep dip bench form',
+	alts:['triceps_pushdown','close_grip_pushup','overhead_triceps_db']},
+  close_grip_pushup:{n:'Push-up z ozkim oprijemom',movement:'triceps_isolation',primary:['triceps','chest'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'intermediate',scheme:'3×8-12',
+	desc:'Push-up z rokami pod rameni — ne izhajajočimi.',
+	cue:'Komolci ob telesu, ne ven.',
+	video:'close grip push up form',
+	alts:['triceps_dip_bench','triceps_pushdown','overhead_triceps_db']},
+  overhead_triceps_db:{n:'Triceps nad glavo z ročko',movement:'triceps_isolation',primary:['triceps'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
+	desc:'Ročka z dvema rokama nad glavo, spusti za glavo, dvigni.',
+	cue:'Komolci ostanejo blizu glave — ne se širi.',
+	video:'overhead triceps extension dumbbell',
+	alts:['triceps_pushdown','triceps_dip_bench','close_grip_pushup']},
+  // ── PULL (back/biceps) ─────────────────────────────────────
+  pullup:{n:'Zgib (pull-up)',movement:'vertical_pull',primary:['back','biceps'],locations:['gym_full','gym_weights','outdoor'],level:'advanced',scheme:'3×AMRAP',
+	desc:'Vis na drogu, dvig brade nad drog.',
+	cue:'Lopatice najprej navzdol, šele potem dvig.',
+	video:'pull up proper form',
+	alts:['lat_pulldown','pullup_assisted','row_db']},
+  pullup_assisted:{n:'Zgib z elastiko',movement:'vertical_pull',primary:['back','biceps'],locations:['gym_full','gym_weights','outdoor'],level:'intermediate',scheme:'3×6-8',
+	desc:'Elastika čez drog, stopalo v elastiko, izvedba zgiba.',
+	cue:'Elastika pomaga — vendar še vedno aktiviraj hrbet.',
+	video:'band assisted pull up',
+	alts:['lat_pulldown','pullup','row_db']},
+  lat_pulldown:{n:'Lat pulldown',movement:'vertical_pull',primary:['back','biceps'],locations:['gym_full'],level:'beginner',scheme:'3×10-12',
+	desc:'Sedi pri stroju, široki oprijem, potegni do prsi.',
+	cue:'Lopatice najprej navzdol, šele potem potegni s komolci.',
+	video:'lat pulldown form',
+	alts:['pullup','pullup_assisted','row_db']},
+  row_bb:{n:'Veslanje s palico',movement:'horizontal_pull',primary:['back'],secondary:['biceps'],locations:['gym_full','gym_weights'],level:'intermediate',scheme:'3×8-10',
+	desc:'Naklon naprej, palica do trebuha.',
+	cue:'Komolci ob telesu, lopatice se srečata.',
+	video:'barbell bent over row form',
+	alts:['row_db','row_machine','row_band']},
+  row_db:{n:'Veslanje z ročko (enoročno)',movement:'horizontal_pull',primary:['back','biceps'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
+	desc:'Roka in koleno na klopi, druga ročka — povleci do boka.',
+	cue:'Občutek krčenja v hrbtu, ne potezi z biceps.',
+	video:'one arm dumbbell row form',
+	alts:['row_bb','row_machine','row_band']},
+  row_machine:{n:'Veslanje pri stroju',movement:'horizontal_pull',primary:['back','biceps'],locations:['gym_full'],level:'beginner',scheme:'3×10-12',
+	desc:'Sedi pri stroju, ročaji potegni do trebuha.',
+	cue:'Lopatice se srečata na koncu giba.',
+	video:'seated cable row form',
+	alts:['row_bb','row_db','lat_pulldown']},
+  row_band:{n:'Veslanje z elastiko',movement:'horizontal_pull',primary:['back','biceps'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×12-15',
+	desc:'Elastika okoli noge/objekta, povleci do trupa.',
+	cue:'Lopatice se srečajo na vrhu giba.',
+	video:'resistance band row form',
+	alts:['row_db','row_machine','superman']},
+  superman:{n:'Superman',movement:'horizontal_pull',primary:['back','glutes'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×12-15',
+	desc:'Leže na trebuhu, hkrati dvigni roke in noge.',
+	cue:'Krči zadnji del telesa, vključno z zadnjico.',
+	video:'superman exercise form',
+	alts:['row_band','reverse_fly_db','singleleg_bridge']},
+  reverse_fly_db:{n:'Reverse fly z ročkami',movement:'rear_delt',primary:['rear_delts','upper_back'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×12-15',
+	desc:'Naklon naprej, ročke širi v stran.',
+	cue:'Komolci ostanejo rahlo pokrčeni — občutek krčenja zgornjega hrbta.',
+	video:'reverse fly form',
+	alts:['superman','row_band','row_db']},
+  bicep_curl_db:{n:'Biceps curl z ročkami',movement:'biceps_isolation',primary:['biceps'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
+	desc:'Stoja, ročke ob telesu, dvigne do ramen.',
+	cue:'Komolci ostanejo ob trupu — ne se zibati.',
+	video:'dumbbell bicep curl form',
+	alts:['bicep_curl_band','bicep_curl_bb','hammer_curl_db']},
+  bicep_curl_bb:{n:'Biceps curl s palico',movement:'biceps_isolation',primary:['biceps'],locations:['gym_full','gym_weights'],level:'beginner',scheme:'3×8-12',
+	desc:'Stoja, palica ob trupu, dvigne do prsi.',
+	cue:'Brez zibanja — uporabi le bicepse.',
+	video:'barbell bicep curl form',
+	alts:['bicep_curl_db','hammer_curl_db','bicep_curl_band']},
+  hammer_curl_db:{n:'Hammer curl z ročkami',movement:'biceps_isolation',primary:['biceps','forearms'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
+	desc:'Ročke v "hammer" oprijemu (palci gor), dvigne.',
+	cue:'Cilja na zunanji del bicepsa in podlaket.',
+	video:'hammer curl form',
+	alts:['bicep_curl_db','bicep_curl_bb','bicep_curl_band']},
+  bicep_curl_band:{n:'Biceps curl z elastiko',movement:'biceps_isolation',primary:['biceps'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×12-15',
+	desc:'Stoja na elastiki, dvigne do prsi.',
+	cue:'Elastika ne sme oslabeti na vrhu.',
+	video:'resistance band bicep curl',
+	alts:['bicep_curl_db','hammer_curl_db','bicep_curl_bb']},
+  // ── CORE ───────────────────────────────────────────────────
+  plank:{n:'Plank',movement:'core_iso',primary:['core'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×30-60s',
+	desc:'Podlakti na tleh, telo ravna linija.',
+	cue:'Stisni zadnjico — ne pusti, da padejo boki.',
+	video:'plank exercise form',
+	alts:['plank_side','deadbug','hollow_hold']},
+  plank_side:{n:'Stranski plank',movement:'core_iso',primary:['obliques','core'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'intermediate',scheme:'3×20-40s/stran',
+	desc:'Bočno na podlaketu, telo ravno.',
+	cue:'Boki visoko — ne pusti, da padejo.',
+	video:'side plank form',
+	alts:['plank','deadbug','russian_twist']},
+  deadbug:{n:'Dead bug',movement:'core_anti',primary:['core'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×10/stran',
+	desc:'Leže, roke gor, kolena 90°. Iztegne nasprotno roko in nogo.',
+	cue:'Križ v tlih celoten gib.',
+	video:'dead bug exercise form',
+	alts:['plank','hollow_hold','birddog']},
+  hollow_hold:{n:'Hollow hold',movement:'core_iso',primary:['core'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'intermediate',scheme:'3×20-30s',
+	desc:'Leže, roke nad glavo, noge ravne, dvig — telo "banana" navzgor.',
+	cue:'Križ v tla, lopatice malo dvignjene.',
+	video:'hollow body hold form',
+	alts:['deadbug','plank','leg_raise']},
+  leg_raise:{n:'Dvigi nog',movement:'core_dynamic',primary:['core'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'intermediate',scheme:'3×10-15',
+	desc:'Leže, dvigne ravne noge do 90°, počasi spusti.',
+	cue:'Križ ne sme zaplutva od tal.',
+	video:'lying leg raise form',
+	alts:['deadbug','hollow_hold','knee_raise']},
+  knee_raise:{n:'Dvig kolen visi',movement:'core_dynamic',primary:['core'],locations:['gym_full','outdoor'],level:'intermediate',scheme:'3×10-15',
+	desc:'Visi na drogu, dvigne kolena do prsi.',
+	cue:'Brez zibanja — kontrolirano.',
+	video:'hanging knee raise form',
+	alts:['leg_raise','hollow_hold','deadbug']},
+  russian_twist:{n:'Russian twist',movement:'core_rotation',primary:['obliques'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×20',
+	desc:'Sed, noge dvignjene, trupa rotira levo-desno.',
+	cue:'Premikajo se lopatice, ne samo roke.',
+	video:'russian twist form',
+	alts:['plank_side','deadbug','bicycle_crunch']},
+  bicycle_crunch:{n:'Kolesarjenje',movement:'core_rotation',primary:['obliques','core'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×20',
+	desc:'Leže, komolec proti nasprotnemu kolenu.',
+	cue:'Kontrolirano, ne hitro — kvaliteta nad številom.',
+	video:'bicycle crunch form',
+	alts:['russian_twist','plank_side','knee_raise']},
+  birddog:{n:'Bird dog',movement:'core_anti',primary:['core','low_back'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×10/stran',
+	desc:'Na vseh štirih, iztegne nasprotno roko in nogo.',
+	cue:'Boki ravni — ne se zibati.',
+	video:'bird dog exercise form',
+	alts:['deadbug','plank','superman']},
+  // ── CALVES ─────────────────────────────────────────────────
+  calf_raise:{n:'Dvig na prste (lytka)',movement:'calf',primary:['calves'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×15-20',
+	desc:'Stoja, dvigne na prste, počasi nazaj.',
+	cue:'Polni razteg na vrhu, polni spust spodaj.',
+	video:'standing calf raise form',
+	alts:['calf_raise_seated','calf_raise_db','calf_raise_oneleg']},
+  calf_raise_db:{n:'Dvig na prste z ročkami',movement:'calf',primary:['calves'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×15-20',
+	desc:'Ročke ob telesu, dvigne na prste.',
+	cue:'Polni razteg, polni dvig.',
+	video:'dumbbell calf raise form',
+	alts:['calf_raise','calf_raise_seated','calf_raise_oneleg']},
+  calf_raise_seated:{n:'Sedeč dvig na prste',movement:'calf',primary:['calves'],locations:['gym_full'],level:'beginner',scheme:'3×15-20',
+	desc:'Sedi pri stroju ali z utežjo na kolenih.',
+	cue:'Cilja drugačen del meč — soleus.',
+	video:'seated calf raise form',
+	alts:['calf_raise','calf_raise_db','calf_raise_oneleg']},
+  calf_raise_oneleg:{n:'Enonožni dvig na prste',movement:'calf',primary:['calves'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'intermediate',scheme:'3×12/nogo',
+	desc:'Stoja na eni nogi, dvigne na prst.',
+	cue:'Drži ravnotežje — počasi navzdol.',
+	video:'single leg calf raise form',
+	alts:['calf_raise','calf_raise_db','calf_raise_seated']}
+};
+
+// Filter exercises by location. Returns only ids that have the location in
+// their `locations` whitelist. Used by buildWorkoutFromTemplate to pick
+// equipment-appropriate exercises.
+function exAvailableAt(loc){
+  const out=[];
+  for(const id in EX_DB){
+	if(EX_DB[id].locations.includes(loc))out.push(id);
+  }
+  return out;
+}
+
+// Returns the user's chosen workout location (default gym_full).
+function getWorkoutLoc(){
+  if(typeof G==='undefined'||!G||!G.loc)return 'gym_full';
+  return G.loc;
+}
+
+// Find an alternative for a given exercise that:
+//   1) Trains the same movement / primary muscle
+//   2) Is available at the user's location
+//   3) Hasn't been used recently in the user's workout (avoids repetition)
+//   4) Optionally excludes a specific id (e.g. the one being swapped)
+//
+// Returns an exercise id (string) or null.
+function findAltExercise(currentId,opts={}){
+  const cur=EX_DB[currentId];
+  if(!cur)return null;
+  const loc=getWorkoutLoc();
+  const exclude=new Set([currentId,...(opts.exclude||[])]);
+  // Recent usage — last 14 days. Prefer exercises not used recently.
+  const recentUsed=new Set();
+  try{
+	for(let i=1;i<=14;i++){
+	  const d=new Date(now);d.setDate(now.getDate()-i);
+	  const k=localDateKey(d);
+	  const plan=localStorage.getItem(lsKey('dp_v6_'+k));
+	  if(plan){
+		const p=JSON.parse(plan);
+		if(Array.isArray(p.ex))p.ex.forEach(e=>{if(e.id)recentUsed.add(e.id);});
+	  }
+	}
+  }catch(e){}
+  // 1st pass: alts list, available at location, not recently used, not excluded
+  const altList=Array.isArray(cur.alts)?cur.alts:[];
+  for(const id of altList){
+	const ex=EX_DB[id];
+	if(!ex)continue;
+	if(exclude.has(id))continue;
+	if(!ex.locations.includes(loc))continue;
+	if(recentUsed.has(id))continue;
+	return id;
+  }
+  // 2nd pass: alts list, location-OK, even if recently used
+  for(const id of altList){
+	const ex=EX_DB[id];
+	if(!ex)continue;
+	if(exclude.has(id))continue;
+	if(!ex.locations.includes(loc))continue;
+	return id;
+  }
+  // 3rd pass: same movement pattern anywhere in DB
+  for(const id in EX_DB){
+	if(exclude.has(id))continue;
+	const ex=EX_DB[id];
+	if(ex.movement!==cur.movement)continue;
+	if(!ex.locations.includes(loc))continue;
+	if(recentUsed.has(id))continue;
+	return id;
+  }
+  // Last resort: any exercise with same primary muscle at this location
+  for(const id in EX_DB){
+	if(exclude.has(id))continue;
+	const ex=EX_DB[id];
+	if(!ex.primary.some(m=>cur.primary.includes(m)))continue;
+	if(!ex.locations.includes(loc))continue;
+	return id;
+  }
+  return null;
+}
+
+// Build a workout from a template (list of slots, each describing what kind
+// of exercise should fill it). The template is generic — actual exercises
+// are pulled from EX_DB filtered by the user's location. Each slot has:
+//   type   = movement family ('hip_extension', 'squat', 'pull', etc.)
+//   primary = preferred id list (try these first)
+//   fallback = movement pattern to match if none in `primary` is available
+function buildWorkoutFromTemplate(template){
+  const loc=getWorkoutLoc();
+  const used=new Set();
+  const out=[];
+  for(const slot of template){
+	let chosen=null;
+	// Try preferred ids first
+	for(const id of (slot.primary||[])){
+	  const ex=EX_DB[id];
+	  if(!ex)continue;
+	  if(used.has(id))continue;
+	  if(!ex.locations.includes(loc))continue;
+	  chosen=id;break;
+	}
+	// Fallback: any exercise matching the movement pattern, at this location
+	if(!chosen&&slot.movement){
+	  for(const id in EX_DB){
+		if(used.has(id))continue;
+		const ex=EX_DB[id];
+		if(ex.movement!==slot.movement)continue;
+		if(!ex.locations.includes(loc))continue;
+		chosen=id;break;
+	  }
+	}
+	if(chosen){
+	  used.add(chosen);
+	  const ex=EX_DB[chosen];
+	  // Use the slot's reps/sets if specified, otherwise fall back to the
+	  // exercise's default scheme.
+	  const scheme=slot.scheme||ex.scheme||'3×10';
+	  // Parse "3×10" → s:'3', r:'10'
+	  const sm=scheme.match(/^(\d+)[×x](.+)$/);
+	  out.push({
+		id:chosen,
+		n:ex.n,
+		s:sm?sm[1]:'3',
+		r:sm?sm[2]:'10'
+	  });
+	}
+  }
+  return out;
+}
+
+// ─────────────────────────────────────────────────────────────
+// WORKOUT TEMPLATES (per-day skeletons)
+// ─────────────────────────────────────────────────────────────
+// Each template is an ordered list of slots, designed by movement pattern
+// for proper training stimulus + balance. Order matters:
+//   - Compound heavy first (when athlete is fresh)
+//   - Isolation/accessory toward the end
+//   - Core last
+const WKT_TEMPLATES={
+  glute:[
+	{primary:['hipthrust_barbell','hipthrust_db','gluteridge_db','gluteridge_bw'],movement:'hip_extension',scheme:'4×8-12'},
+	{primary:['rdl_bb','rdl_db','rdl_db_oneleg','goodmorning_bw'],movement:'hip_hinge',scheme:'3×8-10'},
+	{primary:['bulgarian_split','split_squat','step_up','reverse_lunge'],movement:'lunge_split',scheme:'3×10/nogo'},
+	{primary:['cablepull_through','kettlebell_swing','rdl_db_oneleg'],movement:'hip_hinge',scheme:'3×12-15'},
+	{primary:['donkey_kick_cable','donkey_kick_band','donkey_kick_bw','frog_pump'],movement:'hip_extension_isolation',scheme:'3×15/nogo'},
+	{primary:['hip_abductor_machine','sidestep_band','clamshells','firehydrant'],movement:'hip_abduction',scheme:'3×15'}
+  ],
+  lower:[
+	{primary:['squat_bb','squat_goblet','squat_db','squat_bw'],movement:'squat',scheme:'4×6-10'},
+	{primary:['rdl_bb','rdl_db','goodmorning_bw'],movement:'hip_hinge',scheme:'3×8-10'},
+	{primary:['legpress','bulgarian_split','split_squat','squat_jump'],movement:'squat',scheme:'3×10-12'},
+	{primary:['lunge_db','lunge_bw','reverse_lunge','step_up'],movement:'lunge_walk',scheme:'3×10/nogo'},
+	{primary:['donkey_kick_cable','donkey_kick_band','frog_pump'],movement:'hip_extension_isolation',scheme:'3×15'},
+	{primary:['calf_raise_db','calf_raise','calf_raise_oneleg'],movement:'calf',scheme:'3×15-20'}
+  ],
+  upper:[
+	{primary:['bench_bb','bench_db','chest_press_machine','pushup'],movement:'horizontal_push',scheme:'3-4×6-10'},
+	{primary:['row_bb','row_db','row_machine','row_band'],movement:'horizontal_pull',scheme:'3×8-10'},
+	{primary:['ohp_bb','ohp_db','shoulder_press_machine','pikepushup'],movement:'vertical_push',scheme:'3×8-10'},
+	{primary:['lat_pulldown','pullup_assisted','pullup','row_db'],movement:'vertical_pull',scheme:'3×8-10'},
+	{primary:['bicep_curl_db','bicep_curl_bb','hammer_curl_db','bicep_curl_band'],movement:'biceps_isolation',scheme:'3×10-12'},
+	{primary:['triceps_pushdown','triceps_dip_bench','close_grip_pushup','overhead_triceps_db'],movement:'triceps_isolation',scheme:'3×10-12'}
+  ],
+  full:[
+	{primary:['squat_goblet','squat_bb','squat_db','squat_bw'],movement:'squat',scheme:'3×8-12'},
+	{primary:['bench_db','bench_bb','pushup','chest_press_machine'],movement:'horizontal_push',scheme:'3×8-10'},
+	{primary:['rdl_db','rdl_bb','goodmorning_bw'],movement:'hip_hinge',scheme:'3×8-10'},
+	{primary:['row_db','row_bb','row_band','lat_pulldown'],movement:'horizontal_pull',scheme:'3×10'},
+	{primary:['hipthrust_db','gluteridge_db','frog_pump'],movement:'hip_extension',scheme:'3×12'},
+	{primary:['plank','deadbug','hollow_hold'],movement:'core_iso',scheme:'3×30-45s'}
+  ]
+};
+
 const WKT={
   upper:{title:'Zgornji del telesa',badge:'gym',ex:[{n:'Potisk z ročkami leže',s:'3',r:'12'},{n:'Veslanje z ročko (enoročno)',s:'3',r:'12'},{n:'Vzdolžni potisk nad glavo',s:'3',r:'10'},{n:'Biceps curl z ročkami',s:'3',r:'12'},{n:'Triceps potisk pri kablu',s:'3',r:'12'},{n:'Plank',s:'3',r:'45 sek'}]},
   lower:{title:'Spodnji del telesa',badge:'gym',ex:[{n:'Počep (goblet ali s palico)',s:'4',r:'12'},{n:'Izpadni koraki z ročkami',s:'3',r:'10/nogo'},{n:'Leg press',s:'3',r:'15'},{n:'Mrtvetek z ročkami (RDL)',s:'3',r:'12'},{n:'Donkey kicks pri kablu',s:'3',r:'15/nogo'},{n:'Dvig na prste — lýtka',s:'3',r:'20'}]},
@@ -2076,7 +2660,19 @@ const XI={
 };
 
 // ─── FUZZY EXERCISE INFO LOOKUP ────────────────────────────
-function getExInfo(name){
+// Lookup exercise metadata: prefer EX_DB by ID (rich, curated), fall back
+// to legacy XI table by name. Both eventually return the same shape:
+//   {desc, tip, yt} so renderWorkout doesn't need to know the source.
+function getExInfo(name,id){
+  // 1) EX_DB by ID — richest source
+  if(id&&typeof EX_DB!=='undefined'&&EX_DB[id]){
+	const ex=EX_DB[id];
+	return {
+	  desc:ex.desc||'',
+	  tip:ex.cue||'',
+	  yt:ex.video||ex.n
+	};
+  }
   if(!name)return null;
   if(XI[name])return XI[name];
   // Strip "Min X — " EMOM prefix
@@ -2090,6 +2686,16 @@ function getExInfo(name){
   for(const key of Object.keys(XI)){
 	const kl=key.toLowerCase();
 	if(nl.includes(kl)||kl.includes(nl))return XI[key];
+  }
+  // Fallback: also try EX_DB by NAME (slower, e.g. for CrossFit ex names)
+  if(typeof EX_DB!=='undefined'){
+	const lname=name.toLowerCase();
+	for(const k in EX_DB){
+	  if(EX_DB[k].n.toLowerCase()===lname){
+		const ex=EX_DB[k];
+		return {desc:ex.desc||'',tip:ex.cue||'',yt:ex.video||ex.n};
+	  }
+	}
   }
   return null;
 }
@@ -3203,8 +3809,21 @@ function initMeals(){
 }
 function initWorkout(){
   const w=WKT[S.wt];
-  if(S.wt==='crossfit'){S.ex=[];S.exd=[];S.wuDone=[];S.cfWod=null;}
-  else{S.ex=w.ex?w.ex.map(e=>({...e})):[];S.exd=S.ex.map(()=>false);S.wuDone=(getWorkoutPrimer(S.wt)?.warmup||[]).map(()=>false);}
+  if(S.wt==='crossfit'){S.ex=[];S.exd=[];S.wuDone=[];S.cfWod=null;return;}
+  // Prefer template-based builder for strength workouts: it picks exercises
+  // from EX_DB filtered by the user's workout location, so a "home_basic"
+  // user gets bodyweight exercises while a "gym_full" user gets machines/cables.
+  // Falls back to the static list in WKT[wt].ex when no template is defined.
+  if(WKT_TEMPLATES&&WKT_TEMPLATES[S.wt]){
+	S.ex=buildWorkoutFromTemplate(WKT_TEMPLATES[S.wt]);
+	S.exd=S.ex.map(()=>false);
+  } else if(w&&w.ex){
+	S.ex=w.ex.map(e=>({...e}));
+	S.exd=S.ex.map(()=>false);
+  } else {
+	S.ex=[];S.exd=[];
+  }
+  S.wuDone=(getWorkoutPrimer(S.wt)?.warmup||[]).map(()=>false);
 }
 
 // ─── TOGGLES ────────────────────────────────────────────────
@@ -4514,7 +5133,7 @@ function renderWorkout(){
 	const timeLabel=wod.type==='AMRAP'?`${wod.time} min`:wod.type==='EMOM'?`${wod.time} min`:wod.rounds?`${wod.rounds} krogov`:'';
 	const savedResult=localStorage.getItem(lsKey('wodlog_'+localDateKey(now)))||'';
 	const exRows=wod.ex.map((e,i)=>{
-	  const info=getExInfo(e.n)||{};
+	  const info=getExInfo(e.n,e.id)||{};
 	  const descHtml=info.desc?`<div class="wod-desc-panel" id="wdp${i}"><div class="ex-desc" style="margin-bottom:6px;">${info.desc}</div><div class="ex-tip">💡 ${info.tip}</div><a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent((info.yt||e.n))}" target="_blank">▶ Video</a></div>`:'';
 	  return `<div id="wex${i}">
 		<div class="wod-ex">
@@ -4549,7 +5168,7 @@ function renderWorkout(){
 	c.innerHTML=warmupHtml+`<div style="font-size:12px;color:var(--lt);margin-bottom:10px;">Izberi kaj boš naredila, nastavi čas in odkljukaj ob koncu.</div>`+
 	  S.ex.map((e,i)=>{
 		const done=S.exd[i];const open=!!exExp[i];
-		const info=getExInfo(e.n)||{};
+		const info=getExInfo(e.n,e.id)||{};
 		// Parse duration in minutes from e.r (supports "30 min", "45 min", etc.)
 		const parsedMin=parseInt(e.r)||30;
 		const kcalEst=e.customKcal||Math.round((e.kcal||0)*(parsedMin/(parseInt(e.origR||e.r)||30)))||CARDIO_BURN_PER_MIN*parsedMin||150;
@@ -4609,7 +5228,7 @@ function renderWorkout(){
 	</div>`+
 	  S.ex.map((e,i)=>{
 		const done=S.exd[i];const open=!!exExp[i];
-		const info=getExInfo(e.n)||{};const logged=elog[e.n]||{};
+		const info=getExInfo(e.n,e.id)||{};const logged=elog[e.n]||{};
 		const hist=getExerciseHistory(e.n);
 		const cue=getExerciseFeelCue(e.n);
 		const loggedSummary=summarizeSetLog(logged);
@@ -5829,9 +6448,33 @@ async function swapEx(i){
   if(!btn||btn.disabled)return;
   const cur=S.ex[i];
   if(!cur)return;
-  const origLabel=btn.innerHTML; // remember to restore on error
+  const origLabel=btn.innerHTML;
   btn.disabled=true;btn.innerHTML='<span class="spin">↺</span> Zamenjujem...';card.classList.add('loading');
+  const restoreBtn=()=>{card.classList.remove('loading');btn.disabled=false;btn.innerHTML=origLabel;};
 
+  // ─── PRIMARY PATH: lookup in EX_DB ───
+  // If the current exercise has an id (= came from EX_DB), use findAltExercise.
+  // It accounts for: user location, recent usage history, and stays within
+  // the same movement pattern. Way more accurate than any AI guess.
+  if(cur.id&&EX_DB[cur.id]){
+	// Build exclude list from other exercises in current workout
+	const exclude=S.ex.filter((_,idx)=>idx!==i&&_.id).map(_=>_.id);
+	const altId=findAltExercise(cur.id,{exclude});
+	if(altId&&EX_DB[altId]){
+	  const alt=EX_DB[altId];
+	  const sm=(alt.scheme||'3×10').match(/^(\d+)[×x](.+)$/);
+	  S.ex[i]={
+		id:altId,
+		n:alt.n,
+		s:cur.s||(sm?sm[1]:'3'),
+		r:cur.r||(sm?sm[2]:'10')
+	  };
+	  save();renderWorkout();
+	  return;
+	}
+  }
+
+  // ─── FALLBACK PATH: AI ───
   // Movement pattern + curated alternatives
   const mv=getMovementAlternatives(cur.n);
   // Avoid exercises already in current workout OR already logged today
@@ -5839,8 +6482,6 @@ async function swapEx(i){
   const loggedToday=Object.keys(loadElog()).map(n=>String(n).toLowerCase());
   const blocked=new Set([...otherInWorkout,...loggedToday]);
   const candidates=mv.alternatives.filter(a=>!blocked.has(a.toLowerCase()));
-
-  const restoreBtn=()=>{card.classList.remove('loading');btn.disabled=false;btn.innerHTML=origLabel;};
 
   if(S.wt==='cardio'){
 	const altList=candidates.length?`Izberi eno izmed: ${candidates.join(', ')}.`:'';
@@ -5854,14 +6495,16 @@ async function swapEx(i){
 	return;
   }
 
-  // Strength: stay in same movement pattern
+  // Strength fallback: AI within same movement pattern
+  const loc=getWorkoutLoc();
+  const locLabel={gym_full:'fitnes z napravami in kabli',gym_weights:'fitnes samo z utežmi',home_eq:'doma z opremo',home_basic:'doma brez opreme (telesna teža)',outdoor:'zunaj/teren'}[loc]||'fitnes';
   const altList=candidates.length
 	?`OBVEZNO izberi eno od teh alternativ (vse so iz iste mišične skupine in vzorca giba — ${mv.label}): ${candidates.join(', ')}.`
 	:`Predlagaj alternativo za isti vzorec giba (${mv.label}) in isto mišično skupino.`;
   try{
 	const txt=await api(
-	  `Si fitnes trener za telovadnico. ${altList} Vrni SAMO JSON: {"n":"ime vaje v slovenščini","s":"3","r":"12"}`,
-	  `Zamenjaj vajo "${cur.n}" (${cur.s}×${cur.r}). Vzorec giba: ${mv.label}.`
+	  `Si fitnes trener. Uporabnica trenira: ${locLabel}. ${altList} Predlagaj SAMO vajo, ki jo lahko izvede s svojo opremo. Vrni SAMO JSON: {"n":"ime vaje v slovenščini","s":"3","r":"12"}`,
+	  `Zamenjaj vajo "${cur.n}" (${cur.s}×${cur.r}). Vzorec giba: ${mv.label}. Lokacija: ${locLabel}.`
 	);
 	const p=JSON.parse(txt);S.ex[i]={n:p.n,s:p.s,r:p.r};save();renderWorkout();
   }catch(e){err('Zamenjava ni uspela.');restoreBtn();}
@@ -5992,7 +6635,14 @@ function err(msg){const b=document.getElementById('eb');b.textContent=msg;b.clas
 
 // ─── GOALS & PROFILE ─────────────────────────────────────────
 const GOALS_KEY='user_goals';
-let G={age:null,height:null,weight:null,target:null,goal:'lose',act:'light'};
+// G holds the user's profile: age/height/weight + workout context.
+// `loc` (workout location) determines which exercises the planner can use:
+//   gym_full   = polni fitnes — sve naprave + uteži + kabli
+//   gym_weights = fitnes z utežmi — uteži + klopi, brez naprav/kablov
+//   home_eq    = doma z opremo — uteži, gumijaste trakovi, klop
+//   home_basic = doma brez opreme — telo (bodyweight)
+//   outdoor    = zunaj/teren — tek, hribi, igrišča (klin/drog)
+let G={age:null,height:null,weight:null,target:null,goal:'lose',act:'light',loc:'gym_full'};
 
 function loadGoals(){
   try{
@@ -6050,7 +6700,7 @@ function calcMacroTargets(){
   };
 }
 
-let _selGoal='lose',_selAct='light';
+let _selGoal='lose',_selAct='light',_selLoc='gym_full';
 let _goalsOriginal=null,_goalsSaved=false,_goalsPreviewMode=false;
 
 function readGoalsDraft(){
@@ -6060,7 +6710,8 @@ function readGoalsDraft(){
     weight:parseFloat(document.getElementById('g-weight')?.value)||null,
     target:parseFloat(document.getElementById('g-target')?.value)||null,
     goal:_selGoal,
-    act:_selAct
+    act:_selAct,
+    loc:_selLoc
   };
 }
 function refreshGoalConnectedUI(){
@@ -6086,6 +6737,19 @@ function selAct(a){
   ['sed','light','mod','high'].forEach(x=>document.getElementById('ga-'+x)?.classList.toggle('active',x===a));
   updateGoalsCalc();
   applyGoalsLivePreview();
+}
+// Location of training — narrows which exercises the planner can use.
+// Stored in G.loc and persisted via saveGoalsState. Defaults to 'gym_full'.
+function selLoc(l){
+  _selLoc=l;
+  ['gym_full','gym_weights','home_eq','home_basic','outdoor'].forEach(x=>{
+	const el=document.getElementById('gl-'+x);
+	if(el)el.classList.toggle('active',x===l);
+  });
+  applyGoalsLivePreview();
+  // Re-render today's workout immediately if the goals modal is open in preview mode
+  if(typeof renderWorkout==='function')renderWorkout();
+  if(typeof renderNextUp==='function')renderNextUp();
 }
 function updateGoalsCalc(){
   const age=parseInt(document.getElementById('g-age')?.value)||null;
@@ -6140,8 +6804,8 @@ function openGoals(mode='profile'){
   document.getElementById('g-height').value=G.height||'';
   document.getElementById('g-weight').value=G.weight||'';
   document.getElementById('g-target').value=G.target||'';
-  _selGoal=G.goal||'lose';_selAct=G.act||'light';
-  selGoal(_selGoal);selAct(_selAct);
+  _selGoal=G.goal||'lose';_selAct=G.act||'light';_selLoc=G.loc||'gym_full';
+  selGoal(_selGoal);selAct(_selAct);selLoc(_selLoc);
 
   const titles={
     profile:['Moj <em>profil</em>','Osnovni podatki za natančen izračun.','Shrani profil →'],
