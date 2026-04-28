@@ -3,687 +3,97 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Progress-First Fitness App</title>
+  <title>Progress Fitness</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#f7f2ea;
+      --bg:#f6f1e7;
       --paper:#fffdf8;
-      --paper-2:#f2ece1;
-      --ink:#181612;
-      --muted:#6c665c;
-      --line:rgba(24,22,18,.1);
-      --accent:#c45a32;
-      --accent-2:#2e5d47;
-      --accent-3:#dca86e;
-      --shadow:0 24px 60px rgba(45,33,18,.08);
+      --paper-2:#f1ebe0;
+      --ink:#171511;
+      --muted:#6e675d;
+      --line:rgba(23,21,17,.08);
+      --accent:#c45730;
+      --green:#2f6049;
+      --gold:#b88d55;
+      --danger:#b94d44;
+      --shadow:0 22px 50px rgba(34,23,12,.08);
       --radius:24px;
     }
     body{
       font-family:'DM Sans',system-ui,sans-serif;
       color:var(--ink);
       background:
-        radial-gradient(circle at top left, rgba(220,168,110,.18), transparent 28%),
-        radial-gradient(circle at top right, rgba(46,93,71,.12), transparent 24%),
-        linear-gradient(180deg, #fbf7ef 0%, #f4eee4 100%);
+        radial-gradient(circle at top left, rgba(196,87,48,.12), transparent 24%),
+        radial-gradient(circle at top right, rgba(47,96,73,.10), transparent 22%),
+        linear-gradient(180deg, #fbf7f0 0%, #f2ece1 100%);
       min-height:100vh;
     }
-    .shell{max-width:1240px;margin:0 auto;padding:28px 20px 80px}
+    button,input,select{font:inherit}
+    .app-shell{max-width:1180px;margin:0 auto;padding:22px 18px 110px}
     .topbar{
-      display:flex;align-items:center;justify-content:space-between;gap:16px;
-      margin-bottom:24px;padding:14px 18px;border:1px solid var(--line);
-      border-radius:999px;background:rgba(255,253,248,.78);backdrop-filter:blur(16px);
-      box-shadow:0 10px 30px rgba(28,20,10,.05);
+      display:flex;justify-content:space-between;align-items:center;gap:14px;
+      margin-bottom:18px;padding:14px 16px;border-radius:999px;background:rgba(255,253,248,.78);
+      border:1px solid var(--line);box-shadow:0 10px 28px rgba(28,20,10,.05);backdrop-filter:blur(14px)
     }
     .brand{display:flex;align-items:center;gap:12px}
     .brand-mark{
-      width:40px;height:40px;border-radius:14px;
-      background:linear-gradient(135deg,var(--accent-2),#3f7b5f);
-      color:#fff;display:grid;place-items:center;font-weight:700
+      width:42px;height:42px;border-radius:15px;display:grid;place-items:center;
+      background:linear-gradient(135deg,var(--green),#4d8768);color:#fff;font-weight:700
     }
-    .brand-copy small,.eyebrow,.label,.mini-label{text-transform:uppercase;letter-spacing:.12em}
-    .brand-copy small{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
-    .brand-copy strong{font-size:14px}
-    .nav-mini{display:flex;gap:10px;flex-wrap:wrap}
-    .nav-mini span{
-      font-size:12px;color:var(--muted);padding:8px 12px;border-radius:999px;
-      background:rgba(255,255,255,.55);border:1px solid rgba(24,22,18,.06)
+    .brand-kicker,.section-kicker,.tiny{text-transform:uppercase;letter-spacing:.12em}
+    .brand-kicker{font-size:10px;color:var(--muted);margin-bottom:3px}
+    .brand-title{font-weight:700;font-size:15px}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap}
+    .status-pill{
+      font-size:12px;padding:8px 11px;border-radius:999px;background:rgba(255,255,255,.7);
+      border:1px solid var(--line);color:var(--muted)
     }
+    .status-pill strong{color:var(--ink)}
 
     .hero{
-      display:grid;grid-template-columns:minmax(0,1.2fr) minmax(360px,.9fr);gap:26px;
-      align-items:stretch;margin-bottom:28px
+      display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:18px;
+      margin-bottom:18px
     }
-    .hero-copy,.hero-preview,.card,.panel,.phone,.wire{
-      border:1px solid var(--line);background:rgba(255,253,248,.8);box-shadow:var(--shadow)
+    .hero-card,.card,.panel,.phone{
+      background:rgba(255,253,248,.84);border:1px solid var(--line);box-shadow:var(--shadow)
     }
-    .hero-copy{
-      border-radius:36px;padding:34px;background:
-        linear-gradient(140deg, rgba(255,253,248,.95), rgba(247,242,234,.86)),
-        linear-gradient(135deg, rgba(196,90,50,.06), transparent 45%)
+    .hero-card{border-radius:34px;padding:28px}
+    .hero-card h1{
+      font-family:'Playfair Display',Georgia,serif;font-size:clamp(36px,5vw,62px);
+      line-height:.95;letter-spacing:-.03em;max-width:10ch;margin-bottom:14px
     }
-    .eyebrow{font-size:11px;color:var(--accent);margin-bottom:14px}
-    h1{
-      font-family:'Playfair Display',Georgia,serif;font-size:clamp(42px,6vw,78px);
-      line-height:.95;letter-spacing:-.03em;max-width:10ch;margin-bottom:18px
+    .hero-card h1 em{font-style:normal;color:var(--accent)}
+    .hero-copy{font-size:16px;color:var(--muted);line-height:1.7;max-width:62ch}
+    .hero-grid{margin-top:18px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .mini-stat{
+      border-radius:20px;padding:16px;background:rgba(255,255,255,.8);border:1px solid rgba(23,21,17,.06)
     }
-    h1 em{font-style:normal;color:var(--accent)}
-    .lead{font-size:18px;line-height:1.7;color:var(--muted);max-width:62ch}
-    .hero-stats{
-      margin-top:24px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px
-    }
-    .stat{
-      background:rgba(255,255,255,.72);border:1px solid rgba(24,22,18,.06);
-      border-radius:20px;padding:16px
-    }
-    .stat strong{display:block;font-size:30px;line-height:1;margin-bottom:6px}
-    .stat span{font-size:13px;color:var(--muted);line-height:1.45}
-
-    .hero-preview{border-radius:36px;padding:22px;display:flex;flex-direction:column;gap:16px}
-    .label{font-size:11px;color:var(--muted);margin-bottom:8px}
-    .preview-top{
-      display:flex;justify-content:space-between;align-items:flex-start;gap:12px
-    }
-    .preview-top h2{font-size:28px;line-height:1.05;max-width:10ch}
-    .pill{
-      display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border-radius:999px;
-      font-size:12px;border:1px solid rgba(46,93,71,.15);background:#ebf3ee;color:var(--accent-2)
+    .mini-stat strong{display:block;font-size:28px;line-height:1;margin-bottom:5px}
+    .mini-stat span{font-size:12px;color:var(--muted);line-height:1.5}
+    .coach-card{border-radius:34px;padding:22px;display:flex;flex-direction:column;gap:14px}
+    .section-kicker{font-size:10px;color:var(--accent)}
+    .coach-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+    .coach-head h2{font-size:26px;line-height:1.05;max-width:10ch}
+    .tone{
+      display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;
+      font-size:12px;background:#ebf3ee;color:var(--green);border:1px solid rgba(47,96,73,.12)
     }
     .coach-note{
-      border-radius:22px;padding:18px;background:linear-gradient(135deg,#efe7db,#f9f5ef);
-      border:1px solid rgba(24,22,18,.06)
+      border-radius:22px;padding:16px;background:linear-gradient(135deg,#efe7da,#faf6ef);
+      border:1px solid rgba(23,21,17,.06)
     }
-    .coach-note strong{display:block;font-size:17px;margin-bottom:8px}
+    .coach-note strong{display:block;font-size:16px;margin-bottom:7px}
     .coach-note p{font-size:14px;color:var(--muted);line-height:1.6}
-    .preview-list{display:grid;gap:10px}
-    .preview-item{
-      background:rgba(255,255,255,.8);border:1px solid rgba(24,22,18,.06);
-      border-radius:18px;padding:14px 16px;display:flex;justify-content:space-between;gap:14px
+    .coach-list{display:grid;gap:10px}
+    .coach-item{
+      display:flex;justify-content:space-between;gap:12px;padding:13px 14px;border-radius:18px;
+      border:1px solid rgba(23,21,17,.06);background:rgba(255,255,255,.82)
     }
-    .preview-item strong{display:block;font-size:15px;margin-bottom:4px}
-    .preview-item span{font-size:13px;color:var(--muted)}
-    .preview-item b{font-size:13px;color:var(--accent-2);white-space:nowrap}
-
-    .section{margin-top:24px}
-    .section-head{
-      display:flex;justify-content:space-between;align-items:end;gap:18px;flex-wrap:wrap;
-      margin-bottom:16px
-    }
-    .section-head h3{
-      font-family:'Playfair Display',Georgia,serif;font-size:36px;line-height:1
-    }
-    .section-head p{max-width:64ch;color:var(--muted);line-height:1.6}
-
-    .grid-3,.grid-4,.grid-2{display:grid;gap:16px}
-    .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
-    .grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
-    .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .card{
-      border-radius:26px;padding:22px;background:rgba(255,253,248,.85)
-    }
-    .card .mini-label{font-size:10px;color:var(--muted);margin-bottom:10px}
-    .card h4{font-size:22px;line-height:1.1;margin-bottom:10px}
-    .card p{font-size:14px;color:var(--muted);line-height:1.65}
-    .list{display:grid;gap:10px;margin-top:12px}
-    .list div{
-      padding:11px 13px;border-radius:16px;background:rgba(255,255,255,.78);
-      border:1px solid rgba(24,22,18,.06);font-size:14px;line-height:1.5
-    }
-    .list b{color:var(--ink)}
-
-    .engine{
-      display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:18px
-    }
-    .panel{
-      border-radius:30px;padding:24px;background:linear-gradient(180deg,#fffcf7,#f4eee4)
-    }
-    .engine-steps{display:grid;gap:12px;margin-top:14px}
-    .engine-step{
-      display:grid;grid-template-columns:38px minmax(0,1fr);gap:12px;align-items:start;
-      padding:14px;border-radius:18px;background:rgba(255,255,255,.72);
-      border:1px solid rgba(24,22,18,.06)
-    }
-    .engine-step strong{
-      width:38px;height:38px;border-radius:14px;display:grid;place-items:center;
-      background:#ebf3ee;color:var(--accent-2);font-size:14px
-    }
-    .engine-step h5{font-size:16px;margin-bottom:5px}
-    .engine-step p{font-size:14px;color:var(--muted);line-height:1.6}
-
-    .phone-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-    .phone{
-      border-radius:34px;padding:16px;background:linear-gradient(180deg,#fbf8f2,#f0e9de)
-    }
-    .phone-top{
-      display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;
-      font-size:12px;color:var(--muted)
-    }
-    .phone-screen{
-      min-height:420px;border-radius:28px;padding:18px;background:rgba(255,255,255,.76);
-      border:1px solid rgba(24,22,18,.06)
-    }
-    .screen-kicker{font-size:10px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
-    .screen-title{font-size:28px;line-height:1.05;margin:8px 0 8px}
-    .screen-copy{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:14px}
-    .module{padding:14px;border-radius:18px;border:1px solid rgba(24,22,18,.06);background:#fffdfa;margin-bottom:10px}
-    .module strong{display:block;font-size:15px;margin-bottom:5px}
-    .module span{font-size:13px;color:var(--muted);line-height:1.5}
-    .tag-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-    .tag{
-      font-size:12px;padding:7px 10px;border-radius:999px;background:#f3ece1;color:var(--ink);
-      border:1px solid rgba(24,22,18,.06)
-    }
-    .bar{height:8px;border-radius:999px;background:#e8dfd2;overflow:hidden;margin-top:10px}
-    .bar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent-2),#5f8c78)}
-
-    .tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
-    .tab{
-      border:none;cursor:pointer;padding:12px 16px;border-radius:999px;font:inherit;
-      font-size:13px;background:rgba(255,255,255,.76);color:var(--muted);
-      border:1px solid rgba(24,22,18,.08);transition:.2s
-    }
-    .tab.active{background:var(--ink);color:#fff;border-color:var(--ink)}
-    .tab-panel{display:none}
-    .tab-panel.active{display:block}
-
-    .feature-columns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-    .feature-box{
-      border-radius:24px;padding:20px;border:1px solid var(--line);background:rgba(255,255,255,.7)
-    }
-    .feature-box h4{font-size:20px;margin-bottom:10px}
-    .feature-box ul{list-style:none;display:grid;gap:9px}
-    .feature-box li{
-      font-size:14px;color:var(--muted);line-height:1.55;padding-left:16px;position:relative
-    }
-    .feature-box li::before{
-      content:"";position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:999px;background:var(--accent)
-    }
-
-    .wires{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
-    .wire{
-      border-radius:28px;padding:22px;background:linear-gradient(180deg,#fffdf9,#f3ebdf)
-    }
-    .wire h4{font-size:24px;margin-bottom:8px}
-    .wire p{font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:14px}
-    .wire-flow{display:grid;gap:10px}
-    .wire-flow div{
-      padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.76);
-      border:1px solid rgba(24,22,18,.06);font-size:14px;line-height:1.5
-    }
-    .wire-flow b{display:block;margin-bottom:4px}
-
-    .roadmap{
-      border-radius:34px;padding:26px;background:linear-gradient(160deg,#181612,#2a241d);color:#f8f4ee
-    }
-    .roadmap .tabs{margin-top:18px}
-    .roadmap .tab{
-      background:rgba(255,255,255,.08);color:rgba(248,244,238,.72);border-color:rgba(255,255,255,.12)
-    }
-    .roadmap .tab.active{background:#f7f2ea;color:#181612;border-color:#f7f2ea}
-    .roadmap-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-    .road-card{
-      border-radius:22px;padding:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)
-    }
-    .road-card strong{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#d7c9b4;margin-bottom:10px}
-    .road-card h5{font-size:18px;margin-bottom:8px}
-    .road-card p{font-size:14px;line-height:1.6;color:rgba(248,244,238,.72)}
-
-    .footer-note{
-      margin-top:24px;padding:18px 20px;border-radius:24px;background:#ebf3ee;
-      border:1px solid rgba(46,93,71,.14);display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap
-    }
-    .footer-note strong{font-size:18px;color:var(--accent-2)}
-    .footer-note span{max-width:72ch;font-size:14px;color:var(--muted);line-height:1.6}
-
-    @media (max-width:1080px){
-      .hero,.engine,.phone-grid,.feature-columns,.roadmap-grid,.grid-4,.grid-3,.grid-2,.wires{grid-template-columns:1fr}
-      h1{max-width:none}
-    }
-    @media (max-width:720px){
-      .shell{padding:18px 14px 48px}
-      .topbar{border-radius:28px;padding:14px}
-      .hero-copy,.hero-preview,.panel,.roadmap,.card,.wire{border-radius:28px}
-      .hero-stats{grid-template-columns:1fr}
-      .section-head h3{font-size:30px}
-      .screen-title{font-size:24px}
-    }
-  </style>
-</head>
-<body>
-  <div class="shell">
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-mark">PF</div>
-        <div class="brand-copy">
-          <small>Concept page</small>
-          <strong>Progress-First Fitness App</strong>
-        </div>
-      </div>
-      <div class="nav-mini">
-        <span>Adaptive engine</span>
-        <span>Simple UX</span>
-        <span>Premium coaching</span>
-      </div>
-    </header>
-
-    <section class="hero">
-      <div class="hero-copy">
-        <div class="eyebrow">Fitness product vision</div>
-        <h1>App, ki ne predlaga vadb. App, ki <em>gradi napredek</em>.</h1>
-        <p class="lead">
-          To ni knjižnica lepih treningov. To je inteligenten coaching sistem, ki iz cilja,
-          opreme, regeneracije in pretekle izvedbe vsak teden sestavi boljši plan in ga
-          uporabniku poda na najbolj jasen možen način.
-        </p>
-        <div class="hero-stats">
-          <div class="stat">
-            <strong>4-8</strong>
-            <span>tedenski bloki z jasnim namenom, ne naključni daily workouti</span>
-          </div>
-          <div class="stat">
-            <strong>1</strong>
-            <span>glavni fokus na vsakem ekranu, da je app miren in hiter za uporabo</span>
-          </div>
-          <div class="stat">
-            <strong>360°</strong>
-            <span>pogled na progres, volumen, utrujenost, adherence in quality of execution</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="hero-preview">
-        <div class="preview-top">
-          <div>
-            <div class="label">Današnji občutek appa</div>
-            <h2>Calm surface. Brutal backend.</h2>
-          </div>
-          <div class="pill">Coach mode active</div>
-        </div>
-
-        <div class="coach-note">
-          <strong>Zakaj je ta izdelek drugačen</strong>
-          <p>
-            Povprečen fitness app servira vsebino. Ta app vodi adaptacijo. Če uporabnik spi slabo,
-            stagnira, preskoči trening ali ga boli rame, se plan spremeni pametno in z razlago.
-          </p>
-        </div>
-
-        <div class="preview-list">
-          <div class="preview-item">
-            <div>
-              <strong>Današnji trening</strong>
-              <span>Uporabnik v 10 sekundah razume kaj dela in zakaj.</span>
-            </div>
-            <b>Train screen</b>
-          </div>
-          <div class="preview-item">
-            <div>
-              <strong>Adaptive progression</strong>
-              <span>Load, reps, sets, zamenjave vaj in deload se prilagajajo avtomatsko.</span>
-            </div>
-            <b>Engine</b>
-          </div>
-          <div class="preview-item">
-            <div>
-              <strong>Napredek, ne samo aktivnost</strong>
-              <span>App meri, ali je uporabnik dejansko bližje cilju.</span>
-            </div>
-            <b>Progress</b>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-head">
-        <div>
-          <div class="eyebrow">Product pillars</div>
-          <h3>Temelji produkta</h3>
-        </div>
-        <p>Vsak feature mora izboljšati eno od petih stvari: progresijo, adherence, recovery, clarity ali trust.</p>
-      </div>
-
-      <div class="grid-4">
-        <article class="card">
-          <div class="mini-label">01</div>
-          <h4>Progress first</h4>
-          <p>V ospredju ni content, ampak sistem, ki vodi do moči, mišic, recompositiona ali konsistence.</p>
-        </article>
-        <article class="card">
-          <div class="mini-label">02</div>
-          <h4>Simple on the surface</h4>
-          <p>Uporabnik ne sme čutiti kompleksnosti motorja. Na vsakem koraku vidi samo naslednjo jasno akcijo.</p>
-        </article>
-        <article class="card">
-          <div class="mini-label">03</div>
-          <h4>Adaptive by default</h4>
-          <p>Program se prilagaja performansu, regeneraciji, opremi, bolečini in izpuščenim treningom.</p>
-        </article>
-        <article class="card">
-          <div class="mini-label">04</div>
-          <h4>Trust through clarity</h4>
-          <p>App vedno razloži, kaj je spremenil, zakaj je spremenil in kaj to pomeni za uporabnika.</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="section engine">
-      <div class="panel">
-        <div class="eyebrow">Core moat</div>
-        <h3 style="font-family:'Playfair Display',Georgia,serif;font-size:38px;line-height:1.02;margin-bottom:12px">Adaptive training engine</h3>
-        <p style="font-size:15px;color:var(--muted);line-height:1.7">
-          Srce appa mora biti programerski motor, ki zna iz omejitev, ciljev in odziva uporabnika
-          zgraditi trening, ne pa samo izpisati seznam vaj.
-        </p>
-        <div class="engine-steps">
-          <div class="engine-step">
-            <strong>01</strong>
-            <div>
-              <h5>Onboarding + baseline</h5>
-              <p>Cilj, izkušnje, oprema, razpoložljivi dnevi, trajanje, omejitve in začetni assessment.</p>
-            </div>
-          </div>
-          <div class="engine-step">
-            <strong>02</strong>
-            <div>
-              <h5>4-8 tedenski block builder</h5>
-              <p>Vsak blok dobi objective, volumen, intensity range, movement distribution in deload logiko.</p>
-            </div>
-          </div>
-          <div class="engine-step">
-            <strong>03</strong>
-            <div>
-              <h5>Set-level adaptation</h5>
-              <p>Na podlagi reps, load, RIR, pain flagov in completion quality app korigira naslednje odločitve.</p>
-            </div>
-          </div>
-          <div class="engine-step">
-            <strong>04</strong>
-            <div>
-              <h5>Weekly review</h5>
-              <p>Sistem oceni: ali je problem volumen, utrujenost, slaba izvedba, preslaba adherenca ali napačna izbira vaj.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="eyebrow">Non-negotiables</div>
-        <div class="list">
-          <div><b>Goal-based generation:</b> moč, hipertrofija, recomposition, splošna pripravljenost, povratek po pavzi.</div>
-          <div><b>Intelligent substitutions:</b> zamenjava mora ohraniti training effect, ne samo “isti muscle label”.</div>
-          <div><b>Recovery-aware logic:</b> slab spanec, utrujenost, high soreness ali padci performansa sprožijo prilagoditev.</div>
-          <div><b>Missed session recovery:</b> app mora znati elegantno prestaviti plan, ne pa ga sesuti.</div>
-          <div><b>Coach explanations:</b> “Danes nižji volumen, ker si 3 treninge zapored undershoot-al cilj.”</div>
-          <div><b>Progress proof:</b> dashboard mora dokazati, da se premika tisto, kar je pomembno.</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-head">
-        <div>
-          <div class="eyebrow">Primary navigation</div>
-          <h3>App architecture</h3>
-        </div>
-        <p>Navigacija mora biti kratka in samozavestna: Home, Train, Progress, Plan, Profile.</p>
-      </div>
-
-      <div class="phone-grid">
-        <article class="phone">
-          <div class="phone-top"><span>08:41</span><span>Home</span></div>
-          <div class="phone-screen">
-            <div class="screen-kicker">Calm orientation</div>
-            <div class="screen-title">Today</div>
-            <div class="screen-copy">Domači ekran mora takoj povedati, kaj je naslednja pametna stvar.</div>
-            <div class="module">
-              <strong>Strength block / Week 3</strong>
-              <span>Upper 1 · 52 min · readiness green</span>
-              <div class="tag-row">
-                <div class="tag">Press focus</div>
-                <div class="tag">2 PR candidates</div>
-              </div>
-            </div>
-            <div class="module">
-              <strong>Coach note</strong>
-              <span>Danes dvignemo bench za 2.5 kg, ker si zadnja 2 exposure-a zaprl z rezervama.</span>
-            </div>
-            <div class="module">
-              <strong>Weekly momentum</strong>
-              <span>3 / 4 treningi opravljeni. Adherence je visoka, recovery stabilen.</span>
-              <div class="bar"><span style="width:78%"></span></div>
-            </div>
-          </div>
-        </article>
-
-        <article class="phone">
-          <div class="phone-top"><span>08:41</span><span>Train</span></div>
-          <div class="phone-screen">
-            <div class="screen-kicker">Fast execution</div>
-            <div class="screen-title">Workout player</div>
-            <div class="screen-copy">V tem screenu ni navlake. Samo vaja, cilj, prejšnji rezultat, počitek in input.</div>
-            <div class="module">
-              <strong>Bench press</strong>
-              <span>4 x 6 @ 77.5 kg · target 2 RIR</span>
-            </div>
-            <div class="module">
-              <strong>Last time</strong>
-              <span>75 kg · 6/6/6/5 · average RIR 2.5</span>
-            </div>
-            <div class="module">
-              <strong>Smart adjustment</strong>
-              <span>Če uporabnik undershoot-a reps ali prijavi bolečino, app takoj predlaga korekcijo.</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="phone">
-          <div class="phone-top"><span>08:41</span><span>Progress</span></div>
-          <div class="phone-screen">
-            <div class="screen-kicker">Proof of progress</div>
-            <div class="screen-title">Results</div>
-            <div class="screen-copy">App ne meri samo aktivnosti. Meri, ali se uporabnik res pomika proti cilju.</div>
-            <div class="module">
-              <strong>Strength trend</strong>
-              <span>Bench e1RM +6.4% v 8 tednih</span>
-              <div class="bar"><span style="width:66%"></span></div>
-            </div>
-            <div class="module">
-              <strong>Volume compliance</strong>
-              <span>Chest 96%, Back 101%, Legs 92%</span>
-            </div>
-            <div class="module">
-              <strong>Recovery signal</strong>
-              <span>Utrujenost raste. Naslednji teden sistem zniža accessory volume za 1 stopnjo.</span>
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-head">
-        <div>
-          <div class="eyebrow">User flows</div>
-          <h3>Kako mora app teči</h3>
-        </div>
-        <p>Najboljši občutek pride iz tega, da je vsaka naslednja odločitev hitra, logična in pojasnjena.</p>
-      </div>
-
-      <div class="wires">
-        <article class="wire">
-          <h4>Flow 1: onboarding do prve vadbe</h4>
-          <p>Uporabnik mora v manj kot 5 minutah dobiti plan, ki deluje osebno in strokovno.</p>
-          <div class="wire-flow">
-            <div><b>1. Goal</b> moč, mišice, recomposition, consistency ali povratek po premoru</div>
-            <div><b>2. Constraints</b> dnevi, trajanje, oprema, poškodbe, no-go gibi</div>
-            <div><b>3. Baseline</b> kratek performance assessment ali začetna ocena</div>
-            <div><b>4. Generated block</b> 4-8 tedenski plan z razlago, zakaj je tak</div>
-          </div>
-        </article>
-        <article class="wire">
-          <h4>Flow 2: workout in adaptive correction</h4>
-          <p>Ko trening ne gre po planu, mora app pomagati, ne paničariti.</p>
-          <div class="wire-flow">
-            <div><b>1. Detect mismatch</b> prenizki reps, prenizka rezerva, pain flag ali manjko opreme</div>
-            <div><b>2. Explain</b> “Danes je bench težji od pričakovanega.”</div>
-            <div><b>3. Adjust</b> minus 5% load, menjaj vajo ali znižaj volumen</div>
-            <div><b>4. Preserve intent</b> cilj dneva mora ostati enak, tudi če se vaja spremeni</div>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-head">
-        <div>
-          <div class="eyebrow">Feature map</div>
-          <h3>Kaj mora ta app vsebovati</h3>
-        </div>
-        <p>Spodaj je razdelitev na must-have jedro, močne diferenciatorje in napredni sloj.</p>
-      </div>
-
-      <div class="feature-columns">
-        <article class="feature-box">
-          <h4>P0 · Must have</h4>
-          <ul>
-            <li>deep onboarding in personalizacija</li>
-            <li>4-8 tedenski block generator</li>
-            <li>workout player z rest timerji in set loggingom</li>
-            <li>progression engine z reps, load in RIR logiko</li>
-            <li>exercise library z demoji in cues</li>
-            <li>pain flagi in readiness check-in</li>
-            <li>intelligent exercise swap</li>
-            <li>progress dashboard in PR tracking</li>
-            <li>missed workout rescheduling</li>
-            <li>coach explanation layer</li>
-          </ul>
-        </article>
-        <article class="feature-box">
-          <h4>P1 · Differentiators</h4>
-          <ul>
-            <li>wearable integracije za sleep, HR, steps</li>
-            <li>recovery score z actionable priporočili</li>
-            <li>nutrition guidance za kcal in protein</li>
-            <li>block preview in periodization calendar</li>
-            <li>adherence insights in behavior coaching</li>
-            <li>body metrics in progress photos</li>
-            <li>auto warm-up recommendations</li>
-            <li>community za accountability, ne vanity</li>
-          </ul>
-        </article>
-        <article class="feature-box">
-          <h4>P2 · Advanced layer</h4>
-          <ul>
-            <li>AI form feedback iz videa</li>
-            <li>hybrid coach review ali marketplace</li>
-            <li>travel mode in hotel gym conversion</li>
-            <li>menstrual cycle-aware planning</li>
-            <li>return-to-training protokoli</li>
-            <li>velocity based training podpora</li>
-            <li>plateau diagnostics in volume landmarks</li>
-            <li>multi-goal seasonal planning</li>
-          </ul>
-        </article>
-      </div>
-    </section>
-
-    <section class="section roadmap">
-      <div class="eyebrow" style="color:#d7c9b4">Product build order</div>
-      <h3 style="font-family:'Playfair Display',Georgia,serif;font-size:38px;line-height:1.02">Kaj bi zgradili najprej</h3>
-      <p style="margin-top:10px;max-width:72ch;font-size:15px;line-height:1.7;color:rgba(248,244,238,.72)">
-        Najprej mora nastati jasen MVP, ki že dokaže filozofijo produkta. Šele nato dodajamo “wow” sloje.
-      </p>
-
-      <div class="tabs" id="roadmap-tabs">
-        <button class="tab active" data-tab="mvp">MVP</button>
-        <button class="tab" data-tab="v2">V2</button>
-        <button class="tab" data-tab="future">Future</button>
-      </div>
-
-      <div class="tab-panel active" data-panel="mvp">
-        <div class="roadmap-grid">
-          <div class="road-card">
-            <strong>Phase 1</strong>
-            <h5>Onboarding + engine</h5>
-            <p>Zgradimo input model, baseline, cilj, constraints in block generator.</p>
-          </div>
-          <div class="road-card">
-            <strong>Phase 2</strong>
-            <h5>Workout player</h5>
-            <p>Fast logging, rest timer, previous performance, RIR input, swap logika.</p>
-          </div>
-          <div class="road-card">
-            <strong>Phase 3</strong>
-            <h5>Progress + trust</h5>
-            <p>PR-ji, trendi, block review in razlaga, zakaj se plan spreminja.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="tab-panel" data-panel="v2">
-        <div class="roadmap-grid">
-          <div class="road-card">
-            <strong>Layer 1</strong>
-            <h5>Wearables</h5>
-            <p>Sleep, HR in steps, da recovery sistem postane še bolj točen.</p>
-          </div>
-          <div class="road-card">
-            <strong>Layer 2</strong>
-            <h5>Nutrition support</h5>
-            <p>Kcal in protein priporočila z alignmentom na cilj in training block.</p>
-          </div>
-          <div class="road-card">
-            <strong>Layer 3</strong>
-            <h5>Behavior systems</h5>
-            <p>Adherence coaching, habit signals in pametni reminderji.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="tab-panel" data-panel="future">
-        <div class="roadmap-grid">
-          <div class="road-card">
-            <strong>Future 1</strong>
-            <h5>AI form layer</h5>
-            <p>Video feedback, movement quality cues in avtomatska zaznava napak.</p>
-          </div>
-          <div class="road-card">
-            <strong>Future 2</strong>
-            <h5>Hybrid coaching</h5>
-            <p>Združitev avtomatizacije in človeškega pregleda za premium tier.</p>
-          </div>
-          <div class="road-card">
-            <strong>Future 3</strong>
-            <h5>Advanced performance</h5>
-            <p>VBT, fatigue diagnostics, seasonal planning in atleta usmerjeni moduli.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <div class="footer-note">
-      <strong>Osnovna product resnica</strong>
-      <span>
-        Uporabnik mora v 10 sekundah razumeti, kaj danes dela. V 10 tednih pa mora app dokazati,
-        da so treningi pripeljali do realnega napredka. Vse ostalo je sekundarno.
-      </span>
-    </div>
-  </div>
-
-  <script>
-    const tabs=[...document.querySelectorAll('#roadmap-tabs .tab')];
-    const panels=[...document.querySelectorAll('.tab-panel')];
-    tabs.forEach((tab)=>{
-      tab.addEventListener('click',()=>{
-        const key=tab.dataset.tab;
-        tabs.forEach((item)=>item.classList.toggle('active',item===tab));
-        panels.forEach((panel)=>panel.classList.toggle('active',panel.dataset.panel===key));
-      });
-    });
-  </script>
-</body>
-</html>
+    .coach-item strong{display:block;font-size:14px;margin-bottom:4px}
+    .coach-item span,.coach-item b{font-size:12px;line-height:1.45}
+    .coach-item span{color:var(--muted)}
+    .coach-item b{color:var(--green);white-space:nowrap}
