@@ -370,6 +370,9 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .ex-top-main{flex:1;min-width:0;}
 .ex-detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;}
 .ex-detail-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--lt);}
+.workout-complete-card{background:linear-gradient(135deg,#F8FBF8 0%,#EFF7F1 100%);border:.5px solid #D5E5DA;border-radius:18px;padding:14px 16px;margin-bottom:12px;}
+.workout-complete-title{font-size:18px;color:var(--dk);font-weight:600;margin-bottom:4px;}
+.workout-complete-copy{font-size:13px;color:var(--md);line-height:1.55;}
 .add-ex-row{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap;}
 .add-ex-row input{border:.5px solid var(--br);border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit;background:var(--w);color:var(--dk);outline:none;}
 .add-ex-row input:focus{border-color:rgba(0,0,0,.2);}
@@ -3329,7 +3332,12 @@ function renderNextUp(){
   // Layout
   const planLabel=isOnPlan?'Danes je na planu':'Trening (ročno izbran)';
   const restMode=showing==='rest';
-  const showOpravljeno=isOnPlan&&!isDone;
+  const warmupDone=Array.isArray(S.wuDone)?S.wuDone.filter(Boolean).length:0;
+  const allWarmupDone=Array.isArray(S.wuDone)?warmupDone===S.wuDone.length:true;
+  const readyToFinish=showing!=='rest' && exCount>0 && exDone===exCount && allWarmupDone && !isDone;
+  const progressStarted=warmupDone>0 || exDone>0;
+  const primaryLabel=isDone?'✓ Opravljeno':readyToFinish?'Zaključi trening':progressStarted?'Nadaljuj vadbo':'Začni vadbo';
+  const primaryAction=isDone?'':readyToFinish?'markWorkoutDone()':'startWorkoutSession()';
 
   el.innerHTML=`
 	<div class="wo-overview">
@@ -3344,7 +3352,7 @@ function renderNextUp(){
 		<div class="wo-overview-actions">
 		  <button class="next-up-btn" onclick="togBpManual()" title="Izberi drugo vadbo za danes">Spremeni</button>
 		  ${restMode?`<button class="next-up-btn" onclick="addExtraWorkout()" title="Dodaj bonus trening (ne moti tedenskega plana)">+ Bonus trening</button>`:''}
-		  ${showOpravljeno?`<button class="next-up-btn primary" onclick="markWorkoutDone()" title="Označi kot opravljeno in pojdi na naslednjo">✓ Opravljeno</button>`:''}
+		  ${!restMode&&!isDone?`<button class="next-up-btn primary" onclick="${primaryAction}" title="${primaryLabel}">${primaryLabel}</button>`:''}
 		</div>
 	  </div>
 	  <div class="wo-focus-banner ${fb.cls}">
@@ -3367,6 +3375,21 @@ function addExtraWorkout(){
   S.isExtraWorkout=true;
   S.wtManual=true;
   togBpManual();
+}
+
+function startWorkoutSession(){
+  S.activePanel='workout';
+  save();
+  renderPanelSwitcher();
+  const firstUndoneEx=S.ex.findIndex((_,i)=>!S.exd[i]);
+  if(firstUndoneEx>=0){
+    exExp[firstUndoneEx]=true;
+  }
+  renderWorkout();
+  const target=document.getElementById(firstUndoneEx>=0?('ew'+firstUndoneEx):'wc');
+  if(target&&typeof target.scrollIntoView==='function'){
+    target.scrollIntoView({behavior:'smooth',block:'start'});
+  }
 }
 
 function markWorkoutDone(){
@@ -3393,6 +3416,9 @@ function markWorkoutDone(){
   // dashboard and weekly tracker all update from the same source of truth.
   if(isStrength&&totalExercises>0){
     S.exd=S.exd.map(()=>true);
+  }
+  if(Array.isArray(S.wuDone)&&S.wuDone.length){
+    S.wuDone=S.wuDone.map(()=>true);
   }
 
   if(!S.isExtraWorkout){
@@ -3793,6 +3819,7 @@ function toggleWarmup(i){
   S.wuDone[i]=!S.wuDone[i];
   save();
   renderWorkout();
+  if(typeof renderNextUp==='function')renderNextUp();
 }
 function getExerciseFeelCue(name){
   const n=String(name||'').toLowerCase();
@@ -4566,7 +4593,12 @@ function renderWorkout(){
 	const elog=loadElog();
 	const totalSets=S.ex.reduce((sum,e)=>sum+(parseInt(e.s)||3),0);
 	const estMin=Math.max(35,Math.round(totalSets*2.5));
-	c.innerHTML=warmupHtml+`<div class="workout-summary">
+	const doneCount=(S.exd||[]).filter(Boolean).length;
+	const completeHtml=S.workoutDone?`<div class="workout-complete-card">
+	  <div class="workout-complete-title">Trening zaključen</div>
+	  <div class="workout-complete-copy">Opravila si ${doneCount} od ${S.ex.length} vaj. Naslednji trening se bo pokazal glede na plan, zgodovina pa ostane shranjena.</div>
+	</div>`:'';
+	c.innerHTML=completeHtml+warmupHtml+`<div class="workout-summary">
 	  <div class="ws-stats">
 		<span class="ws-stat"><b>${warmupSteps.length}</b> ogrevanje</span>
 		<span class="ws-stat"><b>${S.ex.length}</b> vaj</span>
