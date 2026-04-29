@@ -1374,15 +1374,15 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 		</div>
 	  </div>
 		  <div class="modal-field">
-			<label>Spol / biološki profil</label>
+			<label>Biološki profil</label>
 			<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;">
-			  <button class="goal-opt" id="gb-female" onclick="selBioSex('female')">Ženska</button>
+			  <button class="goal-opt" id="gb-female" onclick="selBioSex('female')">Ženski</button>
 			  <button class="goal-opt" id="gb-male" onclick="selBioSex('male')">Moški</button>
-			  <button class="goal-opt" id="gb-other" onclick="selBioSex('other')">Ne navedem</button>
-		</div>
-	  </div>
-	  <div class="modal-field">
-		<label>Cikel / hormonski kontekst</label>
+			  <button class="goal-opt" id="gb-other" onclick="selBioSex('other')">Ne upoštevaj</button>
+			</div>
+		  </div>
+		  <div class="modal-field" id="cycle-profile-field">
+			<label>Cikel / hormonski kontekst</label>
 		<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
 		  <button class="goal-opt" id="gc-no" onclick="selCycleAware(false)">Ne upoštevaj</button>
 		  <button class="goal-opt" id="gc-yes" onclick="selCycleAware(true)">Upoštevaj</button>
@@ -7680,6 +7680,7 @@ function normalizeProfileMeta(){
   // Migration from the older separate-language setting. From now on one profile
   // choice controls both calculations and grammatical wording.
   delete G.pronoun;
+  if(G.bioSex!=='female')G.cycleAware=false;
   G.cycleAware=!!G.cycleAware;
 }
 
@@ -7828,11 +7829,17 @@ function selAct(a){
 }
 function selBioSex(s){
   _selBioSex=s;
+  if(_selBioSex!=='female')_selCycleAware=false;
   ['female','male','other'].forEach(x=>document.getElementById('gb-'+x)?.classList.toggle('active',x===s));
+  const cycleField=document.getElementById('cycle-profile-field');
+  if(cycleField)cycleField.style.display=_selBioSex==='female'?'block':'none';
+  document.getElementById('gc-no')?.classList.toggle('active',!_selCycleAware);
+  document.getElementById('gc-yes')?.classList.toggle('active',_selCycleAware);
   updateGoalsCalc();
   applyGoalsLivePreview();
 }
 function selCycleAware(on){
+  if(_selBioSex!=='female')on=false;
   _selCycleAware=!!on;
   document.getElementById('gc-no')?.classList.toggle('active',!_selCycleAware);
   document.getElementById('gc-yes')?.classList.toggle('active',_selCycleAware);
