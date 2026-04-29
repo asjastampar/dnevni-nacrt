@@ -1415,8 +1415,9 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 	<div id="goals-target-section">
 		  <div class="modal-field">
 			<label>Cilj</label>
-			<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;">
+			<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
 			  <button class="goal-opt" id="go-lose" onclick="selGoal('lose')">📉<br>Hujšanje</button>
+			  <button class="goal-opt" id="go-recomp" onclick="selGoal('recomp')">🔥<br>Rekompozicija</button>
 			  <button class="goal-opt" id="go-maintain" onclick="selGoal('maintain')">⚖️<br>Vzdrževanje</button>
 			  <button class="goal-opt" id="go-gain" onclick="selGoal('gain')">📈<br>Pridobivanje</button>
 			</div>
@@ -7700,7 +7701,7 @@ const GOALS_KEY='user_goals';
 //   outdoor    = zunaj/teren — tek, hribi, igrišča (klin/drog)
 let G={
   age:null,height:null,weight:null,target:null,
-  goal:'lose',deficitMode:'standard',act:'light',loc:'gym_full',
+  goal:'recomp',deficitMode:'standard',act:'light',loc:'gym_full',
   bioSex:'female',  // female | male | other — calculations + app language
   cycleAware:false,
   cycleStart:null,
@@ -7717,6 +7718,7 @@ function normalizeProfileMeta(){
   G.cycleAware=!!G.cycleAware;
   if(G.cycleStart&&!/^\d{4}-\d{2}-\d{2}$/.test(String(G.cycleStart)))G.cycleStart=null;
   G.cycleLength=Math.max(21,Math.min(40,parseInt(G.cycleLength)||28));
+  if(!['lose','recomp','maintain','gain'].includes(G.goal))G.goal='recomp';
   if(!['gentle','standard','aggressive'].includes(G.deficitMode))G.deficitMode='standard';
   G.useTrainingBump=!!G.useTrainingBump;
 }
@@ -7864,6 +7866,11 @@ function calcGoalKcal(){
     const mode=G.deficitMode||'standard';
     base=Math.round(tdee*(1-(DEFICIT[mode]||DEFICIT.standard)));
   }
+  if(G.goal==='recomp'){
+    // Recomposition needs enough fuel to train and build/keep muscle.
+    // Keep it near maintenance, with only a tiny nudge down on sedentary days.
+    base=Math.round(tdee*(G.act==='sed'?0.97:1));
+  }
   if(G.goal==='gain')base=Math.round(tdee*1.08);
   return applySafetyFloor(base,G)+cycleAdjustmentFor(G);
 }
@@ -7895,7 +7902,7 @@ function calcMacroTargets(){
   };
 }
 
-let _selGoal='lose',_selDeficitMode='standard',_selAct='light',_selLoc='gym_full',_selBioSex='female',_selCycleAware=false,_selCycleStart=null,_selCycleLength=28;
+let _selGoal='recomp',_selDeficitMode='standard',_selAct='light',_selLoc='gym_full',_selBioSex='female',_selCycleAware=false,_selCycleStart=null,_selCycleLength=28;
 let _goalsOriginal=null,_goalsSaved=false,_goalsPreviewMode=false;
 
 function readGoalsDraft(){
@@ -7931,7 +7938,7 @@ function applyGoalsLivePreview(){
 }
 function selGoal(g){
   _selGoal=g;
-  ['lose','maintain','gain'].forEach(x=>document.getElementById('go-'+x)?.classList.toggle('active',x===g));
+  ['lose','recomp','maintain','gain'].forEach(x=>document.getElementById('go-'+x)?.classList.toggle('active',x===g));
   const defField=document.getElementById('deficit-mode-field');
   if(defField)defField.style.display=g==='lose'?'block':'none';
   updateGoalsCalc();
@@ -8007,6 +8014,7 @@ function updateGoalsCalc(){
   const tdee=Math.round(bmr*ACT_MULT[_selAct]);
   let goalKcal=tdee;
   if(_selGoal==='lose')goalKcal=Math.round(tdee*(1-(DEFICIT[_selDeficitMode]||DEFICIT.standard)));
+  if(_selGoal==='recomp')goalKcal=Math.round(tdee*(_selAct==='sed'?0.97:1));
   if(_selGoal==='gain')goalKcal=Math.round(tdee*1.08);
   const previewProfile={...G,bioSex:_selBioSex,act:_selAct};
   goalKcal=applySafetyFloor(goalKcal,previewProfile);
@@ -8020,6 +8028,7 @@ function updateGoalsCalc(){
   const weeks=diff?Math.round(diff/0.5):null;
   const goalLabel={
     lose:{gentle:'nežno hujšanje (−10%)',standard:'standardno hujšanje (−15%)',aggressive:'hitro hujšanje (−20%)'}[_selDeficitMode]||'standardno hujšanje',
+    recomp:'rekompozicija (mišice gor, maščoba dol)',
     maintain:'vzdrževanje',
     gain:'pridobivanje (+8%)'
   };
@@ -8068,7 +8077,7 @@ function openGoals(mode='profile'){
   if(cycleStartEl)cycleStartEl.value=G.cycleStart||'';
   if(cycleLengthEl)cycleLengthEl.value=G.cycleLength||28;
   normalizeProfileMeta();
-  _selGoal=G.goal||'lose';_selDeficitMode=G.deficitMode||'standard';_selAct=G.act||'light';_selLoc=G.loc||'gym_full';
+  _selGoal=G.goal||'recomp';_selDeficitMode=G.deficitMode||'standard';_selAct=G.act||'light';_selLoc=G.loc||'gym_full';
   _selBioSex=G.bioSex||'female';_selCycleAware=!!G.cycleAware;_selCycleStart=G.cycleStart||null;_selCycleLength=G.cycleLength||28;
   selGoal(_selGoal);selDeficitMode(_selDeficitMode);selAct(_selAct);selBioSex(_selBioSex);selCycleAware(_selCycleAware);selLoc(_selLoc);
 
