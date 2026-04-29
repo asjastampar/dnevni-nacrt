@@ -346,8 +346,27 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .ep.pk{background:#FBE8F5;color:#8B2B6E;}
 .workout-block{display:flex;flex-direction:column;gap:10px;}
 .workout-subhead{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--lt);margin:2px 2px 0;}
-.wu-card{background:var(--w);border:.5px solid var(--br);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:12px;}
+.wu-card{background:var(--w);border:.5px solid var(--br);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:8px;}
 .wu-card.done{background:#F8FBF8;}
+.wu-mini-btn{background:none;border:.5px solid var(--br);color:var(--lt);width:28px;height:28px;border-radius:50%;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;font-family:inherit;flex-shrink:0;transition:all .15s;}
+.wu-mini-btn:hover{color:var(--md);background:var(--bg);border-color:var(--md);}
+.wu-mini-btn.wu-mini-rm:hover{color:var(--red);background:#FDF0EC;border-color:rgba(201,75,42,.3);}
+.wu-add-row{display:flex;gap:6px;margin-top:8px;}
+.wu-add-inp{flex:1;background:var(--w);border:.5px dashed var(--br);border-radius:12px;padding:9px 12px;font-size:13px;font-family:inherit;color:var(--dk);outline:none;}
+.wu-add-inp:focus{border-color:var(--md);border-style:solid;}
+.wu-add-btn{background:none;border:.5px dashed var(--br);border-radius:12px;padding:9px 14px;font-size:12.5px;color:var(--md);cursor:pointer;font-family:inherit;flex-shrink:0;transition:all .15s;}
+.wu-add-btn:hover{background:var(--bg);color:var(--dk);border-color:var(--md);border-style:solid;}
+/* Stretch section — appears after the strength workout. Read-only:
+   no checkbox, no swap, no remove. Just a title, cue, and video link
+   per stretch. Visually softer than warmup so user understands these
+   are suggestions, not items to track. */
+.stretch-block{margin-top:18px;}
+.stretch-card{background:#FAF8F2;border:.5px solid #ECE5D2;border-radius:14px;padding:11px 14px;display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.stretch-dot{width:6px;height:6px;border-radius:50%;background:#C9A961;flex-shrink:0;}
+.stretch-body{flex:1;min-width:0;}
+.stretch-title{font-size:13.5px;color:var(--dk);font-weight:500;margin-bottom:2px;}
+.stretch-time{font-weight:400;color:var(--lt);font-size:12px;}
+.stretch-cue{font-size:11.5px;color:var(--md);line-height:1.4;}
 .wu-dot{width:8px;height:8px;border-radius:50%;background:var(--grn);flex-shrink:0;opacity:.7;}
 .wu-body{flex:1;}
 .wu-title{font-size:15px;color:var(--dk);}
@@ -2222,6 +2241,212 @@ const EX_DB={
 	alts:['calf_raise','calf_raise_db','calf_raise_seated']}
 };
 
+// ─────────────────────────────────────────────────────────────
+// WARMUP DATABASE
+// ─────────────────────────────────────────────────────────────
+// Smart warmup exercises — short, dynamic, target the muscles that the main
+// workout will hit. Each warmup has a duration (sec) instead of reps/kg.
+const WARMUP_DB={
+  // GENERAL
+  cat_cow:{n:'Mačka–krava',time:'45 sek',primary:['spine','core'],
+	desc:'Na vseh štirih, izmenično krčiš in zaobljaš hrbet z dihanjem.',
+	cue:'Počasi — dihaj globoko, drsiš med pozicijama.',
+	video:'cat cow stretch warmup'},
+  hip_circles:{n:'Krogi z boki',time:'30 sek/smer',primary:['hips'],
+	desc:'Stoja, roke v boku, krogi z boki v obe smeri.',
+	cue:'Velik, kontroliran obseg gibanja.',
+	video:'standing hip circles warmup'},
+  arm_circles:{n:'Krogi z rokami',time:'30 sek/smer',primary:['shoulders'],
+	desc:'Stoja, široke roke, majhni→veliki krogi naprej, nato nazaj.',
+	cue:'Začni z malimi krogi in se postopno povečuj.',
+	video:'arm circles warmup'},
+  leg_swings:{n:'Zamahi z nogo',time:'30 sek/nogo',primary:['hips','hamstrings'],
+	desc:'Drži se opore, nogo zamahuje naprej-nazaj nato bočno.',
+	cue:'Sprosti, ne sili — povečuj obseg postopno.',
+	video:'leg swings warmup'},
+  jumping_jacks:{n:'Skakalni razgled',time:'30 sek',primary:['heart','full_body'],
+	desc:'Klasični jumping jacks — dvig srčnega utripa.',
+	cue:'Rahlo — če te zmanjkuje sape, upočasni.',
+	video:'jumping jacks proper form'},
+  high_knees:{n:'Visoki koleni',time:'30 sek',primary:['hips','heart'],
+	desc:'Tek na mestu z visokim dvigom kolen do bokov.',
+	cue:'Aktiviraj trebuh — koleni gor, ne stopalo.',
+	video:'high knees warmup'},
+  // GLUTE/LOWER
+  bw_squats:{n:'Bodyweight počepi',time:'15 ponov.',primary:['quads','glutes'],
+	desc:'Brez uteži, počasen kontroliran počep do paralele.',
+	cue:'Pete na tleh, kolena z prsti.',
+	video:'bodyweight squat warmup'},
+  glute_bridge_warmup:{n:'Glute bridge — aktivacija',time:'15 ponov.',primary:['glutes'],
+	desc:'Leže, kolena pokrčena, dvig medenice z stiskom zadnjice.',
+	cue:'Občutek krčenja zadnjice na vrhu — 1 sek pavza.',
+	video:'glute bridge activation warmup'},
+  banded_walks:{n:'Hoja z elastiko',time:'10 korakov/smer',primary:['glutes_med'],
+	desc:'Elastika nad koleni, polčep, stranski koraki levo-desno.',
+	cue:'Stalno napeti — elastika ne sme oslabeti.',
+	video:'lateral band walks glute warmup'},
+  monster_walks:{n:'Monster walks',time:'10 korakov',primary:['glutes_med'],
+	desc:'Elastika okoli gležnjev, polčep, koraki naprej z odprtjem nog.',
+	cue:'Velik korak vstran-naprej, kontrolirano nazaj.',
+	video:'monster walks glute warmup'},
+  bw_lunge_warmup:{n:'Izpadi v hojo',time:'10 ponov./nogo',primary:['quads','glutes'],
+	desc:'Brez uteži, hodeči izpadi za pripravo nog.',
+	cue:'Sprednje koleno NE gre čez prste.',
+	video:'walking lunge warmup'},
+  // UPPER
+  scapular_pulls:{n:'Lopaten razteg',time:'30 sek',primary:['upper_back'],
+	desc:'Roke pred prsmi, povleci lopatice nazaj-skupaj-spusti.',
+	cue:'Občutek peče v sredini hrbta.',
+	video:'scapular retraction warmup'},
+  bw_pushups_warmup:{n:'Push-up na koleni',time:'8 ponov.',primary:['chest','triceps'],
+	desc:'Push-up s koleni na tleh za pripravo prsi.',
+	cue:'Lažje od navadnega — samo pripravi mišice.',
+	video:'knee push up warmup'},
+  band_pull_apart:{n:'Band pull apart',time:'15 ponov.',primary:['rear_delts','upper_back'],
+	desc:'Elastika v iztegnjenih rokah, povleci v stran.',
+	cue:'Lopatice se srečata.',
+	video:'band pull apart warmup'},
+  shoulder_dislocates:{n:'Shoulder dislocates',time:'10 ponov.',primary:['shoulders'],
+	desc:'Z elastiko ali palico — krog čez glavo nazaj in nazaj.',
+	cue:'Široko — ne sili, postopno zoži oprijem.',
+	video:'shoulder dislocates mobility'},
+  // CARDIO/CORE
+  walking_warmup:{n:'Lahka hoja',time:'3 min',primary:['heart'],
+	desc:'Mirna hoja za dvig srčnega utripa pred kardiom.',
+	cue:'Počasi povečuj tempo.',
+	video:''},
+  dynamic_torso:{n:'Dinamičen torso',time:'30 sek',primary:['core','spine'],
+	desc:'Stoja, kontrolirana rotacija trupa levo-desno.',
+	cue:'Boki ostanejo naprej, premika se zgornji del.',
+	video:'standing torso twist warmup'}
+};
+
+// Warmup template per workout type — picks the right exercises for what's
+// coming. Returns a list of WARMUP_DB ids in order.
+const WARMUP_TEMPLATES={
+  glute:['cat_cow','hip_circles','glute_bridge_warmup','banded_walks','bw_squats'],
+  lower:['cat_cow','hip_circles','leg_swings','glute_bridge_warmup','bw_squats','bw_lunge_warmup'],
+  upper:['cat_cow','arm_circles','scapular_pulls','band_pull_apart','bw_pushups_warmup'],
+  full:['cat_cow','arm_circles','hip_circles','glute_bridge_warmup','bw_squats','scapular_pulls'],
+  cardio:['walking_warmup','arm_circles','leg_swings','high_knees'],
+  crossfit:['jumping_jacks','arm_circles','hip_circles','bw_squats','scapular_pulls']
+};
+
+// ─────────────────────────────────────────────────────────────
+// STRETCH DATABASE
+// ─────────────────────────────────────────────────────────────
+// End-of-workout stretches. Read-only suggestions — user doesn't check
+// them off, just sees what to do for full recovery. Picked based on the
+// muscles that were trained.
+const STRETCH_DB={
+  pigeon:{n:'Golobja poza',time:'45 sek/stran',primary:['glutes','hips'],
+	desc:'Sprednja noga upognjena pred sabo, zadnja iztegnjena nazaj.',
+	cue:'Dihaj globoko v boke — ne potiskaj na silo.',
+	video:'pigeon pose stretch'},
+  hamstring_stretch:{n:'Razteg zadnje lože',time:'30 sek/nogo',primary:['hamstrings'],
+	desc:'Sed, ena noga iztegnjena, druga pokrčena, naklon naprej.',
+	cue:'Hrbet raven — naklon iz bokov, ne križa.',
+	video:'seated hamstring stretch'},
+  hip_flexor:{n:'Razteg upogibalk kolka',time:'30 sek/nogo',primary:['hips','quads'],
+	desc:'Ena noga zadaj na koleni, druga sprednja pod 90°.',
+	cue:'Boki naprej — občutek pred sprednjim stegnom zadnje noge.',
+	video:'kneeling hip flexor stretch'},
+  child_pose:{n:'Pozicija otroka',time:'45 sek',primary:['back','hips'],
+	desc:'Sed na petah, roke iztegnjene naprej, glava na tla.',
+	cue:'Pust dihanju, da širi hrbet.',
+	video:'child pose stretch'},
+  cobra:{n:'Kobra',time:'30 sek',primary:['core','low_back'],
+	desc:'Leže na trebuhu, dvig zgornjega dela telesa z rokama.',
+	cue:'Nežno — če te peče križ, znižaj.',
+	video:'cobra pose stretch'},
+  quad_stretch:{n:'Razteg sprednje stegen',time:'30 sek/nogo',primary:['quads'],
+	desc:'Stoja, drži gleženj zadaj proti zadnjici.',
+	cue:'Boki naprej — koleni skupaj.',
+	video:'standing quad stretch'},
+  calf_stretch:{n:'Razteg meč',time:'30 sek/nogo',primary:['calves'],
+	desc:'Naslon na zid, ena noga zadaj iztegnjena, peta na tlih.',
+	cue:'Občutek peče zadaj v meču.',
+	video:'standing calf stretch'},
+  chest_doorway:{n:'Razteg prsi v podboju',time:'30 sek',primary:['chest','shoulders'],
+	desc:'Roka v podboj v 90°, telo se obrne stran.',
+	cue:'Občutek peče čez prsne mišice.',
+	video:'doorway chest stretch'},
+  triceps_overhead:{n:'Triceps razteg',time:'20 sek/roko',primary:['triceps','shoulders'],
+	desc:'Roka nad glavo, druga jo potegne čez za komolec.',
+	cue:'Stoja pokončna — ne pripogiba se v stran.',
+	video:'overhead triceps stretch'},
+  shoulder_cross:{n:'Razteg ramen čez',time:'20 sek/roko',primary:['shoulders'],
+	desc:'Roka iztegnjena pred prsmi, druga jo potegne k telesu.',
+	cue:'Občutek raztega na zadnji strani rame.',
+	video:'cross body shoulder stretch'},
+  spinal_twist:{n:'Spinal twist',time:'30 sek/stran',primary:['core','spine'],
+	desc:'Leže na hrbtu, ena noga čez telo na nasprotno stran.',
+	cue:'Sprosti — ramena na tleh, dihaj.',
+	video:'supine spinal twist stretch'},
+  butterfly:{n:'Metulj',time:'45 sek',primary:['hips','adductors'],
+	desc:'Sed, podplati skupaj, kolena padejo navzven.',
+	cue:'Naklon naprej za globlji razteg.',
+	video:'butterfly stretch hips'}
+};
+
+// Stretch template per workout type — picked to match trained muscles.
+const STRETCH_TEMPLATES={
+  glute:['pigeon','hip_flexor','hamstring_stretch','child_pose','butterfly'],
+  lower:['quad_stretch','hamstring_stretch','calf_stretch','hip_flexor','butterfly'],
+  upper:['chest_doorway','triceps_overhead','shoulder_cross','child_pose','spinal_twist'],
+  full:['pigeon','chest_doorway','quad_stretch','spinal_twist','child_pose'],
+  cardio:['quad_stretch','hamstring_stretch','calf_stretch','child_pose'],
+  crossfit:['pigeon','chest_doorway','quad_stretch','child_pose','spinal_twist']
+};
+
+// ─────────────────────────────────────────────────────────────
+// STATIC YOUTUBE VIDEO URLS
+// ─────────────────────────────────────────────────────────────
+// For top exercises, use a hardcoded high-quality form video instead of a
+// YouTube search link. Falls back to search if no static URL is set.
+// Curated by exercise id (preferred) or normalized name.
+// To add: pick a video by a credible coach (Squat University, Renaissance
+// Periodization, Jeff Nippard, Athlean-X, etc.) and paste the URL.
+const STATIC_VIDEOS={
+  // GLUTE
+  hipthrust_barbell:'https://www.youtube.com/watch?v=LM8XHLYJoYs',  // Bret Contreras
+  hipthrust_db:'https://www.youtube.com/watch?v=RYmt7vKM9Cw',
+  gluteridge_bb:'https://www.youtube.com/watch?v=8bbE64NuDTU',
+  gluteridge_bw:'https://www.youtube.com/watch?v=wPM8icPu6H8',
+  rdl_bb:'https://www.youtube.com/watch?v=jEy_czb3RKA',
+  rdl_db:'https://www.youtube.com/watch?v=FQ-6acV1NXM',
+  cablepull_through:'https://www.youtube.com/watch?v=CNRaKnUz2gw',
+  donkey_kick_cable:'https://www.youtube.com/watch?v=wPM8icPu6H8',
+  // LOWER
+  squat_bb:'https://www.youtube.com/watch?v=ultWZbUMPL8',  // Squat University
+  squat_goblet:'https://www.youtube.com/watch?v=MeIiIdhvXT4',
+  bulgarian_split:'https://www.youtube.com/watch?v=2C-uNgKwPLE',
+  legpress:'https://www.youtube.com/watch?v=IZxyjW7MPJQ',
+  lunge_db:'https://www.youtube.com/watch?v=D7KaRcUTQeE',
+  // UPPER
+  bench_bb:'https://www.youtube.com/watch?v=rT7DgCr-3pg',  // Athlean-X
+  bench_db:'https://www.youtube.com/watch?v=VmB1G1K7v94',
+  ohp_bb:'https://www.youtube.com/watch?v=2yjwXTZQDDI',
+  ohp_db:'https://www.youtube.com/watch?v=qEwKCR5JCog',
+  pullup:'https://www.youtube.com/watch?v=eGo4IYlbE5g',
+  lat_pulldown:'https://www.youtube.com/watch?v=CAwf7n6Luuc',
+  row_db:'https://www.youtube.com/watch?v=roCP6wCXPqo',
+  bicep_curl_db:'https://www.youtube.com/watch?v=in7PaeYlhrM',
+  triceps_pushdown:'https://www.youtube.com/watch?v=2-LAMcpzODU',
+  // CORE
+  plank:'https://www.youtube.com/watch?v=ASdvN_XEl_c',
+  deadbug:'https://www.youtube.com/watch?v=4XLEnwUr1d8',
+  hollow_hold:'https://www.youtube.com/watch?v=LlDNef_Ztsc'
+};
+
+// Returns a video URL for an exercise — static curated link if available,
+// else a YouTube search fallback URL.
+function getVideoUrl(id,name){
+  if(id&&STATIC_VIDEOS[id])return STATIC_VIDEOS[id];
+  const q=name||(id&&EX_DB[id]?.video)||(id&&EX_DB[id]?.n)||'exercise form';
+  return 'https://www.youtube.com/results?search_query='+encodeURIComponent(q+' form');
+}
+
 // Filter exercises by location. Returns only ids that have the location in
 // their `locations` whitelist. Used by buildWorkoutFromTemplate to pick
 // equipment-appropriate exercises.
@@ -3870,7 +4095,8 @@ function initWorkout(){
   } else {
 	S.ex=[];S.exd=[];
   }
-  S.wuDone=(getWorkoutPrimer(S.wt)?.warmup||[]).map(()=>false);
+  S.warmup=buildWarmup(S.wt);
+  S.wuDone=S.warmup.map(()=>false);
 }
 
 // ─── TOGGLES ────────────────────────────────────────────────
@@ -4476,13 +4702,78 @@ function renderWorkoutPrimer(wt){
   </div>`;
 }
 
-function ensureWarmupState(){
-  const steps=(getWorkoutPrimer(S.wt)?.warmup)||[];
-  if(!Array.isArray(S.wuDone))S.wuDone=[];
-  if(S.wuDone.length!==steps.length){
-    S.wuDone=steps.map((_,i)=>!!S.wuDone[i]);
+// Build today's warmup from the workout type. Each warmup is an exercise
+// object with {id, n, time, video, desc, cue} so it can render with the
+// same swap/remove/add controls as main exercises.
+function buildWarmup(wt){
+  const ids=WARMUP_TEMPLATES[wt]||[];
+  return ids.map(id=>{
+	const w=WARMUP_DB[id];
+	if(!w)return null;
+	return {id,n:w.n,time:w.time,desc:w.desc,cue:w.cue,video:w.video};
+  }).filter(Boolean);
+}
+
+// Find an alternative warmup exercise — same primary muscle target,
+// not already in the current warmup list.
+function findAltWarmup(currentId,exclude){
+  const cur=WARMUP_DB[currentId];
+  if(!cur)return null;
+  const excludeSet=new Set([currentId,...(exclude||[])]);
+  // 1st pass: same primary muscle group
+  for(const id in WARMUP_DB){
+	if(excludeSet.has(id))continue;
+	const w=WARMUP_DB[id];
+	if(!w.primary.some(m=>cur.primary.includes(m)))continue;
+	return id;
   }
-  return steps;
+  // 2nd pass: any not-yet-used warmup
+  for(const id in WARMUP_DB){
+	if(excludeSet.has(id))continue;
+	return id;
+  }
+  return null;
+}
+
+function ensureWarmupState(){
+  // Pick the warmup list — use S.warmup if user has customized it for today,
+  // else build fresh from the template for today's workout type.
+  if(!Array.isArray(S.warmup)||!S.warmup.length){
+	S.warmup=buildWarmup(S.wt);
+  }
+  if(!Array.isArray(S.wuDone))S.wuDone=[];
+  if(S.wuDone.length!==S.warmup.length){
+	S.wuDone=S.warmup.map((_,i)=>!!S.wuDone[i]);
+  }
+  return S.warmup;
+}
+function swapWarmup(i){
+  const cur=S.warmup&&S.warmup[i];
+  if(!cur||!cur.id)return;
+  const exclude=S.warmup.filter((_,k)=>k!==i&&_.id).map(_=>_.id);
+  const altId=findAltWarmup(cur.id,exclude);
+  if(altId&&WARMUP_DB[altId]){
+	const w=WARMUP_DB[altId];
+	S.warmup[i]={id:altId,n:w.n,time:w.time,desc:w.desc,cue:w.cue,video:w.video};
+	save();renderWorkout();
+  }
+}
+function removeWarmup(i){
+  if(!Array.isArray(S.warmup))return;
+  S.warmup.splice(i,1);
+  if(Array.isArray(S.wuDone))S.wuDone.splice(i,1);
+  save();renderWorkout();
+}
+function addCustomWarmup(){
+  const inp=document.getElementById('addWarmupInp');
+  const n=String(inp?.value||'').trim();
+  if(!n)return;
+  if(!Array.isArray(S.warmup))S.warmup=[];
+  S.warmup.push({n,time:'30 sek',custom:true});
+  if(!Array.isArray(S.wuDone))S.wuDone=[];
+  S.wuDone.push(false);
+  inp.value='';
+  save();renderWorkout();
 }
 function toggleWarmup(i){
   ensureWarmupState();
@@ -5480,17 +5771,26 @@ function deleteMeal(i){
 function renderWorkout(){
   const c=document.getElementById('wc'),baw=document.getElementById('baw'),w=WKT[S.wt];
   const warmupSteps=ensureWarmupState();
-  const warmupHtml=warmupSteps.length?`<div class="workout-block">
-    <div class="workout-subhead">Ogrevanje</div>
-    ${warmupSteps.map((step,i)=>`
-      <div class="wu-card${S.wuDone[i]?' done':''}">
-        <div class="wu-dot"></div>
-        <div class="wu-body">
-          <div class="wu-title">${step}</div>
-          <div class="wu-meta">odkljukaj, ko narediš</div>
-        </div>
-        <button class="chk${S.wuDone[i]?' on':''}" onclick="toggleWarmup(${i})">${S.wuDone[i]?'✓':'○'}</button>
-      </div>`).join('')}
+  const warmupHtml=warmupSteps.length||S.wt!=='rest'?`<div class="workout-block">
+	<div class="workout-subhead">Ogrevanje <span style="font-weight:400;color:var(--lt);font-size:11px;">· pred vadbo</span></div>
+	${warmupSteps.map((step,i)=>{
+	  const videoUrl=step.id&&WARMUP_DB[step.id]?getVideoUrl(null,WARMUP_DB[step.id].video||step.n):`https://www.youtube.com/results?search_query=${encodeURIComponent(step.n+' warmup')}`;
+	  return `<div class="wu-card${S.wuDone[i]?' done':''}">
+		<div class="wu-dot"></div>
+		<div class="wu-body">
+		  <div class="wu-title">${step.n}${step.time?` <span style="font-weight:400;color:var(--lt);">· ${step.time}</span>`:''}</div>
+		  ${step.cue?`<div class="wu-meta">${step.cue}</div>`:'<div class="wu-meta">odkljukaj, ko narediš</div>'}
+		</div>
+		<a class="wu-mini-btn" href="${videoUrl}" target="_blank" title="Video navodila">▶</a>
+		<button class="wu-mini-btn" onclick="swapWarmup(${i})" title="Zamenjaj">↺</button>
+		<button class="wu-mini-btn wu-mini-rm" onclick="removeWarmup(${i})" title="Odstrani">✕</button>
+		<button class="chk${S.wuDone[i]?' on':''}" onclick="toggleWarmup(${i})">${S.wuDone[i]?'✓':'○'}</button>
+	  </div>`;
+	}).join('')}
+	<div class="wu-add-row">
+	  <input class="wu-add-inp" id="addWarmupInp" placeholder="dodaj svojo (npr. 5 min tek)" onkeydown="if(event.key==='Enter')addCustomWarmup()">
+	  <button class="wu-add-btn" onclick="addCustomWarmup()">+ Dodaj</button>
+	</div>
   </div>`:'';
   // Defensive helper — set disabled/innerHTML safely
   const setBaw=(disabled,html)=>{
@@ -5594,6 +5894,26 @@ function renderWorkout(){
 	  <div class="workout-complete-title">Trening zaključen</div>
 	  <div class="workout-complete-copy">Opravila si ${doneCount} od ${S.ex.length} vaj. Naslednji trening se bo pokazal glede na plan, zgodovina pa ostane shranjena.</div>
 	</div>`:'';
+	// Build the stretch section — read-only suggestions to do AFTER the
+	// strength exercises. User doesn't check these off, but each has a
+	// short cue and a video link in case they don't know the form.
+	const stretchIds=STRETCH_TEMPLATES[S.wt]||[];
+	const stretchHtml=stretchIds.length?`<div class="workout-block stretch-block">
+	  <div class="workout-subhead">Razteg po vadbi <span style="font-weight:400;color:var(--lt);font-size:11px;">· priporočilo, ne za odkljukati</span></div>
+	  ${stretchIds.map(id=>{
+		const st=STRETCH_DB[id];
+		if(!st)return '';
+		const videoUrl=`https://www.youtube.com/results?search_query=${encodeURIComponent(st.video||st.n+' stretch')}`;
+		return `<div class="stretch-card">
+		  <div class="stretch-dot"></div>
+		  <div class="stretch-body">
+			<div class="stretch-title">${st.n} <span class="stretch-time">· ${st.time}</span></div>
+			${st.cue?`<div class="stretch-cue">${st.cue}</div>`:''}
+		  </div>
+		  <a class="wu-mini-btn" href="${videoUrl}" target="_blank" title="Video navodila">▶</a>
+		</div>`;
+	  }).join('')}
+	</div>`:'';
 	c.innerHTML=completeHtml+warmupHtml+`<div class="workout-summary">
 	  <div class="ws-stats">
 		<span class="ws-stat"><b>${warmupSteps.length}</b> ogrevanje</span>
@@ -5619,8 +5939,8 @@ function renderWorkout(){
 		const descHtml=info.desc?`
 		  <div class="ex-desc">${info.desc}</div>
 		  ${info.tip?`<div class="ex-tip">💡 ${info.tip}</div>`:''}
-		  <a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent((info.yt||e.n))}" target="_blank">▶ Video navodila</a>
-		`:`<a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent(e.n+' form')}" target="_blank">▶ Video navodila</a>`;
+		  <a class="yt-btn" href="${getVideoUrl(e.id,info.yt||e.n)}" target="_blank">▶ Video navodila</a>
+		`:`<a class="yt-btn" href="${getVideoUrl(e.id,e.n)}" target="_blank">▶ Video navodila</a>`;
 		return `<div class="ex-wrap" id="ew${i}">
 		  <div class="ex-top${done?' done':''}" id="et${i}">
 			<div class="edot"></div>
@@ -5663,7 +5983,7 @@ function renderWorkout(){
 			</div>
 		  </div>
 		</div>`;
-	  }).join('');
+	  }).join('')+stretchHtml;
   }
 }
 function togWodDesc(i){
