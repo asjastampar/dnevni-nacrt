@@ -6140,18 +6140,19 @@ function logEx(i,name){
 	if(isCompact){
 	  const kgVal=parseFloat(String(document.getElementById('sc'+i+'-kg')?.value||'').replace(',','.'))||0;
 	  const repsVal=parseInt(document.getElementById('sc'+i+'-reps')?.value)||0;
-	  const setsRaw=document.getElementById('sc'+i+'-sets')?.value;
-	  const setsVal=parseInt(setsRaw)||0;
-	  // All three fields must be filled in. If any are missing, show a hint
-	  // and bail — never silently fall back to a default (that's how users
-	  // end up with "4×6 · 30 kg" they didn't enter).
-	  if(!repsVal||!setsVal||(mode==='weighted'&&!kgVal)){
+	  const setsInput=document.getElementById('sc'+i+'-sets');
+	  const setsRaw=setsInput?.value;
+	  const fallbackSets=(parseInt(logged?.s)||parseInt(ex?.s)||3);
+	  const setsVal=parseInt(setsRaw)||fallbackSets;
+	  // Reps and (for weighted exercises) kg must be explicit. For set count,
+	  // use the current workout target if the compact UI leaves that field empty
+	  // or hidden on smaller screens.
+	  if(!repsVal||(mode==='weighted'&&!kgVal)){
 		const okEl=document.getElementById('lok'+i);
 		if(okEl){
 		  const missing=[];
-		  if(mode==='weighted'&&!kgVal)missing.push('težo');
 		  if(!repsVal)missing.push('ponovitev');
-		  if(!setsVal)missing.push('število serij');
+		  if(mode==='weighted'&&!kgVal)missing.push('težo');
 		  okEl.textContent='⚠ vnesi '+missing.join(', ');
 		  okEl.classList.add('show');
 		  okEl.style.color='#C94B2A';
