@@ -1383,11 +1383,24 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 		  </div>
 		  <div class="modal-field" id="cycle-profile-field">
 			<label>Cikel / hormonski kontekst</label>
-		<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
-		  <button class="goal-opt" id="gc-no" onclick="selCycleAware(false)">Ne upoštevaj</button>
-		  <button class="goal-opt" id="gc-yes" onclick="selCycleAware(true)">Upoštevaj</button>
-		</div>
-	  </div>
+			<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+			  <button class="goal-opt" id="gc-no" onclick="selCycleAware(false)">Ne upoštevaj</button>
+			  <button class="goal-opt" id="gc-yes" onclick="selCycleAware(true)">Upoštevaj</button>
+			</div>
+			<div id="cycle-detail-fields" style="display:none;margin-top:10px;">
+			  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+				<div>
+				  <label style="font-size:11px;">Zadnja menstruacija</label>
+				  <input type="date" id="g-cycle-start" style="text-align:center;">
+				</div>
+				<div>
+				  <label style="font-size:11px;">Dolžina cikla</label>
+				  <input type="number" id="g-cycle-length" min="21" max="40" step="1" placeholder="28" style="text-align:center;">
+				</div>
+			  </div>
+			  <div id="cycle-profile-hint" style="font-size:12px;color:var(--md);line-height:1.45;margin-top:8px;">Uporabljeno samo za lakoto, energijo, recovery in razlago nihanj.</div>
+			</div>
+		  </div>
 	  <div class="modal-field">
 		<label>Aktivnost</label>
 		<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
@@ -4318,11 +4331,15 @@ function renderNextUp(){
 	// Active strength/cardio/crossfit
   // Reaching the bottom range here also means the workout is naturally
   // complete by the time all exercises are checked. We no longer show a
-  // separate "Označi kot opravljeno" button — checking the exercises IS
-  // the completion signal (see togEx).
-  if(exDone===0){
-	return {cls:'fb-go',icon:'📊',title:'Fokus danes:',sub:'Samo pojdi v gym!'};
-  }
+	  // separate "Označi kot opravljeno" button — checking the exercises IS
+	  // the completion signal (see togEx).
+	  if(exDone===0){
+		const cycle=calcCycleContext();
+		if(cycle.active&&(cycle.phase==='menstrual'||cycle.phase==='premenstrual')){
+		  return {cls:'fb-go',icon:'📊',title:'Fokus danes:',sub:`${cycle.label}: cilj je kakovostna tehnika, ne dokazovanje. Če je težko, pusti 2–3 ponovitve v rezervi.`};
+		}
+		return {cls:'fb-go',icon:'📊',title:'Fokus danes:',sub:'Samo pojdi v gym!'};
+	  }
   if(exDone<exCount){
 	return {cls:'fb-go',icon:'💪',title:`${exDone} / ${exCount} vaj opravljeno`,sub:'Še zmoreš — drži tempo!'};
   }
@@ -7672,7 +7689,9 @@ let G={
   age:null,height:null,weight:null,target:null,
   goal:'lose',act:'light',loc:'gym_full',
   bioSex:'female',  // female | male | other — calculations + app language
-  cycleAware:false
+  cycleAware:false,
+  cycleStart:null,
+  cycleLength:28
 };
 
 function normalizeProfileMeta(){
@@ -7682,6 +7701,8 @@ function normalizeProfileMeta(){
   delete G.pronoun;
   if(G.bioSex!=='female')G.cycleAware=false;
   G.cycleAware=!!G.cycleAware;
+  if(G.cycleStart&&!/^\d{4}-\d{2}-\d{2}$/.test(String(G.cycleStart)))G.cycleStart=null;
+  G.cycleLength=Math.max(21,Math.min(40,parseInt(G.cycleLength)||28));
 }
 
 function profilePronoun(){
@@ -7727,6 +7748,41 @@ function calorieBodyFactor(){
   return Math.max(0.65,Math.min(1.75,weightFactor*sexFactor));
 }
 
+function daysBetweenLocal(a,b){
+  const da=new Date(a+'T12:00:00');
+  const db=new Date(b+'T12:00:00');
+  if(isNaN(da)||isNaN(db))return null;
+  return Math.floor((db-da)/(24*60*60*1000));
+}
+
+function calcCycleContext(profile=G,refDate=now){
+  const base={active:false,day:null,phase:null,label:'',kcalAdj:0,note:''};
+  if(!profile||profile.bioSex!=='female'||!profile.cycleAware||!profile.cycleStart)return base;
+  const len=Math.max(21,Math.min(40,parseInt(profile.cycleLength)||28));
+  const today=localDateKey(refDate||new Date());
+  const diff=daysBetweenLocal(profile.cycleStart,today);
+  if(diff===null)return base;
+  const day=((diff%len)+len)%len+1;
+  let phase='follicular',label='Folikularna faza',kcalAdj=0,note='Običajno stabilnejša energija in dober čas za normalen trening.';
+  if(day<=5){
+    phase='menstrual';label='Menstruacija';note='Če je energija nižja, lahko danes zmanjšaš pritisk in držiš tehniko.';
+  }else if(day>=Math.max(18,len-7)){
+    phase='premenstrual';label='Predmenstrualni teden';kcalAdj=150;
+    note='Več lakote je pričakovano. Dodan je majhen prostor za nasiten obrok, predvsem beljakovine in OH.';
+  }else if(day>=15){
+    phase='luteal';label='Lutealna faza';kcalAdj=75;
+    note='Apetit in utrujenost sta lahko malo višja; app rahlo poveča dnevni prostor.';
+  }else if(day>=12){
+    phase='ovulation';label='Okoli ovulacije';note='Če se počutiš dobro, je to pogosto dober čas za močnejši trening.';
+  }
+  return {active:true,day,phase,label,kcalAdj,note,length:len};
+}
+
+function cycleAdjustmentFor(profile=G){
+  const ctx=calcCycleContext(profile);
+  return ctx.active?ctx.kcalAdj:0;
+}
+
 function loadGoals(){
   try{
 	let s=localStorage.getItem(lsKey(GOALS_KEY));
@@ -7759,9 +7815,10 @@ function calcTDEE(){
 function calcGoalKcal(){
   const tdee=calcTDEE();
   if(!tdee)return null;
-  if(G.goal==='lose')return tdee-500;
-  if(G.goal==='gain')return tdee+300;
-  return tdee;
+  let base=tdee;
+  if(G.goal==='lose')base=tdee-500;
+  if(G.goal==='gain')base=tdee+300;
+  return base+cycleAdjustmentFor(G);
 }
 function calcDynamicMacroKcalTarget(){
   const goalKcal=calcGoalKcal();
@@ -7777,14 +7834,17 @@ function calcDynamicMacroKcalTarget(){
 function calcMacroTargets(){
   const kcal=calcDynamicMacroKcalTarget();
   if(!kcal)return null;
+  const cycle=calcCycleContext();
+  const carbShare=cycle.kcalAdj>0?0.45:0.40;
+  const fatShare=cycle.kcalAdj>0?0.25:0.30;
   return {
-	p:Math.round(kcal*0.30/4),  // protein: 4 kcal/g
-	c:Math.round(kcal*0.40/4),  // carbs: 4 kcal/g
-	f:Math.round(kcal*0.30/9)   // fat: 9 kcal/g
+    p:Math.round(kcal*0.30/4),  // protein: 4 kcal/g
+    c:Math.round(kcal*carbShare/4),  // carbs: 4 kcal/g
+    f:Math.round(kcal*fatShare/9)   // fat: 9 kcal/g
   };
 }
 
-let _selGoal='lose',_selAct='light',_selLoc='gym_full',_selBioSex='female',_selCycleAware=false;
+let _selGoal='lose',_selAct='light',_selLoc='gym_full',_selBioSex='female',_selCycleAware=false,_selCycleStart=null,_selCycleLength=28;
 let _goalsOriginal=null,_goalsSaved=false,_goalsPreviewMode=false;
 
 function readGoalsDraft(){
@@ -7797,7 +7857,9 @@ function readGoalsDraft(){
     act:_selAct,
     loc:_selLoc,
     bioSex:_selBioSex,
-    cycleAware:!!_selCycleAware
+    cycleAware:!!_selCycleAware,
+    cycleStart:document.getElementById('g-cycle-start')?.value||_selCycleStart||null,
+    cycleLength:parseInt(document.getElementById('g-cycle-length')?.value)||_selCycleLength||28
   };
 }
 function refreshGoalConnectedUI(){
@@ -7833,6 +7895,7 @@ function selBioSex(s){
   ['female','male','other'].forEach(x=>document.getElementById('gb-'+x)?.classList.toggle('active',x===s));
   const cycleField=document.getElementById('cycle-profile-field');
   if(cycleField)cycleField.style.display=_selBioSex==='female'?'block':'none';
+  refreshCycleDetailUI();
   document.getElementById('gc-no')?.classList.toggle('active',!_selCycleAware);
   document.getElementById('gc-yes')?.classList.toggle('active',_selCycleAware);
   updateGoalsCalc();
@@ -7843,7 +7906,21 @@ function selCycleAware(on){
   _selCycleAware=!!on;
   document.getElementById('gc-no')?.classList.toggle('active',!_selCycleAware);
   document.getElementById('gc-yes')?.classList.toggle('active',_selCycleAware);
+  refreshCycleDetailUI();
   applyGoalsLivePreview();
+}
+
+function refreshCycleDetailUI(){
+  const detail=document.getElementById('cycle-detail-fields');
+  if(detail)detail.style.display=(_selBioSex==='female'&&_selCycleAware)?'block':'none';
+  const hint=document.getElementById('cycle-profile-hint');
+  if(hint){
+    const draft={...G,bioSex:_selBioSex,cycleAware:_selCycleAware,cycleStart:document.getElementById('g-cycle-start')?.value||_selCycleStart,cycleLength:parseInt(document.getElementById('g-cycle-length')?.value)||_selCycleLength};
+    const ctx=calcCycleContext(draft);
+    hint.textContent=ctx.active
+      ? `${ctx.label}, dan ${ctx.day}/${ctx.length}. ${ctx.kcalAdj?`Danes app doda +${ctx.kcalAdj} kcal za več lakote in recovery.`:'Kalorijski cilj ostane normalen.'}`
+      : 'Uporabljeno samo za lakoto, energijo, recovery in razlago nihanj.';
+  }
 }
 // Location of training — narrows which exercises the planner can use.
 // Stored in G.loc and persisted via saveGoalsState. Defaults to 'gym_full'.
@@ -7871,9 +7948,12 @@ function updateGoalsCalc(){
   let goalKcal=tdee;
   const adj={lose:-500,maintain:0,gain:300};
   goalKcal=tdee+(adj[_selGoal]||0);
+  const draftCycle={...G,bioSex:_selBioSex,cycleAware:_selCycleAware,cycleStart:document.getElementById('g-cycle-start')?.value||_selCycleStart,cycleLength:parseInt(document.getElementById('g-cycle-length')?.value)||_selCycleLength};
+  const cycle=calcCycleContext(draftCycle);
+  goalKcal+=cycle.kcalAdj||0;
   const p=Math.round(goalKcal*0.30/4);
-  const c=Math.round(goalKcal*0.40/4);
-  const f=Math.round(goalKcal*0.30/9);
+  const c=Math.round(goalKcal*(cycle.kcalAdj?0.45:0.40)/4);
+  const f=Math.round(goalKcal*(cycle.kcalAdj?0.25:0.30)/9);
   const diff=target&&weight?Math.abs(weight-target):null;
   const weeks=diff?Math.round(diff/0.5):null;
   const goalLabel={lose:'hujšanje (−500 kcal/dan)',maintain:'vzdrževanje',gain:'pridobivanje (+300 kcal/dan)'};
@@ -7892,17 +7972,18 @@ function updateGoalsCalc(){
 	  </div>
 	</div>
 	<div style="background:var(--w);border-radius:8px;padding:10px 12px;margin-bottom:8px;">
-	  <div style="font-size:13px;color:var(--md);margin-bottom:4px;">Cilj: <b style="color:var(--dk);">${goalLabel[_selGoal]}</b></div>
-	  <div style="font-size:22px;font-weight:500;color:var(--dk);">${goalKcal} kcal/dan</div>
-	  <div style="font-size:12px;color:var(--lt);margin-top:4px;">B: ${p}g &nbsp;·&nbsp; OH: ${c}g &nbsp;·&nbsp; M: ${f}g</div>
-	</div>
+		  <div style="font-size:13px;color:var(--md);margin-bottom:4px;">Cilj: <b style="color:var(--dk);">${goalLabel[_selGoal]}</b></div>
+		  <div style="font-size:22px;font-weight:500;color:var(--dk);">${goalKcal} kcal/dan</div>
+		  <div style="font-size:12px;color:var(--lt);margin-top:4px;">B: ${p}g &nbsp;·&nbsp; OH: ${c}g &nbsp;·&nbsp; M: ${f}g</div>
+		  ${cycle.kcalAdj?`<div style="font-size:12px;color:var(--grn);margin-top:5px;">${cycle.label}: +${cycle.kcalAdj} kcal za lakoto/recovery.</div>`:''}
+		</div>
 	${weeks?`<div style="font-size:12px;color:var(--grn);padding:4px 0;">📅 Do cilja ~${weeks} tednov pri 0.5 kg/teden</div>`:''}
 	<div style="font-size:12px;color:var(--lt);margin-top:4px;line-height:1.6;">
-	  BMR = kalorije ki jih telo porabi za dihanje, srce, možgane (${bioLabel}).<br>
-	  TDEE = BMR × faktor aktivnosti = kar telo res porabi vsak dan.<br>
-	  Vadba v appu se doda k cilju ("zaslužene" kalorije).
-	  ${_selCycleAware?'<br>Cikel je shranjen kot readiness kontekst za prihodnje prilagoditve.':''}
-	</div>`;
+		  BMR = kalorije ki jih telo porabi za dihanje, srce, možgane (${bioLabel}).<br>
+		  TDEE = BMR × faktor aktivnosti = kar telo res porabi vsak dan.<br>
+		  Vadba v appu se doda k cilju ("zaslužene" kalorije).
+		  ${cycle.active?`<br>Cikel: ${cycle.label}, dan ${cycle.day}/${cycle.length}. ${cycle.note}`:''}
+		</div>`;
 }
 function openGoals(mode='profile'){
   loadGoals();
@@ -7913,9 +7994,13 @@ function openGoals(mode='profile'){
   document.getElementById('g-height').value=G.height||'';
   document.getElementById('g-weight').value=G.weight||'';
   document.getElementById('g-target').value=G.target||'';
+  const cycleStartEl=document.getElementById('g-cycle-start');
+  const cycleLengthEl=document.getElementById('g-cycle-length');
+  if(cycleStartEl)cycleStartEl.value=G.cycleStart||'';
+  if(cycleLengthEl)cycleLengthEl.value=G.cycleLength||28;
   normalizeProfileMeta();
   _selGoal=G.goal||'lose';_selAct=G.act||'light';_selLoc=G.loc||'gym_full';
-  _selBioSex=G.bioSex||'female';_selCycleAware=!!G.cycleAware;
+  _selBioSex=G.bioSex||'female';_selCycleAware=!!G.cycleAware;_selCycleStart=G.cycleStart||null;_selCycleLength=G.cycleLength||28;
   selGoal(_selGoal);selAct(_selAct);selBioSex(_selBioSex);selCycleAware(_selCycleAware);selLoc(_selLoc);
 
   const titles={
@@ -8037,8 +8122,14 @@ function refreshTrainDaysUI(){
 let _goalsInputsBound=false;
 function bindGoalsInputs(){
   if(_goalsInputsBound)return;
-  ['g-age','g-height','g-weight','g-target'].forEach(id=>{
-	document.getElementById(id)?.addEventListener('input',()=>{updateGoalsCalc();applyGoalsLivePreview();});
+  ['g-age','g-height','g-weight','g-target','g-cycle-start','g-cycle-length'].forEach(id=>{
+    document.getElementById(id)?.addEventListener('input',()=>{
+      if(id==='g-cycle-start')_selCycleStart=document.getElementById(id)?.value||null;
+      if(id==='g-cycle-length')_selCycleLength=parseInt(document.getElementById(id)?.value)||28;
+      refreshCycleDetailUI();
+      updateGoalsCalc();
+      applyGoalsLivePreview();
+    });
   });
   _goalsInputsBound=true;
 }
@@ -8096,13 +8187,18 @@ function renderMacros(){
 	setTxt('ms-p',remP>0?remP+' g manjka':'Doseženo');
 	setTxt('ms-c',totC>targets.c?'Čez cilj':remC+' g do cilja');
 	setTxt('ms-f',totF>=targets.f?'Na zgornji meji':remF+' g do cilja');
-	setTxt('mt-p',remP>0?'Dodaj vir beljakovin, npr. skuta, piščanec, tuna.':'Beljakovine so pokrite — super.');
-	setTxt('mt-c',totC>targets.c?'Danes raje izberi manj OH.':'Prostor za kompleksne OH, npr. riž, krompir, ovseni kosmiči.');
-	setTxt('mt-f',totF>=targets.f?'Danes se izogibaj mastnim jedem.':'Maščobe so še v redu.');
-	let focusTitle='Fokus danes', focusText='Danes si lepo na poti.';
-	if(remP>=20){focusTitle='Fokus danes: Beljakovine';focusText='Manjka ti še '+remP+' g beljakovin do cilja.';}
-	else if(totF>=targets.f){focusTitle='Fokus danes: Lahkotnejši obroki';focusText='Maščobe so na zgornji meji — izberi bolj puste vire.';}
-	else if(totC>targets.c){focusTitle='Fokus danes: Manj ogljikovih hidratov';focusText='Ogljikovi hidrati so že čez cilj — izberi bolj proteinsko opcijo.';}
+		setTxt('mt-p',remP>0?'Dodaj vir beljakovin, npr. skuta, piščanec, tuna.':'Beljakovine so pokrite — super.');
+		setTxt('mt-c',totC>targets.c?'Danes raje izberi manj OH.':'Prostor za kompleksne OH, npr. riž, krompir, ovseni kosmiči.');
+		setTxt('mt-f',totF>=targets.f?'Danes se izogibaj mastnim jedem.':'Maščobe so še v redu.');
+		const cycle=calcCycleContext();
+		let focusTitle='Fokus danes', focusText='Danes si lepo na poti.';
+		if(cycle.kcalAdj>0&&remP<20&&totF<targets.f&&totC<=targets.c){
+		  focusTitle='Fokus danes: več lakote je normalno';
+		  focusText=`${cycle.label}: dodanih je +${cycle.kcalAdj} kcal. Izberi nasiten obrok z beljakovinami in OH.`;
+		}
+		else if(remP>=20){focusTitle='Fokus danes: Beljakovine';focusText='Manjka ti še '+remP+' g beljakovin do cilja.';}
+		else if(totF>=targets.f){focusTitle='Fokus danes: Lahkotnejši obroki';focusText='Maščobe so na zgornji meji — izberi bolj puste vire.';}
+		else if(totC>targets.c){focusTitle='Fokus danes: Manj ogljikovih hidratov';focusText='Ogljikovi hidrati so že čez cilj — izberi bolj proteinsko opcijo.';}
 	setTxt('kcal-focus-title',focusTitle);
 	setTxt('kcal-focus-text',focusText);
   }
