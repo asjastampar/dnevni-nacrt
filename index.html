@@ -5011,26 +5011,33 @@ function renderSetRows(i,e,log){
   // Detect whether all sets have the same kg+reps. If so, render compact mode
   // (one kg + one reps + count). If they differ — meaning user explicitly
   // logged drop sets — render expanded mode with one row per set.
-  const firstKg=sets[0]?.kg||0,firstReps=sets[0]?.reps||0;
+  // CRITICAL: only pre-fill input fields from ACTUAL logged history, not from
+  // the recommended scheme (e.s/e.r). Otherwise users would see "30 / 6" and
+  // wonder where it came from when they only typed the kg. Pre-filling
+  // recommended values is misleading — it fakes a log entry the user didn't make.
+  const hasLog=Array.isArray(log&&log.setsDetail)&&log.setsDetail.length>0;
+  const firstKg=hasLog?(sets[0]?.kg||0):0;
+  const firstReps=hasLog?(sets[0]?.reps||0):0;
   const allSame=sets.every(s=>(s.kg||0)===firstKg&&(s.reps||0)===firstReps);
-  const expanded=!!log&&!allSame; // only auto-expand if user previously logged different sets
+  const expanded=hasLog&&!allSame;
+  // Recommended values shown as placeholders, never as values
+  const recReps=parseInt(e.r)||10;
+  const recSets=parseInt(e.s)||3;
 
   if(!expanded){
-	// COMPACT: single set of inputs that applies to all `setsCount` sets.
-	const setsCount=sets.length||3;
-	const colCount=showKg?3:2;
+	const loggedSetsCount=hasLog?sets.length:0;
 	return `<div class="set-compact ${showKg?'cols-3':'cols-2'}" id="srs${i}" data-mode="compact">
 	  ${showKg?`<div class="set-compact-field">
 		<label>Teža (kg)</label>
-		<input class="set-compact-input" type="number" inputmode="decimal" placeholder="0" id="sc${i}-kg" value="${firstKg||''}">
+		<input class="set-compact-input" type="number" inputmode="decimal" placeholder="kg" id="sc${i}-kg" value="${firstKg||''}">
 	  </div>`:''}
 	  <div class="set-compact-field">
 		<label>Ponovitev</label>
-		<input class="set-compact-input" type="number" inputmode="numeric" placeholder="10" id="sc${i}-reps" value="${firstReps||''}">
+		<input class="set-compact-input" type="number" inputmode="numeric" placeholder="${recReps}" id="sc${i}-reps" value="${firstReps||''}">
 	  </div>
 	  <div class="set-compact-field">
 		<label>Število serij</label>
-		<input class="set-compact-input" type="number" inputmode="numeric" placeholder="3" id="sc${i}-sets" value="${setsCount}">
+		<input class="set-compact-input" type="number" inputmode="numeric" placeholder="${recSets}" id="sc${i}-sets" value="${loggedSetsCount||''}">
 	  </div>
 	</div>
 	<button class="set-add-btn" onclick="expandToPerSet(${i})">+ Drugačna teža po serijah</button>`;
@@ -6083,11 +6090,27 @@ function logEx(i,name){
 	if(isCompact){
 	  const kgVal=parseFloat(String(document.getElementById('sc'+i+'-kg')?.value||'').replace(',','.'))||0;
 	  const repsVal=parseInt(document.getElementById('sc'+i+'-reps')?.value)||0;
-	  const setsVal=Math.max(1,parseInt(document.getElementById('sc'+i+'-sets')?.value)||3);
-	  if(repsVal>0){
-		for(let k=0;k<setsVal;k++)setsDetail.push({kg:kgVal,reps:repsVal});
-		kg=kgVal||'';s=setsVal;r=repsVal;
+	  const setsRaw=document.getElementById('sc'+i+'-sets')?.value;
+	  const setsVal=parseInt(setsRaw)||0;
+	  // All three fields must be filled in. If any are missing, show a hint
+	  // and bail — never silently fall back to a default (that's how users
+	  // end up with "4×6 · 30 kg" they didn't enter).
+	  if(!repsVal||!setsVal||(mode==='weighted'&&!kgVal)){
+		const okEl=document.getElementById('lok'+i);
+		if(okEl){
+		  const missing=[];
+		  if(mode==='weighted'&&!kgVal)missing.push('težo');
+		  if(!repsVal)missing.push('ponovitev');
+		  if(!setsVal)missing.push('število serij');
+		  okEl.textContent='⚠ vnesi '+missing.join(', ');
+		  okEl.classList.add('show');
+		  okEl.style.color='#C94B2A';
+		  setTimeout(()=>{okEl.classList.remove('show');okEl.style.color='';},3500);
+		}
+		return;
 	  }
+	  for(let k=0;k<setsVal;k++)setsDetail.push({kg:kgVal,reps:repsVal});
+	  kg=kgVal||'';s=setsVal;r=repsVal;
 	} else {
 	  const rows=readSetRowsFromDOM(i);
 	  setsDetail=rows.filter(rw=>rw.reps>0).map(rw=>({kg:rw.kg||0,reps:rw.reps||0}));
