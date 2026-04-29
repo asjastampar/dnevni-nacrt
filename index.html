@@ -2828,6 +2828,17 @@ function getTrainingDays(sp){
   if(Array.isArray(sp.trainingDays)&&sp.trainingDays.length)return sp.trainingDays.slice();
   return (AUTO_TRAINING_DAYS[sp.freq]||AUTO_TRAINING_DAYS[3]).slice();
 }
+function getWorkoutCountThisWeek(refDate=now){
+  const mondayKey=isoWeekMonday(refDate);
+  const start=new Date(refDate);start.setHours(0,0,0,0);
+  while(localDateKey(start)!==mondayKey)start.setDate(start.getDate()-1);
+  const end=new Date(refDate);end.setHours(0,0,0,0);
+  let count=0;
+  for(const d=new Date(start);d<=end;d.setDate(d.getDate()+1)){
+    if(wasWorkoutDoneOnDay(localDateKey(d)))count++;
+  }
+  return count;
+}
 // Reset the weekly counter when crossing into a new ISO week.
 function ensureWeeklyReset(sp){
   sp=sp||getSplit();
@@ -2835,6 +2846,11 @@ function ensureWeeklyReset(sp){
   if(sp.weekStart!==thisWeek){
 	sp.weekStart=thisWeek;
 	sp.weeklyDone=0;
+	saveSplit(sp);
+  }
+  const actualWeekDone=getWorkoutCountThisWeek(now);
+  if((sp.weeklyDone||0)!==actualWeekDone){
+	sp.weeklyDone=actualWeekDone;
 	saveSplit(sp);
   }
   return sp;
@@ -2876,7 +2892,8 @@ function getTodaysWorkoutInfo(){
   const dow=now.getDay();
   const trainingDays=getTrainingDays(sp);
   const isTrainingDay=trainingDays.includes(dow);
-  const quotaMet=sp.weeklyDone>=sp.freq;
+  const weekDone=getWorkoutCountThisWeek(now);
+  const quotaMet=weekDone>=sp.freq;
 
   if(quotaMet){
 	return {wt:'rest',isMakeup:false,quotaMet:true};
@@ -4200,6 +4217,8 @@ let _customDays=null; // tracks edits while modal is open
 
 function renderNextUp(){
   const sp=getSplit();
+  const weekDone=getWorkoutCountThisWeek(now);
+  const weekTarget=sp.freq||3;
   const todayInfo=getTodaysWorkoutInfo();
   const next=todayInfo.wt;
   const isMakeup=todayInfo.isMakeup;
@@ -4240,12 +4259,19 @@ function renderNextUp(){
 	}
 	if(showing==='rest'){
 	  // Distinguish "weekly quota already met" from "this is a planned rest day"
-	  const sp=getSplit();
-	  const quotaMet=(sp.weeklyDone||0)>=sp.freq;
+	  const quotaMet=weekDone>=weekTarget;
 	  if(quotaMet){
-		return {cls:'fb-good',icon:'🎉',title:`Tedenski plan opravljen (${sp.weeklyDone}/${sp.freq})`,sub:pickRecoveryTip()};
+		return {cls:'fb-good',icon:'🎉',title:`Tedenski plan opravljen (${weekDone}/${weekTarget})`,sub:pickRecoveryTip()};
 	  }
 	  return {cls:'fb-rest',icon:'😌',title:'Danes je počitek',sub:pickRecoveryTip()};
+	}
+	if(showing==='cardio'){
+	  const selectedIdx=Array.isArray(S.exd)?S.exd.findIndex(Boolean):-1;
+	  const selectedName=selectedIdx>=0?(S.ex?.[selectedIdx]?.n||'Kardio'):null;
+	  if(selectedIdx>=0){
+		return {cls:'fb-good',icon:'🏃‍♀️',title:'Kardio opravljeno',sub:selectedName};
+	  }
+	  return {cls:'fb-go',icon:'🏃‍♀️',title:'Izberi eno kardio aktivnost',sub:'Danes izbereš eno glavno obliko kardio treninga, ne vseh možnosti.'};
 	}
 	// Makeup workout: today isn't a planned day but we're offering a missed one
 	if(isMakeup&&isOnPlan){
@@ -4280,8 +4306,6 @@ function renderNextUp(){
   if(showing!=='rest'){
 	// Weekly progress pill — much clearer than the old "rotation N/N" indicator,
 	// which users read as "X of X done" when it actually meant rotation slot.
-	const weekDone=sp.weeklyDone||0;
-	const weekTarget=sp.freq||3;
 	pills.push(`<span class="wo-pill">Ta teden ${weekDone}/${weekTarget}</span>`);
   }
   if(estMin)pills.push(`<span class="wo-pill"><span class="wo-pill-icon">⏱</span> ~${estMin} min</span>`);
@@ -4359,7 +4383,8 @@ function markWorkoutDone(){
   const exDoneCount=Array.isArray(S.exd)?S.exd.filter(Boolean).length:0;
 
   const sp=ensureWeeklyReset();
-  const willMeetQuota=(sp.weeklyDone+1)>=sp.freq;
+  const weekDone=getWorkoutCountThisWeek(now);
+  const willMeetQuota=(weekDone+1)>=sp.freq;
   let msg=willMeetQuota
     ? `Označiti vadbo kot opravljeno?\n\nS tem zaključiš tedenski plan (${sp.freq}/${sp.freq}). Do ponedeljka bom predlagal lahek razmig.`
     : 'Označiti vadbo kot opravljeno?\n\nNaslednji trening v planu se bo prikazal naslednji načrtovan dan.';
@@ -5920,7 +5945,7 @@ function renderWorkout(){
   }
 	if(S.wt==='cardio'){
 	setBaw(false);document.getElementById('add-ex-row').style.display='none';
-	c.innerHTML=warmupHtml+`<div style="font-size:12px;color:var(--lt);margin-bottom:10px;">Izberi kaj boš naredila, nastavi čas in odkljukaj ob koncu.</div>`+
+	c.innerHTML=warmupHtml+`<div style="font-size:12px;color:var(--lt);margin-bottom:10px;">Izberi eno glavno kardio aktivnost za danes, nastavi čas in jo označi ob koncu.</div>`+
 	  S.ex.map((e,i)=>{
 		const done=S.exd[i];const open=!!exExp[i];
 		const info=getExInfo(e.n,e.id)||{};
@@ -6222,11 +6247,32 @@ function logEx(i,name){
   const ok=document.getElementById('lok'+i);
   if(ok){ok.textContent='✓ shranjeno';ok.classList.add('show');setTimeout(()=>ok.classList.remove('show'),2500);}
   // Auto-mark exercise as done after saving — checkbox flips on
-  if(!S.exd[i]){S.exd[i]=true;save();}
+  if(S.wt==='cardio'){
+	S.exd=S.exd.map((_,idx)=>idx===i);
+	save();
+  }else if(!S.exd[i]){
+	S.exd[i]=true;save();
+  }
   renderWorkout();
 }
 function togEx(i){
   const wasChecked=S.exd[i];
+  if(S.wt==='cardio'){
+	const next=!wasChecked;
+	S.exd=S.exd.map((_,idx)=>idx===i?next:false);
+	save();
+	const topEls=document.querySelectorAll('[id^="et"]');
+	const chkEls=document.querySelectorAll('[id^="echk"]');
+	topEls.forEach((el,idx)=>el.classList.toggle('done',!!S.exd[idx]));
+	chkEls.forEach((el,idx)=>{
+	  el.classList.toggle('on',!!S.exd[idx]);
+	  el.textContent=S.exd[idx]?'✓':'○';
+	});
+	calcKcal();
+	if(typeof renderNextUp==='function')renderNextUp();
+	renderTracker();
+	return;
+  }
   S.exd[i]=!wasChecked;
   save();
   const top=document.getElementById('et'+i),chk=document.getElementById('echk'+i);
