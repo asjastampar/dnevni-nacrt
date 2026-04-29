@@ -575,13 +575,11 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .edit-actions-row{display:flex;justify-content:flex-end;margin-top:10px;}
 .ingredient-editor{display:flex;flex-direction:column;gap:8px;}
 .ing-edit-list{display:flex;flex-direction:column;gap:8px;}
-.ing-edit-row{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(120px,.8fr) 40px;gap:8px;align-items:center;}
-.ing-edit-name{grid-area:name;}
-.ing-edit-amt{grid-area:amt;}
+.ing-edit-row{position:relative;display:flex;flex-direction:column;gap:8px;padding:0;}
 .ing-edit-name,.ing-edit-amt{width:100%;border:.5px solid var(--br);border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit;background:var(--w);color:var(--dk);outline:none;}
 .ing-edit-name:focus,.ing-edit-amt:focus{border-color:rgba(0,0,0,.2);}
 .ing-edit-name::placeholder,.ing-edit-amt::placeholder{color:var(--lt);}
-.ing-edit-rm{grid-area:rm;width:40px;height:40px;border-radius:10px;border:.5px solid var(--br);background:var(--w);color:var(--lt);font-size:18px;cursor:pointer;font-family:inherit;transition:all .15s;}
+.ing-edit-rm{position:absolute;right:10px;top:52px;width:32px;height:32px;border-radius:999px;border:.5px solid var(--br);background:var(--w);color:var(--lt);font-size:18px;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;justify-content:center;z-index:1;}
 .ing-edit-rm:hover{color:var(--red);background:#FDF0EC;border-color:rgba(201,75,42,.25);}
 .ing-edit-add{width:100%;border:.5px dashed var(--br);border-radius:10px;background:transparent;color:var(--md);padding:10px 12px;font-size:13px;cursor:pointer;font-family:inherit;transition:all .15s;}
 .ing-edit-add:hover{background:var(--bg);color:var(--dk);border-color:var(--md);}
@@ -756,26 +754,16 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
   .edit-actions-row .edit-go{
 	width:100%;
   }
-  .ing-edit-row{
-	grid-template-columns:minmax(0,1fr) 44px;
-	grid-template-areas:
-	  "name name"
-	  "amt rm";
-	align-items:stretch;
-  }
   .ing-edit-name,
   .ing-edit-amt{
 	padding:12px 14px;
 	font-size:16px;
   }
-  .ing-edit-amt{
-	min-width:0;
-  }
   .ing-edit-rm{
-	width:44px;
-	height:44px;
-	align-self:stretch;
-	justify-self:stretch;
+	width:36px;
+	height:36px;
+	right:10px;
+	top:58px;
   }
   .add-meal-row{
 	display:grid;
