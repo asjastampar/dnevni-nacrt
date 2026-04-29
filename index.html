@@ -1743,7 +1743,7 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 const SLD=['Nedelja','Ponedeljek','Torek','Sreda','Četrtek','Petek','Sobota'];
 const SLM=['januar','februar','marec','april','maj','junij','julij','avgust','september','oktober','november','december'];
 const LBLS=['Zajtrk','Dopoldanski prigrizek','Kosilo','Popoldanski prigrizek','Večerja'];
-const now=new Date(),DOW=now.getDay();
+let now=new Date(),DOW=now.getDay();
 // IMPORTANT: All date keys (dp_v6_*, track_*, exlog_*, wodlog_*, steps_*) use the
 // LOCAL calendar date — not UTC. Using toISOString().split('T')[0] returns the UTC
 // date, which can differ from the user's local date by ±1 day around midnight.
@@ -1756,8 +1756,20 @@ function localDateKey(d){
   const day=String(d.getDate()).padStart(2,'0');
   return `${y}-${m}-${day}`;
 }
-const TK='dp_v6_'+localDateKey(now);
-const TTRACK='track_'+localDateKey(now);
+function getStateKey(d){return 'dp_v6_'+localDateKey(d||new Date());}
+function getTrackKey(d){return 'track_'+localDateKey(d||new Date());}
+function getExerciseLogKey(d){return 'exlog_'+localDateKey(d||new Date());}
+function ensureCurrentDayContext(){
+  const current=new Date();
+  if(localDateKey(current)===localDateKey(now))return true;
+  now=current;
+  DOW=now.getDay();
+  if(typeof window!=='undefined'&&window.location){
+    window.location.reload();
+    return false;
+  }
+  return true;
+}
 document.getElementById('ds').textContent=SLD[DOW]+', '+now.getDate()+'. '+SLM[now.getMonth()]+' '+now.getFullYear();
 
 // ─── MEAL DATA ─────────────────────────────────────────────
@@ -2822,6 +2834,7 @@ function wasWorkoutDoneOnDay(dateStr){
 	if(t){
 	  const td=JSON.parse(t);
 	  if(Array.isArray(td.ed)&&td.ed.filter(Boolean).length>0)return true;
+	  if(Array.isArray(td.customEx)&&td.customEx.length>0)return true;
 	}
 	const p=localStorage.getItem(lsKey('dp_v6_'+dateStr));
 	if(p){
@@ -3114,9 +3127,22 @@ function getRepRange(exName,wt){
 }
 
 // exercise log: store per day, per exercise name
-const ELKEY='exlog_'+localDateKey(now);
-function loadElog(){try{return JSON.parse(localStorage.getItem(lsKey(ELKEY)))||{};}catch(e){return{};}}
-function saveElog(name,data){const l=loadElog();l[name]=data;try{localStorage.setItem(lsKey(ELKEY),JSON.stringify(l));}catch(e){}}
+function loadElog(){
+  if(!ensureCurrentDayContext())return {};
+  try{return JSON.parse(localStorage.getItem(lsKey(getExerciseLogKey())))||{};}catch(e){return{};}
+}
+function saveElog(name,data){
+  if(!ensureCurrentDayContext())return;
+  const l=loadElog();l[name]=data;
+  try{localStorage.setItem(lsKey(getExerciseLogKey()),JSON.stringify(l));}catch(e){}
+}
+function deleteElog(name){
+  if(!ensureCurrentDayContext())return;
+  const l=loadElog();
+  if(!(name in l))return;
+  delete l[name];
+  try{localStorage.setItem(lsKey(getExerciseLogKey()),JSON.stringify(l));}catch(e){}
+}
 
 let exExp={};  // UI state: which exercises are expanded
 
@@ -3245,15 +3271,21 @@ async function submitAuth(){
 function lsKey(k){ return AUTH?`${AUTH.username}__${k}`:k; }
 
 function load(){
-  try{const sv=localStorage.getItem(lsKey(TK));if(sv){S={...S,...JSON.parse(sv)};getDiet();}}catch(e){}
+  if(!ensureCurrentDayContext())return;
+  try{
+    const sv=localStorage.getItem(lsKey(getStateKey()));
+    if(sv){S={...S,...JSON.parse(sv)};getDiet();}
+  }catch(e){}
 }
 function save(){
-  try{localStorage.setItem(lsKey(TK),JSON.stringify(S));}catch(e){}
+  if(!ensureCurrentDayContext())return;
+  try{localStorage.setItem(lsKey(getStateKey()),JSON.stringify(S));}catch(e){}
   saveTrack();
   // Async cloud sync — fire and forget
   cloudSave();
 }
 function saveTrack(){
+  if(!ensureCurrentDayContext())return;
   // Compute and persist the day's ACTUAL consumed kcal so the historical
   // day-detail card can show what was really eaten (incl. extra "Dodaj obrok"
   // items the user logged on top of the plan), not just the plan's target.
@@ -3263,7 +3295,7 @@ function saveTrack(){
 	if(Array.isArray(S.extras))kcalEaten+=S.extras.reduce((s,e)=>s+(e&&e.done?(parseInt(e.k)||0):0),0);
   }catch(e){}
   try{
-	localStorage.setItem(lsKey(TTRACK),JSON.stringify({
+	localStorage.setItem(lsKey(getTrackKey()),JSON.stringify({
 	  md:S.md,
 	  ed:S.exd,
 	  wt:S.wt,
@@ -3275,18 +3307,20 @@ function saveTrack(){
 
 let _syncTimer=null;
 function cloudSave(){
+  if(!ensureCurrentDayContext())return;
   if(IS_LOCAL_FILE){
     setSyncStatus('✓ lokalno');
     return;
   }
   // Debounce — sync 2s after last change
-  clearTimeout(_syncTimer);
-  _syncTimer=setTimeout(async()=>{
-	if(!AUTH)return;
-	const today=localDateKey(now);
-	let splitState=null;
-	try{const s=localStorage.getItem(lsKey(SPLIT_KEY));if(s)splitState=JSON.parse(s);}catch(e){}
-	let goalsState=null;
+	clearTimeout(_syncTimer);
+	_syncTimer=setTimeout(async()=>{
+	  if(!ensureCurrentDayContext())return;
+	  if(!AUTH)return;
+	  const today=localDateKey(new Date());
+	  let splitState=null;
+	  try{const s=localStorage.getItem(lsKey(SPLIT_KEY));if(s)splitState=JSON.parse(s);}catch(e){}
+	  let goalsState=null;
 	try{const s=localStorage.getItem(lsKey(GOALS_KEY));if(s)goalsState=JSON.parse(s);}catch(e){}
 	const payload={
 	  main:S,
@@ -3331,6 +3365,7 @@ function setSyncStatus(msg){
 
 // ─── APP INIT ────────────────────────────────────────────────
 async function initApp(){
+  if(!ensureCurrentDayContext())return;
   // Show app, hide modal
   document.getElementById('auth-overlay').classList.add('hide');
   document.getElementById('main-app').style.display='block';
@@ -3354,7 +3389,7 @@ async function initApp(){
 
   // Try load from cloud first, fall back to localStorage
   setSyncStatus('↺ nalagam...');
-  const today=localDateKey(now);
+  const today=localDateKey(new Date());
   const cloudData=await cloudLoad(today);
   // Always read local storage first (user-namespaced now that AUTH is set).
   // Cloud overrides on top — if cloudData has fresher values they win.
@@ -3372,7 +3407,7 @@ async function initApp(){
 	  // If max value already meets goal, keep done flag set
 	  if(ST.val>=ST.goal)ST.done=true;
 	}
-	if(cloudData.elog)try{localStorage.setItem(lsKey(ELKEY),JSON.stringify(cloudData.elog));}catch(e){}
+	if(cloudData.elog)try{localStorage.setItem(lsKey(getExerciseLogKey()),JSON.stringify(cloudData.elog));}catch(e){}
 	if(cloudData.wod)try{localStorage.setItem(lsKey('wodlog_'+today),cloudData.wod);}catch(e){}
 	// Restore split (frequency, weeklyDone, position, training days) so weekly
 	// quota and rotation state stay in sync across devices.
@@ -5202,9 +5237,9 @@ function renameExercise(i){
   if(next===old)return;
   const elog=loadElog();
   if(elog[old]&&!elog[next]){
-    elog[next]=elog[old];
-    delete elog[old];
-    try{localStorage.setItem(lsKey(ELKEY),JSON.stringify(elog));}catch(e){}
+	elog[next]=elog[old];
+	delete elog[old];
+	try{localStorage.setItem(lsKey(getExerciseLogKey()),JSON.stringify(elog));}catch(e){}
   }
   S.ex[i]={...cur,n:next,custom:true};
   save();
@@ -5981,6 +6016,7 @@ function renderWorkout(){
 			  ${renderSetRows(i,e,logged)}
 			  <div class="exercise-manual-row">
 				<button class="log-save" onclick="logEx(${i},'${e.n.replace(/'/g,'&#39;')}')">Shrani</button>
+				<button class="ex-action-btn ex-rm" style="padding:12px 18px;" onclick="clearExLog(${i},'${e.n.replace(/'/g,'&#39;')}')">Počisti vnos</button>
 			  </div>
 			</div>
 			${histHtml}
@@ -6060,8 +6096,22 @@ function togExInfo(i){
 	fetchExDesc(name).then(info=>{
 	  if(!info)return;
 	  det.querySelector('.no-desc').outerHTML=`<div class="ex-desc">${info.desc}</div><div class="ex-tip">💡 ${info.tip}</div><a class="yt-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent(info.yt||name)}" target="_blank">▶ Poglej video navodila</a>`;
-	}).catch(()=>{if(det.querySelector('.no-desc'))det.querySelector('.no-desc').textContent='Opis ni na voljo.';});
-  }
+		}).catch(()=>{if(det.querySelector('.no-desc'))det.querySelector('.no-desc').textContent='Opis ni na voljo.';});
+	  }
+}
+function clearExLog(i,name){
+  const ex=S.ex[i];
+  const exName=name||ex?.n;
+  if(!exName)return;
+  const hasLog=!!loadElog()[exName];
+  if(!hasLog && !S.exd[i])return;
+  if(!confirm(`Počistim današnji vnos za "${exName}"?\n\nTo odstrani današnje serije/težo za to vajo. Pretekla zgodovina ostane shranjena.`))return;
+  deleteElog(exName);
+  if(Array.isArray(S.exd))S.exd[i]=false;
+  save();
+  renderWorkout();
+  renderTracker();
+  calcKcal();
 }
 function logEx(i,name){
   const ex=S.ex[i];
@@ -6134,20 +6184,6 @@ function logEx(i,name){
 function togEx(i){
   const wasChecked=S.exd[i];
   S.exd[i]=!wasChecked;
-  // Auto-advance the split the first time ANY exercise gets checked off.
-  // Logic: if at least one exercise is now done AND we haven't yet marked
-  // the workout as done this session, do so. This advances the rotation
-  // and counts toward the weekly quota — the user gets credit for what
-  // they actually did, even if not all exercises are checked.
-  const isStrength=S.wt!=='rest'&&S.wt!=='cardio'&&S.wt!=='crossfit';
-  if(isStrength&&!wasChecked&&!S.workoutDone){
-	const anyDone=(S.exd||[]).some(Boolean);
-	if(anyDone){
-	  S.workoutDone=true;
-	  if(!S.isExtraWorkout&&typeof advanceSplit==='function')advanceSplit();
-	  S.wtManual=false;
-	}
-  }
   save();
   const top=document.getElementById('et'+i),chk=document.getElementById('echk'+i);
   if(top)top.classList.toggle('done',S.exd[i]);
@@ -6253,8 +6289,7 @@ function getRecentHistoryStats(days=28){
 	totalMealsDone+=md.filter(Boolean).length;
 	const mealSlots=(snap.plan&&Array.isArray(snap.plan.meals)&&snap.plan.meals.length)?snap.plan.meals.length:5;
 	totalMealSlots+=mealSlots;
-	const exerciseCount=ed.filter(Boolean).length + (((snap.track&&snap.track.customEx)||[]).length);
-	if((snap.track&&snap.track.wt&&snap.track.wt!=='rest'&&exerciseCount>0) || ((snap.track&&snap.track.wt)==='cardio') || ((snap.track&&snap.track.wt)==='crossfit' && localStorage.getItem(lsKey('wodlog_'+key)))){
+	if(wasWorkoutDoneOnDay(key) || (((snap.track&&snap.track.wt)==='crossfit') && localStorage.getItem(lsKey('wodlog_'+key)))){
 	  workoutDays++;
 	}
 	const kcal=(snap.track&&typeof snap.track.kcalEaten==='number')
@@ -7289,7 +7324,8 @@ async function swapEx(i){
 function removeEx(i){
   if(!S.ex||!S.ex[i])return;
   const removedName=S.ex[i].n;
-  if(!confirm(`Odstrani "${removedName}" iz današnje vadbe?\n\nZgodovina vaje ostane shranjena.`))return;
+  if(!confirm(`Odstrani "${removedName}" iz današnje vadbe?\n\nDanašnji vnos serij/teže za to vajo se bo pobrisal. Zgodovina preteklih dni ostane shranjena.`))return;
+  deleteElog(removedName);
   // Remove from arrays — keep them consistent
   S.ex.splice(i,1);
   if(Array.isArray(S.exd))S.exd.splice(i,1);
