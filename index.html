@@ -1373,20 +1373,12 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 		  <input type="number" id="g-target" placeholder="npr. 63" min="40" max="200" step="0.1" style="text-align:center;">
 		</div>
 	  </div>
-	  <div class="modal-field">
-		<label>Kako naj te app nagovarja?</label>
-		<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;">
-		  <button class="goal-opt" id="gp-f" onclick="selPronoun('f')">Pripravljena</button>
-		  <button class="goal-opt" id="gp-m" onclick="selPronoun('m')">Pripravljen</button>
-		  <button class="goal-opt" id="gp-n" onclick="selPronoun('n')">Nevtralno</button>
-		</div>
-	  </div>
-	  <div class="modal-field">
-		<label>Biološki profil za izračune</label>
-		<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;">
-		  <button class="goal-opt" id="gb-female" onclick="selBioSex('female')">Ženska</button>
-		  <button class="goal-opt" id="gb-male" onclick="selBioSex('male')">Moški</button>
-		  <button class="goal-opt" id="gb-other" onclick="selBioSex('other')">Ne navedem</button>
+		  <div class="modal-field">
+			<label>Spol / biološki profil</label>
+			<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;">
+			  <button class="goal-opt" id="gb-female" onclick="selBioSex('female')">Ženska</button>
+			  <button class="goal-opt" id="gb-male" onclick="selBioSex('male')">Moški</button>
+			  <button class="goal-opt" id="gb-other" onclick="selBioSex('other')">Ne navedem</button>
 		</div>
 	  </div>
 	  <div class="modal-field">
@@ -7679,19 +7671,26 @@ const GOALS_KEY='user_goals';
 let G={
   age:null,height:null,weight:null,target:null,
   goal:'lose',act:'light',loc:'gym_full',
-  pronoun:'f',      // f | m | n — language only
-  bioSex:'female',  // female | male | other — calculations only
+  bioSex:'female',  // female | male | other — calculations + app language
   cycleAware:false
 };
 
 function normalizeProfileMeta(){
-  if(!['f','m','n'].includes(G.pronoun))G.pronoun='f';
   if(!['female','male','other'].includes(G.bioSex))G.bioSex='female';
+  // Migration from the older separate-language setting. From now on one profile
+  // choice controls both calculations and grammatical wording.
+  delete G.pronoun;
   G.cycleAware=!!G.cycleAware;
 }
 
+function profilePronoun(){
+  if(G.bioSex==='male')return 'm';
+  if(G.bioSex==='other')return 'n';
+  return 'f';
+}
+
 function say(forms){
-  const p=G.pronoun||'f';
+  const p=profilePronoun();
   if(typeof forms==='string')return forms;
   return forms[p]||forms.n||forms.f||forms.m||'';
 }
@@ -7748,8 +7747,7 @@ function saveGoalsState(){
   try{localStorage.setItem(lsKey(GOALS_KEY),JSON.stringify(G));}catch(e){}
 }
 
-// Mifflin-St Jeor + activity multiplier. bioSex changes the BMR constant,
-// while pronoun remains language-only.
+// Mifflin-St Jeor + activity multiplier. bioSex also drives app wording.
 const ACT_MULT={sed:1.2,light:1.375,mod:1.55,high:1.725};
 function calcTDEE(){
   if(!G.age||!G.height||!G.weight)return null;
@@ -7785,7 +7783,7 @@ function calcMacroTargets(){
   };
 }
 
-let _selGoal='lose',_selAct='light',_selLoc='gym_full',_selPronoun='f',_selBioSex='female',_selCycleAware=false;
+let _selGoal='lose',_selAct='light',_selLoc='gym_full',_selBioSex='female',_selCycleAware=false;
 let _goalsOriginal=null,_goalsSaved=false,_goalsPreviewMode=false;
 
 function readGoalsDraft(){
@@ -7797,7 +7795,6 @@ function readGoalsDraft(){
     goal:_selGoal,
     act:_selAct,
     loc:_selLoc,
-    pronoun:_selPronoun,
     bioSex:_selBioSex,
     cycleAware:!!_selCycleAware
   };
@@ -7827,11 +7824,6 @@ function selAct(a){
   _selAct=a;
   ['sed','light','mod','high'].forEach(x=>document.getElementById('ga-'+x)?.classList.toggle('active',x===a));
   updateGoalsCalc();
-  applyGoalsLivePreview();
-}
-function selPronoun(p){
-  _selPronoun=p;
-  ['f','m','n'].forEach(x=>document.getElementById('gp-'+x)?.classList.toggle('active',x===p));
   applyGoalsLivePreview();
 }
 function selBioSex(s){
@@ -7916,8 +7908,8 @@ function openGoals(mode='profile'){
   document.getElementById('g-target').value=G.target||'';
   normalizeProfileMeta();
   _selGoal=G.goal||'lose';_selAct=G.act||'light';_selLoc=G.loc||'gym_full';
-  _selPronoun=G.pronoun||'f';_selBioSex=G.bioSex||'female';_selCycleAware=!!G.cycleAware;
-  selGoal(_selGoal);selAct(_selAct);selPronoun(_selPronoun);selBioSex(_selBioSex);selCycleAware(_selCycleAware);selLoc(_selLoc);
+  _selBioSex=G.bioSex||'female';_selCycleAware=!!G.cycleAware;
+  selGoal(_selGoal);selAct(_selAct);selBioSex(_selBioSex);selCycleAware(_selCycleAware);selLoc(_selLoc);
 
   const titles={
     profile:['Moj <em>profil</em>','Osnovni podatki za natančen izračun.','Shrani profil →'],
