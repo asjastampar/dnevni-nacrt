@@ -367,6 +367,10 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .stretch-title{font-size:13.5px;color:var(--dk);font-weight:500;margin-bottom:2px;}
 .stretch-time{font-weight:400;color:var(--lt);font-size:12px;}
 .stretch-cue{font-size:11.5px;color:var(--md);line-height:1.4;}
+.warmup-block{margin-bottom:18px;}
+.warmup-card{background:#F7FAF7;border:.5px solid #DCE8E0;border-radius:14px;padding:11px 14px;display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.warmup-dot{width:6px;height:6px;border-radius:50%;background:#8FB6A0;flex-shrink:0;}
+.warmup-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
 .wu-dot{width:8px;height:8px;border-radius:50%;background:var(--grn);flex-shrink:0;opacity:.7;}
 .wu-body{flex:1;}
 .wu-title{font-size:15px;color:var(--dk);}
@@ -433,6 +437,9 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .add-ex-row input::placeholder{color:var(--lt);}
 .add-ex-name{flex:1;min-width:120px;}
 .add-ex-btn{background:var(--grn);color:var(--w);border:none;border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.add-ex-block{margin:22px 0 18px;}
+.add-ex-block .workout-subhead{margin-bottom:10px;}
+.add-ex-block .add-ex-row{margin-top:0;}
 /* badge / info */
 .badge{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border-radius:20px;font-size:13px;font-weight:500;margin-bottom:11px;}
 .badge.gym{background:#EBF4EF;color:var(--grn);}
@@ -1688,10 +1695,7 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 	</div>
 	<div class="bpsel" id="bpsel" style="display:none;"></div>
 	<div id="wc"></div>
-	<div class="add-ex-row" id="add-ex-row" style="display:none">
-	  <input class="add-ex-name" id="aen" placeholder="Ime vaje (npr. hip thrust)...">
-	  <button class="add-ex-btn" onclick="addCustomEx()">+ Dodaj</button>
-	</div>
+	<div id="add-ex-row" style="display:none"></div>
   </div>
   </div>
 
@@ -2337,15 +2341,34 @@ const WARMUP_DB={
 	video:'standing torso twist warmup'}
 };
 
-// Warmup template per workout type — picks the right exercises for what's
-// coming. Returns a list of WARMUP_DB ids in order.
-const WARMUP_TEMPLATES={
-  glute:['cat_cow','hip_circles','glute_bridge_warmup','banded_walks','bw_squats'],
-  lower:['cat_cow','hip_circles','leg_swings','glute_bridge_warmup','bw_squats','bw_lunge_warmup'],
-  upper:['cat_cow','arm_circles','scapular_pulls','band_pull_apart','bw_pushups_warmup'],
-  full:['cat_cow','arm_circles','hip_circles','glute_bridge_warmup','bw_squats','scapular_pulls'],
-  cardio:['walking_warmup','arm_circles','leg_swings','high_knees'],
-  crossfit:['jumping_jacks','arm_circles','hip_circles','bw_squats','scapular_pulls']
+// Warmup pools are now recommendation-only, not a checklist.
+// Keep them short (max 3) and context-aware: in gym, prefer moves that make
+// sense on the floor/around equipment without looking like home yoga.
+const WARMUP_POOLS={
+  glute:{
+    gym:['walking_warmup','banded_walks','bw_squats','leg_swings','bw_lunge_warmup','monster_walks'],
+    home:['hip_circles','glute_bridge_warmup','bw_squats','leg_swings','banded_walks']
+  },
+  lower:{
+    gym:['walking_warmup','leg_swings','bw_lunge_warmup','bw_squats','hip_circles'],
+    home:['hip_circles','leg_swings','glute_bridge_warmup','bw_squats','bw_lunge_warmup']
+  },
+  upper:{
+    gym:['walking_warmup','arm_circles','band_pull_apart','scapular_pulls','shoulder_dislocates'],
+    home:['cat_cow','arm_circles','band_pull_apart','scapular_pulls','shoulder_dislocates']
+  },
+  full:{
+    gym:['walking_warmup','arm_circles','bw_squats','hip_circles','scapular_pulls'],
+    home:['cat_cow','arm_circles','hip_circles','bw_squats','glute_bridge_warmup']
+  },
+  cardio:{
+    gym:['walking_warmup','leg_swings','high_knees','arm_circles'],
+    home:['walking_warmup','leg_swings','high_knees','dynamic_torso']
+  },
+  crossfit:{
+    gym:['jumping_jacks','hip_circles','scapular_pulls','bw_squats','arm_circles'],
+    home:['jumping_jacks','hip_circles','bw_squats','arm_circles','dynamic_torso']
+  }
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -4741,15 +4764,19 @@ function renderWorkoutPrimer(wt){
   </div>`;
 }
 
-// Build today's warmup from the workout type. Each warmup is an exercise
-// object with {id, n, time, video, desc, cue} so it can render with the
-// same swap/remove/add controls as main exercises.
+function getWarmupContextKey(){
+  const loc=getWorkoutLoc();
+  return (loc==='gym_full'||loc==='gym_weights')?'gym':'home';
+}
+// Build today's warmup from the workout type.
+// Recommendation only: 3 items max, short and context-appropriate.
 function buildWarmup(wt){
-  const ids=WARMUP_TEMPLATES[wt]||[];
-  return ids.map(id=>{
-	const w=WARMUP_DB[id];
-	if(!w)return null;
-	return {id,n:w.n,time:w.time,desc:w.desc,cue:w.cue,video:w.video};
+  const ctx=getWarmupContextKey();
+  const pool=(WARMUP_POOLS[wt]&&WARMUP_POOLS[wt][ctx])||[];
+  return pool.slice(0,3).map(id=>{
+    const w=WARMUP_DB[id];
+    if(!w)return null;
+    return {id,n:w.n,time:w.time,desc:w.desc,cue:w.cue,video:w.video};
   }).filter(Boolean);
 }
 
@@ -4759,14 +4786,27 @@ function findAltWarmup(currentId,exclude){
   const cur=WARMUP_DB[currentId];
   if(!cur)return null;
   const excludeSet=new Set([currentId,...(exclude||[])]);
-  // 1st pass: same primary muscle group
+  const ctx=getWarmupContextKey();
+  const pool=((WARMUP_POOLS[S.wt]&&WARMUP_POOLS[S.wt][ctx])||[]).filter(id=>!excludeSet.has(id));
+  // 1st pass: same primary muscle group inside today's warmup pool
+  for(const id of pool){
+    const w=WARMUP_DB[id];
+    if(!w)continue;
+    if(!w.primary.some(m=>cur.primary.includes(m)))continue;
+    return id;
+  }
+  // 2nd pass: anything else from today's warmup pool
+  for(const id of pool){
+    if(WARMUP_DB[id])return id;
+  }
+  // 3rd pass: same primary muscle group anywhere
   for(const id in WARMUP_DB){
 	if(excludeSet.has(id))continue;
 	const w=WARMUP_DB[id];
 	if(!w.primary.some(m=>cur.primary.includes(m)))continue;
 	return id;
   }
-  // 2nd pass: any not-yet-used warmup
+  // 4th pass: any not-yet-used warmup
   for(const id in WARMUP_DB){
 	if(excludeSet.has(id))continue;
 	return id;
@@ -4775,14 +4815,10 @@ function findAltWarmup(currentId,exclude){
 }
 
 function ensureWarmupState(){
-  // Pick the warmup list — use S.warmup if user has customized it for today,
-  // else build fresh from the template for today's workout type.
-  if(!Array.isArray(S.warmup)||!S.warmup.length){
+  // Pick the warmup list — use today's customized list if present,
+  // else build a short recommendation set for this workout type/location.
+  if(!Array.isArray(S.warmup)||!S.warmup.length||S.warmup.length>3){
 	S.warmup=buildWarmup(S.wt);
-  }
-  if(!Array.isArray(S.wuDone))S.wuDone=[];
-  if(S.wuDone.length!==S.warmup.length){
-	S.wuDone=S.warmup.map((_,i)=>!!S.wuDone[i]);
   }
   return S.warmup;
 }
@@ -5817,26 +5853,22 @@ function deleteMeal(i){
 function renderWorkout(){
   const c=document.getElementById('wc'),baw=document.getElementById('baw'),w=WKT[S.wt];
   const warmupSteps=ensureWarmupState();
-  const warmupHtml=warmupSteps.length||S.wt!=='rest'?`<div class="workout-block">
-	<div class="workout-subhead">Ogrevanje <span style="font-weight:400;color:var(--lt);font-size:11px;">· pred vadbo</span></div>
+  const warmupHtml=warmupSteps.length&&S.wt!=='rest'?`<div class="workout-block warmup-block">
+	<div class="workout-subhead">Ogrevanje pred vadbo <span style="font-weight:400;color:var(--lt);font-size:11px;">· priporočilo, ne za odkljukati</span></div>
 	${warmupSteps.map((step,i)=>{
 	  const videoUrl=step.id&&WARMUP_DB[step.id]?getVideoUrl(null,WARMUP_DB[step.id].video||step.n):`https://www.youtube.com/results?search_query=${encodeURIComponent(step.n+' warmup')}`;
-	  return `<div class="wu-card${S.wuDone[i]?' done':''}">
-		<div class="wu-dot"></div>
-		<div class="wu-body">
-		  <div class="wu-title">${step.n}${step.time?` <span style="font-weight:400;color:var(--lt);">· ${step.time}</span>`:''}</div>
-		  ${step.cue?`<div class="wu-meta">${step.cue}</div>`:'<div class="wu-meta">odkljukaj, ko narediš</div>'}
+	  return `<div class="warmup-card">
+		<div class="warmup-dot"></div>
+		<div class="stretch-body">
+		  <div class="stretch-title">${step.n}${step.time?` <span class="stretch-time">· ${step.time}</span>`:''}</div>
+		  ${step.cue?`<div class="stretch-cue">${step.cue}</div>`:''}
 		</div>
-		<a class="wu-mini-btn" href="${videoUrl}" target="_blank" title="Video navodila">▶</a>
-		<button class="wu-mini-btn" onclick="swapWarmup(${i})" title="Zamenjaj">↺</button>
-		<button class="wu-mini-btn wu-mini-rm" onclick="removeWarmup(${i})" title="Odstrani">✕</button>
-		<button class="chk${S.wuDone[i]?' on':''}" onclick="toggleWarmup(${i})">${S.wuDone[i]?'✓':'○'}</button>
+		<div class="warmup-actions">
+		  <a class="wu-mini-btn" href="${videoUrl}" target="_blank" title="Video navodila">▶</a>
+		  <button class="wu-mini-btn" onclick="swapWarmup(${i})" title="Zamenjaj">↺</button>
+		</div>
 	  </div>`;
 	}).join('')}
-	<div class="wu-add-row">
-	  <input class="wu-add-inp" id="addWarmupInp" placeholder="dodaj svojo (npr. 5 min tek)" onkeydown="if(event.key==='Enter')addCustomWarmup()">
-	  <button class="wu-add-btn" onclick="addCustomWarmup()">+ Dodaj</button>
-	</div>
   </div>`:'';
   // Defensive helper — set disabled/innerHTML safely
   const setBaw=(disabled,html)=>{
@@ -5944,9 +5976,16 @@ function renderWorkout(){
 	// strength exercises. User doesn't check these off, but each has a
 	// short cue and a video link in case they don't know the form.
 	const stretchIds=STRETCH_TEMPLATES[S.wt]||[];
-	const stretchHtml=stretchIds.length?`<div class="workout-block stretch-block">
-	  <div class="workout-subhead">Razteg po vadbi <span style="font-weight:400;color:var(--lt);font-size:11px;">· priporočilo, ne za odkljukati</span></div>
-	  ${stretchIds.map(id=>{
+		const addExerciseHtml=`<div class="add-ex-block">
+		  <div class="workout-subhead">Dodaj vajo</div>
+		  <div class="add-ex-row">
+			<input class="add-ex-name" id="aen" placeholder="Ime vaje (npr. hip thrust)..." onkeydown="if(event.key==='Enter')addCustomEx()">
+			<button class="add-ex-btn" onclick="addCustomEx()">+ Dodaj</button>
+		  </div>
+		</div>`;
+		const stretchHtml=stretchIds.length?`<div class="workout-block stretch-block">
+		  <div class="workout-subhead">Razteg po vadbi <span style="font-weight:400;color:var(--lt);font-size:11px;">· priporočilo, ne za odkljukati</span></div>
+		  ${stretchIds.map(id=>{
 		const st=STRETCH_DB[id];
 		if(!st)return '';
 		const videoUrl=`https://www.youtube.com/results?search_query=${encodeURIComponent(st.video||st.n+' stretch')}`;
@@ -6030,9 +6069,9 @@ function renderWorkout(){
 			</div>
 		  </div>
 		</div>`;
-	  }).join('')+stretchHtml;
-  }
-}
+		  }).join('')+addExerciseHtml+stretchHtml;
+	  }
+	}
 function togWodDesc(i){
   const p=document.getElementById('wdp'+i);
   if(!p)return;
@@ -6197,13 +6236,17 @@ function togEx(i){
   if(typeof renderNextUp==='function')renderNextUp();
   renderTracker();
 }
-function addCustomEx(){
-  const n=document.getElementById('aen').value.trim();
+function addCustomExFromInput(inputId){
+  const el=document.getElementById(inputId);
+  const n=el?.value.trim();
   if(!n)return;
   S.ex.push({n,custom:true});S.exd.push(false);
-  document.getElementById('aen').value='';
+  el.value='';
   exExp[S.ex.length-1]=true;
   save();renderWorkout();
+}
+function addCustomEx(){
+  addCustomExFromInput('aen');
 }
 
 // ─── WEEKLY TRACKER ─────────────────────────────────────────
