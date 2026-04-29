@@ -1374,6 +1374,29 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 		</div>
 	  </div>
 	  <div class="modal-field">
+		<label>Kako naj te app nagovarja?</label>
+		<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;">
+		  <button class="goal-opt" id="gp-f" onclick="selPronoun('f')">Pripravljena</button>
+		  <button class="goal-opt" id="gp-m" onclick="selPronoun('m')">Pripravljen</button>
+		  <button class="goal-opt" id="gp-n" onclick="selPronoun('n')">Nevtralno</button>
+		</div>
+	  </div>
+	  <div class="modal-field">
+		<label>Biološki profil za izračune</label>
+		<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;">
+		  <button class="goal-opt" id="gb-female" onclick="selBioSex('female')">Ženska</button>
+		  <button class="goal-opt" id="gb-male" onclick="selBioSex('male')">Moški</button>
+		  <button class="goal-opt" id="gb-other" onclick="selBioSex('other')">Ne navedem</button>
+		</div>
+	  </div>
+	  <div class="modal-field">
+		<label>Cikel / hormonski kontekst</label>
+		<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+		  <button class="goal-opt" id="gc-no" onclick="selCycleAware(false)">Ne upoštevaj</button>
+		  <button class="goal-opt" id="gc-yes" onclick="selCycleAware(true)">Upoštevaj</button>
+		</div>
+	  </div>
+	  <div class="modal-field">
 		<label>Aktivnost</label>
 		<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
 		  <button class="goal-opt" id="ga-sed" onclick="selAct('sed')">🪑 Pretežno sedem</button>
@@ -1420,7 +1443,7 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 			</div>
 			<div class="goals-plan-section">
 			  <div class="goals-plan-label">Kateri dnevi ti ustrezajo?</div>
-			  <div class="goals-plan-hint">Če jih ne izbereš sama, predlagamo optimalen razpored.</div>
+				<div class="goals-plan-hint">Če jih ne izbereš ročno, predlagamo optimalen razpored.</div>
 			  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;">
 				<button class="goal-opt day-pick" data-day="1" onclick="togTrainDay(1)">Po</button>
 				<button class="goal-opt day-pick" data-day="2" onclick="togTrainDay(2)">To</button>
@@ -1460,7 +1483,7 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 	<div class="modal-logo">Uredi <em>za nazaj</em></div>
 	<div class="modal-sub" id="past-day-sub">—</div>
 	<div style="background:var(--bg);border-radius:9px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--md);line-height:1.45;">
-	  Označi ali dodaj kar si dejansko jedla in trenirala ta dan. Lahko dodaš tudi obroke ali vaje, ki niso bile v planu.
+	  Označi ali dodaj, kar je bilo dejansko zaužito in opravljeno ta dan. Lahko dodaš tudi obroke ali vaje, ki niso bile v planu.
 	</div>
 
 	<!-- Planned meals (from saved plan) -->
@@ -2986,7 +3009,7 @@ const XI={
   'Dumbbell push press':{desc:'Drži ročke na ramenih. Rahlo upogni kolena (dip), nato eksplozivno iztegni noge in potisni ročke nad glavo hkrati. Spusti nazaj na ramena.',tip:'Začetniška teža: 5–7 kg/ročka. Noge dajo impulz — roke samo dokončajo gib. Bolj eksplozivno kot shoulder press.',kg:6,yt:'dumbbell push press crossfit technique'},
   'Veslanje':{desc:'Sedi na veslalni ergometer. Noge iztegni, nato potegni veslo k prsim z rokami in upogni kolena hkrati. Vrni v začetek v obratnem vrstnem redu.',tip:'Ritem: 70% noge, 20% trup, 10% roke. Začni počasi in se ustali na ritmičnem veslanju. Monitor kaže tempo/500m.',kg:0,yt:'rowing machine technique beginners'},
   'Trx veslanje':{desc:'Drži TRX ročici, nagne telo nazaj. Potegni telo navzgor k rokam — komolci gresta ob telesu. Počasi vrni v začetni položaj.',tip:'Bolj pokonci = lažje. Noge skupaj in telo ravno ves čas.',kg:0,yt:'TRX row beginner form'},
-  'Tek (zunaj ali tekalna steza)':{desc:'Teci v tempu pri katerem še lahko govoriš v kratkih stavkih (zmerna intenzivnost). Ogrevanje 5 min hoje, ohlajanje 5 min hoje.',tip:'Za začetnico: izmenjuj 2 min tek + 1 min hoja. Postopno povečuj čas teka. Dobri čevlji so ključni.',kg:0,yt:'running technique beginners form'},
+  'Tek (zunaj ali tekalna steza)':{desc:'Teci v tempu pri katerem še lahko govoriš v kratkih stavkih (zmerna intenzivnost). Ogrevanje 5 min hoje, ohlajanje 5 min hoje.',tip:'Za začetek: izmenjuj 2 min tek + 1 min hoja. Postopno povečuj čas teka. Dobri čevlji so ključni.',kg:0,yt:'running technique beginners form'},
   'Kolesarjenje (zunaj ali sobno kolo)':{desc:'Na sobnem kolesu nastavi upor tako, da je pedajanje zahtevno a vzdržljivo. Na cesti izberi teren brez prevelikih vzponov za začetek.',tip:'Sedlo nastavi na višino kolka. Kolena se ne smejo povsem iztegniti pri pedaliranju. Začni s 20–30 min.',kg:0,yt:'cycling beginner tips technique'},
   'Elipsa':{desc:'Stopi na elipso, drži ročke in enakomerno pedaliraj naprej. Hkrati potiskaj in vleci ročke z rokami za aktivacijo zgornjega dela.',tip:'Odlično za kolena — brez udarca ob podlago. Nastavi upor postopno. Drži hrbet raven, ne visi na ročkah.',kg:0,yt:'elliptical machine beginner tips'},
   'Veslalni ergometer':{desc:'Sedi na ergometer. Začni z nogami, dodaj trup, dokončaj z rokami (10-20-70 razmerje). Vrni v obratnem vrstnem redu.',tip:'Začni pri tempu /500m +2 min nad udobnim. Osredotoči se na tehniko, ne na hitrost. 20 min je dober začetni cilj.',kg:0,yt:'rowing machine technique beginners'},
@@ -3046,7 +3069,7 @@ async function fetchExDesc(name){
   const cache=getDescCache();
   if(cache[name])return cache[name];
   const txt=await api(
-	'Si fitnes trener. Opiši vajo za začetnico v fitnesu. Vrni SAMO veljavni JSON: {"desc":"opis izvedbe v slovenščini (2-3 stavki)","tip":"začetniški nasvet z začetno težo","kg":0,"yt":"youtube search query v angleščini"}',
+	`Si fitnes trener. Opiši vajo za ${beginnerNoun()} v fitnesu. Vrni SAMO veljavni JSON: {"desc":"opis izvedbe v slovenščini (2-3 stavki)","tip":"začetniški nasvet z začetno težo","kg":0,"yt":"youtube search query v angleščini"}`,
 	`Opiši vajo: "${name}"`
   );
   const info=JSON.parse(txt);
@@ -3151,7 +3174,7 @@ function suggestProgression(name,targetRepLow,targetRepHigh,startKg){
 	  kg:lastKg+2.5,
 	  reps:targetRepLow,
 	  sets:lastSets,
-	  note:`✨ +2.5 kg — 2× zaporedoma si naredila ${targetRepHigh}+ ponovitev`,
+	  note:`✨ +2.5 kg — 2× zaporedoma si ${say({f:'naredila',m:'naredil',n:'naredil/a'})} ${targetRepHigh}+ ponovitev`,
 	  type:'increase'
 	};
   }
@@ -3899,7 +3922,7 @@ async function loadMealIdeas(i,force){
   let prompt='';
   if(tab==='fav'){
     const foodList=foods.slice(-20).map(f=>f.f).join(', ');
-    prompt=`Predlagaj 5 idej posebej za ${label.toLowerCase()}. Trenutni obrok je: ${current}. ${typeHint} ${pantry} ${ez} ${lfc} ${foodList?`Uporabnica je pogosto jedla: ${foodList}. Predlagaj podobno ali praktično različico.`:''}`;
+    prompt=`Predlagaj 5 idej posebej za ${label.toLowerCase()}. Trenutni obrok je: ${current}. ${typeHint} ${pantry} ${ez} ${lfc} ${foodList?`${say({f:'Uporabnica je pogosto jedla',m:'Uporabnik je pogosto jedel',n:'Oseba je pogosto jedla'})}: ${foodList}. Predlagaj podobno ali praktično različico.`:''}`;
   }else{
     const eaten=foods.map(f=>f.f).join(', ');
     prompt=`Predlagaj 5 novih idej posebej za ${label.toLowerCase()}. Trenutni obrok je: ${current}. ${typeHint} ${pantry} ${ez} ${lfc} ${eaten?`Izogni se tem že pogosto videnim jedem: ${eaten.slice(0,220)}.`:''}`;
@@ -4718,7 +4741,7 @@ function getWorkoutPrimer(wt){
       flow:[
         'Začni pri prvi vaji z <b>lažjo testno serijo</b>, da preveriš kolena, boke in ravnotežje.',
         'Glavne vaje delaj počasi navzdol in odločno gor. Pri izolacijah res <b>stisni mišico na vrhu</b>.',
-        'Če si izgubljena med napravami, nič hudega: najprej naredi proste vaje, stroje pa vmes poišči v miru.'
+        `${say({f:'Če si izgubljena',m:'Če si izgubljen',n:'Če izgubiš orientacijo'})} med napravami, nič hudega: najprej naredi proste vaje, stroje pa vmes poišči v miru.`
       ],
       rule:'<b>Pravilo izvedbe:</b> kolena naj sledijo prstom, hrbet naj ostane miren, peta pa na tleh kjer je to smiselno.',
       tags:['glavni fokus: noge','sekundarno: zadnjica','bonus: stabilnost']
@@ -4759,8 +4782,8 @@ function getWorkoutPrimer(wt){
     rule:`${cfg.rule} ${commonSafety}`,
     tags:cfg.tags,
     footer:[
-      {lbl:'Kako naj bo težko',copy:'Ko končaš serijo, naj imaš občutek, da bi naredila <b>še 2–3 čiste ponovitve</b>.'},
-      {lbl:'Če si izgubljena',copy:'Odpri eno kartico vaje, poglej kratek opis ali video, nato naredi <b>eno lahko serijo za občutek</b>.'},
+      {lbl:'Kako naj bo težko',copy:`Ko končaš serijo, naj imaš občutek, da bi ${say({f:'naredila',m:'naredil',n:'lahko naredil/a'})} <b>še 2–3 čiste ponovitve</b>.`},
+      {lbl:say({f:'Če si izgubljena',m:'Če si izgubljen',n:'Če si brez orientacije'}),copy:'Odpri eno kartico vaje, poglej kratek opis ali video, nato naredi <b>eno lahko serijo za občutek</b>.'},
       {lbl:'Za napredne',copy:advancedNote}
     ],
     note:commonEffort
@@ -4793,7 +4816,7 @@ function renderWorkoutPrimer(wt){
         <div class="sg-title">${primer.title}</div>
         <div class="sg-sub">${primer.sub}</div>
       </div>
-      <div class="sg-trust">✓ ${primer.trust||'smiselno za začetnico in uporabno za napredovanje'}</div>
+      <div class="sg-trust">✓ ${primer.trust||`smiselno za ${beginnerNoun()} in uporabno za napredovanje`}</div>
     </div>
     <div class="sg-grid">
       <div class="sg-card">
@@ -4994,6 +5017,51 @@ function getInputMode(ex){
   return 'weighted';
 }
 
+function roundSuggestedKg(v){
+  if(!v||v<=0)return 0;
+  const step=v<12?0.5:2.5;
+  return Math.max(step,Math.round(v/step)*step);
+}
+
+function baseStartKgForExercise(ex){
+  if(!ex)return 0;
+  const info=getExInfo(ex.n,ex.id)||{};
+  if(info.kg)return parseFloat(info.kg)||0;
+  const n=(ex.n||'').toLowerCase();
+  if(/hip thrust|hipthrust|glute bridge|glute/.test(n))return 20;
+  if(/leg press/.test(n))return 35;
+  if(/počep.*palic|squat.*bar|palico/.test(n))return 20;
+  if(/goblet|sumo/.test(n))return 10;
+  if(/rdl|mrtv|deadlift/.test(n))return 12;
+  if(/veslan|row/.test(n))return 8;
+  if(/potisk|press|shoulder/.test(n))return 6;
+  if(/curl|biceps|triceps/.test(n))return 5;
+  if(/abduktor|cable|kabel/.test(n))return 10;
+  return 0;
+}
+
+function suggestedStartKgForExercise(ex){
+  if(getInputMode(ex)!=='weighted')return 0;
+  const base=baseStartKgForExercise(ex);
+  if(!base)return 0;
+  const n=(ex.n||'').toLowerCase();
+  let factor=profileLoadFactor();
+  if(/curl|biceps|triceps|shoulder|potisk|press/.test(n))factor*=0.9;
+  if(/leg press|hip thrust|počep|squat/.test(n))factor*=1.05;
+  return roundSuggestedKg(base*factor);
+}
+
+function formatStartingLoadTip(ex,info={}){
+  const mode=getInputMode(ex);
+  if(mode!=='weighted')return info.tip||'Začni lahko in najprej preveri občutek giba.';
+  const kg=suggestedStartKgForExercise(ex);
+  const profileLabel=G.bioSex==='male'?'moški profil':(G.bioSex==='other'?'nevtralen profil':'ženski profil');
+  const baseTip=info.tip||'Najprej izberi težo, pri kateri ostaneta tehnika in občutek ciljne mišice čista.';
+  return kg
+    ? `Začetni predlog za ${profileLabel}: približno ${kg} kg. ${baseTip}`
+    : baseTip;
+}
+
 // Returns the user's previous best for a given exercise — used to anchor
 // progressive overload suggestions. Looks back up to 60 days, prefers the
 // most recent entry with the highest kg or reps.
@@ -5041,7 +5109,7 @@ function parseRepRange(ex){
 function suggestProgression(ex){
   const name=ex.n;
   const base=getExerciseBaseline(name);
-  if(!base)return {type:'first_time',hint:'Prvič vnašaš to vajo. Začni lažje od pričakovanega — tako boš lahko progresno napredovala.'};
+  if(!base)return {type:'first_time',hint:`Prvič vnašaš to vajo. Začni lažje od pričakovanega — tako boš lahko ${say({f:'progresno napredovala',m:'progresno napredoval',n:'progresno napredoval/a'})}.`};
   const repRange=parseRepRange(ex);
   const repHi=repRange?repRange.hi:12;
   const isUpper=ex.id&&typeof EX_DB!=='undefined'&&EX_DB[ex.id]&&['horizontal_push','vertical_push','horizontal_pull','vertical_pull','biceps_isolation','triceps_isolation','rear_delt'].includes(EX_DB[ex.id].movement);
@@ -5146,13 +5214,14 @@ function renderSetRows(i,e,log){
   // Recommended values shown as placeholders, never as values
   const recReps=parseInt(e.r)||10;
   const recSets=parseInt(e.s)||3;
+  const recKg=suggestedStartKgForExercise(e);
 
   if(!expanded){
 	const loggedSetsCount=hasLog?sets.length:0;
 	return `<div class="set-compact ${showKg?'cols-3':'cols-2'}" id="srs${i}" data-mode="compact">
 	  ${showKg?`<div class="set-compact-field">
 		<label>Teža (kg)</label>
-		<input class="set-compact-input" type="number" inputmode="decimal" placeholder="kg" id="sc${i}-kg" value="${firstKg||''}">
+		<input class="set-compact-input" type="number" inputmode="decimal" placeholder="${recKg||'kg'}" id="sc${i}-kg" value="${firstKg||''}">
 	  </div>`:''}
 	  <div class="set-compact-field">
 		<label>Ponovitev</label>
@@ -5496,8 +5565,8 @@ function saveStepsState(){
 }
 
 function stepsKcal(steps){
-  // ~0.04 kcal/korak za 65kg žensko
-  return Math.round(steps*0.04);
+  // Baseline ~0.04 kcal/korak at 65kg, adjusted by profile weight/physiology.
+  return Math.round(steps*0.04*calorieBodyFactor());
 }
 
 function renderSteps(){
@@ -5577,10 +5646,10 @@ function changeStepsGoal(){
 
 function calcExBurn(){
   if(S.wt==='cardio'){
-	return S.ex.reduce((sum,ex,i)=>{
+	return Math.round(S.ex.reduce((sum,ex,i)=>{
 	  if(!S.exd[i])return sum;
 	  return sum+(ex.customKcal||ex.kcal||CARDIO_BURN_PER_MIN*parseInt(ex.r)||150);
-	},0);
+	},0)*calorieBodyFactor());
   }
   if(S.wt==='crossfit'){
 	const wod=S.cfWod||(WKT.crossfit?.wods?.[DOW%7]);
@@ -5588,16 +5657,16 @@ function calcExBurn(){
 	const done=S.exd.filter(Boolean).length;
 	const total=wod.ex?.length||1;
 	const timeMin=(wod.time||15);
-	return Math.round((done/total)*timeMin*9); // ~9 kcal/min CrossFit
+	return Math.round((done/total)*timeMin*9*calorieBodyFactor()); // ~9 kcal/min baseline
   }
   // Strength training: sum by exercise
-  return S.ex.reduce((sum,ex,i)=>{
+  return Math.round(S.ex.reduce((sum,ex,i)=>{
 	if(!S.exd[i])return sum;
 	const logged=loadElog()[ex.n]||{};
 	const sets=(Array.isArray(logged.setsDetail)&&logged.setsDetail.length)?logged.setsDetail.length:(parseInt(logged.s)||parseInt(ex.s)||3);
 	const kcalPerSet=BURN[ex.n]||BURN_DEFAULT;
 	return sum+sets*kcalPerSet;
-  },0);
+  },0)*calorieBodyFactor());
 }
 
 function calcKcal(){
@@ -6028,7 +6097,7 @@ function renderWorkout(){
 			<button class="ex-xbtn${open?' open':''}" id="exb${i}" onclick="togExInfo(${i})">▾</button>
 		  </div>
 		  <div class="cardio-time-edit" id="cte${i}" style="display:none;padding:10px 14px;background:#FDFCF9;border-top:.5px solid var(--br);">
-			<div style="font-size:12px;color:var(--md);margin-bottom:6px;">Koliko minut si (boš) naredila?</div>
+			<div style="font-size:12px;color:var(--md);margin-bottom:6px;">Koliko minut si ${say({f:'naredila',m:'naredil',n:'naredil/a'})}?</div>
 			<div style="display:flex;gap:6px;align-items:center;">
 			  <input type="number" id="cti${i}" value="${parsedMin}" min="5" max="300" step="5" style="border:.5px solid var(--br);border-radius:8px;padding:7px 10px;font-size:14px;font-family:inherit;background:var(--w);width:80px;text-align:center;outline:none;">
 			  <span style="font-size:13px;color:var(--md);">min</span>
@@ -6057,7 +6126,7 @@ function renderWorkout(){
 	const doneCount=(S.exd||[]).filter(Boolean).length;
 	const completeHtml=S.workoutDone?`<div class="workout-complete-card">
 	  <div class="workout-complete-title">Trening zaključen</div>
-	  <div class="workout-complete-copy">Opravila si ${doneCount} od ${S.ex.length} vaj. Naslednji trening se bo pokazal glede na plan, zgodovina pa ostane shranjena.</div>
+	  <div class="workout-complete-copy">${say({f:'Opravila si',m:'Opravil si',n:'Opravljeno'})} ${doneCount} od ${S.ex.length} vaj. Naslednji trening se bo pokazal glede na plan, zgodovina pa ostane shranjena.</div>
 	</div>`:'';
 	// Build the stretch section — read-only suggestions to do AFTER the
 	// strength exercises. User doesn't check these off, but each has a
@@ -6102,7 +6171,7 @@ function renderWorkout(){
 		const cue=getExerciseFeelCue(e.n);
 		const loggedSummary=summarizeSetLog(logged);
 		const setText=formatSetLinesFromLog(logged,e);
-		const firstTip=info.tip?`Začni približno pri: ${info.tip}`:'Če ne veš, začni lažje in prvo serijo naredi testno.';
+		const firstTip=formatStartingLoadTip(e,info);
 		const histHtml=hist.length>0?`
 		  <div class="ex-hist">
 			<div class="ex-hist-title">Zgodovina</div>
@@ -6135,7 +6204,7 @@ function renderWorkout(){
 			</div>
 			<div class="exercise-note">${firstTip}</div>
 			<div class="setlog-sec">
-			  <div class="setlog-label">Danes sem naredila</div>
+			  <div class="setlog-label">Danes sem ${say({f:'naredila',m:'naredil',n:'naredil/a'})}</div>
 			  ${(function(){
 				const prog=suggestProgression(e);
 				if(prog.type==='first_time'){
@@ -7295,7 +7364,7 @@ async function swapMeal(i,opts={}){
   const targetKcal=computeSwapKcalTarget(i);
   const fallbackKcal=parseInt(S.meals[i].k||S.meals[i].kcal)||400;
   const kcalForPrompt=targetKcal||fallbackKcal;
-  const kcalRule=`Kalorična vrednost naj bo ČIM BLIŽJE ${kcalForPrompt} kcal (±70 kcal). NE 400 kcal default — uporabnica ima prav to število proste kalorične luknje za ta obrok.`;
+  const kcalRule=`Kalorična vrednost naj bo ČIM BLIŽJE ${kcalForPrompt} kcal (±70 kcal). NE 400 kcal default — ${coachNoun()} ima prav to število proste kalorične luknje za ta obrok.`;
   const macroRule=macroTargets?`Makro cilj za ta obrok: približno ${macroTargets.p}g beljakovin, ${macroTargets.c}g OH in ${macroTargets.f}g maščob. To uporabi kot smer, ne kot absolutno pravilo.`:'';
   try{
 	const txt=await api(`Si prehranjevalni svetovalec. Zamenjaj obrok. ${ez} ${lfc} ${pantry} ${macroHint.prompt} ${macroRule} ${kcalRule} Vrni SAMO JSON: {"f":"opis v slovenščini","k":${kcalForPrompt},"i":[{"n":"sestavina","a":"100 g"}]}`,
@@ -7510,7 +7579,7 @@ async function refreshMeals(){
   const mealTargets=distributeRemainingKcalAcrossMeals(unfinished);
   const slotGuide=mealTargets.map(x=>`${x.label}: ~${x.kcal} kcal`).join('; ');
   const totalMacroGuide=macroLeft
-    ? `Za preostanek dneva uporabnica še potrebuje približno ${Math.max(0,Math.round(macroLeft.p))}g beljakovin, ${Math.max(0,Math.round(macroLeft.c))}g OH in ${Math.max(0,Math.round(macroLeft.f))}g maščob. To razporedi smiselno čez vse preostale obroke.`
+    ? `Za preostanek dneva ${coachNoun()} še potrebuje približno ${Math.max(0,Math.round(macroLeft.p))}g beljakovin, ${Math.max(0,Math.round(macroLeft.c))}g OH in ${Math.max(0,Math.round(macroLeft.f))}g maščob. To razporedi smiselno čez vse preostale obroke.`
     : '';
   try{
 	const txt=await api(`Si prehranjevalni svetovalec. ${ez} ${lfc} Sestavi SAMO preostale obroke za današnji plan. Ne sestavljaj novega celega dneva. Upoštevaj, da so nekateri obroki že pojedeni in jih ne spreminjamo. Za preostale obroke je na voljo približno ${remainingKcal} kcal skupaj. ${totalMacroGuide} Natančni sloti in želene kalorije: ${slotGuide}. Vrni SAMO veljavni JSON array s ${unfinished.length} elementi v ISTEM vrstnem redu kot sloti. Vsak element mora imeti: "f" = konkretno ime jedi v slovenščini, ne generično "zajtrk", "kosilo", "večerja", "prigrizek"; "k" = kalorije; "i" = seznam sestavin z gramaturami. Format: [{"f":"Skyr z ovsenimi kosmiči, borovnicami in mandlji","k":360,"i":[{"n":"Skyr navadni","a":"170 g"}]}]. Ne uporabljaj generičnih imen obrokov kot naslov jedi.`,
@@ -7546,7 +7615,7 @@ async function swapCfEx(i){
   const cur=S.cfWod.ex[i];
   try{
 	const txt=await api(
-	  'Si CrossFit trener. Zamenjaj eno vajo v WODu z alternativo primerno za začetnico v fitnesu. Vrni SAMO veljavni JSON: {"n":"ime vaje v slovenščini","r":"10"}',
+	  `Si CrossFit trener. Zamenjaj eno vajo v WODu z alternativo primerno za ${beginnerNoun()} v fitnesu. Vrni SAMO veljavni JSON: {"n":"ime vaje v slovenščini","r":"10"}`,
 	  `Zamenjaj CrossFit vajo "${cur.n}" (${cur.r}) z drugačno alternativo za isto območje ali podobno intenzivnost.`
 	);
 	const p=JSON.parse(txt);
@@ -7576,8 +7645,8 @@ async function refreshWorkout(){
 	const t=types[Math.floor(Math.random()*types.length)];
 	try{
 	  const txt=await api(
-		'Si CrossFit trener. Sestavi WOD za začetnico v fitnesu — skalirane vaje, dostopna oprema (kettlebell, ročke, veslanje, lastna teža). Vrni SAMO veljavni JSON: {"type":"AMRAP","time":15,"name":"Ime WODa","ex":[{"n":"ime vaje","r":"10"},{"n":"ime vaje","r":"15"}],"note":"kratko navodilo"}',
-		`Sestavi nov ${t} CrossFit WOD za danes. Vaje v slovenščini, skalirane za začetnico.`
+		`Si CrossFit trener. Sestavi WOD za ${beginnerNoun()} v fitnesu — skalirane vaje, dostopna oprema (kettlebell, ročke, veslanje, lastna teža). Vrni SAMO veljavni JSON: {"type":"AMRAP","time":15,"name":"Ime WODa","ex":[{"n":"ime vaje","r":"10"},{"n":"ime vaje","r":"15"}],"note":"kratko navodilo"}`,
+		`Sestavi nov ${t} CrossFit WOD za danes. Vaje v slovenščini, skalirane za ${beginnerNoun()}.`
 	  );
 	  const p=JSON.parse(txt);
 	  S.cfWod={...p};save();renderWorkout();
@@ -7607,7 +7676,56 @@ const GOALS_KEY='user_goals';
 //   home_eq    = doma z opremo — uteži, gumijaste trakovi, klop
 //   home_basic = doma brez opreme — telo (bodyweight)
 //   outdoor    = zunaj/teren — tek, hribi, igrišča (klin/drog)
-let G={age:null,height:null,weight:null,target:null,goal:'lose',act:'light',loc:'gym_full'};
+let G={
+  age:null,height:null,weight:null,target:null,
+  goal:'lose',act:'light',loc:'gym_full',
+  pronoun:'f',      // f | m | n — language only
+  bioSex:'female',  // female | male | other — calculations only
+  cycleAware:false
+};
+
+function normalizeProfileMeta(){
+  if(!['f','m','n'].includes(G.pronoun))G.pronoun='f';
+  if(!['female','male','other'].includes(G.bioSex))G.bioSex='female';
+  G.cycleAware=!!G.cycleAware;
+}
+
+function say(forms){
+  const p=G.pronoun||'f';
+  if(typeof forms==='string')return forms;
+  return forms[p]||forms.n||forms.f||forms.m||'';
+}
+
+function coachNoun(){
+  return say({f:'uporabnica',m:'uporabnik',n:'oseba'});
+}
+
+function beginnerNoun(){
+  return say({f:'začetnica',m:'začetnik',n:'začetna oseba'});
+}
+
+function bmrOffsetFor(sex){
+  if(sex==='male')return 5;
+  if(sex==='other')return -78; // midpoint between Mifflin female and male constants
+  return -161;
+}
+
+function calcBMRFrom(age,height,weight,bioSex){
+  if(!age||!height||!weight)return null;
+  return Math.round(10*weight+6.25*height-5*age+bmrOffsetFor(bioSex||'female'));
+}
+
+function profileLoadFactor(){
+  if(G.bioSex==='male')return 1.15;
+  if(G.bioSex==='other')return 1;
+  return 0.92;
+}
+
+function calorieBodyFactor(){
+  const weightFactor=(parseFloat(G.weight)||65)/65;
+  const sexFactor=G.bioSex==='male'?1.04:(G.bioSex==='other'?1.02:1);
+  return Math.max(0.65,Math.min(1.75,weightFactor*sexFactor));
+}
 
 function loadGoals(){
   try{
@@ -7623,17 +7741,19 @@ function loadGoals(){
 	  }
 	}
 	if(s)G={...G,...JSON.parse(s)};
+	normalizeProfileMeta();
   }catch(e){}
 }
 function saveGoalsState(){
   try{localStorage.setItem(lsKey(GOALS_KEY),JSON.stringify(G));}catch(e){}
 }
 
-// Mifflin-St Jeor for female + activity multiplier
+// Mifflin-St Jeor + activity multiplier. bioSex changes the BMR constant,
+// while pronoun remains language-only.
 const ACT_MULT={sed:1.2,light:1.375,mod:1.55,high:1.725};
 function calcTDEE(){
   if(!G.age||!G.height||!G.weight)return null;
-  const bmr=10*G.weight+6.25*G.height-5*G.age-161;
+  const bmr=calcBMRFrom(G.age,G.height,G.weight,G.bioSex);
   const tdee=Math.round(bmr*ACT_MULT[G.act||'light']);
   return tdee;
 }
@@ -7665,7 +7785,7 @@ function calcMacroTargets(){
   };
 }
 
-let _selGoal='lose',_selAct='light',_selLoc='gym_full';
+let _selGoal='lose',_selAct='light',_selLoc='gym_full',_selPronoun='f',_selBioSex='female',_selCycleAware=false;
 let _goalsOriginal=null,_goalsSaved=false,_goalsPreviewMode=false;
 
 function readGoalsDraft(){
@@ -7676,18 +7796,24 @@ function readGoalsDraft(){
     target:parseFloat(document.getElementById('g-target')?.value)||null,
     goal:_selGoal,
     act:_selAct,
-    loc:_selLoc
+    loc:_selLoc,
+    pronoun:_selPronoun,
+    bioSex:_selBioSex,
+    cycleAware:!!_selCycleAware
   };
 }
 function refreshGoalConnectedUI(){
   calcKcal();
   if(typeof renderMacros==='function')renderMacros();
   if(typeof renderTracker==='function')renderTracker();
+  if(typeof renderWorkout==='function')renderWorkout();
+  if(typeof renderNextUp==='function')renderNextUp();
 }
 function applyGoalsLivePreview(){
   // Live preview only: update in-memory goal state so the dashboard behind the modal
   // immediately shows what would be saved. Nothing is persisted until saveGoals().
   G={...G,...readGoalsDraft()};
+  normalizeProfileMeta();
   _goalsPreviewMode=true;
   refreshGoalConnectedUI();
 }
@@ -7701,6 +7827,23 @@ function selAct(a){
   _selAct=a;
   ['sed','light','mod','high'].forEach(x=>document.getElementById('ga-'+x)?.classList.toggle('active',x===a));
   updateGoalsCalc();
+  applyGoalsLivePreview();
+}
+function selPronoun(p){
+  _selPronoun=p;
+  ['f','m','n'].forEach(x=>document.getElementById('gp-'+x)?.classList.toggle('active',x===p));
+  applyGoalsLivePreview();
+}
+function selBioSex(s){
+  _selBioSex=s;
+  ['female','male','other'].forEach(x=>document.getElementById('gb-'+x)?.classList.toggle('active',x===s));
+  updateGoalsCalc();
+  applyGoalsLivePreview();
+}
+function selCycleAware(on){
+  _selCycleAware=!!on;
+  document.getElementById('gc-no')?.classList.toggle('active',!_selCycleAware);
+  document.getElementById('gc-yes')?.classList.toggle('active',_selCycleAware);
   applyGoalsLivePreview();
 }
 // Location of training — narrows which exercises the planner can use.
@@ -7724,7 +7867,7 @@ function updateGoalsCalc(){
   const box=document.getElementById('goals-calc');
   if(!age||!height||!weight){box.classList.remove('show');return;}
 
-  const bmr=Math.round(10*weight+6.25*height-5*age-161);
+  const bmr=calcBMRFrom(age,height,weight,_selBioSex);
   const tdee=Math.round(bmr*ACT_MULT[_selAct]);
   let goalKcal=tdee;
   const adj={lose:-500,maintain:0,gain:300};
@@ -7735,6 +7878,7 @@ function updateGoalsCalc(){
   const diff=target&&weight?Math.abs(weight-target):null;
   const weeks=diff?Math.round(diff/0.5):null;
   const goalLabel={lose:'hujšanje (−500 kcal/dan)',maintain:'vzdrževanje',gain:'pridobivanje (+300 kcal/dan)'};
+  const bioLabel={female:'ženski profil',male:'moški profil',other:'nevtralen profil'}[_selBioSex]||'profil';
 
   box.classList.add('show');
   box.innerHTML=`
@@ -7755,9 +7899,10 @@ function updateGoalsCalc(){
 	</div>
 	${weeks?`<div style="font-size:12px;color:var(--grn);padding:4px 0;">📅 Do cilja ~${weeks} tednov pri 0.5 kg/teden</div>`:''}
 	<div style="font-size:12px;color:var(--lt);margin-top:4px;line-height:1.6;">
-	  BMR = kalorije ki jih telo porabi za dihanje, srce, možgane.<br>
+	  BMR = kalorije ki jih telo porabi za dihanje, srce, možgane (${bioLabel}).<br>
 	  TDEE = BMR × faktor aktivnosti = kar telo res porabi vsak dan.<br>
 	  Vadba v appu se doda k cilju ("zaslužene" kalorije).
+	  ${_selCycleAware?'<br>Cikel je shranjen kot readiness kontekst za prihodnje prilagoditve.':''}
 	</div>`;
 }
 function openGoals(mode='profile'){
@@ -7769,8 +7914,10 @@ function openGoals(mode='profile'){
   document.getElementById('g-height').value=G.height||'';
   document.getElementById('g-weight').value=G.weight||'';
   document.getElementById('g-target').value=G.target||'';
+  normalizeProfileMeta();
   _selGoal=G.goal||'lose';_selAct=G.act||'light';_selLoc=G.loc||'gym_full';
-  selGoal(_selGoal);selAct(_selAct);selLoc(_selLoc);
+  _selPronoun=G.pronoun||'f';_selBioSex=G.bioSex||'female';_selCycleAware=!!G.cycleAware;
+  selGoal(_selGoal);selAct(_selAct);selPronoun(_selPronoun);selBioSex(_selBioSex);selCycleAware(_selCycleAware);selLoc(_selLoc);
 
   const titles={
     profile:['Moj <em>profil</em>','Osnovni podatki za natančen izračun.','Shrani profil →'],
@@ -7815,6 +7962,7 @@ function closeGoals(){
 }
 function saveGoals(){
   G={...G,...readGoalsDraft()};
+  normalizeProfileMeta();
   _goalsSaved=true;
   _goalsPreviewMode=false;
   saveGoalsState();
@@ -8271,13 +8419,13 @@ function renderPastPlannedMeals(){
 	}).join('');
   } else {
 	field.style.display='block';
-	mealsEl.innerHTML='<div style="font-size:12px;color:var(--lt);padding:4px 2px;">Za ta dan ni bilo shranjenega plana. Spodaj lahko vseeno dodaš, kar si jedla, in označiš vadbo.</div>';
+	mealsEl.innerHTML='<div style="font-size:12px;color:var(--lt);padding:4px 2px;">Za ta dan ni bilo shranjenega plana. Spodaj lahko vseeno dodaš zaužito hrano in označiš vadbo.</div>';
   }
 }
 
 function renderPastExtras(){
   const el=document.getElementById('past-day-extras');
-  if(!_pastExtras.length){el.innerHTML='<div style="font-size:12px;color:var(--lt);padding:4px 2px;">Dodaj kar si dejansko jedla zunaj plana.</div>';return;}
+  if(!_pastExtras.length){el.innerHTML='<div style="font-size:12px;color:var(--lt);padding:4px 2px;">Dodaj hrano zunaj plana.</div>';return;}
   el.innerHTML=_pastExtras.map((e,i)=>`
 	<div class="past-row" style="justify-content:space-between;cursor:default;">
 	  <span><b>${e.f}</b> <span style="color:var(--lt);">— ${e.k} kcal</span></span>
