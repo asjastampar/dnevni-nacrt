@@ -1398,7 +1398,7 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 				  <input type="number" id="g-cycle-length" min="21" max="40" step="1" placeholder="28" style="text-align:center;">
 				</div>
 			  </div>
-			  <div id="cycle-profile-hint" style="font-size:12px;color:var(--md);line-height:1.45;margin-top:8px;">Uporabljeno samo za lakoto, energijo, recovery in razlago nihanj.</div>
+			  <div id="cycle-profile-hint" style="font-size:12px;color:var(--md);line-height:1.45;margin-top:8px;">Uporabljeno samo za lakoto, energijo, regeneracijo in razlago nihanj.</div>
 			</div>
 		  </div>
 	  <div class="modal-field">
@@ -1944,13 +1944,13 @@ const EM={
 // Eg. hipthrust_barbell, squat_bw_jump, row_db_one.
 const EX_DB={
   // ── HIP-DOMINANT (glute, hamstring, posterior chain) ───────
-  hipthrust_barbell:{n:'Hip thrust s palico',movement:'hip_extension',primary:['glutes'],secondary:['hamstrings'],locations:['gym_full','gym_weights'],level:'intermediate',scheme:'4×8-12',
+  hipthrust_barbell:{n:'Barbell hip thrust',movement:'hip_extension',primary:['glutes'],secondary:['hamstrings'],locations:['gym_full','gym_weights'],level:'intermediate',scheme:'4×8-12',
 	desc:'Zgornji del hrbta na klop, palica čez kolke, stopala ravno pred sebe.',
 	cue:'Na vrhu giba SILNO stisni zadnjico za 1 sekundo — občutek pečenja v zadnjici.',
 	video:'hip thrust barbell form glute focus',
 	alts:['hipthrust_db','gluteridge_bb','gluteridge_bw','gluteridge_band']},
-  hipthrust_db:{n:'Hip thrust z ročko',movement:'hip_extension',primary:['glutes'],secondary:['hamstrings'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-15',
-	desc:'Hrbet na klop, ročka na medenici, dvig do ravne linije ramen-koleni.',
+  hipthrust_db:{n:'Dumbbell hip thrust',movement:'hip_extension',primary:['glutes'],secondary:['hamstrings'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-15',
+	desc:'Hrbet na klopi, ročka na medenici, dvig do ravne linije od ramen do kolen.',
 	cue:'Stisk zadnjice na vrhu — ne dvigaj križa.',
 	video:'dumbbell hip thrust home form',
 	alts:['hipthrust_barbell','gluteridge_db','gluteridge_bw']},
@@ -1961,7 +1961,7 @@ const EX_DB={
 	alts:['hipthrust_barbell','gluteridge_db','gluteridge_bw']},
   gluteridge_db:{n:'Glute bridge z ročko',movement:'hip_extension',primary:['glutes'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×12-15',
 	desc:'Leže na tleh, ročka na kolkih, dvig medenice.',
-	cue:'Stopala bližje zadnjici = več glute, dlje = več hamstring.',
+	cue:'Stopala bližje zadnjici = več zadnjice, dlje = več zadnje lože.',
 	video:'dumbbell glute bridge',
 	alts:['gluteridge_bw','gluteridge_band','hipthrust_db']},
   gluteridge_bw:{n:'Glute bridge — telesna teža',movement:'hip_extension',primary:['glutes'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×15-20',
@@ -1979,17 +1979,17 @@ const EX_DB={
 	cue:'Boki ostanejo ravni — ne pusti, da medenica pade na eno stran.',
 	video:'single leg glute bridge form',
 	alts:['gluteridge_bw','gluteridge_band','rdl_db_oneleg']},
-  rdl_bb:{n:'Romunski mrtvi dvig (palica)',movement:'hip_hinge',primary:['hamstrings','glutes'],secondary:['low_back'],locations:['gym_full','gym_weights'],level:'intermediate',scheme:'3-4×8-10',
+  rdl_bb:{n:'Barbell RDL',movement:'hip_hinge',primary:['hamstrings','glutes'],secondary:['low_back'],locations:['gym_full','gym_weights'],level:'intermediate',scheme:'3-4×8-10',
 	desc:'Stoja, palica blizu telesa, kolena rahlo pokrčena, kolki nazaj.',
 	cue:'Občutek raztega zadnjega dela stegen je signal — ne ukrivljaj križa.',
 	video:'romanian deadlift form barbell',
 	alts:['rdl_db','goodmorning_bb','rdl_db_oneleg']},
-  rdl_db:{n:'Romunski mrtvi dvig (ročke)',movement:'hip_hinge',primary:['hamstrings','glutes'],secondary:['low_back'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
+  rdl_db:{n:'Dumbbell RDL',movement:'hip_hinge',primary:['hamstrings','glutes'],secondary:['low_back'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
 	desc:'Ročke pred stegni, kolena rahlo pokrčena, kolki nazaj.',
 	cue:'Peče te zadnji del stegen, ne križ.',
 	video:'dumbbell romanian deadlift form',
 	alts:['rdl_bb','goodmorning_bw','rdl_db_oneleg']},
-  rdl_db_oneleg:{n:'Enonožni RDL z ročko',movement:'hip_hinge',primary:['glutes','hamstrings'],secondary:['core','balance'],locations:['gym_full','gym_weights','home_eq','home_basic'],level:'intermediate',scheme:'3×8-10/nogo',
+  rdl_db_oneleg:{n:'Single-leg dumbbell RDL',movement:'hip_hinge',primary:['glutes','hamstrings'],secondary:['core','balance'],locations:['gym_full','gym_weights','home_eq','home_basic'],level:'intermediate',scheme:'3×8-10/nogo',
 	desc:'Stoja na eni nogi, druga gre nazaj, ročka v nasprotni roki.',
 	cue:'Trebuh napet — če se zazibaš, zmanjšaj utež.',
 	video:'single leg romanian deadlift form',
@@ -2014,18 +2014,18 @@ const EX_DB={
 	cue:'Moč prihaja iz kolkov, ne iz rok — roke samo vodijo.',
 	video:'kettlebell swing russian form',
 	alts:['cablepull_through','rdl_db','goodmorning_bw']},
-  donkey_kick_cable:{n:'Donkey kicks pri kablu',movement:'hip_extension_isolation',primary:['glutes'],locations:['gym_full'],level:'beginner',scheme:'3×12-15/nogo',
-	desc:'Manšeta na gleženj, na vseh štirih, brca nogo nazaj.',
+  donkey_kick_cable:{n:'Cable donkey kick',movement:'hip_extension_isolation',primary:['glutes'],locations:['gym_full'],level:'beginner',scheme:'3×12-15/nogo',
+	desc:'Manšeta na gležnju, na vseh štirih, nogo potisni nazaj.',
 	cue:'Na vrhu zadrži 1 sek — krčenje samo zadnjice.',
 	video:'cable donkey kick form',
 	alts:['donkey_kick_band','donkey_kick_bw','frog_pump']},
-  donkey_kick_band:{n:'Donkey kicks z elastiko',movement:'hip_extension_isolation',primary:['glutes'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×15/nogo',
-	desc:'Elastika v komolcih in stopalu, brca nogo nazaj.',
+  donkey_kick_band:{n:'Banded donkey kick',movement:'hip_extension_isolation',primary:['glutes'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×15/nogo',
+	desc:'Elastika je vpeta med rokami in stopalom, nogo potisni nazaj.',
 	cue:'Ne dvigaj križa, da bi šla noga višje — kvaliteta.',
 	video:'banded donkey kick form',
 	alts:['donkey_kick_bw','frog_pump','singleleg_bridge']},
-  donkey_kick_bw:{n:'Donkey kicks',movement:'hip_extension_isolation',primary:['glutes'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×15/nogo',
-	desc:'Na vseh štirih, brca nogo navzgor.',
+  donkey_kick_bw:{n:'Bodyweight donkey kick',movement:'hip_extension_isolation',primary:['glutes'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×15/nogo',
+	desc:'Na vseh štirih, nogo potisni navzgor.',
 	cue:'Pet potiska v strop — ne dvigaj križa.',
 	video:'donkey kick exercise form',
 	alts:['donkey_kick_band','frog_pump','firehydrant']},
@@ -2046,63 +2046,63 @@ const EX_DB={
 	alts:['firehydrant','sidestep_band','hip_abductor_machine']},
   sidestep_band:{n:'Stranski koraki z elastiko',movement:'hip_abduction',primary:['glutes_med'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×12/smer',
 	desc:'Elastika okoli kolen ali gležnjev, polčep, stranski koraki.',
-	cue:'Stalno napeti — elastika ne sme oslabeti.',
+	cue:'Napetost naj bo stalna — elastika ne sme popustiti.',
 	video:'lateral band walk form',
 	alts:['firehydrant','clamshells','hip_abductor_machine']},
-  hip_abductor_machine:{n:'Abduktor stroj (odmik nog)',movement:'hip_abduction',primary:['glutes_med'],locations:['gym_full'],level:'beginner',scheme:'3×15-20',
+  hip_abductor_machine:{n:'Hip abductor machine',movement:'hip_abduction',primary:['glutes_med'],locations:['gym_full'],level:'beginner',scheme:'3×15-20',
 	desc:'Sedi na stroju, blazinice ob zunanjem delu kolen, razpre noge.',
-	cue:'Lahno se nakloni naprej za boljši poudarek na glute.',
+	cue:'Rahlo se nagni naprej za boljši poudarek na zadnjici.',
 	video:'hip abductor machine form',
 	alts:['sidestep_band','clamshells','firehydrant']},
   // ── KNEE-DOMINANT (squat / leg press) ──────────────────────
-  squat_bb:{n:'Počep s palico',movement:'squat',primary:['quads','glutes'],secondary:['hamstrings','core'],locations:['gym_full','gym_weights'],level:'intermediate',scheme:'3-4×6-10',
+  squat_bb:{n:'Barbell squat',movement:'squat',primary:['quads','glutes'],secondary:['hamstrings','core'],locations:['gym_full','gym_weights'],level:'intermediate',scheme:'3-4×6-10',
 	desc:'Palica na zgornjem hrbtu, počep do paralele ali nižje.',
-	cue:'Kolena gredo z prsti — ne kolapsirajo navznoter.',
+	cue:'Kolena sledijo prstom — ne uhajajo navznoter.',
 	video:'barbell back squat form',
 	alts:['squat_goblet','legpress','squat_db']},
-  squat_goblet:{n:'Goblet počep',movement:'squat',primary:['quads','glutes'],secondary:['core'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
+  squat_goblet:{n:'Goblet squat',movement:'squat',primary:['quads','glutes'],secondary:['core'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
 	desc:'Ročka pred prsmi, počep — komolci na kolenih spodaj.',
-	cue:'Drži pokončno trupa — ročka ostane pred prsmi.',
+	cue:'Trup naj ostane pokončen — ročka ostane pred prsmi.',
 	video:'goblet squat form',
 	alts:['squat_bb','squat_bw','legpress']},
-  squat_db:{n:'Počep z ročkami',movement:'squat',primary:['quads','glutes'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
+  squat_db:{n:'Dumbbell squat',movement:'squat',primary:['quads','glutes'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
 	desc:'Ročke ob telesu, počep do paralele.',
 	cue:'Pete na tleh skozi ves gib.',
 	video:'dumbbell squat form',
 	alts:['squat_goblet','squat_bw','split_squat']},
-  squat_bw:{n:'Air počep',movement:'squat',primary:['quads','glutes'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×15-20',
+  squat_bw:{n:'Air squat',movement:'squat',primary:['quads','glutes'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×15-20',
 	desc:'Brez uteži, roke pred sabo, počep do paralele.',
 	cue:'Počasi navzdol (3 sek), eksplozivno gor.',
 	video:'air squat bodyweight form',
 	alts:['squat_db','squat_jump','split_squat']},
-  squat_sumo_db:{n:'Sumo počep z ročko',movement:'squat',primary:['glutes','adductors'],secondary:['quads'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
+  squat_sumo_db:{n:'Dumbbell sumo squat',movement:'squat',primary:['glutes','adductors'],secondary:['quads'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
 	desc:'Široka stoja, prsti narazen, ročka držana med nogami, počep.',
-	cue:'Občutek raztega na notranji strani stegen + glute.',
+	cue:'Občutek naj bo na notranji strani stegen in v zadnjici.',
 	video:'sumo squat dumbbell form',
 	alts:['squat_goblet','squat_db','squat_bb']},
   legpress:{n:'Leg press',movement:'squat',primary:['quads','glutes'],locations:['gym_full'],level:'beginner',scheme:'3×12-15',
-	desc:'Sedi v stroj, stopala v sredini ploščadi, počep.',
-	cue:'Visoka in široka stopala = več glutes; nizka in ozka = več quads.',
+	desc:'Sedi v stroj, stopala postavi na sredino ploščadi in izvedi potisk.',
+	cue:'Višje in širše postavljena stopala bolj poudarijo zadnjico; nižje in ožje postavljena stopala bolj poudarijo sprednji del stegen.',
 	video:'leg press form glute focus',
 	alts:['squat_goblet','squat_bb','squat_db']},
-  bulgarian_split:{n:'Bolgarski počep',movement:'lunge_split',primary:['quads','glutes'],secondary:['hamstrings','balance'],locations:['gym_full','gym_weights','home_eq','home_basic','outdoor'],level:'intermediate',scheme:'3×8-10/nogo',
+  bulgarian_split:{n:'Bulgarian split squat',movement:'lunge_split',primary:['quads','glutes'],secondary:['hamstrings','balance'],locations:['gym_full','gym_weights','home_eq','home_basic','outdoor'],level:'intermediate',scheme:'3×8-10/nogo',
 	desc:'Ena noga zadaj na klopi/stolu, počep s sprednjo nogo.',
-	cue:'Težo na peti sprednje noge — peče te quad in glute.',
+	cue:'Teža naj bo na peti sprednje noge — čutiti moraš sprednji del stegna in zadnjico.',
 	video:'bulgarian split squat form',
 	alts:['split_squat','lunge_db','step_up']},
-  split_squat:{n:'Split počep',movement:'lunge_split',primary:['quads','glutes'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×10/nogo',
+  split_squat:{n:'Split squat',movement:'lunge_split',primary:['quads','glutes'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×10/nogo',
 	desc:'Ena noga zadaj na tleh, počep s sprednjo.',
 	cue:'Sprednje koleno NE gre čez prste, zadnje koleno se približa tlom.',
 	video:'split squat form',
 	alts:['lunge_db','bulgarian_split','step_up']},
-  lunge_db:{n:'Izpadni koraki z ročkami',movement:'lunge_walk',primary:['quads','glutes'],locations:['gym_full','gym_weights','home_eq','outdoor'],level:'beginner',scheme:'3×10/nogo',
+  lunge_db:{n:'Dumbbell lunges',movement:'lunge_walk',primary:['quads','glutes'],locations:['gym_full','gym_weights','home_eq','outdoor'],level:'beginner',scheme:'3×10/nogo',
 	desc:'Ročke ob telesu, korak naprej, oba kolena 90°.',
-	cue:'Trupa drži pokončno, ne se naprej nagiba.',
+	cue:'Trup drži pokončno, ne nagibaj se naprej.',
 	video:'walking lunge dumbbell form',
 	alts:['lunge_bw','split_squat','step_up']},
-  lunge_bw:{n:'Izpadni koraki',movement:'lunge_walk',primary:['quads','glutes'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×12/nogo',
+  lunge_bw:{n:'Bodyweight lunges',movement:'lunge_walk',primary:['quads','glutes'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×12/nogo',
 	desc:'Brez uteži, korak naprej, oba kolena 90°.',
-	cue:'Stopa peta, koleno 90° — kontrolirano gor.',
+	cue:'Stopi na peto, koleno naj bo približno 90° — kontrolirano se dvigni.',
 	video:'bodyweight lunge form',
 	alts:['split_squat','reverse_lunge','step_up']},
   reverse_lunge:{n:'Obratni izpad',movement:'lunge_walk',primary:['quads','glutes'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×10/nogo',
@@ -2111,13 +2111,13 @@ const EX_DB={
 	video:'reverse lunge form',
 	alts:['lunge_db','lunge_bw','step_up']},
   step_up:{n:'Step-up na klop',movement:'lunge_split',primary:['glutes','quads'],locations:['gym_full','gym_weights','home_eq','home_basic','outdoor'],level:'beginner',scheme:'3×10/nogo',
-	desc:'Stopalo na klop/stol, dvig na klop s eno nogo.',
-	cue:'Potisnite z dvigajočo peto, ne odrivajte se s tlom.',
+	desc:'Stopalo postavi na klop ali stol, nato se dvigni z eno nogo.',
+	cue:'Potisni skozi peto delovne noge, ne odrivaj se s tal.',
 	video:'dumbbell step up form',
 	alts:['bulgarian_split','split_squat','lunge_db']},
   squat_jump:{n:'Squat jump',movement:'squat_explosive',primary:['quads','glutes','calves'],locations:['home_basic','home_eq','outdoor'],level:'intermediate',scheme:'3×10',
 	desc:'Počep, eksplozivni skok navzgor, mehki pristanek v počepu.',
-	cue:'Pristanek MEHKO — tihi koleni, ne s ploskanjem.',
+	cue:'Pristanek naj bo mehak — kolena mirna, brez glasnega udarca ob tla.',
 	video:'squat jump form',
 	alts:['squat_bw','split_squat','reverse_lunge']},
   // ── PUSH (chest/shoulders/triceps) ─────────────────────────
@@ -2126,7 +2126,7 @@ const EX_DB={
 	cue:'Lopatice v klop, ne dvigaj jih.',
 	video:'barbell bench press form',
 	alts:['bench_db','pushup','chest_press_machine']},
-  bench_db:{n:'Potisk z ročkami leže',movement:'horizontal_push',primary:['chest','triceps'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
+  bench_db:{n:'Dumbbell bench press',movement:'horizontal_push',primary:['chest','triceps'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
 	desc:'Leže na klop, ročke do prsi, gor.',
 	cue:'Ročke se srečajo nad prsmi (ne nad obrazom).',
 	video:'dumbbell bench press form',
@@ -2146,12 +2146,12 @@ const EX_DB={
 	cue:'Višja vzpetina = lažje. Začni visoko in zniže s časom.',
 	video:'incline push up form',
 	alts:['pushup','bench_db','chest_press_machine']},
-  ohp_bb:{n:'Vzdolžni potisk nad glavo (palica)',movement:'vertical_push',primary:['shoulders','triceps'],secondary:['core'],locations:['gym_full','gym_weights'],level:'intermediate',scheme:'3×6-10',
+  ohp_bb:{n:'Barbell overhead press',movement:'vertical_push',primary:['shoulders','triceps'],secondary:['core'],locations:['gym_full','gym_weights'],level:'intermediate',scheme:'3×6-10',
 	desc:'Stoja, palica iz ramen, potisk nad glavo.',
 	cue:'Trebuh napet — ne se naslanjati nazaj.',
 	video:'overhead press barbell form',
 	alts:['ohp_db','pikepushup','shoulder_press_machine']},
-  ohp_db:{n:'Vzdolžni potisk nad glavo (ročke)',movement:'vertical_push',primary:['shoulders','triceps'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
+  ohp_db:{n:'Dumbbell shoulder press',movement:'vertical_push',primary:['shoulders','triceps'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
 	desc:'Stoja ali sed, ročke iz ramen, potisk nad glavo.',
 	cue:'Ročke gredo malo naprej, ne narazen.',
 	video:'dumbbell shoulder press form',
@@ -2207,9 +2207,9 @@ const EX_DB={
 	cue:'Komolci ob telesu, lopatice se srečata.',
 	video:'barbell bent over row form',
 	alts:['row_db','row_machine','row_band']},
-  row_db:{n:'Veslanje z ročko (enoročno)',movement:'horizontal_pull',primary:['back','biceps'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
+  row_db:{n:'One-arm dumbbell row',movement:'horizontal_pull',primary:['back','biceps'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
 	desc:'Roka in koleno na klopi, druga ročka — povleci do boka.',
-	cue:'Občutek krčenja v hrbtu, ne potezi z biceps.',
+	cue:'Občutek krčenja naj bo v hrbtu, ne samo v bicepsu.',
 	video:'one arm dumbbell row form',
 	alts:['row_bb','row_machine','row_band']},
   row_machine:{n:'Veslanje pri stroju',movement:'horizontal_pull',primary:['back','biceps'],locations:['gym_full'],level:'beginner',scheme:'3×10-12',
@@ -2233,22 +2233,22 @@ const EX_DB={
 	video:'reverse fly form',
 	alts:['superman','row_band','row_db']},
   bicep_curl_db:{n:'Biceps curl z ročkami',movement:'biceps_isolation',primary:['biceps'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
-	desc:'Stoja, ročke ob telesu, dvigne do ramen.',
+	desc:'Stoj pokonci, ročke naj bodo ob telesu, nato jih dvigni do ramen.',
 	cue:'Komolci ostanejo ob trupu — ne se zibati.',
 	video:'dumbbell bicep curl form',
 	alts:['bicep_curl_band','bicep_curl_bb','hammer_curl_db']},
   bicep_curl_bb:{n:'Biceps curl s palico',movement:'biceps_isolation',primary:['biceps'],locations:['gym_full','gym_weights'],level:'beginner',scheme:'3×8-12',
-	desc:'Stoja, palica ob trupu, dvigne do prsi.',
+	desc:'Stoj pokonci, palica naj bo ob trupu, nato jo dvigni do prsi.',
 	cue:'Brez zibanja — uporabi le bicepse.',
 	video:'barbell bicep curl form',
 	alts:['bicep_curl_db','hammer_curl_db','bicep_curl_band']},
   hammer_curl_db:{n:'Hammer curl z ročkami',movement:'biceps_isolation',primary:['biceps','forearms'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
-	desc:'Ročke v "hammer" oprijemu (palci gor), dvigne.',
+	desc:'Ročke drži v hammer oprijemu (palci gor), nato jih dvigni.',
 	cue:'Cilja na zunanji del bicepsa in podlaket.',
 	video:'hammer curl form',
 	alts:['bicep_curl_db','bicep_curl_bb','bicep_curl_band']},
   bicep_curl_band:{n:'Biceps curl z elastiko',movement:'biceps_isolation',primary:['biceps'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×12-15',
-	desc:'Stoja na elastiki, dvigne do prsi.',
+	desc:'Stoj na elastiki in jo dvigni do prsi.',
 	cue:'Elastika ne sme oslabeti na vrhu.',
 	video:'resistance band bicep curl',
 	alts:['bicep_curl_db','hammer_curl_db','bicep_curl_bb']},
@@ -2258,14 +2258,14 @@ const EX_DB={
 	cue:'Stisni zadnjico — ne pusti, da padejo boki.',
 	video:'plank exercise form',
 	alts:['plank_side','deadbug','hollow_hold']},
-  plank_side:{n:'Stranski plank',movement:'core_iso',primary:['obliques','core'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'intermediate',scheme:'3×20-40s/stran',
-	desc:'Bočno na podlaketu, telo ravno.',
+  plank_side:{n:'Side plank',movement:'core_iso',primary:['obliques','core'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'intermediate',scheme:'3×20-40s/stran',
+	desc:'Bočno na podlakti, telo v ravni liniji.',
 	cue:'Boki visoko — ne pusti, da padejo.',
 	video:'side plank form',
 	alts:['plank','deadbug','russian_twist']},
   deadbug:{n:'Dead bug',movement:'core_anti',primary:['core'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×10/stran',
-	desc:'Leže, roke gor, kolena 90°. Iztegne nasprotno roko in nogo.',
-	cue:'Križ v tlih celoten gib.',
+	desc:'Leže na hrbtu, roke gor, kolena 90°. Iztegni nasprotno roko in nogo.',
+	cue:'Križ naj ostane na tleh skozi celoten gib.',
 	video:'dead bug exercise form',
 	alts:['plank','hollow_hold','birddog']},
   hollow_hold:{n:'Hollow hold',movement:'core_iso',primary:['core'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'intermediate',scheme:'3×20-30s',
@@ -2274,48 +2274,48 @@ const EX_DB={
 	video:'hollow body hold form',
 	alts:['deadbug','plank','leg_raise']},
   leg_raise:{n:'Dvigi nog',movement:'core_dynamic',primary:['core'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'intermediate',scheme:'3×10-15',
-	desc:'Leže, dvigne ravne noge do 90°, počasi spusti.',
-	cue:'Križ ne sme zaplutva od tal.',
+	desc:'Leže na hrbtu, dvigni ravne noge do 90°, nato jih počasi spusti.',
+	cue:'Križ se ne sme odlepiti od tal.',
 	video:'lying leg raise form',
 	alts:['deadbug','hollow_hold','knee_raise']},
-  knee_raise:{n:'Dvig kolen visi',movement:'core_dynamic',primary:['core'],locations:['gym_full','outdoor'],level:'intermediate',scheme:'3×10-15',
-	desc:'Visi na drogu, dvigne kolena do prsi.',
+  knee_raise:{n:'Hanging knee raise',movement:'core_dynamic',primary:['core'],locations:['gym_full','outdoor'],level:'intermediate',scheme:'3×10-15',
+	desc:'Visi na drogu in dvigni kolena do prsi.',
 	cue:'Brez zibanja — kontrolirano.',
 	video:'hanging knee raise form',
 	alts:['leg_raise','hollow_hold','deadbug']},
   russian_twist:{n:'Russian twist',movement:'core_rotation',primary:['obliques'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×20',
-	desc:'Sed, noge dvignjene, trupa rotira levo-desno.',
+	desc:'Sedi, noge so dvignjene, trup rotira levo-desno.',
 	cue:'Premikajo se lopatice, ne samo roke.',
 	video:'russian twist form',
 	alts:['plank_side','deadbug','bicycle_crunch']},
-  bicycle_crunch:{n:'Kolesarjenje',movement:'core_rotation',primary:['obliques','core'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×20',
+  bicycle_crunch:{n:'Bicycle crunch',movement:'core_rotation',primary:['obliques','core'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×20',
 	desc:'Leže, komolec proti nasprotnemu kolenu.',
 	cue:'Kontrolirano, ne hitro — kvaliteta nad številom.',
 	video:'bicycle crunch form',
 	alts:['russian_twist','plank_side','knee_raise']},
   birddog:{n:'Bird dog',movement:'core_anti',primary:['core','low_back'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×10/stran',
-	desc:'Na vseh štirih, iztegne nasprotno roko in nogo.',
+	desc:'Na vseh štirih iztegni nasprotno roko in nogo.',
 	cue:'Boki ravni — ne se zibati.',
 	video:'bird dog exercise form',
 	alts:['deadbug','plank','superman']},
   // ── CALVES ─────────────────────────────────────────────────
-  calf_raise:{n:'Dvig na prste (lytka)',movement:'calf',primary:['calves'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×15-20',
-	desc:'Stoja, dvigne na prste, počasi nazaj.',
-	cue:'Polni razteg na vrhu, polni spust spodaj.',
+  calf_raise:{n:'Calf raise',movement:'calf',primary:['calves'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'beginner',scheme:'3×15-20',
+	desc:'Stoja, dvigni se na prste in se počasi spusti nazaj.',
+	cue:'Poln dvig na vrhu, poln spust spodaj.',
 	video:'standing calf raise form',
 	alts:['calf_raise_seated','calf_raise_db','calf_raise_oneleg']},
-  calf_raise_db:{n:'Dvig na prste z ročkami',movement:'calf',primary:['calves'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×15-20',
-	desc:'Ročke ob telesu, dvigne na prste.',
+  calf_raise_db:{n:'Dumbbell calf raise',movement:'calf',primary:['calves'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×15-20',
+	desc:'Ročke ob telesu, dvigni se na prste.',
 	cue:'Polni razteg, polni dvig.',
 	video:'dumbbell calf raise form',
 	alts:['calf_raise','calf_raise_seated','calf_raise_oneleg']},
-  calf_raise_seated:{n:'Sedeč dvig na prste',movement:'calf',primary:['calves'],locations:['gym_full'],level:'beginner',scheme:'3×15-20',
+  calf_raise_seated:{n:'Seated calf raise',movement:'calf',primary:['calves'],locations:['gym_full'],level:'beginner',scheme:'3×15-20',
 	desc:'Sedi pri stroju ali z utežjo na kolenih.',
 	cue:'Cilja drugačen del meč — soleus.',
 	video:'seated calf raise form',
 	alts:['calf_raise','calf_raise_db','calf_raise_oneleg']},
-  calf_raise_oneleg:{n:'Enonožni dvig na prste',movement:'calf',primary:['calves'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'intermediate',scheme:'3×12/nogo',
-	desc:'Stoja na eni nogi, dvigne na prst.',
+  calf_raise_oneleg:{n:'Single-leg calf raise',movement:'calf',primary:['calves'],locations:['home_basic','home_eq','outdoor','gym_full','gym_weights'],level:'intermediate',scheme:'3×12/nogo',
+	desc:'Stoja na eni nogi, dvigni se na prste.',
 	cue:'Drži ravnotežje — počasi navzdol.',
 	video:'single leg calf raise form',
 	alts:['calf_raise','calf_raise_db','calf_raise_seated']}
@@ -2333,37 +2333,37 @@ const WARMUP_DB={
 	cue:'Počasi — dihaj globoko, drsiš med pozicijama.',
 	video:'cat cow stretch warmup'},
   hip_circles:{n:'Krogi z boki',time:'30 sek/smer',primary:['hips'],
-	desc:'Stoja, roke v boku, krogi z boki v obe smeri.',
+	desc:'Stoj, roke položi na boke in kroži z boki v obe smeri.',
 	cue:'Velik, kontroliran obseg gibanja.',
 	video:'standing hip circles warmup'},
   arm_circles:{n:'Krogi z rokami',time:'30 sek/smer',primary:['shoulders'],
 	desc:'Stoja, široke roke, majhni→veliki krogi naprej, nato nazaj.',
-	cue:'Začni z malimi krogi in se postopno povečuj.',
+	cue:'Začni z majhnimi krogi in jih postopno povečuj.',
 	video:'arm circles warmup'},
   leg_swings:{n:'Zamahi z nogo',time:'30 sek/nogo',primary:['hips','hamstrings'],
-	desc:'Drži se opore, nogo zamahuje naprej-nazaj nato bočno.',
+	desc:'Drži se opore, nogo zamahuj naprej in nazaj, nato še bočno.',
 	cue:'Sprosti, ne sili — povečuj obseg postopno.',
 	video:'leg swings warmup'},
-  jumping_jacks:{n:'Skakalni razgled',time:'30 sek',primary:['heart','full_body'],
+  jumping_jacks:{n:'Jumping jacks',time:'30 sek',primary:['heart','full_body'],
 	desc:'Klasični jumping jacks — dvig srčnega utripa.',
 	cue:'Rahlo — če te zmanjkuje sape, upočasni.',
 	video:'jumping jacks proper form'},
-  high_knees:{n:'Visoki koleni',time:'30 sek',primary:['hips','heart'],
+  high_knees:{n:'High knees',time:'30 sek',primary:['hips','heart'],
 	desc:'Tek na mestu z visokim dvigom kolen do bokov.',
 	cue:'Aktiviraj trebuh — koleni gor, ne stopalo.',
 	video:'high knees warmup'},
   // GLUTE/LOWER
-  bw_squats:{n:'Bodyweight počepi',time:'15 ponov.',primary:['quads','glutes'],
+  bw_squats:{n:'Bodyweight squats',time:'15 ponov.',primary:['quads','glutes'],
 	desc:'Brez uteži, počasen kontroliran počep do paralele.',
-	cue:'Pete na tleh, kolena z prsti.',
+	cue:'Pete ostanejo na tleh, kolena sledijo prstom.',
 	video:'bodyweight squat warmup'},
   glute_bridge_warmup:{n:'Glute bridge — aktivacija',time:'15 ponov.',primary:['glutes'],
-	desc:'Leže, kolena pokrčena, dvig medenice z stiskom zadnjice.',
+	desc:'Leže, kolena pokrčena, dvig medenice s stiskom zadnjice.',
 	cue:'Občutek krčenja zadnjice na vrhu — 1 sek pavza.',
 	video:'glute bridge activation warmup'},
   banded_walks:{n:'Hoja z elastiko',time:'10 korakov/smer',primary:['glutes_med'],
 	desc:'Elastika nad koleni, polčep, stranski koraki levo-desno.',
-	cue:'Stalno napeti — elastika ne sme oslabeti.',
+	cue:'Napetost naj bo stalna — elastika ne sme popustiti.',
 	video:'lateral band walks glute warmup'},
   monster_walks:{n:'Monster walks',time:'10 korakov',primary:['glutes_med'],
 	desc:'Elastika okoli gležnjev, polčep, koraki naprej z odprtjem nog.',
@@ -2374,12 +2374,12 @@ const WARMUP_DB={
 	cue:'Sprednje koleno NE gre čez prste.',
 	video:'walking lunge warmup'},
   // UPPER
-  scapular_pulls:{n:'Lopaten razteg',time:'30 sek',primary:['upper_back'],
+  scapular_pulls:{n:'Scapular retractions',time:'30 sek',primary:['upper_back'],
 	desc:'Roke pred prsmi, povleci lopatice nazaj-skupaj-spusti.',
 	cue:'Občutek peče v sredini hrbta.',
 	video:'scapular retraction warmup'},
-  bw_pushups_warmup:{n:'Push-up na koleni',time:'8 ponov.',primary:['chest','triceps'],
-	desc:'Push-up s koleni na tleh za pripravo prsi.',
+  bw_pushups_warmup:{n:'Push-up na kolenih',time:'8 ponov.',primary:['chest','triceps'],
+	desc:'Push-up s koleni na tleh za pripravo prsnih mišic.',
 	cue:'Lažje od navadnega — samo pripravi mišice.',
 	video:'knee push up warmup'},
   band_pull_apart:{n:'Band pull apart',time:'15 ponov.',primary:['rear_delts','upper_back'],
@@ -2675,6 +2675,46 @@ function buildWorkoutFromTemplate(template){
   return out;
 }
 
+const EX_NAME_MIGRATIONS={
+  'Potisk z ročkami leže':'Dumbbell bench press',
+  'Veslanje z ročko (enoročno)':'One-arm dumbbell row',
+  'Vzdolžni potisk nad glavo':'Dumbbell shoulder press',
+  'Vzdolžni potisk nad glavo (palica)':'Barbell overhead press',
+  'Vzdolžni potisk nad glavo (ročke)':'Dumbbell shoulder press',
+  'Počep (goblet ali s palico)':'Goblet squat ali barbell squat',
+  'Počep s palico':'Barbell squat',
+  'Goblet počep':'Goblet squat',
+  'Počep z ročkami':'Dumbbell squat',
+  'Sumo počep z ročko':'Dumbbell sumo squat',
+  'Izpadni koraki z ročkami':'Dumbbell lunges',
+  'Mrtvetek z ročkami (RDL)':'Dumbbell RDL',
+  'Romunski mrtvi dvig (palica)':'Barbell RDL',
+  'Romunski mrtvi dvig (ročke)':'Dumbbell RDL',
+  'Enonožni RDL z ročko':'Single-leg dumbbell RDL',
+  'Donkey kicks pri kablu':'Cable donkey kick',
+  'Abduktor stroj (odmik nog)':'Hip abductor machine',
+  'Dvig na prste — lýtka':'Calf raise',
+  'Dvig na prste (lytka)':'Calf raise',
+  'Dvig na prste z ročkami':'Dumbbell calf raise',
+  'Sedeč dvig na prste':'Seated calf raise',
+  'Enonožni dvig na prste':'Single-leg calf raise',
+  'Hip thrust z palico':'Barbell hip thrust',
+  'Hip thrust s palico':'Barbell hip thrust',
+  'Hip thrust z ročko':'Dumbbell hip thrust',
+  'Veslanje v upognjenem položaju':'Bent-over dumbbell row',
+  'Push-up (na kolenih ali polni)':'Push-up (na kolenih ali navaden)'
+};
+function normalizeExerciseDisplayNames(){
+  if(typeof S==='undefined'||!S||!Array.isArray(S.ex))return;
+  let changed=false;
+  S.ex.forEach(e=>{
+    if(!e)return;
+    const next=(e.id&&EX_DB[e.id]?.n)||EX_NAME_MIGRATIONS[e.n];
+    if(next&&e.n!==next){e.n=next;changed=true;}
+  });
+  if(changed)save();
+}
+
 // ─────────────────────────────────────────────────────────────
 // WORKOUT TEMPLATES (per-day skeletons)
 // ─────────────────────────────────────────────────────────────
@@ -2719,12 +2759,12 @@ const WKT_TEMPLATES={
 };
 
 const WKT={
-  upper:{title:'Zgornji del telesa',badge:'gym',ex:[{n:'Potisk z ročkami leže',s:'3',r:'12'},{n:'Veslanje z ročko (enoročno)',s:'3',r:'12'},{n:'Vzdolžni potisk nad glavo',s:'3',r:'10'},{n:'Biceps curl z ročkami',s:'3',r:'12'},{n:'Triceps potisk pri kablu',s:'3',r:'12'},{n:'Plank',s:'3',r:'45 sek'}]},
-  lower:{title:'Spodnji del telesa',badge:'gym',ex:[{n:'Počep (goblet ali s palico)',s:'4',r:'12'},{n:'Izpadni koraki z ročkami',s:'3',r:'10/nogo'},{n:'Leg press',s:'3',r:'15'},{n:'Mrtvetek z ročkami (RDL)',s:'3',r:'12'},{n:'Donkey kicks pri kablu',s:'3',r:'15/nogo'},{n:'Dvig na prste — lýtka',s:'3',r:'20'}]},
-  full:{title:'Celo telo',badge:'gym',ex:[{n:'Počep z ročkami',s:'3',r:'12'},{n:'Potisk z ročkami leže',s:'3',r:'10'},{n:'Mrtvetek z ročkami (RDL)',s:'3',r:'10'},{n:'Veslanje v upognjenem položaju',s:'3',r:'12'},{n:'Vzdolžni potisk nad glavo',s:'3',r:'10'},{n:'Plank',s:'3',r:'30 sek'}]},
-  glute:{title:'Glute day',badge:'glute',ex:[{n:'Hip thrust z palico',s:'4',r:'12'},{n:'Donkey kicks pri kablu',s:'3',r:'15/nogo'},{n:'Cable pull-through',s:'3',r:'15'},{n:'Sumo počep z ročko',s:'3',r:'12'},{n:'Frog pumps',s:'3',r:'20'},{n:'Abduktor stroj (odmik nog)',s:'3',r:'20'}]},
+  upper:{title:'Zgornji del telesa',badge:'gym',ex:[{n:'Dumbbell bench press',s:'3',r:'12'},{n:'One-arm dumbbell row',s:'3',r:'12'},{n:'Dumbbell shoulder press',s:'3',r:'10'},{n:'Biceps curl z ročkami',s:'3',r:'12'},{n:'Triceps potisk pri kablu',s:'3',r:'12'},{n:'Plank',s:'3',r:'45 sek'}]},
+  lower:{title:'Spodnji del telesa',badge:'gym',ex:[{n:'Goblet squat ali barbell squat',s:'4',r:'12'},{n:'Dumbbell lunges',s:'3',r:'10/nogo'},{n:'Leg press',s:'3',r:'15'},{n:'Dumbbell RDL',s:'3',r:'12'},{n:'Cable donkey kick',s:'3',r:'15/nogo'},{n:'Calf raise',s:'3',r:'20'}]},
+  full:{title:'Celo telo',badge:'gym',ex:[{n:'Dumbbell squat',s:'3',r:'12'},{n:'Dumbbell bench press',s:'3',r:'10'},{n:'Dumbbell RDL',s:'3',r:'10'},{n:'Bent-over dumbbell row',s:'3',r:'12'},{n:'Dumbbell shoulder press',s:'3',r:'10'},{n:'Plank',s:'3',r:'30 sek'}]},
+  glute:{title:'Glute day',badge:'glute',ex:[{n:'Barbell hip thrust',s:'4',r:'12'},{n:'Cable donkey kick',s:'3',r:'15/nogo'},{n:'Cable pull-through',s:'3',r:'15'},{n:'Dumbbell sumo squat',s:'3',r:'12'},{n:'Frog pumps',s:'3',r:'20'},{n:'Hip abductor machine',s:'3',r:'20'}]},
   crossfit:{title:'CrossFit WOD',badge:'cf',wods:[
-	{type:'AMRAP',time:15,name:'Začetniški Cindy',ex:[{n:'Push-up (na kolenih ali polni)',r:'10'},{n:'Air squat',r:'15'},{n:'Sit-up',r:'20'}],note:'Naredi čim več krogov v 15 minutah. Beležiš skupno število krogov.'},
+	{type:'AMRAP',time:15,name:'Začetniški Cindy',ex:[{n:'Push-up (na kolenih ali navaden)',r:'10'},{n:'Air squat',r:'15'},{n:'Sit-up',r:'20'}],note:'Naredi čim več krogov v 15 minutah. Beleži skupno število krogov.'},
 	{type:'For Time',rounds:null,name:'21-15-9',ex:[{n:'Kettlebell swing (12 kg)',r:'21 / 15 / 9'},{n:'Goblet squat (12 kg)',r:'21 / 15 / 9'}],note:'Naredi 21 ponovitev obeh vaj, nato 15, nato 9. Izmeri čas.'},
 	{type:'EMOM',time:16,name:'EMOM 16',ex:[{n:'Min 1 — Air squat',r:'12'},{n:'Min 2 — Push-up',r:'8'},{n:'Min 3 — Kettlebell swing (12 kg)',r:'10'},{n:'Min 4 — Počitek',r:'—'}],note:'Vsako minuto začneš naslednji blok. Kar ostane od minute je tvoj počitek.'},
 	{type:'For Time',rounds:5,name:'5 krogov',ex:[{n:'Box step-up (z ročkama 4 kg)',r:'10/nogo'},{n:'Push-up',r:'10'},{n:'Sit-up',r:'15'},{n:'Air squat',r:'20'}],note:'5 krogov za čas. Brez odmorov med vajami, kratek odmor med krogi.'},
@@ -2993,42 +3033,42 @@ const DEF={0:'rest',1:'upper',2:'cardio',3:'upper',4:'rest',5:'lower',6:'cardio'
 
 // ─── EXERCISE INFO DATABASE ─────────────────────────────────
 const XI={
-  'Potisk z ročkami leže':{desc:'Lezi na ravno klop z ročkami v rokah. Ročki drži na višini prsi, dlani naprej. Počasi spusti do prsi (2 sek), nato potisni navzgor do skoraj iztegnitve.',tip:'Začetniška teža: 4–6 kg/ročka. Hrbet rahlo upognjen, lopatice skupaj, stopala trdno na tleh. Počasi dol, hitreje gor.',kg:5,yt:'dumbbell bench press beginner form'},
-  'Veslanje z ročko (enoročno)':{desc:'Postavi koleno in roko na klop za oporo. Ročko v prosti roki, spusti do iztegnitve roke. Povleci ročko do boka — kot veslaš na čolnu.',tip:'Začetniška teža: 6–8 kg. Komolec gre vzdolž telesa navzgor, ne navzven. Hrbet raven, jedro napeto.',kg:7,yt:'one arm dumbbell row beginner'},
-  'Vzdolžni potisk nad glavo':{desc:'Sedi ali stoji. Ročki drži v višini ramen, dlani naprej. Potisni navzgor do skoraj iztegnitve rok, počasi spusti nazaj na ramena.',tip:'Začetniška teža: 4–6 kg/ročka. Ne zakleni komolcev na vrhu. Jedro napeto, ne upogni v križ.',kg:5,yt:'dumbbell shoulder press beginner form'},
-  'Biceps curl z ročkami':{desc:'Stoji pokonci z ročkami ob telesu, dlani naprej. Upogni komolce in dvigni ročke do ramen. Počasi (3 sek) spusti nazaj v izteg.',tip:'Začetniška teža: 4–6 kg. Komolci ostanejo pri telesu — ne nihaj z rameni ali trupom.',kg:5,yt:'dumbbell bicep curl proper form'},
-  'Triceps potisk pri kablu':{desc:'Stoji pred kabelskim strojem, prime ročko ali vrv z obema rokama. Komolci ob telesu in fiksirani. Iztegni roke navzdol, počasi vrni.',tip:'Začetniška teža: 10–15 kg. Samo podlaket se premika. Komolci so ves čas pri telesu.',kg:12,yt:'cable tricep pushdown form'},
-  'Plank':{desc:'Lezi na trebuh, dvigni se na podlahteh in prstih. Telo ravno kot deska — od glave do pet. Aktivno stisni trebuh in zadnjico.',tip:'Začni s 20–30 sek. Zadnjica ne sme biti previsoka ali pre-nizka. Dihaj normalno.',kg:0,yt:'plank proper form beginners'},
-  'Počep (goblet ali s palico)':{desc:'Stoji z nogami v širini ramen. Drži ročko pri prsih (goblet). Spusti se navzdol kot da sediš na stol — peta ostane na tleh. Vstani z pritisnjenim petami.',tip:'Začetniška teža: 6–8 kg ročka. Kolena sledijo prstom navzven, hrbet raven. Gledaj naprej.',kg:8,yt:'goblet squat beginner tutorial'},
-  'Izpadni koraki z ročkami':{desc:'Stoji pokonci z ročkami ob telesu. Naredi velik korak naprej z eno nogo. Spusti zadnje koleno proti tlom. Vrni se nazaj in zamenjaj nogo.',tip:'Začetniška teža: 4–6 kg/ročka. Sprednje koleno ostane nad gležnjem — ne sega pred prste.',kg:5,yt:'dumbbell lunges beginner form'},
-  'Leg press':{desc:'Sedi v leg press stroj, stopala v širini ramen na ploščo. Počasi upogni kolena do 90°, nato potisni ploščo od sebe nazaj.',tip:'Začetniška teža: 30–40 kg. Ne zakleni kolen na vrhu. Spodnja hrbtna mora ostati pritisnjena na naslonjalo.',kg:35,yt:'leg press machine proper form beginners'},
-  'Mrtvetek z ročkami (RDL)':{desc:'Stoji z ročkami pred stegni. Z ravnim hrbtom nagne naprej — boki gredo nazaj. Ročki gresta vzdolž nog navzdol do sredine golenice, nato iztegni boke nazaj.',tip:'Začetniška teža: 7–10 kg/ročka. Kolena rahlo upognjena, hrbet raven. Čutiš razteg v zadnji stegni.',kg:8,yt:'romanian deadlift dumbbell beginner RDL'},
-  'Donkey kicks pri kablu':{desc:'Pritrdi manšeto na gleženj. Klekni na 4 (roke in kolena). Potisni nogo s pokrčenim kolenom nazaj in navzgor. Počasi spusti.',tip:'Začetniška teža: 5–10 kg na kablu. Hrbet raven, jedro napeto. Na vrhu zadrži sekundo in stisni zadnjico.',kg:7,yt:'cable donkey kicks glutes tutorial'},
-  'Dvig na prste — lýtka':{desc:'Stoji na robu stopnice ali na tleh. Dvigni se visoko na prste, zadrži 1 sekundo na vrhu, nato POČASI (3 sek) spusti navzdol.',tip:'Začni brez teže ali z ročkami. Počasno spuščanje (ekscentrična faza) je ključno za razvoj mišice.',kg:0,yt:'calf raises proper form'},
-  'Hip thrust z palico':{desc:'Opri zgornji del hrbta na klop. Palica (z blazinico) leži na bokih. Dvigni boke navzgor — telo ravna linija od kolen do ramen. Zadrži 1 sek, spusti.',tip:'Začetniška teža: 20 kg (sama olimpijska palica). Brada k prsim, jedro napeto. Na vrhu STISNI zadnjico.',kg:20,yt:'hip thrust barbell beginner guide form'},
-  'Cable pull-through':{desc:'Obrni hrbet h kablu, vrv med nogami. Z ravnim hrbtom nagne naprej — boki gredo nazaj (kot RDL). Iztegni boke naprej in vstani pokonci.',tip:'Začetniška teža: 10–15 kg. Enako gibanje kot RDL — gib je v bokih, ne v hrbtu. Stisni zadnjico na koncu.',kg:12,yt:'cable pull through glutes tutorial form'},
-  'Sumo počep z ročko':{desc:'Noge široko razkoračene, prsti navzven ~45°. Drži eno ročko z obema rokama med nogami. Spusti se navzdol, kolena sledijo prstom navzven.',tip:'Začetniška teža: 10–12 kg ročka. Širok stoj bolj aktivira notranje stegno in zadnjico.',kg:10,yt:'sumo squat dumbbell beginner tutorial'},
+  'Dumbbell bench press':{desc:'Lezi na ravno klop z ročkami v rokah. Ročki drži v višini prsi, dlani naj gledajo naprej. Počasi ju spusti do prsi, nato ju potisni navzgor do skoraj iztegnjenih rok.',tip:'Začetna teža: 4–6 kg na ročko. Lopatice naj bodo skupaj, stopala trdno na tleh. Spust naj bo počasen, potisk odločen.',kg:5,yt:'dumbbell bench press beginner form'},
+  'One-arm dumbbell row':{desc:'Postavi eno koleno in eno dlan na klop za oporo. Ročko v prosti roki spusti do iztegnjene roke, nato jo povleci do boka.',tip:'Začetna teža: 6–8 kg. Komolec potuje ob telesu, ne navzven. Hrbet naj ostane raven, jedro napeto.',kg:7,yt:'one arm dumbbell row beginner'},
+  'Dumbbell shoulder press':{desc:'Sedi ali stoj. Ročki drži v višini ramen, dlani naj gledajo naprej. Potisni ju nad glavo do skoraj iztegnjenih rok, nato ju počasi spusti nazaj.',tip:'Začetna teža: 4–6 kg na ročko. Ne zaklepaj komolcev na vrhu. Jedro naj bo napeto, križ miren.',kg:5,yt:'dumbbell shoulder press beginner form'},
+  'Biceps curl z ročkami':{desc:'Stoj pokonci z ročkami ob telesu, dlani naj gledajo naprej. Upogni komolce in dvigni ročke do ramen. Počasi jih spusti nazaj v izteg.',tip:'Začetna teža: 4–6 kg. Komolci ostanejo pri telesu — ne nihaj z rameni ali trupom.',kg:5,yt:'dumbbell bicep curl proper form'},
+  'Triceps potisk pri kablu':{desc:'Stoj pred kabelskim strojem in primi ročko ali vrv z obema rokama. Komolci naj bodo ob telesu. Iztegni roke navzdol, nato jih počasi vrni.',tip:'Začetna teža: 10–15 kg. Premika se samo podlaket. Komolci so ves čas pri telesu.',kg:12,yt:'cable tricep pushdown form'},
+  'Plank':{desc:'Lezi na trebuh, dvigni se na podlakti in prste. Telo naj bo ravno kot deska — od glave do pet. Aktivno stisni trebuh in zadnjico.',tip:'Začni z 20–30 sekundami. Zadnjica ne sme biti previsoko ali prenizko. Dihaj normalno.',kg:0,yt:'plank proper form beginners'},
+  'Goblet squat ali barbell squat':{desc:'Stoj z nogami v širini ramen. Če delaš goblet squat, ročko drži pri prsih. Spusti se, kot da sediš na stol, pri tem pa pete ostanejo na tleh.',tip:'Začetna teža: 6–8 kg pri goblet squatu. Kolena sledijo prstom, hrbet ostane raven, pogled naprej.',kg:8,yt:'goblet squat beginner tutorial'},
+  'Dumbbell lunges':{desc:'Stoj pokonci z ročkami ob telesu. Naredi velik korak naprej z eno nogo, spusti zadnje koleno proti tlom, nato se vrni nazaj in zamenjaj nogo.',tip:'Začetna teža: 4–6 kg na ročko. Sprednje koleno naj ostane približno nad gležnjem.',kg:5,yt:'dumbbell lunges beginner form'},
+  'Leg press':{desc:'Sedi v leg press stroj, stopala postavi v širino ramen na ploščad. Počasi upogni kolena do približno 90°, nato ploščad potisni stran od sebe.',tip:'Začetna teža: 30–40 kg. Ne zaklepaj kolen na vrhu. Spodnji del hrbta naj ostane pritisnjen ob naslonjalo.',kg:35,yt:'leg press machine proper form beginners'},
+  'Dumbbell RDL':{desc:'Stoj z ročkami pred stegni. Z ravnim hrbtom se nagni naprej, kolki gredo nazaj. Ročki potujeta ob nogah do sredine goleni, nato iztegni kolke in se vrni gor.',tip:'Začetna teža: 7–10 kg na ročko. Kolena so rahlo pokrčena, hrbet raven. Čutiti moraš razteg v zadnji loži, ne v križu.',kg:8,yt:'romanian deadlift dumbbell beginner RDL'},
+  'Cable donkey kick':{desc:'Manšeto pritrdi na gleženj. Postavi se na vse štiri ali se opri na oporo. S pokrčenim kolenom potisni nogo nazaj in navzgor, nato jo počasi spusti.',tip:'Začetna teža: 5–10 kg na kablu. Hrbet naj bo raven, jedro napeto. Na vrhu za sekundo stisni zadnjico.',kg:7,yt:'cable donkey kicks glutes tutorial'},
+  'Calf raise':{desc:'Stoj na robu stopnice ali na tleh. Dvigni se visoko na prste, za sekundo zadrži na vrhu, nato se počasi spusti.',tip:'Začni brez teže ali z lahkimi ročkami. Počasno spuščanje je ključno za občutek v mečih.',kg:0,yt:'calf raises proper form'},
+  'Barbell hip thrust':{desc:'Opri zgornji del hrbta na klop. Palica z blazinico leži na bokih. Dvigni boke navzgor, da telo tvori ravno linijo od kolen do ramen. Zadrži 1 sekundo, nato spusti.',tip:'Začetna teža: 20 kg, torej sama olimpijska palica. Brada naj gre rahlo proti prsim, jedro naj bo napeto. Na vrhu močno stisni zadnjico.',kg:20,yt:'hip thrust barbell beginner guide form'},
+  'Cable pull-through':{desc:'Obrni hrbet proti kablu, vrv naj bo med nogami. Z ravnim hrbtom se nagni naprej, boki gredo nazaj kot pri RDL. Nato iztegni boke naprej in vstani pokonci.',tip:'Začetna teža: 10–15 kg. Gib je v bokih, ne v hrbtu. Na koncu stisni zadnjico.',kg:12,yt:'cable pull through glutes tutorial form'},
+  'Dumbbell sumo squat':{desc:'Stopala postavi široko, prsti naj gledajo rahlo navzven. Eno ročko drži z obema rokama med nogami. Spusti se navzdol, kolena pa naj sledijo prstom.',tip:'Začetna teža: 10–12 kg. Širok položaj bolj aktivira notranji del stegen in zadnjico.',kg:10,yt:'sumo squat dumbbell beginner tutorial'},
   'Frog pumps':{desc:'Lezi na hrbet, podplati skupaj in kolena navzven (žabji položaj). Dvigni boke navzgor z močjo zadnjice. Zadrži 1 sek, spusti.',tip:'Brez teže za začetek. Odlična aktivacija zadnjice pred težjimi vajami. Stisni čim bolj na vrhu.',kg:0,yt:'frog pumps glutes activation'},
-  'Abduktor stroj (odmik nog)':{desc:'Sedi v stroj, zunanji del kolen ob naslonu. Odpri noge navzven proti uporu stroja, zadrži 1 sek. Počasi (3 sek) vrni skupaj.',tip:'Začetniška teža: 20–30 kg. Sedi pokonci, ne zibaj z trupom. Nadzorovan gib — ne pust da stroj "zateče" nazaj.',kg:25,yt:'hip abductor machine glutes proper form'},
-  'Počep z ročkami':{desc:'Drži ročke ob telesu. Noge v širini ramen, prsti rahlo navzven. Spusti se navzdol — kolena sledijo prstom, hrbet raven, peta na tleh.',tip:'Začetniška teža: 5–7 kg/ročka. Enaki principi kot goblet počep.',kg:6,yt:'dumbbell squat beginner tutorial form'},
-  'Veslanje v upognjenem položaju':{desc:'Nagne naprej ~45° z ravnim hrbtom, ročke pred koleni z dlanmi navzdol. Povleci ročke k pasu — komolci gresta vzdolž telesa navzgor.',tip:'Začetniška teža: 7–9 kg/ročka. Hrbet raven, jedro napeto. Ne zaokroži hrbta.',kg:8,yt:'bent over dumbbell row form beginners'},
+  'Hip abductor machine':{desc:'Sedi v stroj, zunanji del kolen naj bo ob blazinicah. Noge odpri navzven proti uporu stroja, zadrži 1 sekundo, nato jih počasi vrni skupaj.',tip:'Začetna teža: 20–30 kg. Sedi pokonci, ne zibaj trupa. Gib naj bo nadzorovan — ne pusti, da utež pade nazaj.',kg:25,yt:'hip abductor machine glutes proper form'},
+  'Dumbbell squat':{desc:'Ročke drži ob telesu. Stopala postavi v širino ramen, prsti naj gledajo rahlo navzven. Spusti se navzdol, kolena sledijo prstom, hrbet ostane raven.',tip:'Začetna teža: 5–7 kg na ročko. Veljajo isti principi kot pri goblet squatu.',kg:6,yt:'dumbbell squat beginner tutorial form'},
+  'Bent-over dumbbell row':{desc:'Z ravnim hrbtom se nagni naprej za približno 45°. Ročke naj bodo pred koleni, nato jih povleci proti pasu. Komolci potujejo ob telesu.',tip:'Začetna teža: 7–9 kg na ročko. Hrbet naj ostane raven, jedro napeto. Ne zaokroži hrbta.',kg:8,yt:'bent over dumbbell row form beginners'},
   'Plank z izmenjevanjem rok':{desc:'Začni v visokem planku (iztegnjene roke). Izmenjaje premakni eno roko naprej, vrni, nato drugo. Jedro aktivno ves čas.',tip:'Začni s 20 sek. Boki se ne smejo gugati — stabilnost je cilj.',kg:0,yt:'plank reach tutorial core stability'},
-  'Air squat':{desc:'Stoji z nogami v širini ramen, prsti rahlo navzven. Dvigni roke naprej za ravnotežje. Spusti se navzdol — kolena sledijo prstom, boki gredo pod kolena. Vstani.',tip:'Brez teže. Peta ostane na tleh. Kolena ne smejo "padati" navznoter. Hiter ritem — to je CrossFit osnova.',kg:0,yt:'air squat crossfit technique'},
-  'Push-up (na kolenih ali polni)':{desc:'Dlani nekoliko širše od ramen. Telo ravno. Spusti prsa do tal, komolci grejo diagonalno (ne ravno navzven). Iztegni roke nazaj. Skaliran: kolena na tleh.',tip:'Začni na kolenih dokler ni mogoče narediti 5 čistih polnih push-upov. Jedro napeto ves čas.',kg:0,yt:'push up beginner progression crossfit'},
-  'Kettlebell swing':{desc:'Noge malo širše od ramen. KB med nogami, hrbet raven. Z eksplozivnim gibom bokov (ne rok!) zamahni KB do višine ramen. Spusti nazaj med noge.',tip:'Začetniška teža: 10–12 kg. GIB JE V BOKIH — ne počep, ne dvig z rokami. Stisni zadnjico na vrhu.',kg:12,yt:'kettlebell swing technique beginner'},
-  'Goblet squat (12 kg)':{desc:'Drži kettlebell ali ročko pri prsih. Noge v širini ramen. Spusti se globoko navzdol — komolci naj rahlo potisnejo kolena navzven. Vstani.',tip:'Začetniška teža: 10–12 kg. Bolj vertikalen hrbet kot pri navadnem počepu. Globok počep je cilj.',kg:12,yt:'goblet squat crossfit technique'},
+  'Air squat':{desc:'Stoj z nogami v širini ramen, prsti naj gledajo rahlo navzven. Roke dvigni naprej za ravnotežje. Spusti se navzdol, kolena sledijo prstom, nato vstani.',tip:'Brez teže. Pete ostanejo na tleh. Kolena ne smejo uhajati navznoter. Hiter ritem je v redu, dokler tehnika ostane čista.',kg:0,yt:'air squat crossfit technique'},
+  'Push-up (na kolenih ali navaden)':{desc:'Dlani postavi malo širše od ramen. Telo naj ostane ravno. Spusti prsi proti tlom, komolci potujejo diagonalno, nato se odrini nazaj gor.',tip:'Začni na kolenih, dokler ne zmoreš 5 čistih navadnih push-upov. Jedro naj bo napeto ves čas.',kg:0,yt:'push up beginner progression crossfit'},
+  'Kettlebell swing':{desc:'Stopala postavi malo širše od ramen. Kettlebell naj bo med nogami, hrbet raven. Z eksplozivnim gibom bokov, ne rok, zamahni kettlebell do višine ramen. Nato ga spusti nazaj med noge.',tip:'Začetna teža: 10–12 kg. Gib je v bokih — to ni počep in ni dvig z rokami. Na vrhu stisni zadnjico.',kg:12,yt:'kettlebell swing technique beginner'},
+  'Goblet squat (12 kg)':{desc:'Kettlebell ali ročko drži pri prsih. Stopala postavi v širino ramen. Spusti se globoko navzdol, komolci pa lahko rahlo odprejo kolena navzven. Nato vstani.',tip:'Začetna teža: 10–12 kg. Hrbet naj bo bolj pokončen kot pri klasičnem počepu. Globina je cilj, če jo dosežeš brez rušenja tehnike.',kg:12,yt:'goblet squat crossfit technique'},
   'Sit-up':{desc:'Lezi na hrbet, podplati skupaj (butterfly sit-up) ali noge ravne. Z močjo trebuha vzravnaj do sedečega položaja, dotakni se tal pred nogami. Lezi nazaj.',tip:'Brez teže za začetek. Butterfly položaj (podplati skupaj) zmanjša obremenitev na hrbet.',kg:0,yt:'sit up crossfit butterfly'},
-  'Burpee (step-out različica)':{desc:'Stoji, upogni se in postavi dlani na tla. KORAKAJ (ne skači) eno nogo nazaj, potem drugo — si v plank poziciji. Korakaj nazaj naprej. Vstani.',tip:'Skaliran burpee brez skoka. Ko postane lahek, dodaj skok pri vstopu in clap nad glavo.',kg:0,yt:'burpee scaled beginner modification'},
-  'Box step-up (z ročkama 4 kg)':{desc:'Stopi na box ali klop z eno nogo. Potisni s peto stojne noge in dvigni telo navzgor. Postavi drugo nogo zraven. Sestopi enako.',tip:'Začetniška teža: 4–6 kg/ročka. Višina: 40–50 cm. Drži hrbet raven, ne nagibaj naprej.',kg:4,yt:'box step up dumbbell crossfit scaled'},
-  'Dumbbell push press':{desc:'Drži ročke na ramenih. Rahlo upogni kolena (dip), nato eksplozivno iztegni noge in potisni ročke nad glavo hkrati. Spusti nazaj na ramena.',tip:'Začetniška teža: 5–7 kg/ročka. Noge dajo impulz — roke samo dokončajo gib. Bolj eksplozivno kot shoulder press.',kg:6,yt:'dumbbell push press crossfit technique'},
-  'Veslanje':{desc:'Sedi na veslalni ergometer. Noge iztegni, nato potegni veslo k prsim z rokami in upogni kolena hkrati. Vrni v začetek v obratnem vrstnem redu.',tip:'Ritem: 70% noge, 20% trup, 10% roke. Začni počasi in se ustali na ritmičnem veslanju. Monitor kaže tempo/500m.',kg:0,yt:'rowing machine technique beginners'},
-  'Trx veslanje':{desc:'Drži TRX ročici, nagne telo nazaj. Potegni telo navzgor k rokam — komolci gresta ob telesu. Počasi vrni v začetni položaj.',tip:'Bolj pokonci = lažje. Noge skupaj in telo ravno ves čas.',kg:0,yt:'TRX row beginner form'},
+  'Burpee (step-out različica)':{desc:'Stoj, upogni se in postavi dlani na tla. Eno nogo zakorakaj nazaj, nato še drugo, da prideš v plank. Nato zakorakaj nazaj naprej in vstani.',tip:'To je lažja različica brez skoka. Ko postane prelahka, lahko dodaš skok in plosk nad glavo.',kg:0,yt:'burpee scaled beginner modification'},
+  'Box step-up (z ročkama 4 kg)':{desc:'Z eno nogo stopi na box ali klop. Potisni skozi peto delovne noge in dvigni telo navzgor. Drugo nogo postavi zraven, nato kontrolirano sestopi.',tip:'Začetna teža: 4–6 kg na ročko. Višina naj bo približno 40–50 cm. Hrbet naj ostane raven, brez pretiranega nagibanja naprej.',kg:4,yt:'box step up dumbbell crossfit scaled'},
+  'Dumbbell push press':{desc:'Ročke drži na ramenih. Rahlo upogni kolena, nato eksplozivno iztegni noge in hkrati potisni ročke nad glavo. Spusti jih nazaj na ramena.',tip:'Začetna teža: 5–7 kg na ročko. Noge dajo impulz, roke samo dokončajo gib. To je bolj eksplozivna različica kot shoulder press.',kg:6,yt:'dumbbell push press crossfit technique'},
+  'Veslanje':{desc:'Sedi na veslalni ergometer. Najprej odrini z nogami, nato dodaj trup in na koncu potegni ročaj k prsim. V začetni položaj se vrni v obratnem vrstnem redu.',tip:'Ritem: približno 70 % noge, 20 % trup, 10 % roke. Začni počasi in se ustali v enakomernem ritmu. Monitor kaže tempo na 500 m.',kg:0,yt:'rowing machine technique beginners'},
+  'TRX veslanje':{desc:'Primeš TRX ročici in telo nagneš nazaj. Potegni prsni koš proti rokam, komolci naj potujejo ob telesu. Počasi se vrni v začetni položaj.',tip:'Bolj pokončen položaj je lažji. Telo naj ostane ravno ves čas.',kg:0,yt:'TRX row beginner form'},
   'Tek (zunaj ali tekalna steza)':{desc:'Teci v tempu pri katerem še lahko govoriš v kratkih stavkih (zmerna intenzivnost). Ogrevanje 5 min hoje, ohlajanje 5 min hoje.',tip:'Za začetek: izmenjuj 2 min tek + 1 min hoja. Postopno povečuj čas teka. Dobri čevlji so ključni.',kg:0,yt:'running technique beginners form'},
-  'Kolesarjenje (zunaj ali sobno kolo)':{desc:'Na sobnem kolesu nastavi upor tako, da je pedajanje zahtevno a vzdržljivo. Na cesti izberi teren brez prevelikih vzponov za začetek.',tip:'Sedlo nastavi na višino kolka. Kolena se ne smejo povsem iztegniti pri pedaliranju. Začni s 20–30 min.',kg:0,yt:'cycling beginner tips technique'},
+  'Kolesarjenje (zunaj ali sobno kolo)':{desc:'Na sobnem kolesu nastavi upor tako, da je pedaliranje zahtevno, a vzdržljivo. Na cesti za začetek izberi teren brez prevelikih vzponov.',tip:'Sedlo nastavi približno na višino kolka. Kolena se pri pedaliranju ne smejo povsem iztegniti. Začni z 20–30 minutami.',kg:0,yt:'cycling beginner tips technique'},
   'Elipsa':{desc:'Stopi na elipso, drži ročke in enakomerno pedaliraj naprej. Hkrati potiskaj in vleci ročke z rokami za aktivacijo zgornjega dela.',tip:'Odlično za kolena — brez udarca ob podlago. Nastavi upor postopno. Drži hrbet raven, ne visi na ročkah.',kg:0,yt:'elliptical machine beginner tips'},
   'Veslalni ergometer':{desc:'Sedi na ergometer. Začni z nogami, dodaj trup, dokončaj z rokami (10-20-70 razmerje). Vrni v obratnem vrstnem redu.',tip:'Začni pri tempu /500m +2 min nad udobnim. Osredotoči se na tehniko, ne na hitrost. 20 min je dober začetni cilj.',kg:0,yt:'rowing machine technique beginners'},
-  'Plavanje':{desc:'Izberi stil v katerem se počutiš varno (kravl ali hrbtno). Plavi v enakomernemu tempu, dihaj ritmično.',tip:'Začni s 4×25m z odmorom. Postopno povečuj do 4×50m brez odmora. Fokus na tehniki dihanja.',kg:0,yt:'freestyle swimming beginner technique'},
-  'Hoja (hiter tempo, zunaj)':{desc:'Hodi v tempu pri katerem je dihanje oteženo a še vedno možen pogovor. Roke aktivno zamahuj, hrbtenica ravna.',tip:'Podcenjena vadba! 8000–10000 korakov na dan z nahrbtničkom ali v hrib znatno poveča kalorično porabo.',kg:0,yt:'power walking technique tips'},
+  'Plavanje':{desc:'Izberi stil, v katerem se počutiš varno, na primer kravl ali hrbtno. Plavaj v enakomernem tempu in dihaj ritmično.',tip:'Začni s 4 × 25 m z odmorom. Postopno povečuj do 4 × 50 m brez odmora. Fokus naj bo na tehniki dihanja.',kg:0,yt:'freestyle swimming beginner technique'},
+  'Hoja (hiter tempo, zunaj)':{desc:'Hodi v tempu, pri katerem je dihanje nekoliko oteženo, a se še vedno lahko pogovarjaš. Roke naj aktivno sodelujejo, hrbtenica naj bo vzravnana.',tip:'Podcenjena vadba. 8.000–10.000 korakov na dan, hoja v hrib ali hoja z nahrbtnikom lahko občutno poveča porabo energije.',kg:0,yt:'power walking technique tips'},
   'Pohod na Pohorje 🏔':{desc:'Vzpon z vzpenjače (Mariborska vzpenjača) do koče Bellevue — 1 ura 15 minut normalne hoje po gozdni poti. Pot je dobro označena, primerna za vse ravni. Sestop po isti ali alternativni poti.',tip:'Oprema: udobni čevlji (ni nujno pohodniški), voda 0.5–1L. Odlično za aktiven dan na svežem zraku. Skupaj vzpon + sestop ~2.5 ure in ~400–500 kcal.',kg:0,yt:'Pohorje vzpenjača Maribor pohod'}
 };
 
@@ -4689,7 +4729,7 @@ function getWorkoutPrimer(wt){
       flow:[
         'Naredi <b>20–40 min lahke hoje</b> ali zelo umirjeno kolo.',
         'Dodaj <b>5–8 min mobilnosti</b> za boke, zadnjo ložo in ramena.',
-        'Če si trda od včeraj, naredi <b>1 lahek krog</b>: 10 glute bridge, 10 bodyweight squat, 30 sek dihanja.'
+        `${say({f:'Če si otrdela od včeraj',m:'Če si otrdel od včeraj',n:'Če je telo otrdelo od včeraj'})}, naredi <b>1 lahek krog</b>: 10 glute bridge, 10 bodyweight squat, 30 sek dihanja.`
       ],
       warmup:['3 min lahka hoja','2 min odpiranje bokov in ramen','1 min globoko dihanje'],
       rule:`<b>Pravilo dneva:</b> jutri želiš biti bolj sveža, ne bolj zdelana. ${commonSafety}`,
@@ -4711,7 +4751,7 @@ function getWorkoutPrimer(wt){
         'Zaključi z <b>3–5 min počasnejšega tempa</b>, ne ustavi se naenkrat.'
       ],
       warmup:['3 min hoja ali zelo lahka elipsa','1 min kroženje ramen','1 min dinamičen korak + gležnji'],
-      rule:`<b>Pravilo tempa:</b> če po 2 minutah ne moreš izgovoriti kratkega stavka, si prehitro začela. ${commonSafety}`,
+      rule:`<b>Pravilo tempa:</b> če po 2 minutah ne moreš izgovoriti kratkega stavka, si začel/a prehitro. ${commonSafety}`,
       footer:[
         {lbl:'Začetek',copy:'Raje <b>20 mirnih minut</b> kot 8 minut na silo.'},
         {lbl:'Napredek',copy:'Napredek lovi z <b>več časa ali bolj mirnim pulzom</b>, ne samo z večjo hitrostjo.'},
@@ -4722,15 +4762,15 @@ function getWorkoutPrimer(wt){
   if(wt==='crossfit'){
     return {
       title:'CrossFit naj bo prvič tehničen, ne herojski',
-      sub:'Ta modul je uporaben šele, ko razumeš osnovne gibe. Če si prvič v fitnesu, je čisto ok izbrati glute, lower ali full body namesto WOD-a.',
+      sub:'Ta modul je uporaben šele, ko razumeš osnovne gibe. Če si prvič v fitnesu, je povsem v redu izbrati glute, lower ali full body namesto WOD-a.',
       trust:'Najboljši začetniški CrossFit je skaliran in čist izvedbeno.',
       flow:[
         'Ogrej se <b>5–7 min</b>, nato naredi <b>1 lahek testni krog</b> vseh vaj brez časovnega pritiska.',
         'Vsako vajo raje <b>skaliraj</b> kot goljufaš gib. Kakovost > ego.',
-        'Pravi WOD začni šele, ko veš, kako izgleda vsaka vaja in kam boš odložila opremo.'
+        'Pravi WOD začni šele, ko veš, kako je videti vsaka vaja in kam boš odložil/a opremo.'
       ],
       warmup:['3 min veslanje ali hoja','1 krog: 8 počepov, 8 hinge, 8 potiskov na klop','1 lahek testni krog WOD-a'],
-      rule:`<b>Pravilo danes:</b> če ti srce prehiti tehniko, upočasni. Če si prvič v gymu, je pametna izbira tudi navaden strength trening. ${commonSafety}`,
+      rule:`<b>Pravilo danes:</b> če ti srčni utrip prehiti tehniko, upočasni. Če si prvič v fitnesu, je pametna izbira tudi klasičen trening moči. ${commonSafety}`,
       footer:[
         {lbl:'Skaliranje',copy:'Step-out burpee, lažja teža, manj ponovitev: vse to <b>še vedno šteje</b>.'},
         {lbl:'Cilj',copy:'Najprej osvoji gibanje, potem tempo.'},
@@ -4742,7 +4782,7 @@ function getWorkoutPrimer(wt){
   const byType={
     glute:{
       title:'Danes gradimo zadnjico in linijo nog',
-      sub:'To je glavni “shape” trening. Vaje spodaj dajejo največ smisla za rit in noge, če so tehnično čiste in dovolj blizu naporu.',
+      sub:'To je glavni oblikovalni trening. Vaje spodaj imajo največ smisla za zadnjico in noge, če so tehnično čiste in dovolj blizu naporu.',
       warmup:['5 min hitra hoja z rahlim naklonom ali kolo','10 glute bridge + 10 bodyweight squat','8 reverse lunge na vsako nogo + 15 frog pumps'],
       flow:[
         'Po ogrevanju naredi pri prvi veliki vaji <b>1 lahko pripravljalno serijo</b> brez pritiska.',
@@ -4778,11 +4818,11 @@ function getWorkoutPrimer(wt){
     },
     full:{
       title:'Danes narediš celoten, zelo uporaben začetniški trening',
-      sub:'To je najbolj varna izbira, ko si nova v fitnesu ali ko hočeš v eni seji pokriti celo telo brez kompliciranja.',
+      sub:'To je najbolj varna izbira, ko si nov/a v fitnesu ali ko želiš v eni seji pokriti celo telo brez kompliciranja.',
       warmup:['5 min lahka hoja ali veslanje','10 počepov brez teže + 10 glute bridge','8 incline push-up na klop + 8 band row'],
       flow:[
         'Po ogrevanju pojdi čez vaje po vrsti in si pri prvi dveh vzemi malo več časa za orientacijo.',
-        'Vsaka vaja naj izgleda podobno od prve do zadnje ponovitve. Ko hitrost ali kontrola močno padeta, se serija ustavi.',
+        'Vsaka ponovitev naj bo videti podobno od prve do zadnje. Ko hitrost ali kontrola močno padeta, serijo ustavi.',
         'Raje končaj z občutkom “lahko bi še malo” kot pa da te prvi trening prestraši.'
       ],
       rule:'<b>Pravilo prvega tedna:</b> vse vaje naj bodo približno na občutku 6–7/10 težavnosti. Težje bo prišlo zelo hitro že samo s konsistentnostjo.',
@@ -4949,7 +4989,7 @@ function toggleWarmup(i){
 function getExerciseFeelCue(name){
   const n=String(name||'').toLowerCase();
   if(/hip thrust|glute bridge|frog pump|abduktor|kickback|donkey/i.test(n))return{
-    feel:'zadnjico, ob strani tudi glute medius',
+    feel:'zadnjico, ob strani tudi srednji del zadnjice',
     fix:'če čutiš predvsem križ ali sprednje stegne, znižaj težo, rebra zapri, brado rahlo proti prsnemu košu in na vrhu zavestno stisni zadnjico'
   };
   if(/deadlift|mrtv|rdl|pull.?through|good morning/i.test(n))return{
@@ -5137,7 +5177,7 @@ function suggestProgression(ex){
 	  type:'add_weight',
 	  prevKg:base.kg,prevReps:base.reps,
 	  targetKg:base.kg+inc,targetReps:repRange?repRange.lo:8,
-	  hint:`Prejšnji put: <b>${base.kg} kg × ${base.reps}</b>. Dodaj ${inc} kg → cilj <b>${base.kg+inc} kg × ${repRange?repRange.lo:8}</b>.`
+	  hint:`Prejšnjič: <b>${base.kg} kg × ${base.reps}</b>. Dodaj ${inc} kg → cilj <b>${base.kg+inc} kg × ${repRange?repRange.lo:8}</b>.`
 	};
   }
   if(base.kg>0){
@@ -5145,14 +5185,14 @@ function suggestProgression(ex){
 	  type:'add_reps',
 	  prevKg:base.kg,prevReps:base.reps,
 	  targetKg:base.kg,targetReps:base.reps+1,
-	  hint:`Prejšnji put: <b>${base.kg} kg × ${base.reps}</b>. Cilj danes: <b>${base.kg} kg × ${base.reps+1}</b>.`
+	  hint:`Prejšnjič: <b>${base.kg} kg × ${base.reps}</b>. Cilj danes: <b>${base.kg} kg × ${base.reps+1}</b>.`
 	};
   }
   return {
 	type:'add_reps',
 	prevKg:0,prevReps:base.reps,
 	targetKg:0,targetReps:base.reps+1,
-	hint:`Prejšnji put: <b>${base.reps} ponovitev</b>. Cilj danes: <b>${base.reps+1}</b>.`
+	hint:`Prejšnjič: <b>${base.reps} ponovitev</b>. Cilj danes: <b>${base.reps+1}</b>.`
   };
 }
 
@@ -5554,16 +5594,16 @@ function renderMeals(){
 }
 
 // ─── CALORIE BURN PER EXERCISE ─────────────────────────────
-// Ocena kcal/serijo za posamezno vajo (povprečje za 65kg žensko)
+// Ocena kcal/serijo za posamezno vajo (povprečje za 65 kg osebo)
 const BURN={
-  'Potisk z ročkami leže':18,'Veslanje z ročko (enoročno)':16,'Vzdolžni potisk nad glavo':15,
+  'Dumbbell bench press':18,'One-arm dumbbell row':16,'Dumbbell shoulder press':15,
   'Biceps curl z ročkami':12,'Triceps potisk pri kablu':12,'Plank':8,
-  'Počep (goblet ali s palico)':25,'Izpadni koraki z ročkami':22,'Leg press':20,
-  'Mrtvetek z ročkami (RDL)':24,'Donkey kicks pri kablu':12,'Dvig na prste — lýtka':8,
-  'Hip thrust z palico':20,'Cable pull-through':16,'Sumo počep z ročko':22,
-  'Frog pumps':8,'Abduktor stroj (odmik nog)':10,
-  'Počep z ročkami':24,'Veslanje v upognjenem položaju':18,'Plank z izmenjevanjem rok':9,
-  'Air squat':14,'Push-up (na kolenih ali polni)':12,'Kettlebell swing':20,
+  'Goblet squat ali barbell squat':25,'Dumbbell lunges':22,'Leg press':20,
+  'Dumbbell RDL':24,'Cable donkey kick':12,'Calf raise':8,
+  'Barbell hip thrust':20,'Cable pull-through':16,'Dumbbell sumo squat':22,
+  'Frog pumps':8,'Hip abductor machine':10,
+  'Dumbbell squat':24,'Bent-over dumbbell row':18,'Plank z izmenjevanjem rok':9,
+  'Air squat':14,'Push-up (na kolenih ali navaden)':12,'Kettlebell swing':20,
   'Goblet squat (12 kg)':22,'Sit-up':10,'Burpee (step-out različica)':28,
   'Box step-up (z ročkama 4 kg)':18,'Dumbbell push press':17,'Veslanje':35,
   // Cardio: per minute approximation stored separately
@@ -6034,6 +6074,7 @@ function deleteMeal(i){
 // ─── RENDER WORKOUT ─────────────────────────────────────────
 function renderWorkout(){
   const c=document.getElementById('wc'),baw=document.getElementById('baw'),w=WKT[S.wt];
+  normalizeExerciseDisplayNames();
   const warmupSteps=ensureWarmupState();
   const warmupHtml=warmupSteps.length&&S.wt!=='rest'?`<div class="workout-block warmup-block">
 	<div class="workout-subhead">Ogrevanje pred vadbo <span style="font-weight:400;color:var(--lt);font-size:11px;">· priporočilo, ne za odkljukati</span></div>
@@ -6611,18 +6652,18 @@ function renderHistoryInsights(){
 	<div class="history-stat">
 	  <div class="history-stat-kicker">Povp. kcal</div>
 	  <div class="history-stat-value">${stats.avgKcal||'—'}</div>
-	  <div class="history-stat-note">na vnešen dan</div>
+	  <div class="history-stat-note">na dan z vnosom</div>
 	</div>`;
   const trends=getProgressiveOverloadStats(3);
   if(!trends.length){
-	trendEl.innerHTML=`<div class="history-trend-title">Napredek v progresive overload</div><div class="history-stat-note">Ko boš za iste vaje skozi tedne shranjevala kg/serije/ponovitve, se bodo tukaj pokazali konkretni premiki.</div>`;
+	trendEl.innerHTML=`<div class="history-trend-title">Napredek pri progresivni obremenitvi</div><div class="history-stat-note">Ko bodo za iste vaje skozi tedne shranjeni kilogrami, serije in ponovitve, se bodo tukaj pokazali konkretni premiki.</div>`;
 	return;
   }
-  trendEl.innerHTML=`<div class="history-trend-title">Napredek v progresive overload</div>`+trends.map(t=>`
+  trendEl.innerHTML=`<div class="history-trend-title">Napredek pri progresivni obremenitvi</div>`+trends.map(t=>`
 	<div class="history-trend-item">
 	  <div>
 		<div class="history-trend-name">${t.name}</div>
-		<div class="history-trend-meta">${t.first.kg||0} kg → ${t.last.kg||0} kg · ${t.sessions} beleženj</div>
+		<div class="history-trend-meta">${t.first.kg||0} kg → ${t.last.kg||0} kg · ${t.sessions} vnosov</div>
 	  </div>
 	  <div class="history-trend-delta">${t.kgDelta>0?`+${t.kgDelta} kg`:`+${Math.round(t.volDelta)} vol`}</div>
 	</div>`).join('');
@@ -6991,7 +7032,7 @@ function offlineCrossfitWod(){
     name:'Offline AMRAP',
     ex:[
       {n:'Air squat',r:'14'},
-      {n:'Push-up (na kolenih ali polni)',r:'8'},
+      {n:'Push-up (na kolenih ali navaden)',r:'8'},
       {n:'Sit-up',r:'16'}
     ],
     note:'Naredi čim več kakovostnih krogov v 14 minutah.'
@@ -7303,7 +7344,7 @@ function getMacroAwareMealSuggestion(mealIdx){
 		const proteinNote=pPct<0.5?' Hkrati naj ima jed visoko vsebnost beljakovin (piščanec, tuna, skuta, jajca).':'';
 		return {
 		  bias:'carb_low',
-		  prompt:`POMEMBNO: ${coachNoun()} je že zaužil/a skoraj vse OH za dan (${rem.eaten.c}g od ${targets.c}g cilja). Izogni se jedem z veliko ogljikovih hidratov (kruh, riž, testenine, krompir, kosmiči, sladko). Predlagaj nekaj z beljakovinami in zelenjavo.${proteinNote}`
+		  prompt:`POMEMBNO: dnevni cilj za OH je skoraj zapolnjen (${rem.eaten.c}g od ${targets.c}g cilja). Izogni se jedem z veliko ogljikovih hidratov (kruh, riž, testenine, krompir, kosmiči, sladko). Predlagaj nekaj z beljakovinami in zelenjavo.${proteinNote}`
 		};
 	  }
 
@@ -7312,7 +7353,7 @@ function getMacroAwareMealSuggestion(mealIdx){
 		const proteinNote=pPct<0.5?' Hkrati naj ima jed visoko vsebnost beljakovin.':'';
 		return {
 		  bias:'fat_low',
-		  prompt:`POMEMBNO: ${coachNoun()} je že zaužil/a skoraj vse maščobe za dan (${rem.eaten.f}g od ${targets.f}g cilja). Izogni se mastnim jedem (oreščki, avokado, smetana, maslo, ocvrto). Predlagaj puste beljakovine in zelenjavo.${proteinNote}`
+		  prompt:`POMEMBNO: dnevni cilj za maščobe je skoraj zapolnjen (${rem.eaten.f}g od ${targets.f}g cilja). Izogni se mastnim jedem (oreščki, avokado, smetana, maslo, ocvrto). Predlagaj puste beljakovine in zelenjavo.${proteinNote}`
 		};
 	  }
 
@@ -7402,39 +7443,39 @@ async function swapMeal(i,opts={}){
 const MOVEMENT_PATTERNS = {
   squat: {
 	label: 'počep',
-	alternatives: ['Goblet počep','Počep s palico','Bolgarski split squat','Smith squat','Leg press','Hack squat','Sumo počep z ročko']
+	alternatives: ['Goblet squat','Barbell squat','Bulgarian split squat','Smith squat','Leg press','Hack squat','Dumbbell sumo squat']
   },
   hip_hinge: {
-	label: 'hip hinge / mrtvetek',
-	alternatives: ['Mrtvetek z ročkami (RDL)','Mrtvetek s palico','Cable pull-through','Single-leg RDL','Good morning','Sumo mrtvetek']
+	label: 'hip hinge / RDL',
+	alternatives: ['Dumbbell RDL','Barbell RDL','Cable pull-through','Single-leg dumbbell RDL','Good morning','Sumo deadlift']
   },
   hip_thrust: {
 	label: 'hip thrust / glute bridge',
-	alternatives: ['Hip thrust z palico','Hip thrust na stroju','Glute bridge','Single-leg hip thrust','Frog pumps','Banded hip thrust']
+	alternatives: ['Barbell hip thrust','Hip thrust na stroju','Glute bridge','Single-leg hip thrust','Frog pumps','Banded hip thrust']
   },
   lunge: {
 	label: 'izpadni korak',
-	alternatives: ['Izpadni koraki z ročkami','Reverse lunge','Walking lunges','Bolgarski split squat','Step-up','Curtsy lunge']
+	alternatives: ['Dumbbell lunges','Reverse lunge','Walking lunges','Bulgarian split squat','Step-up','Curtsy lunge']
   },
   glute_isolation: {
 	label: 'glute izolacija',
-	alternatives: ['Donkey kicks pri kablu','Cable kickback','Abduktor stroj','Banded clamshell','Side-lying leg raise','Fire hydrant','Frog pumps']
+	alternatives: ['Cable donkey kick','Cable kickback','Hip abductor machine','Banded clamshell','Side-lying leg raise','Fire hydrant','Frog pumps']
   },
   calf: {
-	label: 'lytka',
-	alternatives: ['Dvig na prste — lýtka','Seated calf raise','Standing calf raise','Single-leg calf raise']
+	label: 'meča',
+	alternatives: ['Calf raise','Seated calf raise','Standing calf raise','Single-leg calf raise']
   },
   horizontal_push: {
 	label: 'horizontalni potisk',
-	alternatives: ['Potisk z ročkami leže','Bench press','Push-up (na kolenih ali polni)','Incline dumbbell press','Cable chest fly','Machine chest press']
+	alternatives: ['Dumbbell bench press','Bench press','Push-up (na kolenih ali navaden)','Incline dumbbell press','Cable chest fly','Machine chest press']
   },
   vertical_push: {
 	label: 'vertikalni potisk',
-	alternatives: ['Vzdolžni potisk nad glavo','Dumbbell shoulder press','Arnold press','Seated machine press','Push press','Pike push-up']
+	alternatives: ['Dumbbell shoulder press','Barbell overhead press','Arnold press','Seated machine press','Push press','Pike push-up']
   },
   horizontal_pull: {
 	label: 'horizontalni vlek',
-	alternatives: ['Veslanje z ročko (enoročno)','Veslanje v upognjenem položaju','Cable row','Seated machine row','TRX veslanje','Inverted row']
+	alternatives: ['One-arm dumbbell row','Bent-over dumbbell row','Cable row','Seated machine row','TRX veslanje','Inverted row']
   },
   vertical_pull: {
 	label: 'vertikalni vlek',
@@ -7679,7 +7720,7 @@ async function refreshWorkout(){
   }
 
   const w=WKT[S.wt];
-  const focus=S.wt==='glute'?'zadnjico (hip thrust, donkey kicks, cable pull-through, sumo počep, glute bridge)':w.title.toLowerCase();
+  const focus=S.wt==='glute'?'zadnjico (hip thrust, donkey kicks, cable pull-through, dumbbell sumo squat, glute bridge)':w.title.toLowerCase();
   try{
 	const txt=await api('Si fitnes trener za telovadnico. SAMO JSON array 6 vaj: [{"n":"ime v slovenščini","s":"3","r":"12"},...]',
 	  `Svež trening za ${focus}. Drugačen od navadnega.`);
@@ -7694,7 +7735,7 @@ function err(msg){const b=document.getElementById('eb');b.textContent=msg;b.clas
 const GOALS_KEY='user_goals';
 // G holds the user's profile: age/height/weight + workout context.
 // `loc` (workout location) determines which exercises the planner can use:
-//   gym_full   = polni fitnes — sve naprave + uteži + kabli
+//   gym_full   = polni fitnes — vse naprave + uteži + kabli
 //   gym_weights = fitnes z utežmi — uteži + klopi, brez naprav/kablov
 //   home_eq    = doma z opremo — uteži, gumijaste trakovi, klop
 //   home_basic = doma brez opreme — telo (bodyweight)
@@ -7740,7 +7781,7 @@ function coachNoun(){
 }
 
 function beginnerNoun(){
-  return say({f:'začetnica',m:'začetnik',n:'začetna oseba'});
+  return say({f:'začetnica',m:'začetnik',n:'začetni nivo'});
 }
 
 function bmrOffsetFor(sex){
@@ -7817,7 +7858,7 @@ function getKcalWarning(kcal,profile=G){
   if(kcal<=floor){
     return {
       type:'warning',
-      text:'Ta cilj je na spodnji varni meji. Za energijo, trening in dolgoročno konsistentnost app ne gre nižje.'
+      text:'Ta cilj je na spodnji varni meji. Za energijo, trening in dolgoročno konsistentnost aplikacija ne gre nižje.'
     };
   }
   return null;
@@ -7985,8 +8026,8 @@ function refreshCycleDetailUI(){
     const draft={...G,bioSex:_selBioSex,cycleAware:_selCycleAware,cycleStart:document.getElementById('g-cycle-start')?.value||_selCycleStart,cycleLength:parseInt(document.getElementById('g-cycle-length')?.value)||_selCycleLength};
     const ctx=calcCycleContext(draft);
     hint.textContent=ctx.active
-      ? `${ctx.label}, dan ${ctx.day}/${ctx.length}. ${ctx.kcalAdj?`Danes app doda +${ctx.kcalAdj} kcal za več lakote in recovery.`:'Kalorijski cilj ostane normalen.'}`
-      : 'Uporabljeno samo za lakoto, energijo, recovery in razlago nihanj.';
+      ? `${ctx.label}, dan ${ctx.day}/${ctx.length}. ${ctx.kcalAdj?`Danes aplikacija doda +${ctx.kcalAdj} kcal za več lakote in regeneracijo.`:'Kalorijski cilj ostane normalen.'}`
+      : 'Uporabljeno samo za lakoto, energijo, regeneracijo in razlago nihanj.';
   }
 }
 // Location of training — narrows which exercises the planner can use.
@@ -8052,12 +8093,12 @@ function updateGoalsCalc(){
 		  <div style="font-size:13px;color:var(--md);margin-bottom:4px;">Cilj: <b style="color:var(--dk);">${goalLabel[_selGoal]}</b></div>
 		  <div style="font-size:22px;font-weight:500;color:var(--dk);">${range.min}–${range.max} kcal/dan</div>
 		  <div style="font-size:12px;color:var(--lt);margin-top:4px;">Target ${range.target} kcal · B: ${p}g &nbsp;·&nbsp; OH: ${c}g &nbsp;·&nbsp; M: ${f}g</div>
-		  ${cycle.kcalAdj?`<div style="font-size:12px;color:var(--grn);margin-top:5px;">${cycle.label}: +${cycle.kcalAdj} kcal za lakoto/recovery.</div>`:''}
+		  ${cycle.kcalAdj?`<div style="font-size:12px;color:var(--grn);margin-top:5px;">${cycle.label}: +${cycle.kcalAdj} kcal za lakoto in regeneracijo.</div>`:''}
 		  ${warning?`<div style="font-size:12px;color:#A86A13;margin-top:5px;">${warning.text}</div>`:''}
 		</div>
 	${weeks?`<div style="font-size:12px;color:var(--grn);padding:4px 0;">📅 Do cilja ~${weeks} tednov pri 0.5 kg/teden</div>`:''}
 	<div style="font-size:12px;color:var(--lt);margin-top:4px;line-height:1.6;">
-		  BMR = kalorije ki jih telo porabi za dihanje, srce, možgane (${bioLabel}).<br>
+		  BMR = kalorije, ki jih telo porabi za dihanje, srce in možgane (${bioLabel}).<br>
 		  TDEE = BMR × faktor aktivnosti = kar telo res porabi vsak dan.<br>
 		  Vadba in koraki se beležijo za kontekst, ne dodajajo se avtomatsko kot "zaslužena hrana".
 		  ${cycle.active?`<br>Cikel: ${cycle.label}, dan ${cycle.day}/${cycle.length}. ${cycle.note}`:''}
@@ -8487,13 +8528,13 @@ async function loadPers(force){
   if(persMode==='fav'){
 	if(foods.length){
 	  const foodList=foods.slice(-20).map(f=>f.f).join(', ');
-	  prompt=`Na podlagi teh jedi ki jih je oseba jedla: ${foodList} — predlagaj 5 podobnih ali enakoh jedi ki bi ji bile všeč. ${ez} ${lfc}`;
+	  prompt=`Na podlagi jedi, ki jih je oseba že jedla (${foodList}), predlagaj 5 podobnih ali enakih jedi, ki bi ji bile všeč. ${ez} ${lfc}`;
 	}else{
-	  prompt=`Predlagaj 5 zdravih jedi za žensko ki hoče shujšati. ${ez} ${lfc}`;
+	  prompt=`Predlagaj 5 zdravih jedi za osebo, ki želi izboljšati telesno kompozicijo. ${ez} ${lfc}`;
 	}
   }else{
 	const eaten=foods.map(f=>f.f).join(', ');
-	prompt=`Predlagaj 5 novih, zanimivih jedi ki jih ta oseba še ni jedla${eaten?` (jedla je: ${eaten.slice(0,200)})`:''} in bi jih bilo vredno poskusiti. ${ez} ${lfc} Naj bodo raznolike in okusne.`;
+	prompt=`Predlagaj 5 novih, zanimivih jedi, ki jih ta oseba še ni jedla${eaten?` (jedla je: ${eaten.slice(0,200)})`:''} in bi jih bilo vredno poskusiti. ${ez} ${lfc} Naj bodo raznolike in okusne.`;
   }
 
   try{
