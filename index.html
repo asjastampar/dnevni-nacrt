@@ -5070,7 +5070,7 @@ function getInputMode(ex){
 	return 'weighted';
   }
   // Legacy / custom exercises — guess from name
-  if(/plank|hold|sit|deadbug|bird dog|hollow/.test(nLower))return 'time';
+  if(/plank|hold|\bsit[-\s]?up(s)?\b|dead\s?bug|bird dog|hollow/.test(nLower))return 'time';
   if(/push.?up|pull.?up|squat$|izpad|bridge|crunch|dvig|burpee/.test(nLower))return 'bodyweight';
   return 'weighted';
 }
