@@ -6381,6 +6381,9 @@ function clearExLog(i,name){
 }
 function logEx(i,name){
   const ex=S.ex[i];
+  const exName=name||ex?.n;
+  if(!exName)return;
+  const logged=loadElog()[exName]||{};
   const mode=getInputMode(ex);
   let setsDetail=[];
   let kg='',s='',r='';
@@ -6440,7 +6443,7 @@ function logEx(i,name){
 	  }
 	}
   }
-  saveElog(name,{kg,s,r,setsDetail});
+  saveElog(exName,{kg,s,r,setsDetail});
   calcKcal();
   const ok=document.getElementById('lok'+i);
   if(ok){ok.textContent='✓ shranjeno';ok.classList.add('show');setTimeout(()=>ok.classList.remove('show'),2500);}
