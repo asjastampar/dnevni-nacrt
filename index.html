@@ -5071,6 +5071,9 @@ function getInputMode(ex){
 	return 'weighted';
   }
   // Legacy / custom exercises — guess from name
+  // Machine/cable/custom gym exercises can include bodyweight-ish words
+  // like "crunch", but if the name clearly points to equipment, we need kg.
+  if(/technogym|machine|stroj|cable|kabel|pulldown|lat\s?pull|press|curl|extension|pushdown|fly|pec\s?deck/.test(nLower))return 'weighted';
   if(/plank|hold|\bsit[-\s]?up(s)?\b|dead\s?bug|bird dog|hollow/.test(nLower))return 'time';
   if(/push.?up|pull.?up|squat$|izpad|bridge|crunch|dvig|burpee/.test(nLower))return 'bodyweight';
   return 'weighted';
