@@ -3596,7 +3596,7 @@ async function initApp(){
 	S.ex=[];S.exd=[];
 	S.workoutDone=false;
   }
-  if(!S.ex||(!S.ex.length&&S.wt!=='crossfit'&&S.wt!=='cardio'&&S.wt!=='rest')){initWorkout();}
+  if(!S.ex||(!S.ex.length&&S.wt!=='crossfit'&&S.wt!=='cardio'&&S.wt!=='rest')){initWorkout({preserveProgress:true});}
 
   // Date display
   document.getElementById('ds').textContent=SLD[DOW]+', '+now.getDate()+'. '+SLM[now.getMonth()]+' '+now.getFullYear();
@@ -4259,9 +4259,62 @@ function initMeals(){
   getDiet();
   applyDietToCurrentMeals();
 }
-function initWorkout(){
+function exerciseKey(name){
+  return String(name||'').trim().toLowerCase().replace(/\s+/g,' ');
+}
+function hasUsefulExerciseLog(log){
+  if(!log)return false;
+  if(Array.isArray(log.setsDetail)&&log.setsDetail.length)return true;
+  if(log.setsText&&String(log.setsText).trim())return true;
+  return !!(log.kg||log.s||log.r);
+}
+function captureWorkoutProgress(){
+  const elog=loadElog();
+  return (S.ex||[]).map((ex,i)=>({
+	ex:{...ex},
+	done:!!(Array.isArray(S.exd)&&S.exd[i]),
+	log:elog[ex?.n]
+  })).filter(item=>item.ex?.n&&(item.ex.custom||item.done||hasUsefulExerciseLog(item.log)));
+}
+function mergePreservedWorkoutProgress(preserved=[]){
+  if(!Array.isArray(S.ex))S.ex=[];
+  if(!Array.isArray(S.exd))S.exd=[];
+  const existing=new Map(S.ex.map((ex,i)=>[exerciseKey(ex?.n),i]));
+  preserved.forEach(item=>{
+	const key=exerciseKey(item.ex?.n);
+	if(!key)return;
+	if(existing.has(key)){
+	  const idx=existing.get(key);
+	  if(item.done||hasUsefulExerciseLog(item.log))S.exd[idx]=true;
+	  return;
+	}
+	S.ex.push({...item.ex,custom:true,recovered:true});
+	S.exd.push(!!(item.done||hasUsefulExerciseLog(item.log)));
+	existing.set(key,S.ex.length-1);
+  });
+}
+function recoverLoggedExercisesIntoWorkout(){
+  const elog=loadElog();
+  const entries=Object.entries(elog).filter(([name,log])=>name&&hasUsefulExerciseLog(log));
+  if(!entries.length)return;
+  if(!Array.isArray(S.ex))S.ex=[];
+  if(!Array.isArray(S.exd))S.exd=[];
+  const existing=new Set(S.ex.map(ex=>exerciseKey(ex?.n)));
+  let changed=false;
+  entries.forEach(([name,log])=>{
+	const key=exerciseKey(name);
+	if(!key||existing.has(key))return;
+	S.ex.push({n:name,s:log.s||'',r:log.r||'',custom:true,recovered:true});
+	S.exd.push(true);
+	existing.add(key);
+	changed=true;
+  });
+  if(changed)save();
+}
+function initWorkout(opts={}){
+  const preserved=opts.preserveProgress?captureWorkoutProgress():[];
   const w=WKT[S.wt];
-  if(S.wt==='crossfit'){S.ex=[];S.exd=[];S.wuDone=[];S.cfWod=null;return;}
+  if(S.wt==='crossfit'){S.ex=[];S.exd=[];S.wuDone=[];S.cfWod=null;mergePreservedWorkoutProgress(preserved);return;}
   // Prefer template-based builder for strength workouts: it picks exercises
   // from EX_DB filtered by the user's workout location, so a "home_basic"
   // user gets bodyweight exercises while a "gym_full" user gets machines/cables.
@@ -4275,6 +4328,7 @@ function initWorkout(){
   } else {
 	S.ex=[];S.exd=[];
   }
+  mergePreservedWorkoutProgress(preserved);
   S.warmup=buildWarmup(S.wt);
   S.wuDone=S.warmup.map(()=>false);
 }
@@ -4532,7 +4586,7 @@ function markWorkoutDone(){
 
 
 function resetToPlan(){
-  S.wt=nextWorkoutInSplit();initWorkout();save();
+  S.wt=nextWorkoutInSplit();initWorkout({preserveProgress:true});save();
   renderBp();renderWorkout();renderNextUp();renderTracker();
 }
 
@@ -4639,7 +4693,7 @@ function saveSplitChoice(){
   }
   // Switch to first workout in new plan
   S.wt=nextWorkoutInSplit();
-  initWorkout();save();
+  initWorkout({preserveProgress:true});save();
   closeSplitPicker();
   renderBp();renderWorkout();renderNextUp();renderTracker();
 }
@@ -5504,7 +5558,7 @@ function selBp(id){
   S.wt=id;
   S.wtManual=true;          // user-picked → don't let schedule override on reload
   S.workoutDone=false;
-  initWorkout();save();
+  initWorkout({preserveProgress:true});save();
   renderBp();renderWorkout();renderNextUp();renderTracker();
 }
 
@@ -6103,6 +6157,7 @@ function deleteMeal(i){
 function renderWorkout(){
   const c=document.getElementById('wc'),baw=document.getElementById('baw'),w=WKT[S.wt];
   normalizeExerciseDisplayNames();
+  recoverLoggedExercisesIntoWorkout();
   const warmupSteps=ensureWarmupState();
   const warmupHtml=warmupSteps.length&&S.wt!=='rest'?`<div class="workout-block warmup-block">
 	<div class="workout-subhead">Ogrevanje pred vadbo <span style="font-weight:400;color:var(--lt);font-size:11px;">· priporočilo, ne za odkljukati</span></div>
