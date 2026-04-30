@@ -340,7 +340,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .hist-xbtn{background:none;border:none;cursor:pointer;color:var(--lt);font-size:15px;flex-shrink:0;line-height:1;transition:transform .2s;}
 .hist-xbtn.open{transform:rotate(180deg);}
 .edot{width:7px;height:7px;border-radius:50%;background:var(--grn);flex-shrink:0;transition:background .2s;}
-.ename{flex:1;font-size:14px;color:var(--dk);}
+.ename{flex:1;min-width:0;font-size:14px;color:var(--dk);line-height:1.3;}
 .epills{display:flex;gap:5px;flex-shrink:0;}
 .ep{background:#EBF4EF;color:var(--grn);font-size:12px;padding:2px 7px;border-radius:5px;white-space:nowrap;}
 .ep.pk{background:#FBE8F5;color:#8B2B6E;}
@@ -375,7 +375,7 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .wu-body{flex:1;}
 .wu-title{font-size:15px;color:var(--dk);}
 .wu-meta{font-size:12px;color:var(--lt);margin-top:2px;}
-.logged-chip{font-size:12px;color:var(--md);background:var(--bg);padding:4px 9px;border-radius:999px;white-space:nowrap;}
+.logged-chip{display:inline-flex;align-items:center;align-self:flex-start;max-width:100%;font-size:12px;color:var(--md);background:var(--bg);padding:4px 9px;border-radius:999px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .cue-box{background:#F4F8F5;border:.5px solid #D5E5DA;border-radius:14px;padding:12px 13px;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
 .cue-row{font-size:13px;line-height:1.5;color:var(--md);}
 .cue-row b{color:var(--dk);font-weight:600;}
@@ -425,7 +425,8 @@ body{background:var(--bg);color:var(--dk);font-family:'DM Sans',system-ui,sans-s
 .exercise-note{font-size:12px;color:var(--md);background:#F8F5EE;border-radius:10px;padding:8px 10px;line-height:1.45;margin-bottom:10px;}
 .ex-summary-line{font-size:12px;color:var(--md);margin-top:4px;line-height:1.45;}
 .ex-top-logged{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.ex-top-main{flex:1;min-width:0;}
+.ex-top-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;}
+.ex-top-main .ename{flex:none;overflow-wrap:anywhere;}
 .ex-detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;}
 .ex-detail-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--lt);}
 .workout-complete-card{background:linear-gradient(135deg,#F8FBF8 0%,#EFF7F1 100%);border:.5px solid #D5E5DA;border-radius:18px;padding:14px 16px;margin-bottom:12px;}
@@ -5414,16 +5415,40 @@ function formatSetLinesFromLog(log,e){
   }
   return '';
 }
+function formatNum(n){
+  const num=parseFloat(n)||0;
+  return Number.isInteger(num)?String(num):String(Math.round(num*10)/10).replace('.',',');
+}
 function summarizeSetLog(log){
   if(!log)return'';
   if(Array.isArray(log.setsDetail)&&log.setsDetail.length){
     const arr=log.setsDetail;
+    const nums=arr.map(s=>({
+      kg:parseFloat(String(s.kg||0).replace(',','.'))||0,
+      reps:parseInt(s.reps)||0,
+      sec:parseInt(s.sec)||0,
+      km:parseFloat(String(s.km||0).replace(',','.'))||0
+    }));
+    if(nums.some(s=>s.sec>0)){
+      const totalSec=nums.reduce((sum,s)=>sum+(s.sec||0),0);
+      const totalMin=Math.round(totalSec/60);
+      const totalKm=nums.reduce((sum,s)=>sum+(s.km||0),0);
+      return `${totalMin} min${totalKm?` · ${formatNum(totalKm)} km`:''}`;
+    }
     const same=arr.every(s=>String(s.kg||0)===String(arr[0].kg||0)&&String(s.reps||0)===String(arr[0].reps||0));
     if(same){
       const first=arr[0]||{};
       return `${arr.length}×${first.reps}${(first.kg||0)>0?` · ${first.kg} kg`:''}`;
     }
-    return arr.map(s=>`${(s.kg||0)>0?`${s.kg}kg×`:'×'}${s.reps}`).join(' · ');
+    const kgVals=nums.map(s=>s.kg).filter(v=>v>0);
+    const repVals=nums.map(s=>s.reps).filter(v=>v>0);
+    const kgMin=kgVals.length?Math.min(...kgVals):0;
+    const kgMax=kgVals.length?Math.max(...kgVals):0;
+    const repMin=repVals.length?Math.min(...repVals):0;
+    const repMax=repVals.length?Math.max(...repVals):0;
+    const kgPart=kgVals.length?(kgMin===kgMax?`${formatNum(kgMin)} kg`:`${formatNum(kgMin)}-${formatNum(kgMax)} kg`):'';
+    const repPart=repVals.length?(repMin===repMax?`${repMin} pon.`:`${repMin}-${repMax} pon.`):'';
+    return [`${arr.length} serije`,kgPart,repPart].filter(Boolean).join(' · ');
   }
   if(log.kg||log.s||log.r){
     return `${log.s||'?'}×${log.r||'?'}${parseFloat(log.kg||0)>0?` · ${log.kg} kg`:''}`;
@@ -6254,8 +6279,8 @@ function renderWorkout(){
 			<div class="edot"></div>
 			<div class="ex-top-main">
 			  <div class="ename">${e.n}</div>
+			  ${loggedSummary?`<span class="logged-chip">${loggedSummary}</span>`:''}
 			</div>
-			${loggedSummary?`<span class="logged-chip">${loggedSummary}</span>`:''}
 			<button class="chk${done?' on':''}" id="echk${i}" onclick="togEx(${i})">${done?'✓':'○'}</button>
 			<button class="ex-xbtn${open?' open':''}" id="exb${i}" onclick="togExInfo(${i})" title="Odpri vajo">▾</button>
 		  </div>
