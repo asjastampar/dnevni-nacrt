@@ -1405,10 +1405,10 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 	  <div class="modal-field">
 		<label>Aktivnost</label>
 		<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
-		  <button class="goal-opt" id="ga-sed" onclick="selAct('sed')">🪑 Pretežno sedem</button>
-		  <button class="goal-opt" id="ga-light" onclick="selAct('light')">🚶 Malo gibanja</button>
-		  <button class="goal-opt" id="ga-mod" onclick="selAct('mod')">🏃 Zmerno aktiven</button>
-		  <button class="goal-opt" id="ga-high" onclick="selAct('high')">💪 Zelo aktiven</button>
+		  <button class="goal-opt" id="ga-sed" onclick="selAct('sed')">🪑 Minimalno gibanje<br><small>brez treninga, zelo malo hoje</small></button>
+		  <button class="goal-opt" id="ga-light" onclick="selAct('light')">🏃 Občasni trening<br><small>trening 1–2× tedensko</small></button>
+		  <button class="goal-opt" id="ga-mod" onclick="selAct('mod')">🏋️ Redna aktivnost<br><small>trening 3–4× tedensko</small></button>
+		  <button class="goal-opt" id="ga-high" onclick="selAct('high')">🔥 Visoka aktivnost<br><small>5×+ tedensko ali fizično delo</small></button>
 		</div>
 	  </div>
 	</div>
@@ -7978,12 +7978,21 @@ function saveGoalsState(){
   try{localStorage.setItem(lsKey(GOALS_KEY),JSON.stringify(G));}catch(e){}
 }
 
-// Mifflin-St Jeor + activity multiplier. bioSex also drives app wording.
-const ACT_MULT={sed:1.2,light:1.375,mod:1.55,high:1.725};
+// Mifflin-St Jeor + activity multiplier. "other" is a neutral midpoint.
+const ACT_MULT={
+  male:{sed:1.2,light:1.35,mod:1.55,high:1.75},
+  female:{sed:1.2,light:1.30,mod:1.50,high:1.65},
+  other:{sed:1.2,light:1.325,mod:1.525,high:1.70}
+};
+function activityMultiplierFor(bioSex,activity){
+  const sexKey=ACT_MULT[bioSex]?bioSex:'other';
+  const actKey=ACT_MULT[sexKey][activity]?activity:'light';
+  return ACT_MULT[sexKey][actKey];
+}
 function calcTDEE(){
   if(!G.age||!G.height||!G.weight)return null;
   const bmr=calcBMRFrom(G.age,G.height,G.weight,G.bioSex);
-  const tdee=Math.round(bmr*ACT_MULT[G.act||'light']);
+  const tdee=Math.round(bmr*activityMultiplierFor(G.bioSex,G.act||'light'));
   return tdee;
 }
 function calcGoalKcal(){
@@ -8139,7 +8148,7 @@ function updateGoalsCalc(){
   if(!age||!height||!weight){box.classList.remove('show');return;}
 
   const bmr=calcBMRFrom(age,height,weight,_selBioSex);
-  const tdee=Math.round(bmr*ACT_MULT[_selAct]);
+  const tdee=Math.round(bmr*activityMultiplierFor(_selBioSex,_selAct));
   let goalKcal=tdee;
   if(_selGoal==='lose')goalKcal=Math.round(tdee*(1-(DEFICIT[_selDeficitMode]||DEFICIT.standard)));
   if(_selGoal==='recomp')goalKcal=Math.round(tdee*(_selAct==='sed'?0.97:1));
@@ -8187,7 +8196,8 @@ function updateGoalsCalc(){
 	<div style="font-size:12px;color:var(--lt);margin-top:4px;line-height:1.6;">
 		  BMR = kalorije, ki jih telo porabi za dihanje, srce in možgane (${bioLabel}).<br>
 		  TDEE = BMR × faktor aktivnosti = kar telo res porabi vsak dan.<br>
-		  Vadba in koraki se beležijo za kontekst, ne dodajajo se avtomatsko kot "zaslužena hrana".
+		  Vadba in koraki se beležijo za kontekst, ne dodajajo se avtomatsko kot "zaslužena hrana".<br>
+		  Izračun je začetna ocena. Po 2 tednih spremljanja teže kalorije prilagodimo glede na trend.
 		  ${cycle.active?`<br>Cikel: ${cycle.label}, dan ${cycle.day}/${cycle.length}. ${cycle.note}`:''}
 		</div>`;
 }
