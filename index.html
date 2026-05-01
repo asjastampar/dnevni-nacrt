@@ -5853,9 +5853,9 @@ function calcKcal(){
   const remaining=goalKcal?goalKcal-totalEaten:null;
   const rangeState=kcalRange
     ? (totalEaten<kcalRange.min
-      ? {kind:'under',amount:kcalRange.min-totalEaten,title:'Do razpona'}
+      ? {kind:'under',amount:kcalRange.min-totalEaten,title:'Do cilja'}
       : (totalEaten>kcalRange.max
-        ? {kind:'over',amount:totalEaten-kcalRange.max,title:'Preko razpona'}
+        ? {kind:'over',amount:totalEaten-kcalRange.max,title:'Preko cilja'}
         : {kind:'in',amount:totalEaten-goalKcal,title:'Znotraj cilja'}))
     : null;
 
@@ -7967,6 +7967,12 @@ function cycleAdjustmentFor(profile=G){
 }
 
 const DEFICIT={gentle:0.10,standard:0.15,aggressive:0.20};
+const GOAL_MACRO_PROFILE={
+  lose:{protein:2.0,fat:0.75,minCarbs:70},
+  recomp:{protein:1.95,fat:0.85,minCarbs:100},
+  maintain:{protein:1.7,fat:0.8,minCarbs:100},
+  gain:{protein:1.8,fat:0.8,minCarbs:120}
+};
 
 function applySafetyFloor(kcal,profile=G){
   const active=profile.act&&profile.act!=='sed';
@@ -8032,21 +8038,24 @@ function calcTDEE(){
   const tdee=Math.round(bmr*activityMultiplierFor(G.bioSex,G.act||'light'));
   return tdee;
 }
+function goalKcalFromTDEE(tdee,profile=G){
+  let base=tdee;
+  if(profile.goal==='lose'){
+    const mode=profile.deficitMode||'standard';
+    base=Math.round(tdee*(1-(DEFICIT[mode]||DEFICIT.standard)));
+  }
+  if(profile.goal==='recomp'){
+    // Recomposition needs enough fuel to train and build/keep muscle.
+    // Keep it near maintenance, with only a tiny nudge down on sedentary days.
+    base=Math.round(tdee*(profile.act==='sed'?0.97:1));
+  }
+  if(profile.goal==='gain')base=Math.round(tdee*1.08);
+  return applySafetyFloor(base,profile)+cycleAdjustmentFor(profile);
+}
 function calcGoalKcal(){
   const tdee=calcTDEE();
   if(!tdee)return null;
-  let base=tdee;
-  if(G.goal==='lose'){
-    const mode=G.deficitMode||'standard';
-    base=Math.round(tdee*(1-(DEFICIT[mode]||DEFICIT.standard)));
-  }
-  if(G.goal==='recomp'){
-    // Recomposition needs enough fuel to train and build/keep muscle.
-    // Keep it near maintenance, with only a tiny nudge down on sedentary days.
-    base=Math.round(tdee*(G.act==='sed'?0.97:1));
-  }
-  if(G.goal==='gain')base=Math.round(tdee*1.08);
-  return applySafetyFloor(base,G)+cycleAdjustmentFor(G);
+  return goalKcalFromTDEE(tdee,G);
 }
 function calcDynamicMacroKcalTarget(){
   const goalKcal=calcGoalKcal();
@@ -8059,21 +8068,24 @@ function calcKcalRange(){
   if(!target)return null;
   return {min:Math.max(0,target-100),target,max:target+100};
 }
-// Macro targets prioritize protein by body weight instead of fixed percentages.
-function calcMacroTargets(){
-  const kcal=calcDynamicMacroKcalTarget();
-  if(!kcal)return null;
-  const cycle=calcCycleContext();
-  const weight=parseFloat(G.weight)||65;
-  const protein=Math.round(weight*1.8);
-  const fat=Math.round(weight*(cycle.kcalAdj>0?0.75:0.8));
+function macroTargetsFor(kcal,profile=G){
+  const weight=parseFloat(profile.weight)||65;
+  const goal=GOAL_MACRO_PROFILE[profile.goal]||GOAL_MACRO_PROFILE.recomp;
+  const protein=Math.round(weight*goal.protein);
+  const fat=Math.round(weight*goal.fat);
   const remaining=kcal-(protein*4)-(fat*9);
-  const carbs=Math.max(80,Math.round(remaining/4));
+  const carbs=Math.max(goal.minCarbs,Math.round(remaining/4));
   return {
     p:protein,
     c:carbs,
     f:fat
   };
+}
+// Macro targets prioritize protein by body weight instead of fixed percentages.
+function calcMacroTargets(){
+  const kcal=calcDynamicMacroKcalTarget();
+  if(!kcal)return null;
+  return macroTargetsFor(kcal,G);
 }
 
 let _selGoal='recomp',_selDeficitMode='standard',_selAct='light',_selLoc='gym_full',_selBioSex='female',_selCycleAware=false,_selCycleStart=null,_selCycleLength=28;
@@ -8186,18 +8198,14 @@ function updateGoalsCalc(){
 
   const bmr=calcBMRFrom(age,height,weight,_selBioSex);
   const tdee=Math.round(bmr*activityMultiplierFor(_selBioSex,_selAct));
-  let goalKcal=tdee;
-  if(_selGoal==='lose')goalKcal=Math.round(tdee*(1-(DEFICIT[_selDeficitMode]||DEFICIT.standard)));
-  if(_selGoal==='recomp')goalKcal=Math.round(tdee*(_selAct==='sed'?0.97:1));
-  if(_selGoal==='gain')goalKcal=Math.round(tdee*1.08);
-  const previewProfile={...G,bioSex:_selBioSex,act:_selAct};
-  goalKcal=applySafetyFloor(goalKcal,previewProfile);
   const draftCycle={...G,bioSex:_selBioSex,cycleAware:_selCycleAware,cycleStart:document.getElementById('g-cycle-start')?.value||_selCycleStart,cycleLength:parseInt(document.getElementById('g-cycle-length')?.value)||_selCycleLength};
+  const previewProfile={...G,weight,goal:_selGoal,deficitMode:_selDeficitMode,bioSex:_selBioSex,act:_selAct,cycleAware:draftCycle.cycleAware,cycleStart:draftCycle.cycleStart,cycleLength:draftCycle.cycleLength};
+  let goalKcal=goalKcalFromTDEE(tdee,previewProfile);
   const cycle=calcCycleContext(draftCycle);
-  goalKcal+=cycle.kcalAdj||0;
-  const p=Math.round(weight*1.8);
-  const f=Math.round(weight*(cycle.kcalAdj?0.75:0.8));
-  const c=Math.max(80,Math.round((goalKcal-(p*4)-(f*9))/4));
+  const macros=macroTargetsFor(goalKcal,previewProfile);
+  const p=macros.p;
+  const f=macros.f;
+  const c=macros.c;
   const diff=target&&weight?Math.abs(weight-target):null;
   const weeks=diff?Math.round(diff/0.5):null;
   const goalLabel={
