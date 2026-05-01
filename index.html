@@ -1982,6 +1982,11 @@ const EX_DB={
 	cue:'Boki ostanejo ravni — ne pusti, da medenica pade na eno stran.',
 	video:'single leg glute bridge form',
 	alts:['gluteridge_bw','gluteridge_band','rdl_db_oneleg']},
+  gluteridge_single:{n:'Single-leg glute bridge',movement:'hip_extension',primary:['glutes'],secondary:['hamstrings','core'],locations:['home_basic','home_eq','outdoor'],level:'intermediate',scheme:'3×10-12/stran',
+	desc:'Leže na hrbtu, ena noga na tleh, druga dvignjena. Dvigni boke.',
+	cue:'Na vrhu stisni zadnjico, boki naj ostanejo ravni.',
+	video:'single leg glute bridge form',
+	alts:['gluteridge_bw','gluteridge_band','hipthrust_db']},
   rdl_bb:{n:'Barbell RDL',movement:'hip_hinge',primary:['hamstrings','glutes'],secondary:['low_back'],locations:['gym_full','gym_weights'],level:'intermediate',scheme:'3-4×8-10',
 	desc:'Stoja, palica blizu telesa, kolena rahlo pokrčena, kolki nazaj.',
 	cue:'Občutek raztega zadnjega dela stegen je signal — ne ukrivljaj križa.',
@@ -1997,6 +2002,11 @@ const EX_DB={
 	cue:'Trebuh napet — če se zazibaš, zmanjšaj utež.',
 	video:'single leg romanian deadlift form',
 	alts:['rdl_db','rdl_bb','singleleg_bridge']},
+  single_leg_rdl_bw:{n:'Single-leg RDL',movement:'hip_hinge',primary:['hamstrings','glutes'],secondary:['core'],locations:['home_basic','home_eq','outdoor'],level:'intermediate',scheme:'3×10/stran',
+	desc:'Stoj na eni nogi, drugo nogo pelji nazaj, trup se nagne naprej.',
+	cue:'Boki ostanejo ravni, gib naj pride iz kolka.',
+	video:'single leg romanian deadlift bodyweight form',
+	alts:['rdl_db','goodmorning_bw','gluteridge_single']},
   goodmorning_bb:{n:'Barbell good morning',movement:'hip_hinge',primary:['hamstrings','glutes'],secondary:['low_back'],locations:['gym_full','gym_weights'],level:'advanced',scheme:'3×8-10',
 	desc:'Palica na zgornjem delu hrbta, kolki nazaj, hrbet raven.',
 	cue:'Zelo lahka utež za začetek — tehnika je vse.',
@@ -2078,6 +2088,16 @@ const EX_DB={
 	cue:'Počasi navzdol (3 sek), eksplozivno gor.',
 	video:'air squat bodyweight form',
 	alts:['squat_db','squat_jump','split_squat']},
+  squat_bw_tempo:{n:'Tempo squat',movement:'squat',primary:['quads','glutes'],secondary:['core'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×10-12',
+	desc:'Počasi se spusti 3 sekunde, spodaj kratka pavza, nato kontrolirano gor.',
+	cue:'Naj pečejo noge, ne križ. Kolena sledijo prstom.',
+	video:'tempo bodyweight squat form',
+	alts:['squat_bw_pause','split_squat_bw','squat_bw']},
+  squat_bw_pause:{n:'Pause squat',movement:'squat',primary:['quads','glutes'],secondary:['core'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×10',
+	desc:'Spusti se v počep, spodaj zadrži 1–2 sekundi, nato vstani.',
+	cue:'Spodaj ostani napeta — ne se odbiti iz pozicije.',
+	video:'pause bodyweight squat form',
+	alts:['squat_bw_tempo','split_squat_bw','squat_bw']},
   squat_sumo_db:{n:'Dumbbell sumo squat',movement:'squat',primary:['glutes','adductors'],secondary:['quads'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
 	desc:'Široka stoja, prsti narazen, ročka držana med nogami, počep.',
 	cue:'Občutek naj bo na notranji strani stegen in v zadnjici.',
@@ -2103,6 +2123,11 @@ const EX_DB={
 	cue:'Sprednje koleno NE gre čez prste, zadnje koleno se približa tlom.',
 	video:'split squat form',
 	alts:['lunge_db','bulgarian_split','step_up']},
+  split_squat_bw:{n:'Split squat',movement:'lunge_split',primary:['quads','glutes'],secondary:['hamstrings','core'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×10/stran',
+	desc:'Ena noga naprej, druga nazaj. Spusti se navzdol in kontrolirano vstani.',
+	cue:'Teža naj bo na sprednji nogi, trup stabilen.',
+	video:'bodyweight split squat form',
+	alts:['bulgarian_split','lunge_bw','squat_bw_tempo']},
   lunge_db:{n:'Dumbbell lunges',movement:'lunge_walk',primary:['quads','glutes'],locations:['gym_full','gym_weights','home_eq','outdoor'],level:'beginner',scheme:'3×10/nogo',
 	desc:'Ročke ob telesu, korak naprej, oba kolena 90°.',
 	cue:'Trup drži pokončno, ne nagibaj se naprej.',
@@ -7912,20 +7937,58 @@ async function refreshWorkout(){
   const btn=document.getElementById('baw');if(!btn||btn.disabled)return;
   btn.disabled=true;btn.innerHTML='<span class="spin">↺</span> Generiram...';
 
+  // CRITICAL: never wipe checked exercises. Identify which slots are still
+  // open (unchecked) — those get new exercises. Checked ones stay in place
+  // with their logged sets/weights/etc., preserving position.
+  const swapIdx=(S.ex||[]).map((_,i)=>i).filter(i=>!(S.exd&&S.exd[i]));
+  const swapCount=swapIdx.length;
+
+  // If everything is already checked, there's nothing to swap.
+  if(swapCount===0){
+	btn.disabled=false;btn.innerHTML='↺ Zamenjaj vaje';
+	err('Vse vaje so že označene kot opravljene. Zamenjati ni česa.');
+	return;
+  }
+
+  // Helper: write `freshEx` into the unchecked slots in-place, leaving
+  // checked exercises and their exd flags untouched.
+  const fillSlots=(freshEx)=>{
+	const newEx=[...S.ex];
+	const newExd=[...(S.exd||[])];
+	swapIdx.forEach((slot,k)=>{
+	  if(freshEx[k]){
+		newEx[slot]=freshEx[k];
+		newExd[slot]=false;
+	  }
+	});
+	// If template returned fewer fresh exercises than open slots, drop the
+	// trailing empty slots so the workout doesn't show stale placeholders.
+	const tail=swapIdx.length-freshEx.length;
+	if(tail>0){
+	  // Remove the last `tail` open slots from the END of the array
+	  const keepCount=newEx.length-tail;
+	  S.ex=newEx.slice(0,keepCount);
+	  S.exd=newExd.slice(0,keepCount);
+	} else {
+	  S.ex=newEx;S.exd=newExd;
+	}
+  };
+
   if(S.wt==='cardio'){
 	try{
 	  const txt=await api(
-		'Si fitnes trener. Predlagaj 7 različnih kardio aktivnosti. Vrni SAMO JSON array: [{"n":"ime aktivnosti v slovenščini","s":"1","r":"30 min","kcal":200},...]',
+		`Si fitnes trener. Predlagaj ${swapCount} različnih kardio aktivnosti. Vrni SAMO JSON array: [{"n":"ime aktivnosti v slovenščini","s":"1","r":"30 min","kcal":200},...]`,
 		'Sestavi raznovrsten seznam kardio aktivnosti — tek, kolo, plavanje, hoja, planinarjenje, elipsa itd. Vključi pohod na Pohorje z oceno kcal ~800.'
 	  );
 	  const p=JSON.parse(txt);
-	  if(Array.isArray(p)){S.ex=p.slice(0,7);S.exd=S.ex.map(()=>false);save();renderWorkout();}
+	  if(Array.isArray(p)){fillSlots(p.slice(0,swapCount));save();renderWorkout();}
 	}catch(e){err('Generiranje ni uspelo.');}
 	btn.disabled=false;btn.innerHTML='↺ Zamenjaj vaje';
 	return;
   }
 
   if(S.wt==='crossfit'){
+	// CrossFit WOD is a single block — refreshing it regenerates the WOD.
 	const types=['AMRAP','For Time','EMOM'];
 	const t=types[Math.floor(Math.random()*types.length)];
 	try{
@@ -7940,12 +8003,43 @@ async function refreshWorkout(){
 	return;
   }
 
+  // STRENGTH PATH: prefer template-based regeneration over AI.
+  if(typeof WKT_TEMPLATES!=='undefined'&&WKT_TEMPLATES[S.wt]&&typeof buildWorkoutFromTemplate==='function'){
+	try{
+	  // Build a fresh full workout from the template, then drop any exercises
+	  // that match the names/ids of already-kept (checked) ones.
+	  const keptIds=new Set();
+	  const keptNames=new Set();
+	  S.ex.forEach((e,i)=>{
+		if(S.exd&&S.exd[i]){
+		  if(e.id)keptIds.add(e.id);
+		  if(e.n)keptNames.add(e.n.toLowerCase());
+		}
+	  });
+	  const fresh=buildWorkoutFromTemplate(WKT_TEMPLATES[S.wt])
+		.filter(e=>!keptIds.has(e.id)&&!keptNames.has((e.n||'').toLowerCase()))
+		.slice(0,swapCount);
+	  fillSlots(fresh);
+	  save();renderWorkout();
+	}catch(e){
+	  err('Generiranje ni uspelo.');
+	}
+	btn.disabled=false;btn.innerHTML='↺ Zamenjaj vaje';
+	return;
+  }
+
+  // FALLBACK: AI for workouts without a template
   const w=WKT[S.wt];
   const focus=S.wt==='glute'?'zadnjico (hip thrust, donkey kicks, cable pull-through, dumbbell sumo squat, glute bridge)':w.title.toLowerCase();
+  const keptNames=S.ex.filter((e,i)=>S.exd&&S.exd[i]).map(e=>e.n).filter(Boolean);
+  const avoidLine=keptNames.length?` Ne uporabljaj teh vaj (so že na seznamu): ${keptNames.join(', ')}.`:'';
   try{
-	const txt=await api('Si fitnes trener za telovadnico. SAMO JSON array 6 vaj: [{"n":"ime v slovenščini","s":"3","r":"12"},...]',
-	  `Svež trening za ${focus}. Drugačen od navadnega.`);
-	const p=JSON.parse(txt);if(Array.isArray(p)){S.ex=p.slice(0,6);S.exd=S.ex.map(()=>false);save();renderWorkout();}
+	const txt=await api(
+	  `Si fitnes trener za telovadnico. SAMO JSON array ${swapCount} vaj: [{"n":"ime v slovenščini","s":"3","r":"12"},...]`,
+	  `Svež trening za ${focus}. Drugačen od navadnega.${avoidLine}`
+	);
+	const p=JSON.parse(txt);
+	if(Array.isArray(p)){fillSlots(p.slice(0,swapCount));save();renderWorkout();}
   }catch(e){err('Generiranje ni uspelo.');}
   btn.disabled=false;btn.innerHTML='↺ Zamenjaj vaje';
 }
