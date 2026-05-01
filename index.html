@@ -7379,7 +7379,7 @@ function offlineApi(sys,msg){
     const n=pickDifferentExercise(extractFirstQuotedText(msg),alts.length?alts:WKT.cardio.ex.map(e=>e.n));
     return JSON.stringify({n,s:'1',r:'30 min',kcal:200});
   }
-  if(/telovadnico\. .*JSON:\s*\{\"n\":\"ime vaje/.test(prompt) || /telovadnico\. .*Vrni SAMO JSON:\s*\{\"n\":\"ime vaje/.test(prompt)){
+  if(/telovadnico\. .*JSON:\s*\{\"n\":\"English exercise name/.test(prompt) || /telovadnico\. .*Vrni SAMO JSON:\s*\{\"n\":\"English exercise name/.test(prompt)){
     const current=extractFirstQuotedText(msg);
     const alts=extractAlternativesFromSys(sys);
     const n=pickDifferentExercise(current,alts);
@@ -7879,7 +7879,7 @@ async function swapEx(i){
 	const altList=candidates.length?`Izberi eno izmed: ${candidates.join(', ')}.`:'';
 	try{
 	  const txt=await api(
-		`Si fitnes trener. Predlagaj alternativno kardio aktivnost iz iste kategorije gibanja. ${altList} Vrni SAMO JSON: {"n":"ime aktivnosti v slovenščini","s":"1","r":"30 min","kcal":200}`,
+		`Si fitnes trener. Predlagaj alternativno kardio aktivnost iz iste kategorije gibanja. Ime aktivnosti naj bo v angleščini. ${altList} Vrni SAMO JSON: {"n":"English activity name","s":"1","r":"30 min","kcal":200}`,
 		`Zamenjaj kardio aktivnost "${cur.n}" z drugačno alternativo iz iste skupine.`
 	  );
 	  const p=JSON.parse(txt);S.ex[i]={...cur,...p};save();renderWorkout();
@@ -7982,6 +7982,48 @@ async function swapCfEx(i){
 	save();renderWorkout();
   }catch(e){err('Zamenjava ni uspela.');btn.disabled=false;btn.innerHTML='↺';}
 }
+function isProtectedWorkoutExercise(ex,i,elog){
+  if(!ex)return false;
+  if(Array.isArray(S.exd)&&S.exd[i])return true;
+  if(ex.custom||ex.recovered)return true;
+  return hasUsefulExerciseLog(elog?.[ex.n]);
+}
+function applyWorkoutRefreshCandidates(candidates){
+  if(!Array.isArray(candidates)||!candidates.length)return false;
+  const oldEx=Array.isArray(S.ex)?S.ex.map(e=>({...e})):[];
+  const oldDone=Array.isArray(S.exd)?S.exd.slice(0,oldEx.length):[];
+  const elog=loadElog();
+  const protectedKeys=new Set();
+  oldEx.forEach((ex,i)=>{
+	if(isProtectedWorkoutExercise(ex,i,elog))protectedKeys.add(exerciseKey(ex.n));
+  });
+  const queue=candidates
+	.map(e=>({...e}))
+	.filter(e=>e&&e.n&&!protectedKeys.has(exerciseKey(e.n)));
+  const nextEx=[];
+  const nextDone=[];
+  let q=0;
+  for(let i=0;i<oldEx.length;i++){
+	const ex=oldEx[i];
+	if(isProtectedWorkoutExercise(ex,i,elog)){
+	  nextEx.push(ex);
+	  nextDone.push(!!oldDone[i]);
+	  continue;
+	}
+	const replacement=queue[q++];
+	if(replacement){
+	  nextEx.push(replacement);
+	  nextDone.push(false);
+	}
+  }
+  while(q<queue.length&&nextEx.length<Math.max(oldEx.length,candidates.length)){
+	nextEx.push(queue[q++]);
+	nextDone.push(false);
+  }
+  S.ex=nextEx.length?nextEx:oldEx;
+  S.exd=nextDone.length?nextDone:oldDone;
+  return true;
+}
 async function refreshWorkout(){
   const btn=document.getElementById('baw');if(!btn||btn.disabled)return;
   btn.disabled=true;btn.innerHTML='<span class="spin">↺</span> Generiram...';
@@ -7989,11 +8031,11 @@ async function refreshWorkout(){
   if(S.wt==='cardio'){
 	try{
 	  const txt=await api(
-		'Si fitnes trener. Predlagaj 7 različnih kardio aktivnosti. Vrni SAMO JSON array: [{"n":"ime aktivnosti v slovenščini","s":"1","r":"30 min","kcal":200},...]',
+		'Si fitnes trener. Predlagaj 7 različnih kardio aktivnosti. Imena aktivnosti naj bodo v angleščini. Vrni SAMO JSON array: [{"n":"English activity name","s":"1","r":"30 min","kcal":200},...]',
 		'Sestavi raznovrsten seznam kardio aktivnosti — tek, kolo, plavanje, hoja, planinarjenje, elipsa itd. Vključi pohod na Pohorje z oceno kcal ~800.'
 	  );
 	  const p=JSON.parse(txt);
-	  if(Array.isArray(p)){S.ex=p.slice(0,7);S.exd=S.ex.map(()=>false);save();renderWorkout();}
+	  if(Array.isArray(p)&&applyWorkoutRefreshCandidates(p.slice(0,7))){save();renderWorkout();}
 	}catch(e){err('Generiranje ni uspelo.');}
 	btn.disabled=false;btn.innerHTML='↺ Zamenjaj vaje';
 	return;
@@ -8004,8 +8046,8 @@ async function refreshWorkout(){
 	const t=types[Math.floor(Math.random()*types.length)];
 	try{
 	  const txt=await api(
-		`Si CrossFit trener. Sestavi WOD za ${beginnerNoun()} v fitnesu — skalirane vaje, dostopna oprema (kettlebell, ročke, veslanje, lastna teža). Vrni SAMO veljavni JSON: {"type":"AMRAP","time":15,"name":"Ime WODa","ex":[{"n":"ime vaje","r":"10"},{"n":"ime vaje","r":"15"}],"note":"kratko navodilo"}`,
-		`Sestavi nov ${t} CrossFit WOD za danes. Vaje v slovenščini, skalirane za ${beginnerNoun()}.`
+		`Si CrossFit trener. Sestavi WOD za ${beginnerNoun()} v fitnesu — skalirane vaje, dostopna oprema (kettlebell, ročke, veslanje, lastna teža). Imena vaj naj bodo v angleščini. Vrni SAMO veljavni JSON: {"type":"AMRAP","time":15,"name":"Ime WODa","ex":[{"n":"English exercise name","r":"10"},{"n":"English exercise name","r":"15"}],"note":"kratko navodilo v slovenščini"}`,
+		`Sestavi nov ${t} CrossFit WOD za danes. Imena vaj v angleščini, navodilo v slovenščini, skalirano za ${beginnerNoun()}.`
 	  );
 	  const p=JSON.parse(txt);
 	  S.cfWod={...p};save();renderWorkout();
@@ -8014,12 +8056,13 @@ async function refreshWorkout(){
 	return;
   }
 
-  const w=WKT[S.wt];
-  const focus=S.wt==='glute'?'zadnjico (hip thrust, donkey kicks, cable pull-through, dumbbell sumo squat, glute bridge)':w.title.toLowerCase();
   try{
-	const txt=await api('Si fitnes trener za telovadnico. SAMO JSON array 6 vaj: [{"n":"ime v slovenščini","s":"3","r":"12"},...]',
-	  `Svež trening za ${focus}. Drugačen od navadnega.`);
-	const p=JSON.parse(txt);if(Array.isArray(p)){S.ex=p.slice(0,6);S.exd=S.ex.map(()=>false);save();renderWorkout();}
+	let candidates=[];
+	const loc=getWorkoutLoc();
+	if(loc==='outdoor'&&S.wt!=='rest'&&S.wt!=='crossfit')candidates=buildOutdoorActivityWorkout(S.wt);
+	else if(WKT_TEMPLATES&&WKT_TEMPLATES[S.wt])candidates=buildWorkoutFromTemplate(WKT_TEMPLATES[S.wt]);
+	else if(WKT[S.wt]?.ex)candidates=WKT[S.wt].ex.map(e=>({...e}));
+	if(applyWorkoutRefreshCandidates(candidates)){save();renderWorkout();}
   }catch(e){err('Generiranje ni uspelo.');}
   btn.disabled=false;btn.innerHTML='↺ Zamenjaj vaje';
 }
