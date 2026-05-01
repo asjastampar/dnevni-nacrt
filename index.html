@@ -2095,7 +2095,7 @@ const EX_DB={
 	alts:['squat_bw_pause','split_squat_bw','squat_bw']},
   squat_bw_pause:{n:'Pause squat',movement:'squat',primary:['quads','glutes'],secondary:['core'],locations:['home_basic','home_eq','outdoor'],level:'beginner',scheme:'3×10',
 	desc:'Spusti se v počep, spodaj zadrži 1–2 sekundi, nato vstani.',
-	cue:'Spodaj ostani napeta — ne se odbiti iz pozicije.',
+	cue:'Spodaj naj trup ostane napet — ne se odbiti iz pozicije.',
 	video:'pause bodyweight squat form',
 	alts:['squat_bw_tempo','split_squat_bw','squat_bw']},
   squat_sumo_db:{n:'Dumbbell sumo squat',movement:'squat',primary:['glutes','adductors'],secondary:['quads'],locations:['gym_full','gym_weights','home_eq'],level:'beginner',scheme:'3×10-12',
@@ -2351,7 +2351,13 @@ const EX_DB={
 	desc:'Stoja na eni nogi, dvigni se na prste.',
 	cue:'Drži ravnotežje — počasi navzdol.',
 	video:'single leg calf raise form',
-	alts:['calf_raise','calf_raise_db','calf_raise_seated']}
+	alts:['calf_raise','calf_raise_db','calf_raise_seated']},
+  // ── OUTDOOR MAIN ACTIVITY ─────────────────────────────────
+  outdoor_walk_hike:{n:'Walk / hike / Pohorje',movement:'cardio',primary:['heart','legs'],secondary:['glutes','calves'],locations:['outdoor'],level:'beginner',scheme:'1×30–90 min',
+	desc:'Izberi hojo, pohod ali teren. Tempo naj bo tak, da se zadihaš, a lahko še govoriš v kratkih stavkih.',
+	cue:'To je glavna aktivnost dneva; dodatne vaje spodaj so samo kratek dodatek, ne šest ločenih fitnes vaj.',
+	video:'hiking walking cardio workout beginner',
+	alts:['squat_bw_tempo','split_squat_bw','gluteridge_single']}
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -2668,6 +2674,8 @@ function findAltExercise(currentId,opts={}){
 function buildWorkoutFromTemplate(template){
   const loc=getWorkoutLoc();
   const used=new Set();
+  const movementCount={};
+  const MAX_SAME_MOVEMENT=2;
   const out=[];
   for(const slot of template){
 	let chosen=null;
@@ -2677,6 +2685,8 @@ function buildWorkoutFromTemplate(template){
 	  if(!ex)continue;
 	  if(used.has(id))continue;
 	  if(!ex.locations.includes(loc))continue;
+	  const movement=ex.movement||slot.movement||'general';
+	  if((movementCount[movement]||0)>=MAX_SAME_MOVEMENT)continue;
 	  chosen=id;break;
 	}
 	// Fallback: any exercise matching the movement pattern, at this location
@@ -2686,12 +2696,16 @@ function buildWorkoutFromTemplate(template){
 		const ex=EX_DB[id];
 		if(ex.movement!==slot.movement)continue;
 		if(!ex.locations.includes(loc))continue;
+		const movement=ex.movement||slot.movement||'general';
+		if((movementCount[movement]||0)>=MAX_SAME_MOVEMENT)continue;
 		chosen=id;break;
 	  }
 	}
 	if(chosen){
 	  used.add(chosen);
 	  const ex=EX_DB[chosen];
+	  const movement=ex.movement||slot.movement||'general';
+	  movementCount[movement]=(movementCount[movement]||0)+1;
 	  // Use the slot's reps/sets if specified, otherwise fall back to the
 	  // exercise's default scheme.
 	  const scheme=slot.scheme||ex.scheme||'3×10';
@@ -2706,6 +2720,25 @@ function buildWorkoutFromTemplate(template){
 	}
   }
   return out;
+}
+
+function buildOutdoorActivityWorkout(wt){
+  const activities=[
+	{id:'outdoor_walk_hike',n:'Walk / hike / Pohorje',s:'1',r:'30–90 min',outdoorMain:true}
+  ];
+  const boosts=[
+	{id:'plank',n:'Plank',s:'3',r:'20–40s'},
+	{id:'split_squat_bw',n:'Split squat',s:'2–3',r:'10/stran'},
+	{id:'gluteridge_bw',n:'Bodyweight glute bridge',s:'3',r:'15–20'}
+  ];
+  if(wt==='upper')return [
+	...activities,
+	{id:'pushup_incline',n:'Incline push-up',s:'2–3',r:'8–12'},
+	{id:'row_band',n:'Resistance band row',s:'2–3',r:'12–15'},
+	{id:'plank',n:'Plank',s:'3',r:'20–40s'}
+  ];
+  if(wt==='cardio')return activities;
+  return [...activities,...boosts];
 }
 
 const EX_NAME_MIGRATIONS={
@@ -2753,6 +2786,10 @@ const EX_NAME_MIGRATIONS={
   'Squat z palico':'Barbell squat',
   'Back squat':'Barbell squat',
   'Barbell back squat':'Barbell squat',
+  'Tempo počep':'Tempo squat',
+  'Počep s tempom':'Tempo squat',
+  'Pause počep':'Pause squat',
+  'Počep s pavzo':'Pause squat',
   'Goblet počep':'Goblet squat',
   'Počep z ročkami':'Dumbbell squat',
   'Sumo počep z ročko':'Dumbbell sumo squat',
@@ -2761,6 +2798,8 @@ const EX_NAME_MIGRATIONS={
   'Romunski mrtvi dvig (palica)':'Barbell RDL',
   'Romunski mrtvi dvig (ročke)':'Dumbbell RDL',
   'Enonožni RDL z ročko':'Single-leg dumbbell RDL',
+  'Enonožni RDL':'Single-leg RDL',
+  'RDL na eni nogi':'Single-leg RDL',
   'Donkey kicks pri kablu':'Cable donkey kick',
   'Abduktor stroj (odmik nog)':'Hip abductor machine',
   'Dvig na prste — lýtka':'Calf raise',
@@ -2794,6 +2833,7 @@ const EX_NAME_MIGRATIONS={
   'Box step-up (z ročkama 4 kg)':'Box step-up (4 kg dumbbells)',
   'Plavanje':'Swimming',
   'Hoja (hiter tempo, zunaj)':'Brisk walk (outdoor)',
+  'Hoja / pohod / Pohorje':'Walk / hike / Pohorje',
   'Pohod na Pohorje 🏔':'Hike'
 };
 function normalizeExerciseNameKey(name){
@@ -2838,17 +2878,17 @@ function normalizeExerciseDisplayNames(){
 //   - Core last
 const WKT_TEMPLATES={
   glute:[
-	{primary:['hipthrust_barbell','hipthrust_db','gluteridge_db','gluteridge_bw'],movement:'hip_extension',scheme:'4×8-12'},
-	{primary:['rdl_bb','rdl_db','rdl_db_oneleg','goodmorning_bw'],movement:'hip_hinge',scheme:'3×8-10'},
-	{primary:['bulgarian_split','split_squat','step_up','reverse_lunge'],movement:'lunge_split',scheme:'3×10/nogo'},
-	{primary:['cablepull_through','kettlebell_swing','rdl_db_oneleg'],movement:'hip_hinge',scheme:'3×12-15'},
+	{primary:['gluteridge_single','gluteridge_bw','hipthrust_barbell','hipthrust_db','gluteridge_db'],movement:'hip_extension',scheme:'4×8-12'},
+	{primary:['single_leg_rdl_bw','rdl_bb','rdl_db','rdl_db_oneleg','goodmorning_bw'],movement:'hip_hinge',scheme:'3×8-10'},
+	{primary:['split_squat_bw','bulgarian_split','split_squat','step_up','reverse_lunge'],movement:'lunge_split',scheme:'3×10/nogo'},
+	{primary:['single_leg_rdl_bw','cablepull_through','kettlebell_swing','rdl_db_oneleg'],movement:'hip_hinge',scheme:'3×12-15'},
 	{primary:['donkey_kick_cable','donkey_kick_band','donkey_kick_bw','frog_pump'],movement:'hip_extension_isolation',scheme:'3×15/nogo'},
 	{primary:['hip_abductor_machine','sidestep_band','clamshells','firehydrant'],movement:'hip_abduction',scheme:'3×15'}
   ],
   lower:[
-	{primary:['squat_bb','squat_goblet','squat_db','squat_bw'],movement:'squat',scheme:'4×6-10'},
-	{primary:['rdl_bb','rdl_db','goodmorning_bw'],movement:'hip_hinge',scheme:'3×8-10'},
-	{primary:['legpress','bulgarian_split','split_squat','squat_jump'],movement:'squat',scheme:'3×10-12'},
+	{primary:['squat_bw_tempo','squat_bw_pause','split_squat_bw','squat_bb','squat_goblet','squat_db','squat_bw'],movement:'squat',scheme:'4×6-10'},
+	{primary:['single_leg_rdl_bw','rdl_bb','rdl_db','goodmorning_bw'],movement:'hip_hinge',scheme:'3×8-10'},
+	{primary:['squat_bw_pause','legpress','bulgarian_split','split_squat','squat_jump'],movement:'squat',scheme:'3×10-12'},
 	{primary:['lunge_db','lunge_bw','reverse_lunge','step_up'],movement:'lunge_walk',scheme:'3×10/nogo'},
 	{primary:['donkey_kick_cable','donkey_kick_band','frog_pump'],movement:'hip_extension_isolation',scheme:'3×15'},
 	{primary:['calf_raise_db','calf_raise','calf_raise_oneleg'],movement:'calf',scheme:'3×15-20'}
@@ -2862,11 +2902,11 @@ const WKT_TEMPLATES={
 	{primary:['triceps_pushdown','triceps_dip_bench','close_grip_pushup','overhead_triceps_db'],movement:'triceps_isolation',scheme:'3×10-12'}
   ],
   full:[
-	{primary:['squat_goblet','squat_bb','squat_db','squat_bw'],movement:'squat',scheme:'3×8-12'},
+	{primary:['squat_bw_tempo','squat_bw_pause','split_squat_bw','squat_goblet','squat_bb','squat_db','squat_bw'],movement:'squat',scheme:'3×8-12'},
 	{primary:['bench_db','bench_bb','pushup','chest_press_machine'],movement:'horizontal_push',scheme:'3×8-10'},
-	{primary:['rdl_db','rdl_bb','goodmorning_bw'],movement:'hip_hinge',scheme:'3×8-10'},
+	{primary:['single_leg_rdl_bw','rdl_db','rdl_bb','goodmorning_bw'],movement:'hip_hinge',scheme:'3×8-10'},
 	{primary:['row_db','row_bb','row_band','lat_pulldown'],movement:'horizontal_pull',scheme:'3×10'},
-	{primary:['hipthrust_db','gluteridge_db','frog_pump'],movement:'hip_extension',scheme:'3×12'},
+	{primary:['gluteridge_single','gluteridge_bw','hipthrust_db','gluteridge_db','frog_pump'],movement:'hip_extension',scheme:'3×12'},
 	{primary:['plank','deadbug','hollow_hold'],movement:'core_iso',scheme:'3×30-45s'}
   ]
 };
@@ -4455,6 +4495,15 @@ function initWorkout(opts={}){
   const preserved=opts.preserveProgress?captureWorkoutProgress():[];
   const w=WKT[S.wt];
   if(S.wt==='crossfit'){S.ex=[];S.exd=[];S.wuDone=[];S.cfWod=null;mergePreservedWorkoutProgress(preserved);return;}
+  const loc=getWorkoutLoc();
+  if(loc==='outdoor'&&S.wt!=='rest'&&S.wt!=='crossfit'){
+	S.ex=buildOutdoorActivityWorkout(S.wt);
+	S.exd=S.ex.map(()=>false);
+	mergePreservedWorkoutProgress(preserved);
+	S.warmup=buildWarmup(S.wt);
+	S.wuDone=S.warmup.map(()=>false);
+	return;
+  }
   // Prefer template-based builder for strength workouts: it picks exercises
   // from EX_DB filtered by the user's workout location, so a "home_basic"
   // user gets bodyweight exercises while a "gym_full" user gets machines/cables.
@@ -7937,58 +7986,20 @@ async function refreshWorkout(){
   const btn=document.getElementById('baw');if(!btn||btn.disabled)return;
   btn.disabled=true;btn.innerHTML='<span class="spin">↺</span> Generiram...';
 
-  // CRITICAL: never wipe checked exercises. Identify which slots are still
-  // open (unchecked) — those get new exercises. Checked ones stay in place
-  // with their logged sets/weights/etc., preserving position.
-  const swapIdx=(S.ex||[]).map((_,i)=>i).filter(i=>!(S.exd&&S.exd[i]));
-  const swapCount=swapIdx.length;
-
-  // If everything is already checked, there's nothing to swap.
-  if(swapCount===0){
-	btn.disabled=false;btn.innerHTML='↺ Zamenjaj vaje';
-	err('Vse vaje so že označene kot opravljene. Zamenjati ni česa.');
-	return;
-  }
-
-  // Helper: write `freshEx` into the unchecked slots in-place, leaving
-  // checked exercises and their exd flags untouched.
-  const fillSlots=(freshEx)=>{
-	const newEx=[...S.ex];
-	const newExd=[...(S.exd||[])];
-	swapIdx.forEach((slot,k)=>{
-	  if(freshEx[k]){
-		newEx[slot]=freshEx[k];
-		newExd[slot]=false;
-	  }
-	});
-	// If template returned fewer fresh exercises than open slots, drop the
-	// trailing empty slots so the workout doesn't show stale placeholders.
-	const tail=swapIdx.length-freshEx.length;
-	if(tail>0){
-	  // Remove the last `tail` open slots from the END of the array
-	  const keepCount=newEx.length-tail;
-	  S.ex=newEx.slice(0,keepCount);
-	  S.exd=newExd.slice(0,keepCount);
-	} else {
-	  S.ex=newEx;S.exd=newExd;
-	}
-  };
-
   if(S.wt==='cardio'){
 	try{
 	  const txt=await api(
-		`Si fitnes trener. Predlagaj ${swapCount} različnih kardio aktivnosti. Vrni SAMO JSON array: [{"n":"ime aktivnosti v slovenščini","s":"1","r":"30 min","kcal":200},...]`,
+		'Si fitnes trener. Predlagaj 7 različnih kardio aktivnosti. Vrni SAMO JSON array: [{"n":"ime aktivnosti v slovenščini","s":"1","r":"30 min","kcal":200},...]',
 		'Sestavi raznovrsten seznam kardio aktivnosti — tek, kolo, plavanje, hoja, planinarjenje, elipsa itd. Vključi pohod na Pohorje z oceno kcal ~800.'
 	  );
 	  const p=JSON.parse(txt);
-	  if(Array.isArray(p)){fillSlots(p.slice(0,swapCount));save();renderWorkout();}
+	  if(Array.isArray(p)){S.ex=p.slice(0,7);S.exd=S.ex.map(()=>false);save();renderWorkout();}
 	}catch(e){err('Generiranje ni uspelo.');}
 	btn.disabled=false;btn.innerHTML='↺ Zamenjaj vaje';
 	return;
   }
 
   if(S.wt==='crossfit'){
-	// CrossFit WOD is a single block — refreshing it regenerates the WOD.
 	const types=['AMRAP','For Time','EMOM'];
 	const t=types[Math.floor(Math.random()*types.length)];
 	try{
@@ -8003,43 +8014,12 @@ async function refreshWorkout(){
 	return;
   }
 
-  // STRENGTH PATH: prefer template-based regeneration over AI.
-  if(typeof WKT_TEMPLATES!=='undefined'&&WKT_TEMPLATES[S.wt]&&typeof buildWorkoutFromTemplate==='function'){
-	try{
-	  // Build a fresh full workout from the template, then drop any exercises
-	  // that match the names/ids of already-kept (checked) ones.
-	  const keptIds=new Set();
-	  const keptNames=new Set();
-	  S.ex.forEach((e,i)=>{
-		if(S.exd&&S.exd[i]){
-		  if(e.id)keptIds.add(e.id);
-		  if(e.n)keptNames.add(e.n.toLowerCase());
-		}
-	  });
-	  const fresh=buildWorkoutFromTemplate(WKT_TEMPLATES[S.wt])
-		.filter(e=>!keptIds.has(e.id)&&!keptNames.has((e.n||'').toLowerCase()))
-		.slice(0,swapCount);
-	  fillSlots(fresh);
-	  save();renderWorkout();
-	}catch(e){
-	  err('Generiranje ni uspelo.');
-	}
-	btn.disabled=false;btn.innerHTML='↺ Zamenjaj vaje';
-	return;
-  }
-
-  // FALLBACK: AI for workouts without a template
   const w=WKT[S.wt];
   const focus=S.wt==='glute'?'zadnjico (hip thrust, donkey kicks, cable pull-through, dumbbell sumo squat, glute bridge)':w.title.toLowerCase();
-  const keptNames=S.ex.filter((e,i)=>S.exd&&S.exd[i]).map(e=>e.n).filter(Boolean);
-  const avoidLine=keptNames.length?` Ne uporabljaj teh vaj (so že na seznamu): ${keptNames.join(', ')}.`:'';
   try{
-	const txt=await api(
-	  `Si fitnes trener za telovadnico. SAMO JSON array ${swapCount} vaj: [{"n":"ime v slovenščini","s":"3","r":"12"},...]`,
-	  `Svež trening za ${focus}. Drugačen od navadnega.${avoidLine}`
-	);
-	const p=JSON.parse(txt);
-	if(Array.isArray(p)){fillSlots(p.slice(0,swapCount));save();renderWorkout();}
+	const txt=await api('Si fitnes trener za telovadnico. SAMO JSON array 6 vaj: [{"n":"ime v slovenščini","s":"3","r":"12"},...]',
+	  `Svež trening za ${focus}. Drugačen od navadnega.`);
+	const p=JSON.parse(txt);if(Array.isArray(p)){S.ex=p.slice(0,6);S.exd=S.ex.map(()=>false);save();renderWorkout();}
   }catch(e){err('Generiranje ni uspelo.');}
   btn.disabled=false;btn.innerHTML='↺ Zamenjaj vaje';
 }
@@ -8510,7 +8490,7 @@ function saveGoals(){
   // If equipment/location changed, rebuild only the still-open plan slots.
   // initWorkout({preserveProgress:true}) keeps checked/logged/custom exercises
   // and swaps the rest through EX_DB location filters.
-  if(locChanged&&WKT_TEMPLATES&&WKT_TEMPLATES[S.wt]){
+  if(locChanged){
     initWorkout({preserveProgress:true});
   }
 
