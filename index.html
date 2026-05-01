@@ -8306,12 +8306,22 @@ function closeGoals(){
   document.getElementById('goals-overlay').classList.add('hide');
 }
 function saveGoals(){
-  G={...G,...readGoalsDraft()};
+  const draft=readGoalsDraft();
+  const oldLoc=(_goalsOriginal&&_goalsOriginal.loc)||G.loc||'gym_full';
+  const locChanged=oldLoc!==draft.loc;
+  G={...G,...draft};
   normalizeProfileMeta();
   _goalsSaved=true;
   _goalsPreviewMode=false;
   saveGoalsState();
   try{localStorage.setItem(lsKey('goals_seen'),'1');}catch(e){}
+
+  // If equipment/location changed, rebuild only the still-open plan slots.
+  // initWorkout({preserveProgress:true}) keeps checked/logged/custom exercises
+  // and swaps the rest through EX_DB location filters.
+  if(locChanged&&WKT_TEMPLATES&&WKT_TEMPLATES[S.wt]){
+    initWorkout({preserveProgress:true});
+  }
 
   // Commit preview: dashboard, macro targets and weekly tracker stay connected to the saved goal.
   closeGoals();
