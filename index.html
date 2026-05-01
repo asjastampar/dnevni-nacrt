@@ -1264,6 +1264,8 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 .kcal-summary.over .kcal-hero-icon{background:var(--orn-soft) !important;color:var(--orn) !important;}
 .kcal-summary.over .kcal-hero-icon::before{color:var(--orn) !important;}
 .kcal-summary.over .arc-fill{stroke:var(--orn) !important;}
+.kcal-summary.in-range .kcal-arc-remaining{font-size:42px !important;letter-spacing:0 !important;}
+.kcal-summary.in-range .kcal-hero-unit{display:none !important;}
 
 
 /* Compact user dropdown menu */
@@ -4149,7 +4151,8 @@ function applyDietToCurrentMeals(){
   const src=getMealSrc();
   const pinned=getPinned();
   S.meals=src.map((m,i)=>{
-	if(pinned[i])return {label:m.l,...pinned[i],pinned:true};
+	const pinnedMeal=getPinnedMealFor(m.l,i,pinned);
+	if(pinnedMeal)return {label:m.l,...pinnedMeal,pinned:true};
 	return mealVariant(m,i);
   });
   if(!Array.isArray(S.md)||!S.md.length)S.md=[false,false,false,false,false];
@@ -4196,6 +4199,31 @@ document.addEventListener('click',e=>{const p=document.getElementById('pantry-pa
 const PINNED_KEY='pinned_meals';
 function getPinned(){try{return JSON.parse(localStorage.getItem(lsKey(PINNED_KEY)))||{};}catch(e){return{};}}
 function savePinned(p){try{localStorage.setItem(lsKey(PINNED_KEY),JSON.stringify(p));}catch(e){}}
+function pinnedMealKey(label){
+  return baseMealLabel(label||'Obrok')||'Obrok';
+}
+function getPinnedMealFor(label,index,pinned=getPinned()){
+  const key=pinnedMealKey(label);
+  return pinned[key]||pinned[index]||null;
+}
+function hasPinnedMealFor(label,index,pinned=getPinned()){
+  return !!getPinnedMealFor(label,index,pinned);
+}
+function writePinnedMealFor(label,index,meal){
+  const pinned=getPinned();
+  const key=pinnedMealKey(label);
+  pinned[key]={f:meal.f||meal.food,k:meal.k||meal.kcal,i:meal.i||[]};
+  // Older versions stored pins by array index. Keep the new label-based key
+  // only, so deleting/reordering today's cards cannot accidentally move a pin.
+  if(index!==undefined&&index!==null)delete pinned[index];
+  savePinned(pinned);
+}
+function removePinnedMealFor(label,index){
+  const pinned=getPinned();
+  delete pinned[pinnedMealKey(label)];
+  if(index!==undefined&&index!==null)delete pinned[index];
+  savePinned(pinned);
+}
 function ensureMealStateArrays(){
   if(!Array.isArray(S.md))S.md=[];
   if(!Array.isArray(S.exp))S.exp=[];
@@ -4347,7 +4375,8 @@ function toggleEasy(){
 	const pinned=getPinned();
 	S.meals=S.meals.map((existing,i)=>{
 	  // Pinned slot: keep as pinned object
-	  if(pinned[i])return {label:existing.label,...pinned[i],pinned:true};
+	  const pinnedMeal=getPinnedMealFor(existing.label,i,pinned);
+	  if(pinnedMeal)return {label:existing.label,...pinnedMeal,pinned:true};
 	  // Already eaten today: keep current meal exactly as is
 	  if(S.md&&S.md[i])return existing;
 	  // Otherwise replace the content, but keep the original meal label/slot.
@@ -5580,7 +5609,7 @@ function renderMeals(){
 	const pantryState=S.mealPantry[i]||null;
 	const pantryBadge=pantryState&&Array.isArray(pantryState.items)&&pantryState.items.length?`<span class="meal-pantry-badge">imam doma</span>`:'';
 	const easyMark=S.easy&&!m.pinned?`<span class="easy-badge">hitro</span>`:'';
-	const isPinned=!!m.pinned||!!pinned[i];
+	const isPinned=!!m.pinned||hasPinnedMealFor(m.label,i,pinned);
 	const pinnedBadge=isPinned?`<span class="pinned-badge">📌 privzeto</span>`:'';
 	const compactDone=done&&!doneExpanded&&!manualOpen&&!editOpen&&!pantryOpen&&!ideasOpen&&!moreOpen;
 	const compactTitle=headline;
@@ -5827,7 +5856,7 @@ function calcKcal(){
       ? {kind:'under',amount:kcalRange.min-totalEaten,title:'Do razpona'}
       : (totalEaten>kcalRange.max
         ? {kind:'over',amount:totalEaten-kcalRange.max,title:'Preko razpona'}
-        : {kind:'in',amount:0,title:'V razponu si'}))
+        : {kind:'in',amount:totalEaten-goalKcal,title:'Znotraj cilja'}))
     : null;
 
   // Arc SVG display
@@ -5848,14 +5877,26 @@ function calcKcal(){
 
   if(remaining!==null&&arcRemEl){
     const isOver=rangeState?rangeState.kind==='over':remaining<0;
-    const displayKcal=rangeState?rangeState.amount:Math.abs(remaining);
+    const isInRange=rangeState?.kind==='in';
+    const displayKcal=rangeState?Math.abs(rangeState.amount):Math.abs(remaining);
     const heroTitle=document.querySelector('.kcal-hero-title');
     const kcalSummary=document.getElementById('kcal-summary');
 
-    if(heroTitle)heroTitle.textContent=rangeState?rangeState.title:(isOver?'Preko cilja':'Še lahko poješ');
-    if(kcalSummary)kcalSummary.classList.toggle('over',isOver);
+    if(heroTitle){
+      if(isInRange){
+        const delta=rangeState.amount;
+        const sign=delta>0?'+':(delta<0?'−':'±');
+        heroTitle.textContent=`Znotraj cilja (${sign}${Math.abs(delta)} kcal)`;
+      }else{
+        heroTitle.textContent=rangeState?rangeState.title:(isOver?'Preko cilja':'Še lahko poješ');
+      }
+    }
+    if(kcalSummary){
+      kcalSummary.classList.toggle('over',isOver);
+      kcalSummary.classList.toggle('in-range',isInRange);
+    }
 
-    arcRemEl.textContent=(isOver?'+':'')+displayKcal;
+    arcRemEl.textContent=isInRange?'✓':((isOver?'+':'')+displayKcal);
     arcRemEl.className='kcal-arc-remaining'+(isOver?' over':'');
     const pct=Math.min(1,totalEaten/(kcalRange?.max||goalKcal));
 	const dashLen=Math.round(pct*ARC_LEN);
@@ -5868,7 +5909,10 @@ function calcKcal(){
 	const kcalSummary=document.getElementById('kcal-summary');
 
 	if(heroTitle)heroTitle.textContent='Še lahko poješ';
-	if(kcalSummary)kcalSummary.classList.remove('over');
+	if(kcalSummary){
+	  kcalSummary.classList.remove('over');
+	  kcalSummary.classList.remove('in-range');
+	}
 
 	arcRemEl.textContent='—';
 	if(arcFill)arcFill.setAttribute('stroke-dasharray','0 '+ARC_LEN);
@@ -6035,9 +6079,8 @@ function toggleManualInput(i){
   if(S.manualOpen[i])setTimeout(()=>{
 	const inp=document.getElementById('mi'+i);
 	if(inp){
-	  inp.value=S.meals[i]?.f||S.meals[i]?.food||'';
+	  inp.value='';
 	  inp.focus();
-	  inp.select();
 	}
   },40);
 }
@@ -6074,9 +6117,6 @@ async function submitCustom(i){
 	const p=JSON.parse(txt);
 	const finalItems=(p.i&&p.i.length?p.i:directItems);
 	S.meals[i]={...S.meals[i],f:p.f||summarizeIngredientLines(finalItems,S.meals[i].f),k:parseInt(p.k)||S.meals[i].k,i:finalItems,custom:true};
-	// If meal was pinned, update the pin too
-	const pinned=getPinned();
-	if(pinned[i]){pinned[i]={f:p.f||summarizeIngredientLines(finalItems,S.meals[i].f),k:parseInt(p.k)||0,i:finalItems};savePinned(pinned);}
 	if(S.editOpen)S.editOpen[i]=false;
 	save();renderMeals();calcKcal();
   }catch(e){
@@ -6123,17 +6163,17 @@ function togIng(i){
   renderMeals();
 }
 function togPin(i){
-  const pinned=getPinned();
   const m=S.meals[i];
-  if(pinned[i]){
-	delete pinned[i];
+  if(hasPinnedMealFor(m.label,i)){
+	removePinnedMealFor(m.label,i);
 	S.meals[i]={...S.meals[i],pinned:false};
   }else{
-	// Save current meal (food + kcal + ingredients) as pinned for this slot
-	pinned[i]={f:m.f||m.food,k:m.k||m.kcal,i:m.i||[]};
+	// Pin the meal slot by label (e.g. "Zajtrk"), not by today's card index.
+	// Eating something else today should never erase the saved default meal.
+	writePinnedMealFor(m.label,i,m);
 	S.meals[i]={...S.meals[i],pinned:true};
   }
-  savePinned(pinned);save();renderMeals();
+  save();renderMeals();
 }
 function deleteMeal(i){
   S.meals.splice(i,1);
@@ -6147,9 +6187,6 @@ function deleteMeal(i){
   if(S.mealPantryOpen)S.mealPantryOpen.splice(i,1);
   if(S.mealIdeasOpen)S.mealIdeasOpen.splice(i,1);
   if(S.mealIdeasTab)S.mealIdeasTab.splice(i,1);
-  // Unpin if pinned
-  const pinned=getPinned();
-  if(pinned[i]){delete pinned[i];savePinned(pinned);}
   save();renderMeals();
 }
 
