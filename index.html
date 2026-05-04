@@ -7988,6 +7988,89 @@ function isProtectedWorkoutExercise(ex,i,elog){
   if(ex.custom||ex.recovered)return true;
   return hasUsefulExerciseLog(elog?.[ex.n]);
 }
+function findExerciseIdByName(name){
+  if(!name||typeof EX_DB==='undefined')return null;
+  const canonical=canonicalExerciseName(name)||name;
+  const key=normalizeExerciseNameKey(canonical);
+  for(const id in EX_DB){
+	if(normalizeExerciseNameKey(EX_DB[id].n)===key)return id;
+  }
+  return null;
+}
+function exerciseFromDbId(id,fallbackEx){
+  const ex=EX_DB?.[id];
+  if(!ex)return null;
+  const scheme=fallbackEx?.scheme||ex.scheme||`${fallbackEx?.s||3}×${fallbackEx?.r||10}`;
+  const sm=String(scheme).match(/^(\d+(?:–\d+)?)[×x](.+)$/);
+  return {
+	id,
+	n:ex.n,
+	s:sm?sm[1]:(fallbackEx?.s||'3'),
+	r:sm?sm[2]:(fallbackEx?.r||'10')
+  };
+}
+function applyWorkoutRefreshByIndex(nextByIndex){
+  if(!Array.isArray(nextByIndex)||!nextByIndex.length)return false;
+  const oldEx=Array.isArray(S.ex)?S.ex.map(e=>({...e})):[];
+  const oldDone=Array.isArray(S.exd)?S.exd.slice(0,oldEx.length):[];
+  const elog=loadElog();
+  let changed=false;
+  S.ex=oldEx.map((ex,i)=>{
+	if(isProtectedWorkoutExercise(ex,i,elog))return ex;
+	const next=nextByIndex[i];
+	if(next&&next.n&&exerciseKey(next.n)!==exerciseKey(ex.n)){
+	  changed=true;
+	  return {...next};
+	}
+	return ex;
+  });
+  S.exd=oldDone.slice(0,S.ex.length);
+  return changed;
+}
+function buildRefreshAlternativesForCurrentWorkout(){
+  const loc=getWorkoutLoc();
+  const elog=loadElog();
+  const usedIds=new Set((S.ex||[]).map(ex=>ex?.id).filter(Boolean));
+  const usedNames=new Set((S.ex||[]).map(ex=>exerciseKey(ex?.n)).filter(Boolean));
+  const out=[];
+  (S.ex||[]).forEach((cur,i)=>{
+	if(isProtectedWorkoutExercise(cur,i,elog)){
+	  out[i]=null;
+	  return;
+	}
+	const curId=cur.id||findExerciseIdByName(cur.n);
+	let alt=null;
+	if(curId&&EX_DB[curId]){
+	  const exclude=[...usedIds].filter(id=>id!==curId);
+	  const altId=findAltExercise(curId,{exclude});
+	  if(altId){
+		alt=exerciseFromDbId(altId,cur);
+		usedIds.add(altId);
+	  }
+	}
+	if(!alt){
+	  const movement=curId&&EX_DB[curId]?EX_DB[curId].movement:classifyMovement(cur.n);
+	  for(const id in EX_DB){
+		const ex=EX_DB[id];
+		if(id===curId)continue;
+		if(usedIds.has(id))continue;
+		if(usedNames.has(exerciseKey(ex.n)))continue;
+		if(ex.movement!==movement)continue;
+		if(!ex.locations.includes(loc))continue;
+		alt=exerciseFromDbId(id,cur);
+		usedIds.add(id);
+		break;
+	  }
+	}
+	if(!alt&&WKT_TEMPLATES&&WKT_TEMPLATES[S.wt]){
+	  const rebuilt=buildWorkoutFromTemplate(WKT_TEMPLATES[S.wt]);
+	  alt=rebuilt.find(e=>e&&exerciseKey(e.n)!==exerciseKey(cur.n)&&!usedNames.has(exerciseKey(e.n)))||null;
+	}
+	if(alt)usedNames.add(exerciseKey(alt.n));
+	out[i]=alt;
+  });
+  return out;
+}
 function applyWorkoutRefreshCandidates(candidates){
   if(!Array.isArray(candidates)||!candidates.length)return false;
   const oldEx=Array.isArray(S.ex)?S.ex.map(e=>({...e})):[];
@@ -8057,12 +8140,20 @@ async function refreshWorkout(){
   }
 
   try{
-	let candidates=[];
 	const loc=getWorkoutLoc();
-	if(loc==='outdoor'&&S.wt!=='rest'&&S.wt!=='crossfit')candidates=buildOutdoorActivityWorkout(S.wt);
-	else if(WKT_TEMPLATES&&WKT_TEMPLATES[S.wt])candidates=buildWorkoutFromTemplate(WKT_TEMPLATES[S.wt]);
-	else if(WKT[S.wt]?.ex)candidates=WKT[S.wt].ex.map(e=>({...e}));
-	if(applyWorkoutRefreshCandidates(candidates)){save();renderWorkout();}
+	let changed=false;
+	if(loc==='outdoor'&&S.wt!=='rest'&&S.wt!=='crossfit'){
+	  changed=applyWorkoutRefreshCandidates(buildOutdoorActivityWorkout(S.wt));
+	}else{
+	  const nextByIndex=buildRefreshAlternativesForCurrentWorkout();
+	  changed=applyWorkoutRefreshByIndex(nextByIndex);
+	}
+	if(changed){
+	  save();
+	  renderWorkout();
+	}else{
+	  err('Ni odprtih vaj za zamenjavo ali pa za ta trening trenutno ni drugih primernih alternativ.');
+	}
   }catch(e){err('Generiranje ni uspelo.');}
   btn.disabled=false;btn.innerHTML='↺ Zamenjaj vaje';
 }
