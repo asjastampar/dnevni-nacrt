@@ -1475,11 +1475,10 @@ body{background:radial-gradient(circle at 50% -10%, rgba(40,102,79,.045), transp
 			  <div class="goals-plan-label">Kje treniraš?</div>
 			  <div class="goals-plan-hint">Vaje prilagodimo opremi, ki jo imaš na voljo.</div>
 			  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:7px;">
-				<button class="goal-opt" id="gl-gym_full" onclick="selLoc('gym_full')">🏋️ Fitnes (vse)</button>
-				<button class="goal-opt" id="gl-gym_weights" onclick="selLoc('gym_weights')">💪 Fitnes (uteži)</button>
-				<button class="goal-opt" id="gl-home_eq" onclick="selLoc('home_eq')">🏠 Doma (oprema)</button>
-				<button class="goal-opt" id="gl-home_basic" onclick="selLoc('home_basic')">🤸 Doma (telo)</button>
-				<button class="goal-opt" id="gl-outdoor" onclick="selLoc('outdoor')" style="grid-column:span 2;">🌲 Zunaj / teren</button>
+				<button class="goal-opt" id="gl-gym_full" onclick="selLoc('gym_full')">🏋️ Fitnes</button>
+				<button class="goal-opt" id="gl-home_basic" onclick="selLoc('home_basic')">🤸 Doma lastna teža</button>
+				<button class="goal-opt" id="gl-home_eq" onclick="selLoc('home_eq')">🏠 Doma uteži</button>
+				<button class="goal-opt" id="gl-outdoor" onclick="selLoc('outdoor')">🌲 Zunaj</button>
 			  </div>
 			</div>
 			<div class="goals-plan-summary" id="train-days-summary">—</div>
@@ -7889,7 +7888,7 @@ async function swapEx(i){
 
   // Strength fallback: AI within same movement pattern
   const loc=getWorkoutLoc();
-  const locLabel={gym_full:'fitnes z napravami in kabli',gym_weights:'fitnes samo z utežmi',home_eq:'doma z opremo',home_basic:'doma brez opreme (telesna teža)',outdoor:'zunaj/teren'}[loc]||'fitnes';
+  const locLabel={gym_full:'fitnes',gym_weights:'fitnes',home_eq:'doma z utežmi ali opremo',home_basic:'doma z lastno težo',outdoor:'zunaj'}[loc]||'fitnes';
   const altList=candidates.length
 	?`OBVEZNO izberi eno od teh alternativ (vse so iz iste mišične skupine in vzorca giba — ${mv.label}): ${candidates.join(', ')}.`
 	:`Predlagaj alternativo za isti vzorec giba (${mv.label}) in isto mišično skupino.`;
@@ -8213,6 +8212,8 @@ let G={
 
 function normalizeProfileMeta(){
   if(!['female','male','other'].includes(G.bioSex))G.bioSex='female';
+  if(G.loc==='gym_weights')G.loc='gym_full';
+  if(!['gym_full','home_eq','home_basic','outdoor'].includes(G.loc))G.loc='gym_full';
   // Migration from the older separate-language setting. From now on one profile
   // choice controls both calculations and grammatical wording.
   delete G.pronoun;
@@ -8515,8 +8516,10 @@ function refreshCycleDetailUI(){
 // Location of training — narrows which exercises the planner can use.
 // Stored in G.loc and persisted via saveGoalsState. Defaults to 'gym_full'.
 function selLoc(l){
+  if(l==='gym_weights')l='gym_full';
+  if(!['gym_full','home_eq','home_basic','outdoor'].includes(l))l='gym_full';
   _selLoc=l;
-  ['gym_full','gym_weights','home_eq','home_basic','outdoor'].forEach(x=>{
+  ['gym_full','home_eq','home_basic','outdoor'].forEach(x=>{
 	const el=document.getElementById('gl-'+x);
 	if(el)el.classList.toggle('active',x===l);
   });
@@ -8597,7 +8600,7 @@ function openGoals(mode='profile'){
   if(cycleStartEl)cycleStartEl.value=G.cycleStart||'';
   if(cycleLengthEl)cycleLengthEl.value=G.cycleLength||28;
   normalizeProfileMeta();
-  _selGoal=G.goal||'recomp';_selDeficitMode=G.deficitMode||'standard';_selAct=G.act||'light';_selLoc=G.loc||'gym_full';
+  _selGoal=G.goal||'recomp';_selDeficitMode=G.deficitMode||'standard';_selAct=G.act||'light';_selLoc=(G.loc==='gym_weights'?'gym_full':(G.loc||'gym_full'));
   _selBioSex=G.bioSex||'female';_selCycleAware=!!G.cycleAware;_selCycleStart=G.cycleStart||null;_selCycleLength=G.cycleLength||28;
   selGoal(_selGoal);selDeficitMode(_selDeficitMode);selAct(_selAct);selBioSex(_selBioSex);selCycleAware(_selCycleAware);selLoc(_selLoc);
 
