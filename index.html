@@ -8009,6 +8009,28 @@ function exerciseFromDbId(id,fallbackEx){
 	r:sm?sm[2]:(fallbackEx?.r||'10')
   };
 }
+function exerciseFromAnyName(name,fallbackEx){
+  const id=findExerciseIdByName(name);
+  if(id)return exerciseFromDbId(id,fallbackEx);
+  return {
+	n:String(name||'Vaja').trim(),
+	s:fallbackEx?.s||'3',
+	r:fallbackEx?.r||'10'
+  };
+}
+function findCuratedAlternativeForExercise(cur,usedNames){
+  const mv=getMovementAlternatives(cur?.n||'');
+  return findCuratedAlternativeByPattern(mv.pattern,cur,usedNames);
+}
+function findCuratedAlternativeByPattern(pattern,cur,usedNames){
+  const alts=MOVEMENT_PATTERNS[pattern]?.alternatives||[];
+  for(const name of alts){
+	const key=exerciseKey(name);
+	if(!key||key===exerciseKey(cur?.n)||usedNames.has(key))continue;
+	return exerciseFromAnyName(name,cur);
+  }
+  return null;
+}
 function applyWorkoutRefreshByIndex(nextByIndex){
   if(!Array.isArray(nextByIndex)||!nextByIndex.length)return false;
   const oldEx=Array.isArray(S.ex)?S.ex.map(e=>({...e})):[];
@@ -8039,6 +8061,9 @@ function buildRefreshAlternativesForCurrentWorkout(){
 	  return;
 	}
 	const curId=cur.id||findExerciseIdByName(cur.n);
+	const templateMovement=WKT_TEMPLATES?.[S.wt]?.[i]?.movement;
+	const classifiedMovement=classifyMovement(cur.n);
+	const targetMovement=(curId&&EX_DB[curId]?.movement)||templateMovement||classifiedMovement;
 	let alt=null;
 	if(curId&&EX_DB[curId]){
 	  const exclude=[...usedIds].filter(id=>id!==curId);
@@ -8049,18 +8074,22 @@ function buildRefreshAlternativesForCurrentWorkout(){
 	  }
 	}
 	if(!alt){
-	  const movement=curId&&EX_DB[curId]?EX_DB[curId].movement:classifyMovement(cur.n);
 	  for(const id in EX_DB){
 		const ex=EX_DB[id];
 		if(id===curId)continue;
 		if(usedIds.has(id))continue;
 		if(usedNames.has(exerciseKey(ex.n)))continue;
-		if(ex.movement!==movement)continue;
+		if(ex.movement!==targetMovement)continue;
 		if(!ex.locations.includes(loc))continue;
 		alt=exerciseFromDbId(id,cur);
 		usedIds.add(id);
 		break;
 	  }
+	}
+	if(!alt){
+	  alt=targetMovement&&targetMovement!=='general'
+		?findCuratedAlternativeByPattern(targetMovement,cur,usedNames)
+		:findCuratedAlternativeForExercise(cur,usedNames);
 	}
 	if(!alt&&WKT_TEMPLATES&&WKT_TEMPLATES[S.wt]){
 	  const rebuilt=buildWorkoutFromTemplate(WKT_TEMPLATES[S.wt]);
@@ -8070,6 +8099,10 @@ function buildRefreshAlternativesForCurrentWorkout(){
 	out[i]=alt;
   });
   return out;
+}
+function hasRefreshableWorkoutExercise(){
+  const elog=loadElog();
+  return (S.ex||[]).some((ex,i)=>!isProtectedWorkoutExercise(ex,i,elog));
 }
 function applyWorkoutRefreshCandidates(candidates){
   if(!Array.isArray(candidates)||!candidates.length)return false;
@@ -8140,14 +8173,13 @@ async function refreshWorkout(){
   }
 
   try{
-	const loc=getWorkoutLoc();
-	let changed=false;
-	if(loc==='outdoor'&&S.wt!=='rest'&&S.wt!=='crossfit'){
-	  changed=applyWorkoutRefreshCandidates(buildOutdoorActivityWorkout(S.wt));
-	}else{
-	  const nextByIndex=buildRefreshAlternativesForCurrentWorkout();
-	  changed=applyWorkoutRefreshByIndex(nextByIndex);
+	if(!hasRefreshableWorkoutExercise()){
+	  err('Vse vaje so že obkljukane ali imajo shranjen vnos, zato jih ne zamenjam.');
+	  btn.disabled=false;btn.innerHTML='↺ Zamenjaj vaje';
+	  return;
 	}
+	const nextByIndex=buildRefreshAlternativesForCurrentWorkout();
+	const changed=applyWorkoutRefreshByIndex(nextByIndex);
 	if(changed){
 	  save();
 	  renderWorkout();
