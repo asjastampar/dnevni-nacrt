@@ -5292,6 +5292,7 @@ function parseSetLines(text){
 function getInputMode(ex){
   if(!ex)return 'weighted';
   const nLower=(ex.n||'').toLowerCase();
+  const loc=getWorkoutLoc();
   // Cardio workout type — by exercise name
   if(S.wt==='cardio'){
 	if(/tek|run|hoja|walk/.test(nLower))return 'run';
@@ -5309,6 +5310,10 @@ function getInputMode(ex){
 	const e=EX_DB[ex.id];
 	// Isometric holds → time
 	if(e.movement==='core_iso'&&/plank|hold/i.test(e.n))return 'time';
+	// If the user trains with bodyweight only, available bodyweight variants
+	// should not ask for kg by default. Progress is reps, tempo, pauses,
+	// harder variations and shorter rest — not external load.
+	if(loc==='home_basic'&&e.locations.includes('home_basic'))return 'bodyweight';
 	// Pure bodyweight exercises (no kg field needed) — when neither home_eq
 	// nor gym is in locations, OR when the name strongly implies BW
 	const bwOnly=e.locations.every(l=>l==='home_basic'||l==='outdoor');
@@ -5322,6 +5327,7 @@ function getInputMode(ex){
   // like "crunch", but if the name clearly points to equipment, we need kg.
   if(/technogym|machine|stroj|cable|kabel|pulldown|lat\s?pull|press|curl|extension|pushdown|fly|pec\s?deck/.test(nLower))return 'weighted';
   if(/plank|hold|\bsit[-\s]?up(s)?\b|dead\s?bug|bird dog|hollow/.test(nLower))return 'time';
+  if(loc==='home_basic')return 'bodyweight';
   if(/push.?up|pull.?up|squat$|izpad|bridge|crunch|dvig|burpee/.test(nLower))return 'bodyweight';
   return 'weighted';
 }
@@ -5528,6 +5534,7 @@ function renderSetRows(i,e,log){
 
   if(!expanded){
 	const loggedSetsCount=hasLog?sets.length:0;
+	const addSetLabel=showKg?'+ Drugačna teža po serijah':'+ Različne ponovitve po serijah';
 	return `<div class="set-compact ${showKg?'cols-3':'cols-2'}" id="srs${i}" data-mode="compact">
 	  ${showKg?`<div class="set-compact-field">
 		<label>Teža (kg)</label>
@@ -5542,7 +5549,7 @@ function renderSetRows(i,e,log){
 		<input class="set-compact-input" type="number" inputmode="numeric" placeholder="${recSets}" id="sc${i}-sets" value="${loggedSetsCount||''}">
 	  </div>
 	</div>
-	<button class="set-add-btn" onclick="expandToPerSet(${i})">+ Drugačna teža po serijah</button>`;
+	<button class="set-add-btn" onclick="expandToPerSet(${i})">${addSetLabel}</button>`;
   }
 
   // EXPANDED: per-set rows
@@ -5558,7 +5565,7 @@ function renderSetRows(i,e,log){
 	</div>
   `).join('');
   return `<div class="set-rows" id="srs${i}" data-mode="expanded">${rowsHtml}</div>
-	<button class="set-add-btn" onclick="addSetRow(${i})">+ Dodaj serijo z drugačno težo</button>`;
+	<button class="set-add-btn" onclick="addSetRow(${i})">${showKg?'+ Dodaj serijo z drugačno težo':'+ Dodaj serijo'}</button>`;
 }
 
 // User clicks "+ Drugačna teža po serijah" → swap from compact to expanded view.
@@ -5593,7 +5600,7 @@ function expandToPerSet(i){
   const nextBtn=compact.nextElementSibling;
   compact.outerHTML=`<div class="set-rows" id="srs${i}" data-mode="expanded">${rowsHtml}</div>`;
   if(nextBtn&&nextBtn.classList.contains('set-add-btn')){
-	nextBtn.outerHTML=`<button class="set-add-btn" onclick="addSetRow(${i})">+ Dodaj serijo z drugačno težo</button>`;
+	nextBtn.outerHTML=`<button class="set-add-btn" onclick="addSetRow(${i})">${showKg?'+ Dodaj serijo z drugačno težo':'+ Dodaj serijo'}</button>`;
   }
 }
 
